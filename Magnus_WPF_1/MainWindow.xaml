@@ -1,0 +1,359 @@
+﻿<Window x:Class="Magnus_WPF_1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:dragablz="clr-namespace:Dragablz;assembly=Dragablz"
+        xmlns:avalonDock="http://schemas.xceed.com/wpf/xaml/avalondock"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:Magnus_WPF_1"
+        xmlns:view="clr-namespace:Magnus_WPF_1.UI.UserControls.View"
+        mc:Ignorable="d"
+        d:DesignHeight="2000" d:DesignWidth="3333"
+        WindowState="Maximized" Closed="Window_Closed">
+
+
+    <Window.Resources>
+        
+        <Grid x:Key="runSequenceImage" Margin="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"></RowDefinition>
+                <RowDefinition Height="1*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Image Grid.Row="0"  Source="\Resources\start.png"></Image>
+            <TextBlock Grid.Row="1" Text="Run" Foreground="Yellow" TextAlignment="Center" FontSize="20"></TextBlock>
+        </Grid>
+        
+                <!--Background button-->
+        <LinearGradientBrush x:Key="BgButton" EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+            <GradientStop Color="#FFE47F27" Offset="0.439" />
+            <GradientStop Color="#FFD06F67" Offset="0.808"/>
+        </LinearGradientBrush>
+        <!--Open Dialog Settings-->
+        <Storyboard x:Key="sb_OpenDialogUC">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="grd_Dialog_Settings">
+                <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="{Binding Path=DialogUCHeight,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <!--Close Dialog Settings-->
+        <Storyboard x:Key="sb_CloseDialogUC">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="grd_Dialog_Settings">
+                <EasingDoubleKeyFrame KeyTime="0" Value="{Binding Path=DialogUCHeight,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0" />
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Style x:Key="FocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="2" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                   StrokeThickness="1" StrokeDashArray="1 2"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <LinearGradientBrush x:Key="MouseOverButtonStyle" EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+            <GradientStop Color="#FF03D4F2" Offset="0.439"/>
+            <GradientStop Color="#FF17717E" Offset="0.808"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="CheckedButtonStyle" EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+            <GradientStop Color="#FFFFBA40" Offset="0.439"/>
+            <GradientStop Color="#FFBFAD5E" Offset="0.808"/>
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FF282323"/>
+        <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FF0073B9"/>
+        <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF9F9F9F"/>
+        <!--<Style x:Key="ToggleButtonStyle1" TargetType="{x:Type ToggleButton}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Background" Value="{x:Null}"/>
+            <Setter Property="IsChecked" Value="False"></Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border x:Name="border"
+                                BorderBrush="AliceBlue" 
+                                CornerRadius="3"
+                                BorderThickness="1" 
+                                SnapsToDevicePixels="true">
+                            <ContentPresenter x:Name="contentPresenter" 
+                                              Focusable="False" 
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              Margin="{TemplateBinding Padding}" 
+                                              RecognizesAccessKey="True" 
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource MouseOverButtonStyle}"/>
+                                <Setter Property="BorderThickness" TargetName="border" Value="0"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource CheckedButtonStyle}"/>
+                                <Setter Property="BorderThickness" TargetName="border" Value="0"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="border" 
+                                        Value="{StaticResource Button.Disabled.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" 
+                                        Value="{StaticResource Button.Disabled.Border}"/>
+                                <Setter Property="TextElement.Foreground"
+                                        TargetName="contentPresenter"
+                                        Value="{StaticResource Button.Disabled.Foreground}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>-->
+    </Window.Resources>
+
+    <Grid Background="Gray">
+        <!--Title-->
+        <!--<Grid Height="30" VerticalAlignment="Top" Background="Black">
+        </Grid>-->
+            <!--Tool-->
+        <Grid x:Name="controllTabPanel" Height="130" VerticalAlignment="Top">
+            
+            <dragablz:TabablzControl x:Name="tab_controls" BorderBrush="#FF322F2E" ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionChanged="TabablzControl_SelectionChanged">
+                <dragablz:TabablzControl.Background>
+                    <LinearGradientBrush EndPoint="0.5,0.03" 
+                                                 MappingMode="RelativeToBoundingBox" 
+                                                 StartPoint="0.5,0">
+                        <GradientStop Color="#FF342F2E" Offset="0.997"/>
+                        <GradientStop Color="#FF2662B1" Offset="0.919"/>
+                    </LinearGradientBrush>
+                </dragablz:TabablzControl.Background>
+                <TabItem Name="tabRibbon" Header="Magnus" Background="Blue">
+                    <StackPanel Orientation="Horizontal" 
+                                        IsEnabled="True" 
+                                        Name="tabMasterView">
+                        <Border BorderBrush="GhostWhite" BorderThickness="0,0,1,0" Margin="0,3,0,0">
+                            <RibbonGroup Name="inspection_group">
+                                <RibbonGroup.Style>
+                                    <Style TargetType="RibbonGroup">
+                                        <Setter Property="FontSize" Value="12"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=IsUseSmallIcon, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Value="True">
+                                                <Setter Property="FontSize" Value="11"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </RibbonGroup.Style>
+                                <RibbonGroup.Header>
+                                    <TextBlock Text="Inspection" Name="groupInspection"
+                                                   FontFamily="Microsoft New Tai Lue"
+                                                   Foreground="#FFD6F9FF" FontSize="13"
+                                                   FontWeight="Bold">
+                                        <TextBlock.Effect>
+                                            <BlurEffect Radius="0.1"/>
+                                        </TextBlock.Effect>
+                                    </TextBlock>
+                                </RibbonGroup.Header>
+
+                                <RibbonButton Name="inspect_btn"
+                                                        Label="Inspect"
+                                                        LargeImageSource="\Resources\run-custom.png"
+                                                        MouseOverBackground="{StaticResource MouseOverButtonStyle}"
+                                                        Foreground="GhostWhite"
+                                                        PreviewMouseDown="PreviewMouseDownInspectionBtn"
+                                                        Width="auto" Click="inspect_btn_Click"/>
+
+                                <RibbonButton Name="inspect_offline_btn"
+                                                        Label="Offline Inspection"
+                                                        LargeImageSource="\Resources\run-custom.png"
+                                                        MouseOverBackground="{StaticResource MouseOverButtonStyle}"
+                                                        Foreground="GhostWhite"
+                                                        PreviewMouseDown="PreviewMouseDownInspectionBtn"
+                                                        Width="auto" Click="inspect_offline_btn_Click"/>
+
+
+                                <RibbonToggleButton Name="inspect_cycle_btn"
+                                                        Label="Inspect Cycle"
+                                                        LargeImageSource="\Resources\camera-custom.png" Foreground="GhostWhite"
+                                                        Checked="Inspect_Cycle_Checked"
+                                                        Unchecked="Inspect_Cycle_Unchecked"
+                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
+                                                        MouseOverBackground="{StaticResource MouseOverButtonStyle}"
+                                                        Width="auto"/>
+                                <RibbonButton Name="load_teach_image_btn"
+                                                        Label="Load Teach Image"
+                                                        LargeImageSource="\Resources\file-upload-custom.png" Foreground="GhostWhite"
+                                                        MouseOverBackground="{StaticResource MouseOverButtonStyle}"
+                                                        Width="auto" Click="load_teach_image_btn_Click"/>
+
+                                <RibbonButton Name="save_teach_image_btn"
+                                                        Label="Save Teach Image"
+                                                        LargeImageSource="\Resources\download-box-custom.png" Foreground="GhostWhite"
+                                                        MouseOverBackground="{StaticResource MouseOverButtonStyle}"
+                                                        Width="auto" Click="save_teach_image_btn_Click"/>
+
+                                <RibbonToggleButton Name="enable_saveimage_btn"
+                                                        Label="Enable Saving Image"
+                                                        LargeImageSource="\Resources\save-image.png"
+                                                        MouseOverBackground="{StaticResource MouseOverButtonStyle}"
+                                                        Foreground="GhostWhite"
+                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
+                                                        Width="auto" Unchecked="enable_saveimage_btn_Unchecked" 
+                                                        Checked="enable_saveimage_btn_Checked"
+                                                        IsChecked="True"/>
+
+
+                                <RibbonToggleButton Name="teach_parameters_btn"
+                                                        Label="Teach Parameter"
+                                                        LargeImageSource="\Resources\book-open-custom.png"
+                                                        MouseOverBackground="{StaticResource MouseOverButtonStyle}"
+                                                        Foreground="GhostWhite"
+                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
+                                                        Width="auto" 
+                                                        Checked="teach_parameters_btn_Checked"
+                                                        Unchecked="teach_parameters_btn_Unchecked" />
+
+                                <RibbonToggleButton Name="mapping_parameters_btn"
+                                                        Label="Mapping Setting"
+                                                        LargeImageSource="\Resources\book-open-custom.png"
+                                                        MouseOverBackground="{StaticResource MouseOverButtonStyle}"
+                                                        Foreground="GhostWhite"
+                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
+                                                        Width="auto" 
+                                                        Checked="mapping_parameters_btn_Checked"
+                                                        Unchecked="mapping_parameters_btn_Unchecked" />
+
+
+                                <RibbonButton x:Name="btn_teach"
+                                                  Label="Teach"
+                                                  LargeImageSource="\Resources\human-male-board-custom.png"
+                                                  Foreground="Wheat"
+                                                  Click="btn_teach_click"
+                                                  MouseOverBackground="{StaticResource BgButton}" 
+                                                  Width="68"/>
+
+                                <RibbonButton x:Name="btn_next_teach"
+                                                  Label="Next"
+                                                  LargeImageSource="\Resources/step-forward-custom.png"
+                                                  Foreground="Wheat"
+                                                  Click="btn_next_teach_click"
+                                                  IsEnabled="false"
+                                                  MouseOverBackground="{StaticResource BgButton}" 
+                                                  Width="68"/>
+
+                                <RibbonButton x:Name="btn_abort_teach"
+                                                  Label="Abort"
+                                                  LargeImageSource="\Resources/close-octagon-custom.png"
+                                                  Foreground="Wheat"
+                                                  IsEnabled="false"
+                                                  Click="btn_abort_teach_Click"
+                                                  MouseOverBackground="{StaticResource BgButton}" 
+                                                  Width="68"/>
+
+
+                            </RibbonGroup>
+                        </Border>
+                    </StackPanel>
+                </TabItem>
+            </dragablz:TabablzControl>
+            
+            <ToggleButton x:Name="btn_run_sequence" Content="{StaticResource runSequenceImage}"
+                Height="Auto" Width="100" Margin="0,30,10,5" HorizontalAlignment ="Right"
+                    Background="Transparent" BorderBrush="GreenYellow" BorderThickness="1"
+                          IsChecked="False" Checked="btn_run_sequence_Checked" Unchecked="btn_run_sequence_Unchecked">
+            </ToggleButton>
+
+            
+        </Grid>
+        
+            <Grid x:Name="grd_Dialog_Settings" 
+              Width="{Binding Path=DialogUCWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+              Panel.ZIndex="3"
+              HorizontalAlignment="Left"
+              VerticalAlignment="Top"            
+              MouseDown="grd_Dialog_Settings_MouseDown" 
+              MouseMove="grd_Dialog_Settings_MouseMove" 
+              MouseUp="grd_Dialog_Settings_MouseUp">
+            <Grid.RenderTransform>
+                <TranslateTransform x:Name="tt_DialogSettings"/>
+            </Grid.RenderTransform>
+            <Grid.Background>
+                <SolidColorBrush Color="Black" Opacity="0.6"/>
+            </Grid.Background>
+            <Grid.Effect>
+                <DropShadowEffect BlurRadius="2" ShadowDepth="1" Color="#FFAEAEAE"/>
+            </Grid.Effect>
+            <Grid x:Name="grd_PopupDialog" SizeChanged="GridSettingChangedSize"></Grid>
+        </Grid>
+
+            <Grid x:Name="Layout" Margin="0 130 0 0" 
+              
+            HorizontalAlignment="Stretch" Background="Black">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2.46*"></ColumnDefinition>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <!--image view-->
+                <Grid Grid.Column="0">
+                    <avalonDock:DockingManager x:Name="dockManager" 
+                                       ActiveContentChanged="dockManager_ActiveContentChanged"                                  
+                                       AllowMixedOrientation="True" 
+                                       GridSplitterWidth="1" 
+                                       GridSplitterHeight="1"
+                                       Layout="{Binding layoutHPSF, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}">
+                        <avalonDock:DockingManager.Theme>
+                            <avalonDock:Vs2013DarkTheme/>
+                        </avalonDock:DockingManager.Theme>
+                        <avalonDock:DockingManager.DocumentHeaderTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding ContentId}" Margin="0 0 0 0" FontSize="10" FontWeight="Bold"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </avalonDock:DockingManager.DocumentHeaderTemplate>
+                    </avalonDock:DockingManager>
+                </Grid>
+
+                <Grid Grid.Column="1" Margin="0 0 0 0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2.1*"></RowDefinition>
+                        <RowDefinition Height="1*"></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <GroupBox Margin="10" Header="Mapping Result" Foreground="WhiteSmoke" FontSize="20">
+
+                            <!--<Border  Height="auto"
+                            BorderBrush="WhiteSmoke"
+                            CornerRadius="3" BorderThickness="3" 
+                            Background="Transparent" Opacity="0.8" 
+                            Margin="9,20,9,1">-->
+                            <Canvas Margin="10" x:Name="canvas_Mapping" MouseMove="canvas_Mapping_MouseMove" HorizontalAlignment="Left" MouseLeftButtonDown="canvas_Mapping_MouseLeftButtonDown" MouseLeave="canvas_Mapping_MouseLeave">
+                            <Border x:Name="border_boundingbox_focus"></Border>
+                                <!--<Label x:Name="lb_canvas_MappingID"
+                                   Width="30" Height="30" Background="AliceBlue" Foreground="Black" FontSize="10" MouseLeave="Fl_MouseLeave" MouseEnter="Fl_MouseEnter"></Label>-->
+                            </Canvas>
+                            <!--</Border>-->
+                        </GroupBox>
+
+                    </Grid>
+                    <Grid Grid.Row="1">
+
+                        <Border Height="Auto"
+                        CornerRadius="8" BorderThickness="3" 
+                        Background="Transparent" Opacity="0.8" 
+                        Margin="0.2,0,0.4,0.2">
+                            <DockPanel  LastChildFill="True">
+                                <DockPanel LastChildFill="True" DockPanel.Dock="Top">
+                                    <view:StatisticView x:Name="statisticView"
+                                        DockPanel.Dock="Top"></view:StatisticView>
+                                </DockPanel>
+                            </DockPanel>
+                        </Border>
+                    </Grid>
+                </Grid>
+
+                <!--Mapping-->
+
+            </Grid>
+    </Grid>
+</Window>

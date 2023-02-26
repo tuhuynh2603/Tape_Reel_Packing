@@ -1,0 +1,61 @@
+﻿<UserControl x:Class="Magnus_WPF_1.UI.UserControls.View.StatisticView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Magnus_WPF_1.UI.UserControls.View"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="400">
+    <GroupBox Margin="5" Header="Statistics" Foreground="WhiteSmoke" FontSize="20" Style="{x:Null}">
+        <ListBox Margin="5" Background="Transparent" Name="lboxStatistic" BorderThickness="0">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <ContentPresenter></ContentPresenter>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border Name="HighlightBorder"
+                                Margin="0"
+                                Padding="5"
+                                BorderThickness="0"
+                                BorderBrush="#FF606060"
+                                Background="{Binding BrushRowList}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Name="nameStatistic"
+                                            Grid.Column="0"
+                                            FontSize="16"
+                                            FontFamily="Microsoft New Tai Lue"
+                                            HorizontalAlignment="Stretch"
+                                            Text="{Binding nameSummary,Mode=TwoWay}"
+                                            TextWrapping="Wrap"
+                                            Foreground="{Binding color}">
+                            </TextBlock>
+                            <TextBlock Name="valueStatistic"
+                                            Grid.Column="1"
+                                            FontSize="16"
+                                            FontFamily="Microsoft New Tai Lue"
+                                            HorizontalAlignment="Right"
+                                            TextAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding valueSummary,Mode=TwoWay}"
+                                            TextWrapping="Wrap"
+                                            Foreground="{Binding color}">
+                            </TextBlock>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </GroupBox>
+</UserControl>

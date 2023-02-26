@@ -1,0 +1,16 @@
+C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\bin\Debug\Magnus_WPF_1.exe.config
+C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\bin\Debug\Magnus_WPF_1.exe
+C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\bin\Debug\Magnus_WPF_1.pdb
+C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\obj\Debug\Magnus_WPF_1.csproj.AssemblyReference.cache
+C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\obj\Debug\Magnus_WPF_1.csproj.SuggestedBindingRedirects.cache
+C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\obj\Debug\MainWindow.g.cs
+C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\obj\Debug\App.g.cs
+C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\obj\Debug\Magnus_WPF_1_MarkupCompile.cache
+C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\obj\Debug\Magnus_WPF_1_MarkupCompile.lref
+C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\obj\Debug\MainWindow.baml
+C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\obj\Debug\Magnus_WPF_1.g.resources
+C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\obj\Debug\Magnus_WPF_1.Properties.Resources.resources
+C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\obj\Debug\Magnus_WPF_1.csproj.GenerateResource.cache
+C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\obj\Debug\Magnus_WPF_1.csproj.CoreCompileInputs.cache
+C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\obj\Debug\Magnus_WPF_1.exe
+C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\obj\Debug\Magnus_WPF_1.pdb

@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "dgSpecHash": "K2NoJ131xVFDbgTx39a8bxPJXHPn66L+2QooL5YPm5fxc3GcJo+KVrjgNzBlUThDmFuu93FVqC5big96YZAxRQ==",
+  "success": true,
+  "projectFilePath": "C:\\Wisely\\C#\\Tape_Reel_Packing\\Magnus_WPF_1\\Magnus_WPF_1.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\huynh\\.nuget\\packages\\bouncycastle\\1.8.9\\bouncycastle.1.8.9.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\dragablz\\0.0.3.234\\dragablz.0.0.3.234.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\emgu.cv\\4.1.0.3420\\emgu.cv.4.1.0.3420.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\extended.wpf.toolkit\\3.8.2\\extended.wpf.toolkit.3.8.2.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\itextsharp\\5.5.13.3\\itextsharp.5.5.13.3.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\materialdesigncolors\\2.1.0\\materialdesigncolors.2.1.0.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\materialdesignthemes\\4.7.0\\materialdesignthemes.4.7.0.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\microsoft.xaml.behaviors.wpf\\1.1.39\\microsoft.xaml.behaviors.wpf.1.1.39.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\xceed.wpf.avalondock.themes.vs2013\\2.9.0.1\\xceed.wpf.avalondock.themes.vs2013.2.9.0.1.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\zedgraph\\5.1.7\\zedgraph.5.1.7.nupkg.sha512"
+  ],
+  "logs": []
+}

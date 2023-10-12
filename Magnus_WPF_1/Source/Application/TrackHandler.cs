@@ -74,7 +74,7 @@ namespace Magnus_WPF_1.Source.Application
             InspectionCore.Initialize();
         }
 
-        private void Cap_ImageGrabbed(object sender, EventArgs e)
+        private void Video_ImageGrabbed(object sender, EventArgs e)
         {
             try
             {
@@ -93,7 +93,7 @@ namespace Magnus_WPF_1.Source.Application
             }
         }
 
-        private void Cap_ImageGrabbedSingle(object sender, EventArgs e)
+        private void SingleOffline_ImageGrabbed(object sender, EventArgs e)
         {
             try
             {
@@ -110,7 +110,6 @@ namespace Magnus_WPF_1.Source.Application
                 {
                     InspectionCore.LoadImage(m_imageViews[0].btmSource);
                 });
-
 
                 m_nResult[m_nCurrentClickMappingID] = Inspect();
 
@@ -132,6 +131,9 @@ namespace Magnus_WPF_1.Source.Application
             double nAngleOutput = 0;
             double dScoreOutput = 0;
             int nResult = InspectionCore.SimpleInspection(ref polygon, ref pCenter, ref mat_output, ref nAngleOutput, ref dScoreOutput);
+            
+
+            //Draw Result
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
                 m_imageViews[0].ClearOverlay();
@@ -140,28 +142,28 @@ namespace Magnus_WPF_1.Source.Application
                 m_imageViews[0].DrawPolygonOverlay(ref polygon,color, 1);
                 m_imageViews[0].DrawCrossPointOverlay(ref pCenter);
                 color = new SolidColorBrush(Colors.Yellow);
-                m_imageViews[0].DrawStringOverlay("(X,Y) = (" + pCenter.X.ToString() + "," + pCenter.Y.ToString() + ")", pCenter.X + 10, pCenter.Y, color, 10);
+                m_imageViews[0].DrawStringOverlay("(X, Y, Angle) = (" + pCenter.X.ToString() + ", " + pCenter.Y.ToString() +", " + ((int)nAngleOutput).ToString() + ")", pCenter.X + 10, pCenter.Y, color, 20);
 
-                m_imageViews[0].DrawRegionOverlay(ref mat_output);
+                //m_imageViews[0].DrawRegionOverlay(ref mat_output);
 
                 if (nResult == -99)
                 {
                     color = new SolidColorBrush(Colors.Red);
-                    m_imageViews[0].DrawString("Finding Device got error! " + nAngleOutput.ToString(), 10, 10, color, 31);
+                    m_imageViews[0].DrawString("Device not found! ", 10, 10, color, 31);
                 }
                 else
                 {
                     if (nResult == -1)
                     {
                         color = new SolidColorBrush(Colors.Red);
-                        m_imageViews[0].DrawString("Matching Score is too low! Angle: " + nAngleOutput.ToString(), 10, 10, color, 31);
+                        m_imageViews[0].DrawString("Not Good", 10, 10, color, 31);
                         m_imageViews[0].DrawString("Score: " + ((int)dScoreOutput).ToString(), 10, 35, color, 31);
 
                     }
                     else
                     {
                         color = new SolidColorBrush(Colors.Green);
-                        m_imageViews[0].DrawString(/*m_cap.GetCaptureProperty(CapProp.Focus).ToString() */ "Device founded. Angle: " + nAngleOutput.ToString(), 10, 10, color, 31);
+                        m_imageViews[0].DrawString(/*m_cap.GetCaptureProperty(CapProp.Focus).ToString() */ "Good", 10, 10, color, 31);
                         m_imageViews[0].DrawString("Score: " + ((int)dScoreOutput).ToString(), 10, 35, color, 31);
 
                     }
@@ -228,7 +230,7 @@ namespace Magnus_WPF_1.Source.Application
         }
 
 
-        private void SequenceCap_ImageGrabbedSingle(object sender, EventArgs e)
+        private void Online_ImageGrabbed(object sender, EventArgs e)
         {
             try
             {
@@ -300,7 +302,7 @@ namespace Magnus_WPF_1.Source.Application
 
         public int Snap()
         {
-            m_cap.ImageGrabbed += Cap_ImageGrabbed;
+            m_cap.ImageGrabbed += Video_ImageGrabbed;
 
             m_cap.Start();
             if (MainWindow.mainWindow == null)
@@ -312,7 +314,7 @@ namespace Magnus_WPF_1.Source.Application
                     return -1;
             }
             m_cap.Stop();
-            m_cap.ImageGrabbed -= Cap_ImageGrabbed;
+            m_cap.ImageGrabbed -= Video_ImageGrabbed;
 
             //m_cap.Dispose();
             return 0;
@@ -320,7 +322,7 @@ namespace Magnus_WPF_1.Source.Application
 
         public int SingleSnap()
         {
-            m_cap.ImageGrabbed += Cap_ImageGrabbedSingle;
+            m_cap.ImageGrabbed += SingleOffline_ImageGrabbed;
 
             m_cap.Start();
             if (MainWindow.mainWindow == null)
@@ -331,7 +333,7 @@ namespace Magnus_WPF_1.Source.Application
                     return -1;
             }
             m_cap.Stop();
-            m_cap.ImageGrabbed -= Cap_ImageGrabbedSingle;
+            m_cap.ImageGrabbed -= SingleOffline_ImageGrabbed;
 
             return 0;
         }
@@ -345,15 +347,15 @@ namespace Magnus_WPF_1.Source.Application
 
             m_strCurrentLot = string.Format("TrayID_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
 
-            m_cap.ImageGrabbed += SequenceCap_ImageGrabbedSingle;
+            m_cap.ImageGrabbed += Online_ImageGrabbed;
             m_cap.Start();
             while(MainWindow.mainWindow.bEnableRunSequence)
             {
 
-                if (MainWindow.mainWindow == null)
-                    return;
+                //if (MainWindow.mainWindow == null)
+                //    return;
 
-                while (!Master.m_hardwareTriggerSnapEvent[0].WaitOne(100))
+                while (!Master.m_hardwareTriggerSnapEvent[0].WaitOne(10))
                 {
                     if (MainWindow.mainWindow == null)
                         return;
@@ -361,25 +363,26 @@ namespace Magnus_WPF_1.Source.Application
                     if (!MainWindow.mainWindow.bEnableRunSequence)
                     {
                         m_cap.Stop();
-                        m_cap.ImageGrabbed -= SequenceCap_ImageGrabbedSingle;
+                        m_cap.ImageGrabbed -= Online_ImageGrabbed;
                         return;
                     }
 
                 }
 
+                // Update Current Device ID
                 m_CurrentSequenceDeviceID++;
                 if (m_CurrentSequenceDeviceID >= Source.Application.Application.categoriesMappingParam.M_NumberDeviceX * Source.Application.Application.categoriesMappingParam.M_NumberDeviceY)
                     m_CurrentSequenceDeviceID = 0;
-
-
                 if (m_CurrentSequenceDeviceID == 0)
                 {
                         m_strCurrentLot = string.Format("TrayID_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
                 }
 
+
+                // Do Inspection
                 Master.InspectEvent[0].Set();
                 bool b = false;
-                while(!Master.InspectDoneEvent[0].WaitOne(100))
+                while(!Master.InspectDoneEvent[0].WaitOne(10))
                 {
                     if (MainWindow.mainWindow == null)
                         return;
@@ -387,11 +390,12 @@ namespace Magnus_WPF_1.Source.Application
                     if (!MainWindow.mainWindow.bEnableRunSequence)
                     {
                         m_cap.Stop();
-                        m_cap.ImageGrabbed -= SequenceCap_ImageGrabbedSingle;
+                        m_cap.ImageGrabbed -= Online_ImageGrabbed;
                         return;
                     }
                 }
 
+                // Update Statistics
                 if (m_CurrentSequenceDeviceID == 0)
                 {
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
@@ -409,7 +413,7 @@ namespace Magnus_WPF_1.Source.Application
 
             }
             m_cap.Stop();
-            m_cap.ImageGrabbed -= SequenceCap_ImageGrabbedSingle;
+            m_cap.ImageGrabbed -= Online_ImageGrabbed;
 
         }
 

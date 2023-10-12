@@ -27,6 +27,7 @@ namespace Magnus_WPF_1.Source.Application
         public static AutoResetEvent[] m_hardwareTriggerSnapEvent;
         public Application applications = new Application();
         public TeachParametersUC teachParameter = new TeachParametersUC();
+        public static AutoResetEvent m_NextStepTeachEvent;
         public MappingSetingUC mappingParameter = new MappingSetingUC();
 
         // public AutoDeleteImagesDlg m_AutoDeleteImagesDlg = new AutoDeleteImagesDlg();
@@ -39,7 +40,8 @@ namespace Magnus_WPF_1.Source.Application
 
         public Thread threadGrabImageSimulateCycle;
         public Thread threadInspecOffline;
-
+        public Thread m_TeachThread;
+        public static bool m_bIsTeaching;
         public Thread m_SaveInspectImageThread;
         public static Queue<ImageSaveData> m_SaveInspectImageQueue = new Queue<ImageSaveData>(); // create a queue to hold messages
         public BitmapSource btmSource;
@@ -52,6 +54,8 @@ namespace Magnus_WPF_1.Source.Application
             InspectEvent = new AutoResetEvent[Application.m_nTrack];
             InspectDoneEvent = new AutoResetEvent[Application.m_nTrack];
             m_hardwareTriggerSnapEvent = new AutoResetEvent[Application.m_nTrack];
+            m_NextStepTeachEvent = new AutoResetEvent(false);
+            m_bIsTeaching = false;
             for (int n = 0; n < Application.m_nTrack; n++)
             {
                 InspectEvent[n] = new AutoResetEvent(false);
@@ -118,7 +122,7 @@ namespace Magnus_WPF_1.Source.Application
         }
         #endregion
 
-        public static BitmapImage LoadBitmap(string pathFile)
+        public BitmapImage LoadBitmap(string pathFile)
         {
             BitmapImage bitmap = new BitmapImage();
             try
@@ -140,7 +144,7 @@ namespace Magnus_WPF_1.Source.Application
             return bitmap;
         }
 
-        public void loadTeachImageToUI()
+        public void loadTeachImageToUI(int nTrack = 0)
         {
 
             string image_top_view = System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp");
@@ -151,12 +155,12 @@ namespace Magnus_WPF_1.Source.Application
                 string[] nameImageArray = image_top_view.Split('\\');
                 int leght = nameImageArray.Count();
                 string _nameImage = nameImageArray[leght - 1];
-                m_Tracks[0].m_imageViews[0].nameImage = _nameImage;
+                m_Tracks[nTrack].m_imageViews[0].nameImage = _nameImage;
                 BitmapImage bitmap = new BitmapImage();
                 bitmap = LoadBitmap(image_top_view);
-                m_Tracks[0].m_imageViews[0].UpdateNewImage(bitmap);
-                m_Tracks[0].m_imageViews[0].GridOverlay.Children.Clear();
-                m_Tracks[0].m_imageViews[0].UpdateTextOverlay("", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+                m_Tracks[nTrack].m_imageViews[0].UpdateNewImage(bitmap);
+                m_Tracks[nTrack].m_imageViews[0].GridOverlay.Children.Clear();
+                m_Tracks[nTrack].m_imageViews[0].UpdateTextOverlay("", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
                 mainWindow.UpdateTitleDoc(0, string.Format("Name Image: {0}", " teachImage.bmp"), true);
             }
         }
@@ -221,6 +225,24 @@ namespace Magnus_WPF_1.Source.Application
                 Thread.Sleep(10);
 
             }
+        }
+
+        public void TeachThread()
+        {
+            if (m_TeachThread == null)
+            {
+                m_TeachThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[0].m_imageViews[0].TeachSequence()));
+                m_TeachThread.SetApartmentState(ApartmentState.STA);
+            }
+            else
+            {
+                m_TeachThread = null;
+                m_TeachThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[0].m_imageViews[0].TeachSequence()));
+                m_TeachThread.SetApartmentState(ApartmentState.STA);
+            }
+            m_TeachThread.Start();
+
+
         }
 
         public void UpdateResult()

@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\obj\Debug\
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\Debug\
 Magnus_WPF_1
 none
 false
 DEBUG;TRACE
-C:\Wisely\C#\Magnus_WPF_1\Magnus_WPF_1\App.xaml
-1219584333
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\App.xaml
+61895890147
 
-51579654133
-13-1310406943
-MainWindow.xaml;
+231956567821
+33703833855
+MainWindow.xaml;MappingSetingUC.xaml;ResourceControl.xaml;TeachParametersUC.xaml;UI\UserControls\View\ImageView.xaml;UI\UserControls\View\StatisticView.xaml;
 
-False
+True
 

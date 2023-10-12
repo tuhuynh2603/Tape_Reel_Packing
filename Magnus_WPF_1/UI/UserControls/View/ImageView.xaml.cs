@@ -18,6 +18,7 @@ using System.Drawing;
 //using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -600,6 +601,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
         }
         public bool ClearOverlay()
         {
+            resultTeach.Children.Clear();
             image.Dispatcher.Invoke((Action)delegate
             {
                 GridOverlay.Children.Clear();
@@ -683,7 +685,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             _startPositionDlg = e.GetPosition(this);
             if (_startPositionDlg.X != 0 && _startPositionDlg.Y != 0)
             {
-                _startOffsetPositionDlg = new Vector(tt_DefectSettings.X, tt_DefectSettings.Y);
+                _startOffsetPositionDlg = new System.Windows.Vector(tt_DefectSettings.X, tt_DefectSettings.Y);
                 grd_Defect_Settings.CaptureMouse();
             }
 
@@ -694,7 +696,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
         {
             if (grd_Defect_Settings.IsMouseCaptured)
             {
-                Vector offset = System.Windows.Point.Subtract(e.GetPosition(this), _startPositionDlg);
+                System.Windows.Vector offset = System.Windows.Point.Subtract(e.GetPosition(this), _startPositionDlg);
                 tt_DefectSettings.X = _startOffsetPositionDlg.X + offset.X;
                 tt_DefectSettings.Y = _startOffsetPositionDlg.Y + offset.Y;
             }
@@ -889,89 +891,298 @@ namespace Magnus_WPF_1.UI.UserControls.View
             resultTeach.Children.Add(tbl_Status1);
         }
 
-        //List<Rectangles> TP_roiNo_Temp = new List<Rectangles>();
-        Rectangles L_DeviceLocationRoi_Temp = new Rectangles();
-        Rectangles L_TemplateRoi_Temp = new Rectangles();
-        int L_CornerIndex_Temp = 0;
-        public int Teach(int nCurrentTeachingStep)
+        public void loadTeachImageToUI(int nTrack = 0)
         {
-            System.Windows.Shapes.Rectangle rec = new System.Windows.Shapes.Rectangle();
-            double scaleX = image.ActualWidth / ((BitmapSource)image.Source).PixelWidth;
-            double scaleY = image.ActualHeight / ((BitmapSource)image.Source).PixelHeight;
-            // now only teach device location so only TP_roiNo
-            switch (nCurrentTeachingStep)
+
+            string image_top_view = System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp");
+            if (!File.Exists(image_top_view))
+                return;
+            else
             {
-                //case (int)TEACHSTEP.TEACH_LOADIMAGE:
-                //    GridOverlay.Children.Clear();
-                //    UpdateTextOverlay("[" + (nCurrentTeachingStep + 1).ToString() + "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString() + "] Teach Imaged Loaded, Press 'Next' to continue! ", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
-                //    break;
+                string[] nameImageArray = image_top_view.Split('\\');
+                int leght = nameImageArray.Count();
+                string _nameImage = nameImageArray[leght - 1];
+                nameImage = _nameImage;
+                BitmapImage bitmap = new BitmapImage();
+                bitmap = MainWindow.mainWindow.master.LoadBitmap(image_top_view);
+                UpdateNewImage(bitmap);
+                GridOverlay.Children.Clear();
+                UpdateTextOverlay("", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+                MainWindow.mainWindow.UpdateTitleDoc(0, string.Format("Name Image: {0}", " teachImage.bmp"), true);
+            }
+        }
 
-                case (int)TEACHSTEP.TEACH_DEVICELOCATION:
-                    GridOverlay.Children.Clear();
-                    controlWin.Visibility = Visibility.Visible;
-                    UpdateTextOverlay("[" + (nCurrentTeachingStep + 1).ToString() + "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString() + "] Please Locate Searching Area", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
-                    SetControlWin(Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi);
-                    break;
+
+        //List<Rectangles> TP_roiNo_Temp = new List<Rectangles>();
+        //Rectangles L_DeviceLocationRoi_Temp = new Rectangles();
+        //Rectangles L_TemplateRoi_Temp = new Rectangles();
+        //int L_CornerIndex_Temp = 0;
+        //public int Teach(int nCurrentTeachingStep = 0)
+        //{
+        //    System.Windows.Shapes.Rectangle rec = new System.Windows.Shapes.Rectangle();
+        //    double scaleX = image.ActualWidth / ((BitmapSource)image.Source).PixelWidth;
+        //    double scaleY = image.ActualHeight / ((BitmapSource)image.Source).PixelHeight;
+        //    // now only teach device location so only TP_roiNo
+        //    switch (nCurrentTeachingStep)
+        //    {
+        //        //case (int)TEACHSTEP.TEACH_LOADIMAGE:
+        //        //    GridOverlay.Children.Clear();
+        //        //    UpdateTextOverlay("[" + (nCurrentTeachingStep + 1).ToString() + "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString() + "] Teach Imaged Loaded, Press 'Next' to continue! ", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+        //        //    break;
+
+        //        case (int)TEACHSTEP.TEACH_DEVICELOCATION:
+        //            GridOverlay.Children.Clear();
+        //            UpdateTextOverlay("[" + (nCurrentTeachingStep + 1).ToString() + "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString() + "] Please Locate Searching Area", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+        //            controlWin.Visibility = Visibility.Visible;
+        //            SetControlWin(Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi);
+        //            break;
                     
-                case (int)TEACHSTEP.TEACH_DEVICELOCATION_TEACHED:
-                    L_DeviceLocationRoi_Temp = GetRectangle();
-                    controlWin.Visibility = Visibility.Collapsed;
-                    UpdateTextOverlay("[" + (nCurrentTeachingStep + 1).ToString() + "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString() + "] Searching Area Taught", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+        //        case (int)TEACHSTEP.TEACH_DEVICELOCATION_TEACHED:
+        //            L_DeviceLocationRoi_Temp = GetRectangle();
+        //            controlWin.Visibility = Visibility.Collapsed;
+        //            UpdateTextOverlay("[" + (nCurrentTeachingStep + 1).ToString() + "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString() + "] Searching Area Taught", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
 
-                    rec.Width = GetRectangle().Width * scaleX;
-                    rec.Height = GetRectangle().Height * scaleY;
-                    rec.Stroke = System.Windows.Media.Brushes.Green;
-                    rec.StrokeThickness = 3;
-                    //a.Fill = System.Windows.Media.Brushes.White;
-                    Canvas.SetTop(rec, GetRectangle().TopLeft.Y * scaleY);
-                    Canvas.SetLeft(rec, GetRectangle().TopLeft.X * scaleX);
-                    GridOverlay.Children.Add(rec);
-                    break;
+        //            rec.Width = GetRectangle().Width * scaleX;
+        //            rec.Height = GetRectangle().Height * scaleY;
+        //            rec.Stroke = System.Windows.Media.Brushes.Green;
+        //            rec.StrokeThickness = 3;
+        //            //a.Fill = System.Windows.Media.Brushes.White;
+        //            Canvas.SetTop(rec, GetRectangle().TopLeft.Y * scaleY);
+        //            Canvas.SetLeft(rec, GetRectangle().TopLeft.X * scaleX);
+        //            GridOverlay.Children.Add(rec);
+        //            break;
 
-                case (int)TEACHSTEP.TEACH_TEMPLATEROI:
+        //        case (int)TEACHSTEP.TEACH_TEMPLATEROI:
+        //            UpdateTextOverlay("[" + (nCurrentTeachingStep + 1).ToString() + "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString() + "] Please Locate Device BoundingBox", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+        //            controlWin.Visibility = Visibility.Visible;
+        //            SetControlWin(Source.Application.Application.categoriesTeachParam.L_TemplateRoi);
+        //            break;
+
+        //        case (int)TEACHSTEP.TEACH_TEMPLATEROI_TEACHED:
+        //            L_TemplateRoi_Temp = GetRectangle();
+        //            List<System.Drawing.Point> p_Regionpolygon = new List<System.Drawing.Point>();
+        //            Mat mat_DeviceLocationRegion = new Mat();
+        //            double nAngleOutput = 0.0;
+        //            double dScoreOutput = 0.0;
+        //            System.Drawing.Rectangle rectMatchingPosition = new System.Drawing.Rectangle();
+        //            InspectionCore.AutoTeachDatumLocation(ref p_Regionpolygon, L_DeviceLocationRoi_Temp, L_TemplateRoi_Temp, ref mat_DeviceLocationRegion, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput, ref L_CornerIndex_Temp);
+
+        //            controlWin.Visibility = Visibility.Collapsed;
+        //            //UpdateTextOverlay("[" + (nCurrentTeachingStep + 1).ToString() + "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString() + "Device Found, Corner = " + L_CornerIndex_Temp.ToString() + "]", "" , DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+        //            UpdateTextOverlay( (nCurrentTeachingStep + 1).ToString() + "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString() + "  Device Found", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+
+        //            rec.Width = GetRectangle().Width * scaleX;
+        //            rec.Height = GetRectangle().Height * scaleY;
+        //            rec.Stroke = System.Windows.Media.Brushes.Green;
+        //            rec.StrokeThickness = 3;
+        //            //a.Fill = System.Windows.Media.Brushes.White;
+        //            Canvas.SetTop(rec, GetRectangle().TopLeft.Y * scaleY);
+        //            Canvas.SetLeft(rec, GetRectangle().TopLeft.X * scaleX);
+        //            GridOverlay.Children.Add(rec);
+        //            SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
+
+        //            DrawPolygonOverlay(ref p_Regionpolygon, color, 1);
+        //            DrawRegionOverlay(ref mat_DeviceLocationRegion);
+        //            break;
+        //    }           
+        //    return 0;
+        //}
+        private int waitNextTeachStep()
+        {
+            while (!Master.m_NextStepTeachEvent.WaitOne(100))
+            {
+                if (MainWindow.mainWindow == null || !Master.m_bIsTeaching)
+                {
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        controlWin.Visibility = Visibility.Collapsed;
+                        MainWindow.mainWindow.SetDisableTeachButton();
+                        MainWindow.mainWindow.master.loadTeachImageToUI();
+                        Master.m_bIsTeaching = false;
+
+                    });
+                    return -1;
+                }
+            }
+            return 0;
+        }
+
+        List<Rectangles> L_PVIArea = new List<Rectangles>();
+        public void TeachSequence()
+        {
+            Master.m_bIsTeaching = true;
+            Master.m_NextStepTeachEvent.Reset();
+            Source.Application.Application.LoadTeachParam();
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                resultTeach.Children.Clear();
+                ClearOverlay();
+                loadTeachImageToUI();
+            });
+
+            // now only teach device location so only TP_roiNo
+            int nCurrentStep = 0;
+            Rectangles L_DeviceLocationRoi_Temp = Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi;
+
+            if (true)
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Please Locate Searching Area", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
                     controlWin.Visibility = Visibility.Visible;
-                    UpdateTextOverlay("[" + (nCurrentTeachingStep + 1).ToString() + "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString() + "] Please Locate Device BoundingBox", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
-                    SetControlWin(Source.Application.Application.categoriesTeachParam.L_TemplateRoi);
-                    break;
+                    SetControlWin(Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi);
+                });
 
-                case (int)TEACHSTEP.TEACH_TEMPLATEROI_TEACHED:
-                    L_TemplateRoi_Temp = GetRectangle();
+                if (waitNextTeachStep() < 0)
+                    return;
+
+                nCurrentStep++;
+
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    L_DeviceLocationRoi_Temp = GetRectangle();
+                    Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi = L_DeviceLocationRoi_Temp;
+                    controlWin.Visibility = Visibility.Collapsed;
+                    UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Searching Area Taught", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+                    UpdateRegionOverlay();
+
+                });
+
+                if (waitNextTeachStep() < 0)
+                    return;
+
+                nCurrentStep++;
+            }
+            if (true)
+            {
+                if (L_PVIArea.Count() < 5)
+                {
+                    L_PVIArea.Clear();
+
+                    for (int nPVIArea = 0; nPVIArea < 5; nPVIArea++)
+                    {
+                        L_PVIArea.Add(Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi);
+                    }
+                }
+                for (int nPVIArea = 0; nPVIArea < 5; nPVIArea++)
+                {
+                    Rectangles lPVIAreaTemp = L_PVIArea[nPVIArea];
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Please Locate Pvi Area " + nPVIArea.ToString(), "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+                        controlWin.Visibility = Visibility.Visible;
+                        SetControlWin(lPVIAreaTemp);
+                    });
+
+                    if (waitNextTeachStep() < 0)
+                        return;
+
+                    nCurrentStep++;
+
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        L_PVIArea[nPVIArea] = (GetRectangle());
+                        //Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi = L_DeviceLocationRoi_Temp;
+                        controlWin.Visibility = Visibility.Collapsed;
+                        UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Pvi Area " + nPVIArea.ToString() + " is Taught", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+                        UpdateRegionOverlay();
+
+                    });
+
+                    if (waitNextTeachStep() < 0)
+                        return;
+
+                    nCurrentStep++;
+                }
+            }
+
+            if (true)
+            {
+                // Teach Region 2
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Please Locate Device BoundingBox", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+                    controlWin.Visibility = Visibility.Visible;
+                    SetControlWin(Source.Application.Application.categoriesTeachParam.L_TemplateRoi);
+                });
+
+                if (waitNextTeachStep() < 0)
+                    return;
+
+                nCurrentStep++;
+
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    Rectangles L_TemplateRoi_Temp = GetRectangle();
+                    controlWin.Visibility = Visibility.Collapsed;
+
                     List<System.Drawing.Point> p_Regionpolygon = new List<System.Drawing.Point>();
                     Mat mat_DeviceLocationRegion = new Mat();
                     double nAngleOutput = 0.0;
                     double dScoreOutput = 0.0;
+                    int L_CornerIndex_Temp = 0;
                     System.Drawing.Rectangle rectMatchingPosition = new System.Drawing.Rectangle();
                     InspectionCore.AutoTeachDatumLocation(ref p_Regionpolygon, L_DeviceLocationRoi_Temp, L_TemplateRoi_Temp, ref mat_DeviceLocationRegion, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput, ref L_CornerIndex_Temp);
+                    Source.Application.Application.categoriesTeachParam.L_TemplateRoi = L_TemplateRoi_Temp;
+                    Source.Application.Application.categoriesTeachParam.L_CornerIndex = L_CornerIndex_Temp;
 
-                    controlWin.Visibility = Visibility.Collapsed;
-                    UpdateTextOverlay("[" + (nCurrentTeachingStep + 1).ToString() + "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString() + "Device Found, Corner = " + L_CornerIndex_Temp.ToString() + "]", "" , DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
-                    rec.Width = GetRectangle().Width * scaleX;
-                    rec.Height = GetRectangle().Height * scaleY;
-                    rec.Stroke = System.Windows.Media.Brushes.Green;
-                    rec.StrokeThickness = 3;
-                    //a.Fill = System.Windows.Media.Brushes.White;
-                    Canvas.SetTop(rec, GetRectangle().TopLeft.Y * scaleY);
-                    Canvas.SetLeft(rec, GetRectangle().TopLeft.X * scaleX);
-                    GridOverlay.Children.Add(rec);
                     SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
-
                     DrawPolygonOverlay(ref p_Regionpolygon, color, 1);
                     DrawRegionOverlay(ref mat_DeviceLocationRegion);
-                    break;
-            }           
-            return 0;
+
+                    UpdateTextOverlay((nCurrentStep + 1).ToString()/* + "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "  Device Found", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+                    UpdateRegionOverlay();
+                });
+
+                if (waitNextTeachStep() < 0)
+                    return;
+
+                nCurrentStep++;
+            }
+            // Save Parameter
+            var result = MessageBox.Show("Do you want to save teach parameter ?", "Save Teach Parameter", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                //SetTeachParameterToCategories();
+                InspectionCore.SetTeachParameterToInspectionCore();
+                InspectionCore.SetTemplateImage();
+                saveTemplateImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "templateImage_1.bmp"));
+                MainWindow.mainWindow.master.WriteTeachParam();
+                //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                //{
+                //    //resultTeach.Children.Clear();
+                //    ClearOverlay();
+                //});
+            }
+            else
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    MainWindow.mainWindow.master.teachParameter.UpdateTeachParameter(Source.Application.Application.dictTeachParam);
+                });
+
+                InspectionCore.SetTeachParameterToInspectionCore();
+                InspectionCore.LoadTeachImageToInspectionCore();
+                //MainWindow.mainWindow.master.LoadRecipe();
+            }
+
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                ClearOverlay();
+                MainWindow.mainWindow.SetDisableTeachButton();
+                MainWindow.mainWindow.master.loadTeachImageToUI();
+                Master.m_bIsTeaching = false;
+
+            });
         }
 
-        public void SetTeachParameterToCategories()
-        {
-            Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi = L_DeviceLocationRoi_Temp;
-            Source.Application.Application.categoriesTeachParam.L_TemplateRoi = L_TemplateRoi_Temp;
-            Source.Application.Application.categoriesTeachParam.L_CornerIndex = L_CornerIndex_Temp;
-        }
-        public void SaveTeachParameter()
-        {
 
-        }
+        //public void SetTeachParameterToCategories()
+        //{
+        //    Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi = L_DeviceLocationRoi_Temp;
+        //    Source.Application.Application.categoriesTeachParam.L_TemplateRoi = L_TemplateRoi_Temp;
+        //    Source.Application.Application.categoriesTeachParam.L_CornerIndex = L_CornerIndex_Temp;
+        //}
 
         Rectangles GetRectangle()
         {
@@ -1001,6 +1212,20 @@ namespace Magnus_WPF_1.UI.UserControls.View
             Canvas.SetTop(controlWin, rectangles.TopLeft.Y * scaleY);
             controlWin.Height = rectangles.Height * scaleX;
             controlWin.Width = rectangles.Width * scaleY;
+        }
+
+        private void UpdateRegionOverlay()
+        {
+            Rectangle rec = new Rectangle();
+            double scaleX = image.ActualWidth / ((BitmapSource)image.Source).PixelWidth;
+            double scaleY = image.ActualHeight / ((BitmapSource)image.Source).PixelHeight;
+            rec.Width = GetRectangle().Width * scaleX;
+            rec.Height = GetRectangle().Height * scaleY;
+            rec.Stroke = System.Windows.Media.Brushes.Green;
+            rec.StrokeThickness = 3;
+            Canvas.SetTop(rec, GetRectangle().TopLeft.Y * scaleY);
+            Canvas.SetLeft(rec, GetRectangle().TopLeft.X * scaleX);
+            GridOverlay.Children.Add(rec);
         }
         public void SaveTeachImage(string pathFileImage)
         {

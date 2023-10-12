@@ -170,7 +170,7 @@
 
 
                                 <RibbonToggleButton Name="inspect_cycle_btn"
-                                                        Label="Inspect Cycle"
+                                                        Label="Camera"
                                                         LargeImageSource="\Resources\camera-custom.png" Foreground="GhostWhite"
                                                         Checked="Inspect_Cycle_Checked"
                                                         Unchecked="Inspect_Cycle_Unchecked"
@@ -246,8 +246,41 @@
                                                   Click="btn_abort_teach_Click"
                                                   MouseOverBackground="{StaticResource BgButton}" 
                                                   Width="68"/>
+                            </RibbonGroup>
+                        </Border>
 
+                        <Border BorderBrush="GhostWhite" BorderThickness="0,0,1,0" Margin="0,3,0,0">
 
+                            <RibbonGroup Name="hardware_group">
+                            <RibbonGroup.Style>
+                                <Style TargetType="RibbonGroup">
+                                    <Setter Property="FontSize" Value="12"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=IsUseSmallIcon, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Value="True">
+                                            <Setter Property="FontSize" Value="11"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </RibbonGroup.Style>
+                            <RibbonGroup.Header>
+                                <TextBlock Text="Hardware" Name="groupHardware"
+                                                    FontFamily="Microsoft New Tai Lue"
+                                                    Foreground="#FFD6F9FF" FontSize="13"
+                                                    FontWeight="Bold">
+                                    <TextBlock.Effect>
+                                        <BlurEffect Radius="0.1"/>
+                                    </TextBlock.Effect>
+                                </TextBlock>
+                            </RibbonGroup.Header>
+
+                            <RibbonButton x:Name="btn_COM_Connection"
+                                                    Label="COM Communication"
+                                                    LargeImageSource="\Resources/network.png"
+                                                    Foreground="White"
+                                                    IsEnabled="true"
+                                                    Click="btn_abort_teach_Click"
+                                                    MouseOverBackground="{StaticResource BgButton}" 
+                                                    Width="100"/>
                             </RibbonGroup>
                         </Border>
                     </StackPanel>

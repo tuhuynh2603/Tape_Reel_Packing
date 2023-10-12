@@ -13,7 +13,7 @@ namespace Magnus_WPF_1.Source.Application
 {
     public class Application
     {
-        public static int m_nTrack = 1;
+        public static int m_nTrack = 2;
         public static int m_nDoc = 1;
         public static bool m_bEnableSavingOnlineImage = true;
 
@@ -30,7 +30,7 @@ namespace Magnus_WPF_1.Source.Application
 
         public static void CheckRegistry()
         {
-            pathRegistry = "Software\\MagnusVision\\SemiConductor_1";
+            pathRegistry = "Software\\HD Vision\\SemiConductor_1";
             RegistryKey register = Registry.CurrentUser.CreateSubKey(pathRegistry, true);
         }
         public void SetRegistry()
@@ -124,15 +124,15 @@ namespace Magnus_WPF_1.Source.Application
 
             ReadLine("LOCATION", "Device Location Roi", ini, ref dictTeachParam);
             ReadLine("LOCATION", "lower threshold", ini, ref dictTeachParam);
-           ReadLine("LOCATION", "upper threshold", ini, ref dictTeachParam);
-           ReadLine("LOCATION", "Opening Mask", ini, ref dictTeachParam);
-           ReadLine("LOCATION", "Dilation Mask", ini, ref dictTeachParam);
-           ReadLine("LOCATION", "Min Width Device", ini, ref dictTeachParam);
-           ReadLine("LOCATION", "Min Height Device", ini, ref dictTeachParam);
-           ReadLine("LOCATION", "Template Roi", ini, ref dictTeachParam);
-           ReadLine("LOCATION", "Number Side", ini, ref dictTeachParam);
-           ReadLine("LOCATION", "Angle Resolution", ini, ref dictTeachParam);
-           ReadLine("LOCATION", "Min Score", ini, ref dictTeachParam);
+            ReadLine("LOCATION", "upper threshold", ini, ref dictTeachParam);
+            ReadLine("LOCATION", "Opening Mask", ini, ref dictTeachParam);
+            ReadLine("LOCATION", "Dilation Mask", ini, ref dictTeachParam);
+            ReadLine("LOCATION", "Min Width Device", ini, ref dictTeachParam);
+            ReadLine("LOCATION", "Min Height Device", ini, ref dictTeachParam);
+            ReadLine("LOCATION", "Template Roi", ini, ref dictTeachParam);
+            ReadLine("LOCATION", "Number Side", ini, ref dictTeachParam);
+            ReadLine("LOCATION", "Angle Resolution", ini, ref dictTeachParam);
+            ReadLine("LOCATION", "Min Score", ini, ref dictTeachParam);
             ReadLine("LOCATION", "Corner Index", ini, ref dictTeachParam);
 
             InspectionCore.LoadTeachImageToInspectionCore();

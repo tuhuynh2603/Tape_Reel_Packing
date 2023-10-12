@@ -114,6 +114,14 @@ namespace Magnus_WPF_1
             {
 
             };
+
+            //master.m_Tracks[0].m_imageViews[0].resultTeach.Children.Clear();
+            //master.m_Tracks[0].m_imageViews[0].ClearOverlay();
+            for (int nTrack = 0; nTrack < Source.Application.Application.m_nTrack; nTrack++)
+                master.loadTeachImageToUI(nTrack);
+            //Source.Application.Application.LoadTeachParam();
+
+
         }
 
 
@@ -286,11 +294,11 @@ namespace Magnus_WPF_1
                 {
                     imagesViewPane[track_index * num_Doc + doc_index] = new LayoutDocumentPane();
                     imagesViewPane[track_index * num_Doc + doc_index].CanRepositionItems = false;
-                    if (track_index == 0)
-                        imagesViewPaneGroup[0].Children.Add(imagesViewPane[track_index * num_Doc + doc_index]);
+                    //if (track_index == 0)
+                    //    imagesViewPaneGroup[0].Children.Add(imagesViewPane[track_index * num_Doc + doc_index]);
 
-                    else
-                        imagesViewPaneGroup[track_index].Children.Add(imagesViewPane[track_index * num_Doc + doc_index]);
+                    //else
+                    imagesViewPaneGroup[track_index].Children.Add(imagesViewPane[track_index * num_Doc + doc_index]);
 
                     imagesViewDoc[track_index * num_Doc + doc_index] = new LayoutDocument
                     {
@@ -505,7 +513,7 @@ namespace Magnus_WPF_1
                 master.threadGrabImageSimulateCycle = new System.Threading.Thread(new System.Threading.ThreadStart(() =>master.Grab_Image_Testing_Thread(true)));
                 master.threadGrabImageSimulateCycle.Start();
             }
-            Master.InspectEvent[0].WaitOne();
+
             //mainWindow.statisticView.UpdateValueStatistic(master.m_Tracks[0].m_nResult);
             //inspect_btn.IsEnabled = bEnableGrabImages;
         }
@@ -624,57 +632,58 @@ namespace Magnus_WPF_1
         int nCurrentTeachingStep = -1;
         private void btn_abort_teach_Click(object sender, RoutedEventArgs e)
         {
-            nCurrentTeachingStep = -1;
+            //if (Master.m_bIsTeaching)
+            //    Master.m_NextStepTeachEvent.Set();
+            //nCurrentTeachingStep = -1;
+            Master.m_bIsTeaching = false;
             SetDisableTeachButton();
             master.loadTeachImageToUI();
             master.m_Tracks[0].m_imageViews[0].resultTeach.Children.Clear();
             master.m_Tracks[0].m_imageViews[0].ClearOverlay();
+            master.m_Tracks[0].m_imageViews[0].controlWin.Visibility = Visibility.Collapsed;
 
         }
 
         private void btn_next_teach_click(object sender, RoutedEventArgs e)
         {
-            nCurrentTeachingStep++;
-            if(nCurrentTeachingStep < (int)TEACHSTEP.TEACH_TOTALSTEP)
-                master.m_Tracks[0].m_imageViews[0].Teach(nCurrentTeachingStep);
-            else
-            {
-                var result = MessageBox.Show("Do you want to save teach parameter ?", "Save Teach Parameter", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                if (result == MessageBoxResult.Yes)
-                {
-                    master.m_Tracks[0].m_imageViews[0].SetTeachParameterToCategories();
-                    InspectionCore.SetTeachParameterToInspectionCore();
-                    InspectionCore.SetTemplateImage();
-                    //master.m_Tracks[0].m_imageViews[0].SaveTeachImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp"));
-                    master.m_Tracks[0].m_imageViews[0].saveTemplateImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "templateImage_1.bmp"));
-                    mainWindow.master.WriteTeachParam();
-                    master.m_Tracks[0].m_imageViews[0].resultTeach.Children.Clear();
-                    master.m_Tracks[0].m_imageViews[0].ClearOverlay();
+            if(Master.m_bIsTeaching)
+                Master.m_NextStepTeachEvent.Set();
+        //    nCurrentTeachingStep++;
+        //    if(nCurrentTeachingStep < (int)TEACHSTEP.TEACH_TOTALSTEP)
+        //        master.m_Tracks[0].m_imageViews[0].Teach(nCurrentTeachingStep);
+        //    else
+        //    {
+        //        var result = MessageBox.Show("Do you want to save teach parameter ?", "Save Teach Parameter", MessageBoxButton.YesNo, MessageBoxImage.Question);
+        //        if (result == MessageBoxResult.Yes)
+        //        {
+        //            master.m_Tracks[0].m_imageViews[0].SetTeachParameterToCategories();
+        //            InspectionCore.SetTeachParameterToInspectionCore();
+        //            InspectionCore.SetTemplateImage();
+        //            //master.m_Tracks[0].m_imageViews[0].SaveTeachImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp"));
+        //            master.m_Tracks[0].m_imageViews[0].saveTemplateImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "templateImage_1.bmp"));
+        //            mainWindow.master.WriteTeachParam();
+        //            master.m_Tracks[0].m_imageViews[0].resultTeach.Children.Clear();
+        //            master.m_Tracks[0].m_imageViews[0].ClearOverlay();
 
-                }
-                nCurrentTeachingStep = -1;
-                SetDisableTeachButton();
-                master.loadTeachImageToUI();
+        //        }
+        //        nCurrentTeachingStep = -1;
+        //        SetDisableTeachButton();
+        //        master.loadTeachImageToUI();
 
-            }
+        //    }
 
         }
 
+        
         private void btn_teach_click(object sender, RoutedEventArgs e)
         {
-            master.m_Tracks[0].m_imageViews[0].resultTeach.Children.Clear();
-            master.m_Tracks[0].m_imageViews[0].ClearOverlay();
-
-            master.loadTeachImageToUI();
-            Source.Application.Application.LoadTeachParam();
+            if (Master.m_bIsTeaching)
+                return;
 
             SetEnableTeachButton();
             nCurrentTeachingStep = 0;
-            master.m_Tracks[0].m_imageViews[0].Teach(nCurrentTeachingStep);
-
-            //nCurrentTeachingStep = 0;
-            // Load teach image
-            // Load UI
+            //master.m_Tracks[0].m_imageViews[0].Teach(nCurrentTeachingStep);
+            master.TeachThread();
 
         }
 

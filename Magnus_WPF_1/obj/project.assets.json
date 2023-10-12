@@ -14,14 +14,10 @@
       "Dragablz/0.0.3.234": {
         "type": "package",
         "compile": {
-          "lib/net45/Dragablz.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Dragablz.dll": {}
         },
         "runtime": {
-          "lib/net45/Dragablz.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Dragablz.dll": {}
         }
       },
       "EMGU.CV/4.1.0.3420": {
@@ -30,20 +26,12 @@
           "ZedGraph": "[5.1.7]"
         },
         "compile": {
-          "lib/net35/Emgu.CV.UI.dll": {
-            "related": ".XML"
-          },
-          "lib/net35/Emgu.CV.World.dll": {
-            "related": ".xml"
-          }
+          "lib/net35/Emgu.CV.UI.dll": {},
+          "lib/net35/Emgu.CV.World.dll": {}
         },
         "runtime": {
-          "lib/net35/Emgu.CV.UI.dll": {
-            "related": ".XML"
-          },
-          "lib/net35/Emgu.CV.World.dll": {
-            "related": ".xml"
-          }
+          "lib/net35/Emgu.CV.UI.dll": {},
+          "lib/net35/Emgu.CV.World.dll": {}
         },
         "build": {
           "build/EMGU.CV.targets": {}
@@ -116,14 +104,10 @@
       "MaterialDesignColors/2.1.0": {
         "type": "package",
         "compile": {
-          "lib/net462/MaterialDesignColors.dll": {
-            "related": ".pdb"
-          }
+          "lib/net462/MaterialDesignColors.dll": {}
         },
         "runtime": {
-          "lib/net462/MaterialDesignColors.dll": {
-            "related": ".pdb"
-          }
+          "lib/net462/MaterialDesignColors.dll": {}
         }
       },
       "MaterialDesignThemes/4.7.0": {
@@ -133,14 +117,10 @@
           "Microsoft.Xaml.Behaviors.Wpf": "1.1.39"
         },
         "compile": {
-          "lib/net462/MaterialDesignThemes.Wpf.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net462/MaterialDesignThemes.Wpf.dll": {}
         },
         "runtime": {
-          "lib/net462/MaterialDesignThemes.Wpf.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net462/MaterialDesignThemes.Wpf.dll": {}
         },
         "build": {
           "build/MaterialDesignThemes.targets": {}
@@ -158,14 +138,10 @@
           "WindowsBase"
         ],
         "compile": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         },
         "runtime": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         }
       },
       "Xceed.Wpf.AvalonDock.Themes.VS2013/2.9.0.1": {
@@ -183,14 +159,10 @@
       "ZedGraph/5.1.7": {
         "type": "package",
         "compile": {
-          "lib/net35-Client/ZedGraph.dll": {
-            "related": ".XML"
-          }
+          "lib/net35-Client/ZedGraph.dll": {}
         },
         "runtime": {
-          "lib/net35-Client/ZedGraph.dll": {
-            "related": ".XML"
-          }
+          "lib/net35-Client/ZedGraph.dll": {}
         },
         "resource": {
           "lib/net35-Client/de/ZedGraph.resources.dll": {
@@ -248,14 +220,10 @@
       "Dragablz/0.0.3.234": {
         "type": "package",
         "compile": {
-          "lib/net45/Dragablz.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Dragablz.dll": {}
         },
         "runtime": {
-          "lib/net45/Dragablz.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Dragablz.dll": {}
         }
       },
       "EMGU.CV/4.1.0.3420": {
@@ -264,20 +232,12 @@
           "ZedGraph": "[5.1.7]"
         },
         "compile": {
-          "lib/net35/Emgu.CV.UI.dll": {
-            "related": ".XML"
-          },
-          "lib/net35/Emgu.CV.World.dll": {
-            "related": ".xml"
-          }
+          "lib/net35/Emgu.CV.UI.dll": {},
+          "lib/net35/Emgu.CV.World.dll": {}
         },
         "runtime": {
-          "lib/net35/Emgu.CV.UI.dll": {
-            "related": ".XML"
-          },
-          "lib/net35/Emgu.CV.World.dll": {
-            "related": ".xml"
-          }
+          "lib/net35/Emgu.CV.UI.dll": {},
+          "lib/net35/Emgu.CV.World.dll": {}
         },
         "build": {
           "build/EMGU.CV.targets": {}
@@ -350,14 +310,10 @@
       "MaterialDesignColors/2.1.0": {
         "type": "package",
         "compile": {
-          "lib/net462/MaterialDesignColors.dll": {
-            "related": ".pdb"
-          }
+          "lib/net462/MaterialDesignColors.dll": {}
         },
         "runtime": {
-          "lib/net462/MaterialDesignColors.dll": {
-            "related": ".pdb"
-          }
+          "lib/net462/MaterialDesignColors.dll": {}
         }
       },
       "MaterialDesignThemes/4.7.0": {
@@ -367,14 +323,10 @@
           "Microsoft.Xaml.Behaviors.Wpf": "1.1.39"
         },
         "compile": {
-          "lib/net462/MaterialDesignThemes.Wpf.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net462/MaterialDesignThemes.Wpf.dll": {}
         },
         "runtime": {
-          "lib/net462/MaterialDesignThemes.Wpf.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net462/MaterialDesignThemes.Wpf.dll": {}
         },
         "build": {
           "build/MaterialDesignThemes.targets": {}
@@ -392,14 +344,10 @@
           "WindowsBase"
         ],
         "compile": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         },
         "runtime": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         }
       },
       "Xceed.Wpf.AvalonDock.Themes.VS2013/2.9.0.1": {
@@ -417,14 +365,10 @@
       "ZedGraph/5.1.7": {
         "type": "package",
         "compile": {
-          "lib/net35-Client/ZedGraph.dll": {
-            "related": ".XML"
-          }
+          "lib/net35-Client/ZedGraph.dll": {}
         },
         "runtime": {
-          "lib/net35-Client/ZedGraph.dll": {
-            "related": ".XML"
-          }
+          "lib/net35-Client/ZedGraph.dll": {}
         },
         "resource": {
           "lib/net35-Client/de/ZedGraph.resources.dll": {
@@ -482,14 +426,10 @@
       "Dragablz/0.0.3.234": {
         "type": "package",
         "compile": {
-          "lib/net45/Dragablz.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Dragablz.dll": {}
         },
         "runtime": {
-          "lib/net45/Dragablz.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Dragablz.dll": {}
         }
       },
       "EMGU.CV/4.1.0.3420": {
@@ -498,20 +438,12 @@
           "ZedGraph": "[5.1.7]"
         },
         "compile": {
-          "lib/net35/Emgu.CV.UI.dll": {
-            "related": ".XML"
-          },
-          "lib/net35/Emgu.CV.World.dll": {
-            "related": ".xml"
-          }
+          "lib/net35/Emgu.CV.UI.dll": {},
+          "lib/net35/Emgu.CV.World.dll": {}
         },
         "runtime": {
-          "lib/net35/Emgu.CV.UI.dll": {
-            "related": ".XML"
-          },
-          "lib/net35/Emgu.CV.World.dll": {
-            "related": ".xml"
-          }
+          "lib/net35/Emgu.CV.UI.dll": {},
+          "lib/net35/Emgu.CV.World.dll": {}
         },
         "build": {
           "build/EMGU.CV.targets": {}
@@ -584,14 +516,10 @@
       "MaterialDesignColors/2.1.0": {
         "type": "package",
         "compile": {
-          "lib/net462/MaterialDesignColors.dll": {
-            "related": ".pdb"
-          }
+          "lib/net462/MaterialDesignColors.dll": {}
         },
         "runtime": {
-          "lib/net462/MaterialDesignColors.dll": {
-            "related": ".pdb"
-          }
+          "lib/net462/MaterialDesignColors.dll": {}
         }
       },
       "MaterialDesignThemes/4.7.0": {
@@ -601,14 +529,10 @@
           "Microsoft.Xaml.Behaviors.Wpf": "1.1.39"
         },
         "compile": {
-          "lib/net462/MaterialDesignThemes.Wpf.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net462/MaterialDesignThemes.Wpf.dll": {}
         },
         "runtime": {
-          "lib/net462/MaterialDesignThemes.Wpf.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net462/MaterialDesignThemes.Wpf.dll": {}
         },
         "build": {
           "build/MaterialDesignThemes.targets": {}
@@ -626,14 +550,10 @@
           "WindowsBase"
         ],
         "compile": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         },
         "runtime": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         }
       },
       "Xceed.Wpf.AvalonDock.Themes.VS2013/2.9.0.1": {
@@ -651,14 +571,10 @@
       "ZedGraph/5.1.7": {
         "type": "package",
         "compile": {
-          "lib/net35-Client/ZedGraph.dll": {
-            "related": ".XML"
-          }
+          "lib/net35-Client/ZedGraph.dll": {}
         },
         "runtime": {
-          "lib/net35-Client/ZedGraph.dll": {
-            "related": ".XML"
-          }
+          "lib/net35-Client/ZedGraph.dll": {}
         },
         "resource": {
           "lib/net35-Client/de/ZedGraph.resources.dll": {
@@ -716,14 +632,10 @@
       "Dragablz/0.0.3.234": {
         "type": "package",
         "compile": {
-          "lib/net45/Dragablz.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Dragablz.dll": {}
         },
         "runtime": {
-          "lib/net45/Dragablz.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Dragablz.dll": {}
         }
       },
       "EMGU.CV/4.1.0.3420": {
@@ -732,20 +644,12 @@
           "ZedGraph": "[5.1.7]"
         },
         "compile": {
-          "lib/net35/Emgu.CV.UI.dll": {
-            "related": ".XML"
-          },
-          "lib/net35/Emgu.CV.World.dll": {
-            "related": ".xml"
-          }
+          "lib/net35/Emgu.CV.UI.dll": {},
+          "lib/net35/Emgu.CV.World.dll": {}
         },
         "runtime": {
-          "lib/net35/Emgu.CV.UI.dll": {
-            "related": ".XML"
-          },
-          "lib/net35/Emgu.CV.World.dll": {
-            "related": ".xml"
-          }
+          "lib/net35/Emgu.CV.UI.dll": {},
+          "lib/net35/Emgu.CV.World.dll": {}
         },
         "build": {
           "build/EMGU.CV.targets": {}
@@ -818,14 +722,10 @@
       "MaterialDesignColors/2.1.0": {
         "type": "package",
         "compile": {
-          "lib/net462/MaterialDesignColors.dll": {
-            "related": ".pdb"
-          }
+          "lib/net462/MaterialDesignColors.dll": {}
         },
         "runtime": {
-          "lib/net462/MaterialDesignColors.dll": {
-            "related": ".pdb"
-          }
+          "lib/net462/MaterialDesignColors.dll": {}
         }
       },
       "MaterialDesignThemes/4.7.0": {
@@ -835,14 +735,10 @@
           "Microsoft.Xaml.Behaviors.Wpf": "1.1.39"
         },
         "compile": {
-          "lib/net462/MaterialDesignThemes.Wpf.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net462/MaterialDesignThemes.Wpf.dll": {}
         },
         "runtime": {
-          "lib/net462/MaterialDesignThemes.Wpf.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net462/MaterialDesignThemes.Wpf.dll": {}
         },
         "build": {
           "build/MaterialDesignThemes.targets": {}
@@ -860,14 +756,10 @@
           "WindowsBase"
         ],
         "compile": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         },
         "runtime": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         }
       },
       "Xceed.Wpf.AvalonDock.Themes.VS2013/2.9.0.1": {
@@ -885,14 +777,10 @@
       "ZedGraph/5.1.7": {
         "type": "package",
         "compile": {
-          "lib/net35-Client/ZedGraph.dll": {
-            "related": ".XML"
-          }
+          "lib/net35-Client/ZedGraph.dll": {}
         },
         "runtime": {
-          "lib/net35-Client/ZedGraph.dll": {
-            "related": ".XML"
-          }
+          "lib/net35-Client/ZedGraph.dll": {}
         },
         "resource": {
           "lib/net35-Client/de/ZedGraph.resources.dll": {
@@ -1475,8 +1363,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\huynh\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\huynh\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
@@ -1488,12 +1375,8 @@
       "outputPath": "C:\\Wisely\\C#\\Tape_Reel_Packing\\Magnus_WPF_1\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
         "C:\\Users\\huynh\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [

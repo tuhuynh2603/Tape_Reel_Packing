@@ -250,7 +250,7 @@ namespace Magnus_WPF_1.Source.Algorithm
         {
 
             int nStep = 5;
-            double dResolutionTemp = 30;
+            double dResolutionTemp = 15;
 
             double dAngleStart = matchingAngle -dResolutionTemp;
 
@@ -291,12 +291,12 @@ namespace Magnus_WPF_1.Source.Algorithm
                 if (matchingAngle <= -180)
                     matchingAngle = 180 + matchingAngle;
 
-                    rectMatchingPosition = new Rectangle(new System.Drawing.Point(rectTemplateMatchedPosition[nMaxScoreIndex].X,
+                rectMatchingPosition = new Rectangle(new System.Drawing.Point(rectTemplateMatchedPosition[nMaxScoreIndex].X,
                                                    rectTemplateMatchedPosition[nMaxScoreIndex].Y)
                                                    , rectTemplateMatchedPosition[nMaxScoreIndex].Size);
 
 
-                dAngleStart = matchingAngle - dResolutionTemp;
+               dAngleStart = matchingAngle - dResolutionTemp;
 
                 if (dAngleStart >= 180)
                     dAngleStart = 180 - dAngleStart;

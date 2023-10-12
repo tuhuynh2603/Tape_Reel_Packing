@@ -50,7 +50,6 @@ C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\tr\ZedGraph.resources.
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\zh-cn\ZedGraph.resources.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\zh-tw\ZedGraph.resources.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Magnus_WPF_1.csproj.AssemblyReference.cache
-C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Magnus_WPF_1.csproj.SuggestedBindingRedirects.cache
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Magnus_WPF_1.exe.config
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\MainWindow.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\MappingSetingUC.g.cs

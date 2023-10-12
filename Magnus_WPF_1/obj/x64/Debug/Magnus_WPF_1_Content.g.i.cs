@@ -8,9 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/blue-chip.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/gray-chip.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/green-chip.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/red-chip.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/hardware.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/network.png")]
 
 

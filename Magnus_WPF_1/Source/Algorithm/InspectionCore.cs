@@ -186,8 +186,8 @@ namespace Magnus_WPF_1.Source.Algorithm
             rec.Height = (int)DeviceLocationParameter.m_L_TemplateRoi.Height;
             imgCropped.ROI = rec;
             m_TemplateImage.Gray = imgCropped.Mat.Clone();
-            CvInvoke.Imshow("Template Image", m_TemplateImage.Gray);
-            CvInvoke.WaitKey();
+            //CvInvoke.Imshow("Template Image", m_TemplateImage.Gray);
+            //CvInvoke.WaitKey();
         }
 
         public static int FindDeviceLocation(ref CvImage imgSource,
@@ -238,7 +238,7 @@ namespace Magnus_WPF_1.Source.Algorithm
                     bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(imgSource, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_nStepTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
                 else
                 {
-                    bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(imgSource, m_TemplateImage.Gray, 0, 12, 30, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+                    bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(imgSource, m_TemplateImage.Gray, 0, 24, 15, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
 
                     bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_KdTreeTemplateMatching(imgSource, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
                
@@ -250,7 +250,7 @@ namespace Magnus_WPF_1.Source.Algorithm
                     bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(ImageAfterDilationCrop.Mat, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_nStepTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
                 else
                 {
-                    bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(ImageAfterDilationCrop.Mat, m_TemplateImage.Gray, 0, 12, 30, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+                    bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(ImageAfterDilationCrop.Mat, m_TemplateImage.Gray, 0, 24, 15, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
 
                     bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_KdTreeTemplateMatching(ImageAfterDilationCrop.Mat, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
                 }
@@ -359,8 +359,8 @@ namespace Magnus_WPF_1.Source.Algorithm
             rec.Height = (int)rectTemplateInput.Height;
             imgCropped.ROI = rec;
             templateImageCropped = imgCropped.Mat.Clone();
-            CvInvoke.Imshow("Template Image", templateImageCropped);
-            CvInvoke.WaitKey();
+            //CvInvoke.Imshow("Template Image", templateImageCropped);
+            //CvInvoke.WaitKey();
 
 
             System.Drawing.Rectangle rectDeviceLocation = new System.Drawing.Rectangle((int)rectDeviceLocationInput.TopLeft.X,

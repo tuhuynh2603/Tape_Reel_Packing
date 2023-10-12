@@ -268,6 +268,7 @@ namespace Magnus_WPF_1.Source.Application
                 });
 
                 m_nResult[m_CurrentSequenceDeviceID] = Inspect();
+                ////
                 Master.InspectEvent[0].Reset();
                 Master.InspectDoneEvent[0].Set();
             }

@@ -20,7 +20,7 @@
                 <RowDefinition Height="3*"></RowDefinition>
                 <RowDefinition Height="1*"></RowDefinition>
             </Grid.RowDefinitions>
-            <Image Grid.Row="0"  Source="\Resources\start.png"></Image>
+            <Image Grid.Row="0"  Source="Resources\start.png"></Image>
             <TextBlock Grid.Row="1" Text="Run" Foreground="Yellow" TextAlignment="Center" FontSize="20"></TextBlock>
         </Grid>
         
@@ -154,7 +154,7 @@
 
                                 <RibbonButton Name="inspect_btn"
                                                         Label="Inspect"
-                                                        LargeImageSource="\Resources\run-custom.png"
+                                                        LargeImageSource="Resources\run-custom.png"
                                                         MouseOverBackground="{StaticResource MouseOverButtonStyle}"
                                                         Foreground="GhostWhite"
                                                         PreviewMouseDown="PreviewMouseDownInspectionBtn"
@@ -162,7 +162,7 @@
 
                                 <RibbonButton Name="inspect_offline_btn"
                                                         Label="Offline Inspection"
-                                                        LargeImageSource="\Resources\run-custom.png"
+                                                        LargeImageSource="Resources\run-custom.png"
                                                         MouseOverBackground="{StaticResource MouseOverButtonStyle}"
                                                         Foreground="GhostWhite"
                                                         PreviewMouseDown="PreviewMouseDownInspectionBtn"
@@ -171,7 +171,7 @@
 
                                 <RibbonToggleButton Name="inspect_cycle_btn"
                                                         Label="Camera"
-                                                        LargeImageSource="\Resources\camera-custom.png" Foreground="GhostWhite"
+                                                        LargeImageSource="Resources\camera-custom.png" Foreground="GhostWhite"
                                                         Checked="Inspect_Cycle_Checked"
                                                         Unchecked="Inspect_Cycle_Unchecked"
                                                         CheckedBackground="{StaticResource CheckedButtonStyle}"
@@ -179,19 +179,19 @@
                                                         Width="auto"/>
                                 <RibbonButton Name="load_teach_image_btn"
                                                         Label="Load Teach Image"
-                                                        LargeImageSource="\Resources\file-upload-custom.png" Foreground="GhostWhite"
+                                                        LargeImageSource="Resources\file-upload-custom.png" Foreground="GhostWhite"
                                                         MouseOverBackground="{StaticResource MouseOverButtonStyle}"
                                                         Width="auto" Click="load_teach_image_btn_Click"/>
 
                                 <RibbonButton Name="save_teach_image_btn"
                                                         Label="Save Teach Image"
-                                                        LargeImageSource="\Resources\download-box-custom.png" Foreground="GhostWhite"
+                                                        LargeImageSource="Resources\download-box-custom.png" Foreground="GhostWhite"
                                                         MouseOverBackground="{StaticResource MouseOverButtonStyle}"
                                                         Width="auto" Click="save_teach_image_btn_Click"/>
 
                                 <RibbonToggleButton Name="enable_saveimage_btn"
                                                         Label="Enable Saving Image"
-                                                        LargeImageSource="\Resources\save-image.png"
+                                                        LargeImageSource="Resources\save-image.png"
                                                         MouseOverBackground="{StaticResource MouseOverButtonStyle}"
                                                         Foreground="GhostWhite"
                                                         CheckedBackground="{StaticResource CheckedButtonStyle}"
@@ -202,7 +202,7 @@
 
                                 <RibbonToggleButton Name="teach_parameters_btn"
                                                         Label="Teach Parameter"
-                                                        LargeImageSource="\Resources\book-open-custom.png"
+                                                        LargeImageSource="Resources\book-open-custom.png"
                                                         MouseOverBackground="{StaticResource MouseOverButtonStyle}"
                                                         Foreground="GhostWhite"
                                                         CheckedBackground="{StaticResource CheckedButtonStyle}"
@@ -212,7 +212,7 @@
 
                                 <RibbonToggleButton Name="mapping_parameters_btn"
                                                         Label="Mapping Setting"
-                                                        LargeImageSource="\Resources\book-open-custom.png"
+                                                        LargeImageSource="Resources\book-open-custom.png"
                                                         MouseOverBackground="{StaticResource MouseOverButtonStyle}"
                                                         Foreground="GhostWhite"
                                                         CheckedBackground="{StaticResource CheckedButtonStyle}"
@@ -223,7 +223,7 @@
 
                                 <RibbonButton x:Name="btn_teach"
                                                   Label="Teach"
-                                                  LargeImageSource="\Resources\human-male-board-custom.png"
+                                                  LargeImageSource="Resources\human-male-board-custom.png"
                                                   Foreground="Wheat"
                                                   Click="btn_teach_click"
                                                   MouseOverBackground="{StaticResource BgButton}" 
@@ -231,7 +231,7 @@
 
                                 <RibbonButton x:Name="btn_next_teach"
                                                   Label="Next"
-                                                  LargeImageSource="\Resources/step-forward-custom.png"
+                                                  LargeImageSource="Resources/step-forward-custom.png"
                                                   Foreground="Wheat"
                                                   Click="btn_next_teach_click"
                                                   IsEnabled="false"
@@ -240,7 +240,7 @@
 
                                 <RibbonButton x:Name="btn_abort_teach"
                                                   Label="Abort"
-                                                  LargeImageSource="\Resources/close-octagon-custom.png"
+                                                  LargeImageSource="Resources/close-octagon-custom.png"
                                                   Foreground="Wheat"
                                                   IsEnabled="false"
                                                   Click="btn_abort_teach_Click"
@@ -275,7 +275,7 @@
 
                             <RibbonButton x:Name="btn_COM_Connection"
                                                     Label="COM Communication"
-                                                    LargeImageSource="\Resources/network.png"
+                                                    LargeImageSource="Resources/network.png"
                                                     Foreground="White"
                                                     IsEnabled="true"
                                                     Click="btn_abort_teach_Click"

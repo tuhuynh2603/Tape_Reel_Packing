@@ -25,6 +25,7 @@ using Emgu.CV;
 using iTextSharp.text.pdf.parser;
 using System.Security.Cryptography;
 //using System.Windows.Forms;
+using Magnus_WPF_1.Source.LogMessage;
 
 namespace Magnus_WPF_1
 {
@@ -79,6 +80,9 @@ namespace Magnus_WPF_1
             InitializeComponent();
             this.DataContext = this;
             //ButtonNameFCN = "123";
+            //LogMessage.LogDebugMessage(1, "Start Application");
+            LogMessage.WriteToDebugViewer(0, string.Format("Start Application...."));
+
             mainWindow = this;
             master = new Master(this);
 
@@ -380,6 +384,7 @@ namespace Magnus_WPF_1
         private void ImageDoc_DoubleClick(object sender, MouseButtonEventArgs e)
         {
             ZoomDocPanel(0);
+            //getChosenDoc()
         }
 
         bool isOneSpecificDocState = false;
@@ -394,7 +399,7 @@ namespace Magnus_WPF_1
                 imagesViewDoc[trackID].CanFloat = false;
                 imagesViewDoc[trackID].CanMove = false;
 
-                layoutPanel.ReplaceChildAt(0, bigPanelGroup);
+                layoutPanel.ReplaceChildAt(trackID, bigPanelGroup);
             }
             else
             {
@@ -404,12 +409,11 @@ namespace Magnus_WPF_1
                 imagesViewDoc[trackID].CanMove = false;
                 bigTagPanel.ReplaceChild(imagesViewDoc[trackID], bigDoc);
                 imagesViewPane[trackID].Children.Add(imagesViewDoc[trackID]);
-                layoutPanel.ReplaceChildAt(0, layoutRoot);
+                layoutPanel.ReplaceChildAt(trackID, layoutRoot);
             }
             isOneSpecificDocState = !isOneSpecificDocState;
             child_PreviewMouseRightButtonDown(activeImageDock, null);
         }
-
         private void child_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             ImageView im = sender as ImageView;
@@ -501,7 +505,7 @@ namespace Magnus_WPF_1
             if (bEnableSingleSnapImages)
                 bEnableSingleSnapImages = false;
 
-            Master.InspectEvent[0].Set();
+            Master.InspectEvent[master.m_nActiveTrack].Set();
 
             if (master.threadGrabImageSimulateCycle == null)
             {

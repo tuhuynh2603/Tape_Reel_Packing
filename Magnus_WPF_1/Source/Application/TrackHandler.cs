@@ -43,10 +43,12 @@ namespace Magnus_WPF_1.Source.Application
         public static int m_Height = 1080;
         public ImageView[] m_imageViews;
         public int[] m_nResult;
+        public int m_nTrackID;
         public VideoCapture m_cap;
         Mat m_frame = new Mat();
         public Track(int indexTrack, int numdoc, string serieCam, MainWindow app)
         {
+            m_nTrackID = indexTrack;
             mainWindow = app;
             m_imageViews = new ImageView[numdoc];
             m_cap = new VideoCapture(0);
@@ -70,7 +72,7 @@ namespace Magnus_WPF_1.Source.Application
             m_imageViews[0].docID = 0;
             m_imageViews[0].trackID = indexTrack;
             m_imageViews[0].dockPaneID = 0;
-            m_imageViews[0].visibleRGB = indexTrack == 0 ? Visibility.Visible : Visibility.Collapsed;
+            m_imageViews[0].visibleRGB = /*indexTrack == 0 ?*/ Visibility.Visible /*: Visibility.Collapsed*/;
             InspectionCore.Initialize();
         }
 

@@ -22,26 +22,27 @@ namespace Magnus_WPF_1.Source.Application
 
         private MainWindow mainWindow;
         public Track[] m_Tracks;
+        public int m_nActiveTrack;
+        public Application applications = new Application();
+        public TeachParametersUC teachParameter = new TeachParametersUC();
+        public MappingSetingUC mappingParameter = new MappingSetingUC();
+        public static bool m_bIsTeaching;
+        public static AutoResetEvent m_NextStepTeachEvent;
+
         public static AutoResetEvent[] InspectEvent;
         public static AutoResetEvent[] InspectDoneEvent;
         public static AutoResetEvent[] m_hardwareTriggerSnapEvent;
-        public Application applications = new Application();
-        public TeachParametersUC teachParameter = new TeachParametersUC();
-        public static AutoResetEvent m_NextStepTeachEvent;
-        public MappingSetingUC mappingParameter = new MappingSetingUC();
-
         // public AutoDeleteImagesDlg m_AutoDeleteImagesDlg = new AutoDeleteImagesDlg();
 
-        public delegate void DelegateCameraStream();
-        public DelegateCameraStream delegateCameraStream;
+        //public delegate void DelegateCameraStream();
+        //public DelegateCameraStream delegateCameraStream;
 
-        public delegate void GrabDelegate();
-        public GrabDelegate grabDelegate;
+        //public delegate void GrabDelegate();
+        //public GrabDelegate grabDelegate;
 
         public Thread threadGrabImageSimulateCycle;
         public Thread threadInspecOffline;
         public Thread m_TeachThread;
-        public static bool m_bIsTeaching;
         public Thread m_SaveInspectImageThread;
         public static Queue<ImageSaveData> m_SaveInspectImageQueue = new Queue<ImageSaveData>(); // create a queue to hold messages
         public BitmapSource btmSource;
@@ -74,15 +75,18 @@ namespace Magnus_WPF_1.Source.Application
                 m_SaveInspectImageThread.Start();
             }
 
-
+            m_nActiveTrack = 0;
         }
         public void DeleteMaster()
         {
-            m_Tracks[0].m_cap.Dispose();
-            InspectEvent[0].Reset();
-            InspectEvent[0].Dispose();
-            InspectDoneEvent[0].Reset();
-            InspectDoneEvent[0].Dispose();
+            for (int nTrack = 0; nTrack < Application.m_nTrack; nTrack++)
+            {
+                m_Tracks[nTrack].m_cap.Dispose();
+                InspectEvent[nTrack].Reset();
+                InspectEvent[nTrack].Dispose();
+                InspectDoneEvent[nTrack].Reset();
+                InspectDoneEvent[nTrack].Dispose();
+            }
         }
         public void LoadRecipe(bool isLoadRecipeManualy = false)
         {
@@ -113,10 +117,11 @@ namespace Magnus_WPF_1.Source.Application
         private void ContructorDocComponent()
         {
             m_Tracks = new Track[Application.m_nTrack];
+            string [] nSeriCam = { "none", "none" };
             for (int index_track = 0; index_track < Application.m_nTrack; index_track++)
             {
                 //for(int index_doc = 0; index_doc < Application.m_nDoc; index_doc++)
-                m_Tracks[index_track] = new Track(index_track, 1, "none", mainWindow);
+                m_Tracks[index_track] = new Track(index_track, 1, nSeriCam[index_track], mainWindow);
 
             }
         }

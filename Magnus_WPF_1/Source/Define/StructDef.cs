@@ -1,16 +1,9 @@
-﻿using Emgu.CV;
-using System;
-using System.Collections.Generic;
-//using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿//using System.Drawing;
 using System.Windows;
-using System.Windows.Media.Imaging;
 
 namespace Magnus_WPF_1.Source.Define
 {
-    public enum TEACHSTEP :int
+    public enum TEACHSTEP : int
     {
         TEACH_LOADIMAGE = -1,
         TEACH_DEVICELOCATION,
@@ -20,7 +13,7 @@ namespace Magnus_WPF_1.Source.Define
         TEACH_TOTALSTEP
     }
 
-    public enum IMAGETYPE :int
+    public enum IMAGETYPE : int
     {
         GRAY_TYPE,
         BGR_TYPE

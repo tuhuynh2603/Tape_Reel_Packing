@@ -1,23 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-using Emgu.CV;
+﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
 using Magnus_WPF_1.Source.Define;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using static Magnus_WPF_1.Source.Define.Rectangles;
 using CvContourArray = Emgu.CV.Util.VectorOfVectorOfPoint;
 using CvImage = Emgu.CV.Mat;
 using CvPointArray = Emgu.CV.Util.VectorOfPoint;
 using CvPointFArray = Emgu.CV.Util.VectorOfPointF;
 using Line = Emgu.CV.Structure.LineSegment2D;
 using LineArray = System.Collections.Generic.List<Emgu.CV.Structure.LineSegment2D>;
-using Emgu.CV.Structure;
-using static Magnus_WPF_1.Source.Define.Rectangles;
-using Emgu.CV.WPF;
-using System.Windows.Media.Imaging;
-using System.Windows.Media;
 
 namespace Magnus_WPF_1.Source.Algorithm
 {

@@ -1,34 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Media;
-using System.Windows.Shapes;
-using Emgu.CV;
+﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
-using Emgu.CV.Util;
-using Magnus_WPF_1.Source.Algorithm;
-using Magnus_WPF_1.Source.Define;
-using Magnus_WPF_1.UI.UserControls.View;
-using static Magnus_WPF_1.Source.Algorithm.InspectionCore;
-using CvImage = Emgu.CV.Mat;
-using Line = Emgu.CV.Structure.LineSegment2D;
-using LineArray = System.Collections.Generic.List<Emgu.CV.Structure.LineSegment2D>;
-using CvContourArray = Emgu.CV.Util.VectorOfVectorOfPoint;
-using CvPointArray = Emgu.CV.Util.VectorOfPoint;
-using Org.BouncyCastle.Tsp;
-using iTextSharp.text;
 using Emgu.CV.WPF;
-using System.Windows.Media.Imaging;
-using Magnus_WPF_1.Source.Application;
-using System.Windows.Controls;
-using iTextSharp.text.pdf.fonts.cmaps;
+using Magnus_WPF_1.Source.Define;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
-using System.Reflection;
+using System.Linq;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using CvImage = Emgu.CV.Mat;
+using CvPointArray = Emgu.CV.Util.VectorOfPoint;
 
 namespace Magnus_WPF_1.Source.Algorithm
 {
@@ -98,7 +81,8 @@ namespace Magnus_WPF_1.Source.Algorithm
 
         public static bool LoadOfflineImage(string strPath)
         {
-            try {
+            try
+            {
                 m_SourceImage.Gray = CvInvoke.Imread(strPath, Emgu.CV.CvEnum.ImreadModes.Grayscale);
                 m_SourceImage.Bgr = CvInvoke.Imread(strPath, Emgu.CV.CvEnum.ImreadModes.Color);
 
@@ -126,12 +110,12 @@ namespace Magnus_WPF_1.Source.Algorithm
         {
             try
             {
-                if(Directory.Exists(strPath) == false)
+                if (Directory.Exists(strPath) == false)
                 {
                     Directory.CreateDirectory(strPath);
                 }
 
-                string strImageName =System.IO.Path.Combine(strPath, "Device_" + strDeviceID + ".bmp");
+                string strImageName = System.IO.Path.Combine(strPath, "Device_" + strDeviceID + ".bmp");
                 if (Directory.Exists(strPath))
                     CvInvoke.Imwrite(strImageName, m_SourceImage.Bgr);
 
@@ -169,11 +153,11 @@ namespace Magnus_WPF_1.Source.Algorithm
 
             return true;
         }
-        public static int SimpleInspection(ref List<Point> p_Regionpolygon, ref Point pCenter, ref Mat mat_DeviceLocationRegion,  ref double nAngleOutput, ref double dScoreOutput)
+        public static int SimpleInspection(ref List<Point> p_Regionpolygon, ref Point pCenter, ref Mat mat_DeviceLocationRegion, ref double nAngleOutput, ref double dScoreOutput)
         {
 
             return FindDeviceLocation(ref m_SourceImage.Gray,
-                                 ref p_Regionpolygon, ref pCenter, ref mat_DeviceLocationRegion,ref nAngleOutput, ref dScoreOutput);
+                                 ref p_Regionpolygon, ref pCenter, ref mat_DeviceLocationRegion, ref nAngleOutput, ref dScoreOutput);
         }
 
         public static void SetTemplateImage()
@@ -191,7 +175,7 @@ namespace Magnus_WPF_1.Source.Algorithm
         }
 
         public static int FindDeviceLocation(ref CvImage imgSource,
-            ref List<Point> p_Regionpolygon, ref Point pCenter, ref Mat mat_DeviceLocationRegion,ref double nAngleOutput, ref double dScoreOutput)
+            ref List<Point> p_Regionpolygon, ref Point pCenter, ref Mat mat_DeviceLocationRegion, ref double nAngleOutput, ref double dScoreOutput)
         {
             if (m_TemplateImage.Gray == null)
                 return -99;
@@ -207,13 +191,13 @@ namespace Magnus_WPF_1.Source.Algorithm
             mat_DeviceLocationRegion = new CvImage();
 
             System.Drawing.Rectangle rectDeviceLocation = new System.Drawing.Rectangle((int)DeviceLocationParameter.m_L_DeviceLocationRoi.TopLeft.X,
-                                                                                        (int)DeviceLocationParameter.m_L_DeviceLocationRoi.TopLeft.Y, 
-                                                                                        (int)DeviceLocationParameter.m_L_DeviceLocationRoi.Width, 
+                                                                                        (int)DeviceLocationParameter.m_L_DeviceLocationRoi.TopLeft.Y,
+                                                                                        (int)DeviceLocationParameter.m_L_DeviceLocationRoi.Width,
                                                                                        (int)DeviceLocationParameter.m_L_DeviceLocationRoi.Height);
             //Image<Gray, Byte> Image_Source_Crop_Temp = new Image<Gray, Byte>(imgSource.Bitmap);
             CvImage rec_region = new CvImage();
             rec_region = CvImage.Zeros(imgSource.Height, imgSource.Width, DepthType.Cv8U, 1);
-            CvInvoke.Rectangle(rec_region, rectDeviceLocation, new MCvScalar(255), -1);           
+            CvInvoke.Rectangle(rec_region, rectDeviceLocation, new MCvScalar(255), -1);
             MagnusOpenCVLib.Threshold2(ref imgSource, ref img_thresholdRegion, DeviceLocationParameter.m_L_lowerThreshold, DeviceLocationParameter.m_L_upperThreshold);
             CvInvoke.BitwiseAnd(img_thresholdRegion, rec_region, img_thresholdRegion);
             MagnusOpenCVLib.OpeningRectangle(ref img_thresholdRegion, ref img_openingRegionRegion, DeviceLocationParameter.m_nOpeningMask, DeviceLocationParameter.m_nOpeningMask);
@@ -224,7 +208,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             if (rectLabel == null)
                 return -99;
 
-            MagnusOpenCVLib.DilationRectangle(ref img_SelectRegion,ref img_DilationRegion, DeviceLocationParameter.m_nDilationMask, DeviceLocationParameter.m_nDilationMask);
+            MagnusOpenCVLib.DilationRectangle(ref img_SelectRegion, ref img_DilationRegion, DeviceLocationParameter.m_nDilationMask, DeviceLocationParameter.m_nDilationMask);
             System.Drawing.Rectangle rectangleRoi = new System.Drawing.Rectangle();
             Image<Gray, Byte> ImageAfterDilationCrop = new Image<Gray, Byte>(imgSource.Bitmap);
             Image<Gray, Byte> Img = new Image<Gray, Byte>(imgSource.Bitmap);
@@ -241,7 +225,7 @@ namespace Magnus_WPF_1.Source.Algorithm
                     bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(imgSource, m_TemplateImage.Gray, 0, 24, 15, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
 
                     bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_KdTreeTemplateMatching(imgSource, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
-               
+
                 }
             }
             else
@@ -293,10 +277,10 @@ namespace Magnus_WPF_1.Source.Algorithm
 
         }
 
-        public static int FindNearestPoints(CvImage imgSourceInput, ref CvImage deviceLocationThresholdRegion, System.Drawing.Rectangle rectMatchingPosition,List<Point> polygonInput, float fAngleInput)
+        public static int FindNearestPoints(CvImage imgSourceInput, ref CvImage deviceLocationThresholdRegion, System.Drawing.Rectangle rectMatchingPosition, List<Point> polygonInput, float fAngleInput)
         {
 
-            RotatedRect rotateRect = new RotatedRect(polygonInput[polygonInput.Count()-1], new SizeF(rectMatchingPosition.Width - 30, rectMatchingPosition.Height - 30), -fAngleInput);
+            RotatedRect rotateRect = new RotatedRect(polygonInput[polygonInput.Count() - 1], new SizeF(rectMatchingPosition.Width - 30, rectMatchingPosition.Height - 30), -fAngleInput);
             CvImage rec_region2 = new CvImage();
             rec_region2 = CvImage.Zeros(imgSourceInput.Height, imgSourceInput.Width, DepthType.Cv8U, 1);
             MagnusOpenCVLib.GenRectangle2(rec_region2, rotateRect, new MCvScalar(255), 1);

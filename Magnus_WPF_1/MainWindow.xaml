@@ -177,6 +177,17 @@
                                                         CheckedBackground="{StaticResource CheckedButtonStyle}"
                                                         MouseOverBackground="{StaticResource MouseOverButtonStyle}"
                                                         Width="auto"/>
+
+
+                                <RibbonToggleButton Name="camera_setting_btn"
+                                                        Label="Camera Setting"
+                                                        LargeImageSource="Resources\camera-custom.png" Foreground="GhostWhite"
+                                                        Checked="Camera_Setting_Checked"
+                                                        Unchecked="Camera_Setting_Unchecked"
+                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
+                                                        MouseOverBackground="{StaticResource MouseOverButtonStyle}"
+                                                        Width="auto"/>
+
                                 <RibbonButton Name="load_teach_image_btn"
                                                         Label="Load Teach Image"
                                                         LargeImageSource="Resources\file-upload-custom.png" Foreground="GhostWhite"

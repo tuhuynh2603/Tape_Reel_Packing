@@ -1,13 +1,9 @@
 ﻿using Magnus_WPF_1.Source.Algorithm;
 using Magnus_WPF_1.Source.Define;
 using Microsoft.Win32;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Magnus_WPF_1.MappingSetingUC;
 
 namespace Magnus_WPF_1.Source.Application
 {

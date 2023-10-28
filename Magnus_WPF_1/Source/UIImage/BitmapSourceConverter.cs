@@ -1,16 +1,14 @@
 ﻿
+using Emgu.CV.CvEnum;
 using System;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using Emgu.CV;
-using Emgu.CV.CvEnum;
 
 namespace Emgu.CV.WPF
 {
-	public static class BitmapSourceConvert
+    public static class BitmapSourceConvert
     {
         /// <summary>
         /// Delete a GDI object
@@ -81,7 +79,7 @@ namespace Emgu.CV.WPF
             }
             else
             {
-              //  DebugMessage.WriteToDebugViewer(0, $"Format of source {source.Format}");
+                //  DebugMessage.WriteToDebugViewer(0, $"Format of source {source.Format}");
                 throw new Exception(String.Format("Convertion from BitmapSource of format {0} is not supported.", source.Format));
             }
         }

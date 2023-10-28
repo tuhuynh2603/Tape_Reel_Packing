@@ -37,13 +37,40 @@
           "build/EMGU.CV.targets": {}
         }
       },
-      "Extended.Wpf.Toolkit/3.8.2": {
+      "EPPlus/4.5.3.1": {
         "type": "package",
+        "frameworkAssemblies": [
+          "PresentationCore",
+          "System",
+          "System.Core",
+          "System.Data",
+          "System.Drawing",
+          "System.Security",
+          "System.Xml",
+          "System.configuration"
+        ],
+        "compile": {
+          "lib/net40/EPPlus.dll": {}
+        },
+        "runtime": {
+          "lib/net40/EPPlus.dll": {}
+        }
+      },
+      "Extended.Wpf.Toolkit/2.9.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "PresentationCore",
+          "PresentationFramework",
+          "System",
+          "System.Xaml",
+          "WindowsBase"
+        ],
         "compile": {
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.Aero.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.Metro.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.VS2010.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.dll": {},
+          "lib/net40/Xceed.Wpf.DataGrid.dll": {},
           "lib/net40/Xceed.Wpf.Toolkit.dll": {}
         },
         "runtime": {
@@ -51,12 +78,10 @@
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.Metro.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.VS2010.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.dll": {},
+          "lib/net40/Xceed.Wpf.DataGrid.dll": {},
           "lib/net40/Xceed.Wpf.Toolkit.dll": {}
         },
         "resource": {
-          "lib/net40/cs-CZ/Xceed.Wpf.AvalonDock.resources.dll": {
-            "locale": "cs-CZ"
-          },
           "lib/net40/de/Xceed.Wpf.AvalonDock.resources.dll": {
             "locale": "de"
           },
@@ -101,7 +126,7 @@
           "lib/itextsharp.dll": {}
         }
       },
-      "MaterialDesignColors/2.1.0": {
+      "MaterialDesignColors/2.1.4": {
         "type": "package",
         "compile": {
           "lib/net462/MaterialDesignColors.dll": {}
@@ -110,10 +135,10 @@
           "lib/net462/MaterialDesignColors.dll": {}
         }
       },
-      "MaterialDesignThemes/4.7.0": {
+      "MaterialDesignThemes/4.9.0": {
         "type": "package",
         "dependencies": {
-          "MaterialDesignColors": "2.1.0",
+          "MaterialDesignColors": "2.1.4",
           "Microsoft.Xaml.Behaviors.Wpf": "1.1.39"
         },
         "compile": {
@@ -243,13 +268,40 @@
           "build/EMGU.CV.targets": {}
         }
       },
-      "Extended.Wpf.Toolkit/3.8.2": {
+      "EPPlus/4.5.3.1": {
         "type": "package",
+        "frameworkAssemblies": [
+          "PresentationCore",
+          "System",
+          "System.Core",
+          "System.Data",
+          "System.Drawing",
+          "System.Security",
+          "System.Xml",
+          "System.configuration"
+        ],
+        "compile": {
+          "lib/net40/EPPlus.dll": {}
+        },
+        "runtime": {
+          "lib/net40/EPPlus.dll": {}
+        }
+      },
+      "Extended.Wpf.Toolkit/2.9.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "PresentationCore",
+          "PresentationFramework",
+          "System",
+          "System.Xaml",
+          "WindowsBase"
+        ],
         "compile": {
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.Aero.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.Metro.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.VS2010.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.dll": {},
+          "lib/net40/Xceed.Wpf.DataGrid.dll": {},
           "lib/net40/Xceed.Wpf.Toolkit.dll": {}
         },
         "runtime": {
@@ -257,12 +309,10 @@
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.Metro.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.VS2010.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.dll": {},
+          "lib/net40/Xceed.Wpf.DataGrid.dll": {},
           "lib/net40/Xceed.Wpf.Toolkit.dll": {}
         },
         "resource": {
-          "lib/net40/cs-CZ/Xceed.Wpf.AvalonDock.resources.dll": {
-            "locale": "cs-CZ"
-          },
           "lib/net40/de/Xceed.Wpf.AvalonDock.resources.dll": {
             "locale": "de"
           },
@@ -307,7 +357,7 @@
           "lib/itextsharp.dll": {}
         }
       },
-      "MaterialDesignColors/2.1.0": {
+      "MaterialDesignColors/2.1.4": {
         "type": "package",
         "compile": {
           "lib/net462/MaterialDesignColors.dll": {}
@@ -316,10 +366,10 @@
           "lib/net462/MaterialDesignColors.dll": {}
         }
       },
-      "MaterialDesignThemes/4.7.0": {
+      "MaterialDesignThemes/4.9.0": {
         "type": "package",
         "dependencies": {
-          "MaterialDesignColors": "2.1.0",
+          "MaterialDesignColors": "2.1.4",
           "Microsoft.Xaml.Behaviors.Wpf": "1.1.39"
         },
         "compile": {
@@ -449,13 +499,40 @@
           "build/EMGU.CV.targets": {}
         }
       },
-      "Extended.Wpf.Toolkit/3.8.2": {
+      "EPPlus/4.5.3.1": {
         "type": "package",
+        "frameworkAssemblies": [
+          "PresentationCore",
+          "System",
+          "System.Core",
+          "System.Data",
+          "System.Drawing",
+          "System.Security",
+          "System.Xml",
+          "System.configuration"
+        ],
+        "compile": {
+          "lib/net40/EPPlus.dll": {}
+        },
+        "runtime": {
+          "lib/net40/EPPlus.dll": {}
+        }
+      },
+      "Extended.Wpf.Toolkit/2.9.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "PresentationCore",
+          "PresentationFramework",
+          "System",
+          "System.Xaml",
+          "WindowsBase"
+        ],
         "compile": {
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.Aero.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.Metro.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.VS2010.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.dll": {},
+          "lib/net40/Xceed.Wpf.DataGrid.dll": {},
           "lib/net40/Xceed.Wpf.Toolkit.dll": {}
         },
         "runtime": {
@@ -463,12 +540,10 @@
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.Metro.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.VS2010.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.dll": {},
+          "lib/net40/Xceed.Wpf.DataGrid.dll": {},
           "lib/net40/Xceed.Wpf.Toolkit.dll": {}
         },
         "resource": {
-          "lib/net40/cs-CZ/Xceed.Wpf.AvalonDock.resources.dll": {
-            "locale": "cs-CZ"
-          },
           "lib/net40/de/Xceed.Wpf.AvalonDock.resources.dll": {
             "locale": "de"
           },
@@ -513,7 +588,7 @@
           "lib/itextsharp.dll": {}
         }
       },
-      "MaterialDesignColors/2.1.0": {
+      "MaterialDesignColors/2.1.4": {
         "type": "package",
         "compile": {
           "lib/net462/MaterialDesignColors.dll": {}
@@ -522,10 +597,10 @@
           "lib/net462/MaterialDesignColors.dll": {}
         }
       },
-      "MaterialDesignThemes/4.7.0": {
+      "MaterialDesignThemes/4.9.0": {
         "type": "package",
         "dependencies": {
-          "MaterialDesignColors": "2.1.0",
+          "MaterialDesignColors": "2.1.4",
           "Microsoft.Xaml.Behaviors.Wpf": "1.1.39"
         },
         "compile": {
@@ -655,13 +730,40 @@
           "build/EMGU.CV.targets": {}
         }
       },
-      "Extended.Wpf.Toolkit/3.8.2": {
+      "EPPlus/4.5.3.1": {
         "type": "package",
+        "frameworkAssemblies": [
+          "PresentationCore",
+          "System",
+          "System.Core",
+          "System.Data",
+          "System.Drawing",
+          "System.Security",
+          "System.Xml",
+          "System.configuration"
+        ],
+        "compile": {
+          "lib/net40/EPPlus.dll": {}
+        },
+        "runtime": {
+          "lib/net40/EPPlus.dll": {}
+        }
+      },
+      "Extended.Wpf.Toolkit/2.9.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "PresentationCore",
+          "PresentationFramework",
+          "System",
+          "System.Xaml",
+          "WindowsBase"
+        ],
         "compile": {
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.Aero.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.Metro.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.VS2010.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.dll": {},
+          "lib/net40/Xceed.Wpf.DataGrid.dll": {},
           "lib/net40/Xceed.Wpf.Toolkit.dll": {}
         },
         "runtime": {
@@ -669,12 +771,10 @@
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.Metro.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.Themes.VS2010.dll": {},
           "lib/net40/Xceed.Wpf.AvalonDock.dll": {},
+          "lib/net40/Xceed.Wpf.DataGrid.dll": {},
           "lib/net40/Xceed.Wpf.Toolkit.dll": {}
         },
         "resource": {
-          "lib/net40/cs-CZ/Xceed.Wpf.AvalonDock.resources.dll": {
-            "locale": "cs-CZ"
-          },
           "lib/net40/de/Xceed.Wpf.AvalonDock.resources.dll": {
             "locale": "de"
           },
@@ -719,7 +819,7 @@
           "lib/itextsharp.dll": {}
         }
       },
-      "MaterialDesignColors/2.1.0": {
+      "MaterialDesignColors/2.1.4": {
         "type": "package",
         "compile": {
           "lib/net462/MaterialDesignColors.dll": {}
@@ -728,10 +828,10 @@
           "lib/net462/MaterialDesignColors.dll": {}
         }
       },
-      "MaterialDesignThemes/4.7.0": {
+      "MaterialDesignThemes/4.9.0": {
         "type": "package",
         "dependencies": {
-          "MaterialDesignColors": "2.1.0",
+          "MaterialDesignColors": "2.1.4",
           "Microsoft.Xaml.Behaviors.Wpf": "1.1.39"
         },
         "compile": {
@@ -1175,23 +1275,42 @@
         "lib/net35/Emgu.CV.World.xml"
       ]
     },
-    "Extended.Wpf.Toolkit/3.8.2": {
-      "sha512": "PtCcY0iuDI3d6y8ot3G6ne1+05vSGxZjUWWuVLPLdIvumIGlkq8xcq0sH5YKoI9lJTRtL46bOpMNS5dpajqyjQ==",
+    "EPPlus/4.5.3.1": {
+      "sha512": "2BFgconr3ZxC95P2KkEzcagdlGTBC14BD/39oy7GDHuJMqrJl3nvrHEegNTdIvlOG46T+AaI416zJQ5qBIzi8g==",
       "type": "package",
-      "path": "extended.wpf.toolkit/3.8.2",
+      "path": "epplus/4.5.3.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "epplus.4.5.3.1.nupkg.sha512",
+        "epplus.nuspec",
+        "lib/net35/EPPlus.dll",
+        "lib/net35/EPPlus.xml",
+        "lib/net40/EPPlus.dll",
+        "lib/net40/EPPlus.xml",
+        "lib/netstandard2.0/EPPlus.dll",
+        "lib/netstandard2.0/EPPlus.xml",
+        "readme.txt"
+      ]
+    },
+    "Extended.Wpf.Toolkit/2.9.0": {
+      "sha512": "W2T2Qle8vGkmm2F1N25ZPGrUlKCCKyPrrpMq/wvuOf5zMjEGm6uEwNkXbRZtVd8OQ2TSp1zoprxzQMv1zTwc9g==",
+      "type": "package",
+      "path": "extended.wpf.toolkit/2.9.0",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "LICENSE.txt",
-        "extended.wpf.toolkit.3.8.2.nupkg.sha512",
+        "extended.wpf.toolkit.2.9.0.nupkg.sha512",
         "extended.wpf.toolkit.nuspec",
+        "lib/net35/WPFToolkit.dll",
+        "lib/net35/Xceed.Wpf.Toolkit.dll",
         "lib/net40/Xceed.Wpf.AvalonDock.Themes.Aero.dll",
         "lib/net40/Xceed.Wpf.AvalonDock.Themes.Metro.dll",
         "lib/net40/Xceed.Wpf.AvalonDock.Themes.VS2010.dll",
         "lib/net40/Xceed.Wpf.AvalonDock.dll",
+        "lib/net40/Xceed.Wpf.DataGrid.dll",
         "lib/net40/Xceed.Wpf.Toolkit.dll",
-        "lib/net40/cs-CZ/Xceed.Wpf.AvalonDock.resources.dll",
         "lib/net40/de/Xceed.Wpf.AvalonDock.resources.dll",
         "lib/net40/es/Xceed.Wpf.AvalonDock.resources.dll",
         "lib/net40/fr/Xceed.Wpf.AvalonDock.resources.dll",
@@ -1221,10 +1340,10 @@
         "notice.txt"
       ]
     },
-    "MaterialDesignColors/2.1.0": {
-      "sha512": "cK+ovgmFeWcXUKZizjlpwgvTiHPmoiWS7EsXlHPJPwPhl/lXozY9RiNUPaUMTDGG/GR61eohnSCcTnETSwATRA==",
+    "MaterialDesignColors/2.1.4": {
+      "sha512": "C4Oy+qkjMoMPoZKyqYdCnIYtK8c0OSIHmNP73Vgc69NjiUG093xTkE7W/Ks54cTDS7fmWOtUHfwISTVTtb/YKg==",
       "type": "package",
-      "path": "materialdesigncolors/2.1.0",
+      "path": "materialdesigncolors/2.1.4",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1237,14 +1356,14 @@
         "lib/net7.0/MaterialDesignColors.pdb",
         "lib/netcoreapp3.1/MaterialDesignColors.dll",
         "lib/netcoreapp3.1/MaterialDesignColors.pdb",
-        "materialdesigncolors.2.1.0.nupkg.sha512",
+        "materialdesigncolors.2.1.4.nupkg.sha512",
         "materialdesigncolors.nuspec"
       ]
     },
-    "MaterialDesignThemes/4.7.0": {
-      "sha512": "SktJPYTVAmvf3T8901WEXHgApCvhoYO/vy1DKelyjU92lcGjIkLMboLvPjddc61l3J6AbnFue1kMlWijNll8PA==",
+    "MaterialDesignThemes/4.9.0": {
+      "sha512": "Bp9Auw70j+9V7WsUMT4pc8ulVzfL0Eav/tyGgICDirxxhKJwhqtC/6PRkTUm+R1t9611xiDuk5pSUNdDV6vfOQ==",
       "type": "package",
-      "path": "materialdesignthemes/4.7.0",
+      "path": "materialdesignthemes/4.9.0",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
@@ -1281,7 +1400,7 @@
         "lib/netcoreapp3.1/MaterialDesignThemes.Wpf.dll",
         "lib/netcoreapp3.1/MaterialDesignThemes.Wpf.pdb",
         "lib/netcoreapp3.1/MaterialDesignThemes.Wpf.xml",
-        "materialdesignthemes.4.7.0.nupkg.sha512",
+        "materialdesignthemes.4.9.0.nupkg.sha512",
         "materialdesignthemes.nuspec",
         "tools/VisualStudioToolsManifest.xml"
       ]
@@ -1354,10 +1473,9 @@
   "projectFileDependencyGroups": {
     ".NETFramework,Version=v4.7.2": [
       "Dragablz >= 0.0.3.234",
+      "EPPlus >= 4.5.3.1",
       "Emgu.CV >= 4.1.0.3420",
-      "Extended.Wpf.Toolkit >= 3.8.2",
-      "MaterialDesignColors >= 2.1.0",
-      "MaterialDesignThemes >= 4.7.0",
+      "MaterialDesignThemes >= 4.9.0",
       "Xceed.Wpf.AvalonDock.Themes.VS2013 >= 2.9.0.1",
       "iTextSharp >= 5.5.13.3"
     ]
@@ -1399,21 +1517,17 @@
             "target": "Package",
             "version": "[0.0.3.234, )"
           },
+          "EPPlus": {
+            "target": "Package",
+            "version": "[4.5.3.1, )"
+          },
           "Emgu.CV": {
             "target": "Package",
             "version": "[4.1.0.3420, )"
           },
-          "Extended.Wpf.Toolkit": {
-            "target": "Package",
-            "version": "[3.8.2, )"
-          },
-          "MaterialDesignColors": {
-            "target": "Package",
-            "version": "[2.1.0, )"
-          },
           "MaterialDesignThemes": {
             "target": "Package",
-            "version": "[4.7.0, )"
+            "version": "[4.9.0, )"
           },
           "Xceed.Wpf.AvalonDock.Themes.VS2013": {
             "target": "Package",

@@ -42,8 +42,8 @@
                 </Grid.ColumnDefinitions>
                 <RadioButton  Name="bnContinuesMode"  Checked="bnContinuesMode_Checked" IsEnabled="False" Grid.Column="0" VerticalAlignment="Center">continuous mode</RadioButton>
                 <RadioButton  Name="bnTriggerMode" Checked="bnTriggerMode_Checked" IsEnabled="False" Grid.Column="1" VerticalAlignment="Center">trigger mode</RadioButton>
-                <Button Name="bnOpen" Click="bnOpen_Click" Grid.Column="2" VerticalAlignment="Center" Height="25">Turn on</Button>
-                <Button  Name="bnClose" Click="bnClose_Click" IsEnabled="False" Grid.Column="3" VerticalAlignment="Center" Height="25">Turn off</Button>
+                <Button Name="bnOpen" Click="bnOpen_Click" Grid.Column="2" VerticalAlignment="Center" Height="25">Open Camera</Button>
+                <Button  Name="bnClose" Click="bnClose_Click" IsEnabled="False" Grid.Column="3" VerticalAlignment="Center" Height="25">Close Camera</Button>
             </Grid>
 
             <Grid Height="25" >
@@ -55,7 +55,7 @@
                 </Grid.ColumnDefinitions>
                 <Button  Name="bnStartGrab"  Click="bnStartGrab_Click" IsEnabled="False"  Grid.Column="0" >Start collecting</Button>
                 <Button  Name="bnStopGrab"  Click="bnStopGrab_Click" IsEnabled="False"  Grid.Column="1">Stop collection</Button>
-                <Button Name="bnTriggerExec" Click="bnTriggerExec_Click" IsEnabled="False" Grid.Column="2" >Soft trigger once</Button>
+                <Button Name="bnSoftTriggerOnce" Click="bnSoftTriggerOnce_Click" IsEnabled="False" Grid.Column="2" >Soft trigger once</Button>
                 <CheckBox  Name="cbSoftTrigger" Checked="cbSoftTrigger_Checked" IsEnabled="False"  Grid.Column="3" VerticalAlignment="Center" Background="WhiteSmoke">Soft trigger</CheckBox>
             </Grid>
 

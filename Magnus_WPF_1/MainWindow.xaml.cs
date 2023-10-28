@@ -1,38 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Magnus_WPF_1.Source.Application;
+//using System.Windows.Forms;
+using Magnus_WPF_1.Source.LogMessage;
+using Magnus_WPF_1.UI.UserControls.View;
+using System;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Xceed.Wpf.AvalonDock.Layout;
-using Magnus_WPF_1.Source.Application;
-using Magnus_WPF_1.UI.UserControls.View;
-using System.IO;
-using System.Threading;
-using Emgu.CV.Ocl;
-using Magnus_WPF_1.Source.Define;
-using Magnus_WPF_1.Source.Algorithm;
-using Emgu.CV;
-using iTextSharp.text.pdf.parser;
-using System.Security.Cryptography;
-//using System.Windows.Forms;
-using Magnus_WPF_1.Source.LogMessage;
 
 namespace Magnus_WPF_1
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window,INotifyPropertyChanged
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
 
         public Master master;
@@ -55,7 +39,7 @@ namespace Magnus_WPF_1
 
         private LayoutDocument teachViewDoc;
         public static ImageView activeImageDock;
-        public static 
+        public static
         LayoutPanel layoutRoot;
 
 
@@ -140,7 +124,7 @@ namespace Magnus_WPF_1
         {
             m_nDeviceX = Source.Application.Application.categoriesMappingParam.M_NumberDeviceX;
             m_nDeviceY = Source.Application.Application.categoriesMappingParam.M_NumberDeviceY;
-            int nMaxDeviceStep = m_nDeviceX > m_nDeviceY? m_nDeviceX : m_nDeviceY;
+            int nMaxDeviceStep = m_nDeviceX > m_nDeviceY ? m_nDeviceX : m_nDeviceY;
             if (canvas_Mapping.Children != null)
             {
                 //canvas_Mapping.Children.RemoveRange(0, canvas_Mapping.Children.Count);
@@ -149,7 +133,7 @@ namespace Magnus_WPF_1
             }
 
             m_nWidthMappingRect = 500 / nMaxDeviceStep;
-            m_nStepMappingRect = m_nWidthMappingRect + 10/ nMaxDeviceStep;
+            m_nStepMappingRect = m_nWidthMappingRect + 10 / nMaxDeviceStep;
             string path = @"/Resources/gray-chip.png";
             arr_imageMapping = new Image[m_nDeviceX * m_nDeviceY];
             arr_textBlockMapping = new Label[m_nDeviceX * m_nDeviceY];
@@ -162,8 +146,8 @@ namespace Magnus_WPF_1
                     //Canvas canvas_temp = new Canvas();
                     arr_imageMapping[nID] = new Image();
                     arr_imageMapping[nID].Source = new BitmapImage(new Uri(path, UriKind.Relative));
-                    arr_imageMapping[nID].Width =  0.95 * m_nWidthMappingRect;
-                    arr_imageMapping[nID].Height =  0.95 * m_nWidthMappingRect;
+                    arr_imageMapping[nID].Width = 0.95 * m_nWidthMappingRect;
+                    arr_imageMapping[nID].Height = 0.95 * m_nWidthMappingRect;
                     arr_textBlockMapping[nID] = new Label();
                     arr_textBlockMapping[nID].Content = (nDeviceX + 1 + nDeviceY * m_nDeviceX);
                     arr_textBlockMapping[nID].FontSize = 0.95 * m_nWidthMappingRect / 3;
@@ -175,7 +159,7 @@ namespace Magnus_WPF_1
                     canvas_Mapping.Children.Add(arr_imageMapping[nID]);
 
                     Canvas.SetLeft(arr_textBlockMapping[nID], m_nStepMappingRect * nDeviceX);
-                    Canvas.SetTop(arr_textBlockMapping[nID], m_nStepMappingRect * nDeviceY + arr_textBlockMapping[nID].FontSize/3);
+                    Canvas.SetTop(arr_textBlockMapping[nID], m_nStepMappingRect * nDeviceY + arr_textBlockMapping[nID].FontSize / 3);
                     canvas_Mapping.Children.Add(arr_textBlockMapping[nID]);
 
 
@@ -195,10 +179,10 @@ namespace Magnus_WPF_1
         int nDeviceID = -1;
         private int Check_mapping_Cursor_ID(Point cur_point)
         {
-            int  nIDX = (int)(cur_point.X / m_nStepMappingRect);
+            int nIDX = (int)(cur_point.X / m_nStepMappingRect);
             int nIDY = (int)(cur_point.Y / m_nStepMappingRect);
 
-            if( nDeviceID != nIDX + nIDY * m_nDeviceX )
+            if (nDeviceID != nIDX + nIDY * m_nDeviceX)
             {
                 nDeviceID = nIDX + nIDY * m_nDeviceX;
                 if (nIDX < m_nDeviceX && nIDY < m_nDeviceY)
@@ -224,8 +208,8 @@ namespace Magnus_WPF_1
             m_CanvasMovePoint = e.GetPosition(canvas_Mapping);
             int nID = Check_mapping_Cursor_ID(m_CanvasMovePoint);
             master.m_Tracks[0].m_nCurrentClickMappingID = nID;
-            if(btn_run_sequence.IsChecked ==true)
-                 Master.m_hardwareTriggerSnapEvent[0].Set();
+            if (btn_run_sequence.IsChecked == true)
+                Master.m_hardwareTriggerSnapEvent[0].Set();
             else
                 Master.InspectEvent[0].Set();
         }
@@ -233,7 +217,7 @@ namespace Magnus_WPF_1
         private void canvas_Mapping_MouseMove(object sender, MouseEventArgs e)
         {
             m_CanvasMovePoint = e.GetPosition(canvas_Mapping);
-            Check_mapping_Cursor_ID(m_CanvasMovePoint);        
+            Check_mapping_Cursor_ID(m_CanvasMovePoint);
         }
 
         private void canvas_Mapping_MouseLeave(object sender, MouseEventArgs e)
@@ -260,20 +244,20 @@ namespace Magnus_WPF_1
             teachViewDoc = new LayoutDocument();
             teachViewDoc.CanClose = false;
             teachViewDoc.CanFloat = false;
-            teachViewDoc.CanMove = false;
+            //teachViewDoc.CanMove = false;
             teachViewDoc.Title = "Camera View";
             teachViewDoc.ContentId = "Teach";
-           // teachViewDoc.Content = master.teachView;
+            // teachViewDoc.Content = master.teachView;
         }
         private void ContrucUIComponent()
         {
             InitBigDocPanel();
 
-           // InitTeachDocument();
+            // InitTeachDocument();
 
             layoutPanel = new LayoutPanel();
             mainPanelGroup = new LayoutDocumentPaneGroup();
-           // mainPanelGroup.Orientation = Orientation.Horizontal;
+            // mainPanelGroup.Orientation = Orientation.Horizontal;
 
             int numTrack, num_Doc, total_doc;
             numTrack = Magnus_WPF_1.Source.Application.Application.m_nTrack;
@@ -311,15 +295,15 @@ namespace Magnus_WPF_1
                         ContentId = "N/A ",
                         CanFloat = false,
                         CanClose = false,
-                        CanMove = false,
+                        //CanMove = false,
                     };
                     imagesViewPane[track_index * num_Doc + doc_index].Children.Add(imagesViewDoc[track_index * num_Doc + doc_index]);
                 }
             }
             #endregion
 
-           // grd_Status_Offline.Children.Add(statusUC);
-           // statusUC.UpdateStatus("IDLE");
+            // grd_Status_Offline.Children.Add(statusUC);
+            // statusUC.UpdateStatus("IDLE");
 
             #region Show UI
             layoutRoot = new LayoutPanel();
@@ -397,7 +381,7 @@ namespace Magnus_WPF_1
                 bigTagPanel.ReplaceChild(bigDoc, imagesViewDoc[trackID]);
                 imagesViewDoc[trackID].CanClose = false;
                 imagesViewDoc[trackID].CanFloat = false;
-                imagesViewDoc[trackID].CanMove = false;
+                //imagesViewDoc[trackID].CanMove = false;
 
                 layoutPanel.ReplaceChildAt(trackID, bigPanelGroup);
             }
@@ -406,7 +390,7 @@ namespace Magnus_WPF_1
                 mainPanelGroup = oldPanelGroup;
                 imagesViewDoc[trackID].CanClose = false;
                 imagesViewDoc[trackID].CanFloat = false;
-                imagesViewDoc[trackID].CanMove = false;
+                //imagesViewDoc[trackID].CanMove = false;
                 bigTagPanel.ReplaceChild(imagesViewDoc[trackID], bigDoc);
                 imagesViewPane[trackID].Children.Add(imagesViewDoc[trackID]);
                 layoutPanel.ReplaceChildAt(trackID, layoutRoot);
@@ -464,6 +448,38 @@ namespace Magnus_WPF_1
 
         }
 
+        private void Camera_Setting_Checked(object sender, RoutedEventArgs e)
+        {
+            bool bEnable = (bool)camera_setting_btn.IsChecked;
+
+            int currentTabIndex = tab_controls.SelectedIndex;
+            //tt_DialogSettings.X = 0;
+            //tt_DialogSettings.Y = 0;
+
+            grd_PopupDialog.Children.Clear();
+            if(master.m_Tracks[0].hIKControlCameraView != null)
+                grd_PopupDialog.Children.Add(master.m_Tracks[0].hIKControlCameraView);
+            //grd_Dialog_Settings.Margin = new Thickness(0, 160, 0, 0);
+            //grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Top;
+            //grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Left;
+            //master.teachParameter.Width = 300;
+            //master.teachParameter.Height = 600;
+            //master.m_Tracks[0].m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autofocus, 1);
+
+            //grd_PopupDialog.Children.Add(master.teachParameter);
+            //grd_PopupDialog.Children.Add(master.m_Tracks[]);
+            //tab_controls.SelectedIndex = currentTabIndex;
+
+
+        }
+
+        private void Camera_Setting_Unchecked(object sender, RoutedEventArgs e)
+        {
+            bool bEnable = (bool)camera_setting_btn.IsChecked;
+            grd_PopupDialog.Children.Clear();
+
+        }
+
         private void PreviewMouseDownInspectionBtn(object sender, MouseButtonEventArgs e)
         {
 
@@ -509,12 +525,12 @@ namespace Magnus_WPF_1
 
             if (master.threadGrabImageSimulateCycle == null)
             {
-                master.threadGrabImageSimulateCycle = new System.Threading.Thread(new System.Threading.ThreadStart(() =>master.Grab_Image_Testing_Thread(true)));
+                master.threadGrabImageSimulateCycle = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread(true)));
                 master.threadGrabImageSimulateCycle.Start();
             }
             else if (!master.threadGrabImageSimulateCycle.IsAlive)
             {
-                master.threadGrabImageSimulateCycle = new System.Threading.Thread(new System.Threading.ThreadStart(() =>master.Grab_Image_Testing_Thread(true)));
+                master.threadGrabImageSimulateCycle = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread(true)));
                 master.threadGrabImageSimulateCycle.Start();
             }
 
@@ -565,7 +581,7 @@ namespace Magnus_WPF_1
         }
 
 
-
+        //HIKControlCameraView cameraView = new HIKControlCameraView();
         private void teach_parameters_btn_Checked(object sender, RoutedEventArgs e)
         {
             teach_parameters_btn.IsChecked = true;
@@ -587,7 +603,9 @@ namespace Magnus_WPF_1
             //master.m_Tracks[0].m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autofocus, 1);
 
             grd_PopupDialog.Children.Add(master.teachParameter);
+            //grd_PopupDialog.Children.Add(master.m_Tracks[]);
             tab_controls.SelectedIndex = currentTabIndex;
+
         }
 
         private void teach_parameters_btn_Unchecked(object sender, RoutedEventArgs e)
@@ -650,35 +668,35 @@ namespace Magnus_WPF_1
 
         private void btn_next_teach_click(object sender, RoutedEventArgs e)
         {
-            if(Master.m_bIsTeaching)
+            if (Master.m_bIsTeaching)
                 Master.m_NextStepTeachEvent.Set();
-        //    nCurrentTeachingStep++;
-        //    if(nCurrentTeachingStep < (int)TEACHSTEP.TEACH_TOTALSTEP)
-        //        master.m_Tracks[0].m_imageViews[0].Teach(nCurrentTeachingStep);
-        //    else
-        //    {
-        //        var result = MessageBox.Show("Do you want to save teach parameter ?", "Save Teach Parameter", MessageBoxButton.YesNo, MessageBoxImage.Question);
-        //        if (result == MessageBoxResult.Yes)
-        //        {
-        //            master.m_Tracks[0].m_imageViews[0].SetTeachParameterToCategories();
-        //            InspectionCore.SetTeachParameterToInspectionCore();
-        //            InspectionCore.SetTemplateImage();
-        //            //master.m_Tracks[0].m_imageViews[0].SaveTeachImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp"));
-        //            master.m_Tracks[0].m_imageViews[0].saveTemplateImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "templateImage_1.bmp"));
-        //            mainWindow.master.WriteTeachParam();
-        //            master.m_Tracks[0].m_imageViews[0].resultTeach.Children.Clear();
-        //            master.m_Tracks[0].m_imageViews[0].ClearOverlay();
+            //    nCurrentTeachingStep++;
+            //    if(nCurrentTeachingStep < (int)TEACHSTEP.TEACH_TOTALSTEP)
+            //        master.m_Tracks[0].m_imageViews[0].Teach(nCurrentTeachingStep);
+            //    else
+            //    {
+            //        var result = MessageBox.Show("Do you want to save teach parameter ?", "Save Teach Parameter", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            //        if (result == MessageBoxResult.Yes)
+            //        {
+            //            master.m_Tracks[0].m_imageViews[0].SetTeachParameterToCategories();
+            //            InspectionCore.SetTeachParameterToInspectionCore();
+            //            InspectionCore.SetTemplateImage();
+            //            //master.m_Tracks[0].m_imageViews[0].SaveTeachImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp"));
+            //            master.m_Tracks[0].m_imageViews[0].saveTemplateImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "templateImage_1.bmp"));
+            //            mainWindow.master.WriteTeachParam();
+            //            master.m_Tracks[0].m_imageViews[0].resultTeach.Children.Clear();
+            //            master.m_Tracks[0].m_imageViews[0].ClearOverlay();
 
-        //        }
-        //        nCurrentTeachingStep = -1;
-        //        SetDisableTeachButton();
-        //        master.loadTeachImageToUI();
+            //        }
+            //        nCurrentTeachingStep = -1;
+            //        SetDisableTeachButton();
+            //        master.loadTeachImageToUI();
 
-        //    }
+            //    }
 
         }
 
-        
+
         private void btn_teach_click(object sender, RoutedEventArgs e)
         {
             if (Master.m_bIsTeaching)
@@ -726,8 +744,8 @@ namespace Magnus_WPF_1
 
         private void mapping_parameters_btn_Unchecked(object sender, RoutedEventArgs e)
         {
-                mapping_parameters_btn.IsChecked = false;
-                grd_PopupDialog.Children.Clear();
+            mapping_parameters_btn.IsChecked = false;
+            grd_PopupDialog.Children.Clear();
 
             if (m_nDeviceX != Source.Application.Application.categoriesMappingParam.M_NumberDeviceX || m_nDeviceY != Source.Application.Application.categoriesMappingParam.M_NumberDeviceY)
             {
@@ -735,7 +753,7 @@ namespace Magnus_WPF_1
                 InitCanvasMapping();
             }
 
-                //DisbleButtonStandard();
+            //DisbleButtonStandard();
         }
 
         private void mapping_parameters_btn_Checked(object sender, RoutedEventArgs e)
@@ -790,7 +808,7 @@ namespace Magnus_WPF_1
         {
             string path = @"/Resources/green-chip.png";
 
-            if (nResult <0)
+            if (nResult < 0)
                 path = @"/Resources/red-chip.png";
 
             arr_imageMapping[nID].Source = new BitmapImage(new Uri(path, UriKind.Relative));

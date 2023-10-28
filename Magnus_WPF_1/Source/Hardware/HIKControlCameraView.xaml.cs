@@ -26,9 +26,7 @@ namespace Magnus_WPF_1.Source.Hardware
             DeviceListAcq();
             InitializeCamera(strCameraID);
             // ch:设置采集连续模式 | en:Set Continues Aquisition Mode
-            m_MyCamera.MV_CC_SetEnumValue_NET("AcquisitionMode", (uint)MyCamera.MV_CAM_ACQUISITION_MODE.MV_ACQ_MODE_SINGLE);
-            m_MyCamera.MV_CC_SetEnumValue_NET("TriggerMode", (uint)MyCamera.MV_CAM_TRIGGER_MODE.MV_TRIGGER_MODE_ON);
-            m_MyCamera.MV_CC_SetEnumValue_NET("TriggerSource", (uint)MyCamera.MV_CAM_TRIGGER_SOURCE.MV_TRIGGER_SOURCE_SOFTWARE);
+
         }
 
         // ch:显示错误信息 | en:Show error message
@@ -134,9 +132,6 @@ namespace Magnus_WPF_1.Source.Hardware
             InitializeCamera("");
 
             // ch:设置采集连续模式 | en:Set Continues Aquisition Mode
-            m_MyCamera.MV_CC_SetEnumValue_NET("AcquisitionMode", (uint)MyCamera.MV_CAM_ACQUISITION_MODE.MV_ACQ_MODE_CONTINUOUS);
-            m_MyCamera.MV_CC_SetEnumValue_NET("TriggerMode", (uint)MyCamera.MV_CAM_TRIGGER_MODE.MV_TRIGGER_MODE_OFF);
-
             bnGetParam_Click(null, null);
 
             // ch:控件操作 | en:Control operation
@@ -149,7 +144,7 @@ namespace Magnus_WPF_1.Source.Hardware
             bnContinuesMode.IsChecked = true;
             bnTriggerMode.IsEnabled = true;
             cbSoftTrigger.IsEnabled = false;
-            bnTriggerExec.IsEnabled = false;
+            bnSoftTriggerOnce.IsEnabled = false;
 
             tbExposure.IsEnabled = true;
             tbGain.IsEnabled = true;
@@ -158,8 +153,7 @@ namespace Magnus_WPF_1.Source.Hardware
             bnSetParam.IsEnabled = true;
         }
 
-
-        private void InitializeCamera(string strCameraID)
+        public void InitializeCamera(string strCameraID)
         {
 
             int nCameraIndex = -1;
@@ -167,10 +161,10 @@ namespace Magnus_WPF_1.Source.Hardware
             if (strCameraID != "")
             {
                 // ch:选择第一项 | en:Select the first item
-                if (m_stDeviceList.nDeviceNum != 0)
-                {
-                    cbDeviceList.SelectedIndex = 0;
-                }
+                //if (m_stDeviceList.nDeviceNum != 0)
+                //{
+                //    cbDeviceList.SelectedIndex = 0;
+                //}
 
                 for (int n = 0; n < m_stDeviceList.nDeviceNum; n++)
                 {
@@ -199,10 +193,10 @@ namespace Magnus_WPF_1.Source.Hardware
                 // ch:获取选择的设备信息 | en:Get selected device information
             }
             else
-                nCameraIndex = (int)m_stDeviceList.pDeviceInfo[cbDeviceList.SelectedIndex];
+                nCameraIndex = cbDeviceList.SelectedIndex;
 
 
-            if (m_stDeviceList.nDeviceNum == 0 || nCameraIndex < 0)
+            if ( nCameraIndex < 0)
                 return;
 
            /* MyCamera.MV_CC_DEVICE_INFO*/ devices =
@@ -224,6 +218,12 @@ namespace Magnus_WPF_1.Source.Hardware
             {
                 return;
             }
+
+            if (m_MyCamera.MV_CC_IsDeviceConnected_NET())
+                m_MyCamera.MV_CC_CloseDevice_NET();
+
+            if (m_MyCamera.MV_CC_IsDeviceConnected_NET())
+                m_MyCamera.MV_CC_DestroyDevice_NET();
 
             nRet = m_MyCamera.MV_CC_OpenDevice_NET();
             if (MyCamera.MV_OK != nRet)
@@ -251,6 +251,11 @@ namespace Magnus_WPF_1.Source.Hardware
                 }
             }
 
+
+            m_MyCamera.MV_CC_SetEnumValue_NET("AcquisitionMode", (uint)MyCamera.MV_CAM_ACQUISITION_MODE.MV_ACQ_MODE_CONTINUOUS);
+            m_MyCamera.MV_CC_SetEnumValue_NET("TriggerMode", (uint)MyCamera.MV_CAM_TRIGGER_MODE.MV_TRIGGER_MODE_ON);
+            m_MyCamera.MV_CC_SetEnumValue_NET("TriggerSource", (uint)MyCamera.MV_CAM_TRIGGER_SOURCE.MV_TRIGGER_SOURCE_SOFTWARE);
+
         }
 
         private void bnClose_Click(object sender, RoutedEventArgs e)
@@ -274,7 +279,7 @@ namespace Magnus_WPF_1.Source.Hardware
             bnContinuesMode.IsEnabled = false;
             bnTriggerMode.IsEnabled = false;
             cbSoftTrigger.IsEnabled = false;
-            bnTriggerExec.IsEnabled = false;
+            bnSoftTriggerOnce.IsEnabled = false;
 
             tbExposure.IsEnabled = false;
             tbGain.IsEnabled = false;
@@ -289,7 +294,7 @@ namespace Magnus_WPF_1.Source.Hardware
             {
                 m_MyCamera.MV_CC_SetEnumValue_NET("TriggerMode", (uint)MyCamera.MV_CAM_TRIGGER_MODE.MV_TRIGGER_MODE_OFF);
                 cbSoftTrigger.IsEnabled = false;
-                bnTriggerExec.IsEnabled = false;
+                bnSoftTriggerOnce.IsEnabled = false;
             }
         }
 
@@ -306,7 +311,7 @@ namespace Magnus_WPF_1.Source.Hardware
                     m_MyCamera.MV_CC_SetEnumValue_NET("TriggerSource", (uint)MyCamera.MV_CAM_TRIGGER_SOURCE.MV_TRIGGER_SOURCE_SOFTWARE);
                     if (m_bGrabbing)
                     {
-                        bnTriggerExec.IsEnabled = true;
+                        bnSoftTriggerOnce.IsEnabled = true;
                     }
                 }
                 else
@@ -360,8 +365,8 @@ namespace Magnus_WPF_1.Source.Hardware
             {
                 if (stFrameInfo.pBufAddr != null)
                 {
-                    byte[] temp = new byte[stFrameInfo.stFrameInfo.nFrameLen];//= grabResult.PixelData as byte[];
-                    Marshal.Copy(stFrameInfo.pBufAddr, temp, 0, temp.Length);
+                    //byte[] temp = new byte[stFrameInfo.stFrameInfo.nFrameLen];//= grabResult.PixelData as byte[];
+                    Marshal.Copy(stFrameInfo.pBufAddr, pGrabbedImgBuf, 0, (int)stFrameInfo.stFrameInfo.nFrameLen);
 
                     //byte[] temp = new byte[stFrameInfo.stFrameInfo.nFrameLen];
                     //Marshal.Copy(stFrameInfo.pBufAddr,  (Intptr)pGrabbedImgBuf, 0, stFrameInfo.stFrameInfo.nFrameLen);
@@ -398,7 +403,7 @@ namespace Magnus_WPF_1.Source.Hardware
 
             if (true == bnTriggerMode.IsChecked && true == cbSoftTrigger.IsChecked)
             {
-                bnTriggerExec.IsEnabled = true;
+                bnSoftTriggerOnce.IsEnabled = true;
             }
         }
 
@@ -418,10 +423,10 @@ namespace Magnus_WPF_1.Source.Hardware
             bnStartGrab.IsEnabled = true;
             bnStopGrab.IsEnabled = false;
 
-            bnTriggerExec.IsEnabled = false;
+            bnSoftTriggerOnce.IsEnabled = false;
         }
 
-        private void bnTriggerExec_Click(object sender, RoutedEventArgs e)
+        private void bnSoftTriggerOnce_Click(object sender, RoutedEventArgs e)
         {
             // ch:触发命令 | en:Trigger command
             int nRet = m_MyCamera.MV_CC_SetCommandValue_NET("TriggerSoftware");
@@ -439,13 +444,13 @@ namespace Magnus_WPF_1.Source.Hardware
                 m_MyCamera.MV_CC_SetEnumValue_NET("TriggerSource", (uint)MyCamera.MV_CAM_TRIGGER_SOURCE.MV_TRIGGER_SOURCE_SOFTWARE);
                 if (m_bGrabbing)
                 {
-                    bnTriggerExec.IsEnabled = true;
+                    bnSoftTriggerOnce.IsEnabled = true;
                 }
             }
             else
             {
                 m_MyCamera.MV_CC_SetEnumValue_NET("TriggerSource", (uint)MyCamera.MV_CAM_TRIGGER_SOURCE.MV_TRIGGER_SOURCE_LINE0);
-                bnTriggerExec.IsEnabled = false;
+                bnSoftTriggerOnce.IsEnabled = false;
             }
         }
 

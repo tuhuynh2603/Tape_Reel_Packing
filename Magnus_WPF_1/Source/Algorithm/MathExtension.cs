@@ -1,11 +1,6 @@
-﻿using Emgu.CV.CvEnum;
-using Emgu.CV;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Magnus_WPF_1.Source.Algorithm
 {

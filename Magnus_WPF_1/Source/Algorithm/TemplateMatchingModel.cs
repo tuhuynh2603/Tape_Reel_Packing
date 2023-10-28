@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Drawing;
-using Emgu.CV;
+﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
 using CvImage = Emgu.CV.Mat;
 using CvPointFArray = Emgu.CV.Util.VectorOfPointF;
-using Emgu.CV.Flann;
-using System.Reflection;
-using Org.BouncyCastle.Tsp;
 
 namespace Magnus_WPF_1.Source.Algorithm
 {
@@ -195,10 +192,10 @@ namespace Magnus_WPF_1.Source.Algorithm
             return true;
         }
 
-        public bool MAgnus_TemplateMatching(CvImage img_ImageSource,CvImage img_Template, double minMatchingScore, int nStep, double nResolution, ref Rectangle rectMatchingPosition, ref double matchingAngle, ref double matchingScore)
+        public bool MAgnus_TemplateMatching(CvImage img_ImageSource, CvImage img_Template, double minMatchingScore, int nStep, double nResolution, ref Rectangle rectMatchingPosition, ref double matchingAngle, ref double matchingScore)
         {
 
-            float angleStart = -180;         
+            float angleStart = -180;
             List<CvImage> list_templateImages = new List<CvImage>();
             List<CvImage> list_maskTemplateImages = new List<CvImage>();
 
@@ -206,7 +203,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             {
                 CvImage templateMat = new CvImage();
                 CvImage maskMat = new CvImage();
-                Rectangle searchRoi = new Rectangle(0,0, img_Template.Width, img_Template.Height);
+                Rectangle searchRoi = new Rectangle(0, 0, img_Template.Width, img_Template.Height);
                 RotateCropImageAndMask(ref img_Template, searchRoi, (float)(angleStart + nResolution * index), ref templateMat, ref maskMat);
 
                 list_templateImages.Add(templateMat);
@@ -252,7 +249,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             int nStep = 5;
             double dResolutionTemp = 15;
 
-            double dAngleStart = matchingAngle -dResolutionTemp;
+            double dAngleStart = matchingAngle - dResolutionTemp;
 
             while (dResolutionTemp >= dResolution)
             {
@@ -296,7 +293,7 @@ namespace Magnus_WPF_1.Source.Algorithm
                                                    , rectTemplateMatchedPosition[nMaxScoreIndex].Size);
 
 
-               dAngleStart = matchingAngle - dResolutionTemp;
+                dAngleStart = matchingAngle - dResolutionTemp;
 
                 if (dAngleStart >= 180)
                     dAngleStart = 180 - dAngleStart;

@@ -1,37 +1,24 @@
-﻿using Emgu.CV.Structure;
+﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
+using Emgu.CV.WPF;
+using Magnus_WPF_1.Source.Algorithm;
+using Magnus_WPF_1.Source.Define;
+using Magnus_WPF_1.Source.Hardware;
 using Magnus_WPF_1.UI.UserControls.View;
+using MvCamCtrl.NET;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
-using System.Windows;
-using static Emgu.CV.VideoCapture;
-using Emgu.CV;
-using System.Windows.Controls;
 using System.Drawing;
-using System.Runtime.InteropServices;
-using Emgu.CV.WPF;
 using System.Drawing.Imaging;
-using System.Text.RegularExpressions;
-using System.ServiceModel.Configuration;
-using Magnus_WPF_1.Source.Algorithm;
-using static Magnus_WPF_1.Source.Algorithm.MagnusOpenCVLib;
-using static Magnus_WPF_1.Source.Algorithm.InspectionCore;
-using LineArray = System.Collections.Generic.List<Emgu.CV.Structure.LineSegment2D>;
-using System.Windows.Shapes;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Point = System.Drawing.Point;
 using Rectangle = System.Drawing.Rectangle;
-using Magnus_WPF_1.Source.Define;
-using System.Windows.Media;
-using Emgu.CV.CvEnum;
-using Org.BouncyCastle.Asn1.Cms;
-using Microsoft.Win32;
-using System.Windows.Forms;
-using System.Reflection;
 
 namespace Magnus_WPF_1.Source.Application
 {
@@ -39,24 +26,30 @@ namespace Magnus_WPF_1.Source.Application
     {
         private MainWindow mainWindow;
 
-        public static int m_Width = 1920;
-        public static int m_Height = 1080;
+        public static int m_Width = 3840;
+        public static int m_Height = 2748;
         public ImageView[] m_imageViews;
         public int[] m_nResult;
         public int m_nTrackID;
+        public HIKControlCameraView hIKControlCameraView;
         public VideoCapture m_cap;
+        public string m_strSeriCamera = "";
         Mat m_frame = new Mat();
         public Track(int indexTrack, int numdoc, string serieCam, MainWindow app)
         {
             m_nTrackID = indexTrack;
             mainWindow = app;
             m_imageViews = new ImageView[numdoc];
-            m_cap = new VideoCapture(0);
             m_nResult = new int[10000];
-            m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, m_Width);
-            m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, m_Height);
-            m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, 10);
-            m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autofocus, 1);
+            if(serieCam != "none")
+                hIKControlCameraView = new HIKControlCameraView(serieCam);
+            m_strSeriCamera = serieCam;
+
+            //m_cap = new VideoCapture(0);
+            //m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, m_Width);
+            //m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, m_Height);
+            //m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, 10);
+            //m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autofocus, 1);
             //m_cap.SetCaptureProperty(CapProp.Focus, 65); // set the focus to the specified value
 
             int dpi = 96;
@@ -133,7 +126,7 @@ namespace Magnus_WPF_1.Source.Application
             double nAngleOutput = 0;
             double dScoreOutput = 0;
             int nResult = InspectionCore.SimpleInspection(ref polygon, ref pCenter, ref mat_output, ref nAngleOutput, ref dScoreOutput);
-            
+
 
             //Draw Result
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
@@ -141,10 +134,10 @@ namespace Magnus_WPF_1.Source.Application
                 m_imageViews[0].ClearOverlay();
                 m_imageViews[0].ClearText();
                 SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
-                m_imageViews[0].DrawPolygonOverlay(ref polygon,color, 1);
+                m_imageViews[0].DrawPolygonOverlay(ref polygon, color, 1);
                 m_imageViews[0].DrawCrossPointOverlay(ref pCenter);
                 color = new SolidColorBrush(Colors.Yellow);
-                m_imageViews[0].DrawStringOverlay("(X, Y, Angle) = (" + pCenter.X.ToString() + ", " + pCenter.Y.ToString() +", " + ((int)nAngleOutput).ToString() + ")", pCenter.X + 10, pCenter.Y, color, 20);
+                m_imageViews[0].DrawStringOverlay("(X, Y, Angle) = (" + pCenter.X.ToString() + ", " + pCenter.Y.ToString() + ", " + ((int)nAngleOutput).ToString() + ")", pCenter.X + 10, pCenter.Y, color, 20);
 
                 //m_imageViews[0].DrawRegionOverlay(ref mat_output);
 
@@ -193,8 +186,8 @@ namespace Magnus_WPF_1.Source.Application
                 foreach (FileSystemInfo item in items)
                 {
 
-                    while(!Master.InspectEvent[0].WaitOne(100))                   
-                    { 
+                    while (!Master.InspectEvent[0].WaitOne(100))
+                    {
                         if (mainWindow == null)
                             return;
                     }
@@ -243,7 +236,7 @@ namespace Magnus_WPF_1.Source.Application
                 if (MainWindow.mainWindow.bEnableRunSequence == false)
                     return;
 
-                if(!Master.InspectEvent[0].WaitOne(1))
+                if (!Master.InspectEvent[0].WaitOne(1))
                     return;
 
                 Array.Clear(m_imageViews[0].bufferImage, 0, m_imageViews[0].bufferImage.Length);
@@ -323,6 +316,80 @@ namespace Magnus_WPF_1.Source.Application
             return 0;
         }
 
+        public int Snap_HIKCamera()
+        {
+            if (!hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
+                hIKControlCameraView.InitializeCamera(m_strSeriCamera);
+
+            int nRet = hIKControlCameraView.m_MyCamera.MV_CC_StartGrabbing_NET();
+            if (MyCamera.MV_OK != nRet)
+            {
+                hIKControlCameraView.m_bGrabbing = false;
+                return 0;
+            }
+            while (MainWindow.mainWindow.bEnableGrabCycle)
+            {
+                if (MainWindow.mainWindow == null)
+                    return -1;
+
+                int nWidth = 0, nHeight = 0;
+
+                nRet = hIKControlCameraView.m_MyCamera.MV_CC_SetCommandValue_NET("TriggerSoftware");
+                if (MyCamera.MV_OK != nRet)
+                {
+                    //OutputDe("Trigger Software Fail!", nRet);
+                    nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+                    return 0;
+                }
+
+                hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);
+                m_imageViews[0].UpdateSourceImageMono();
+                //m_imageViews[0].UpdateNewImageColor(m_imageViews[0].bufferImage, nWidth, nHeight, 96);
+                if (MyCamera.MV_OK != nRet)
+                {
+                    hIKControlCameraView.m_bGrabbing = false;
+                    nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+                    return 0;
+                }
+            }
+
+            nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+            return 0;
+        }
+
+
+        public int SingleSnap_HIKCamera()
+        {
+            if (!hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
+                hIKControlCameraView.InitializeCamera(m_strSeriCamera);
+
+            int nRet = hIKControlCameraView.m_MyCamera.MV_CC_StartGrabbing_NET();
+            if (MyCamera.MV_OK != nRet)
+            {
+                hIKControlCameraView.m_bGrabbing = false;
+                return 0;
+            }
+
+            int nWidth = 0, nHeight = 0;
+            nRet = hIKControlCameraView.m_MyCamera.MV_CC_SetCommandValue_NET("TriggerSoftware");
+            if (MyCamera.MV_OK != nRet)
+            {
+                //OutputDe("Trigger Software Fail!", nRet);
+                nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+                return 0;
+            }
+            hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);         
+            m_imageViews[0].UpdateSourceImageMono();
+            // m_imageViews[0].UpdateNewImageColor(m_imageViews[0].bufferImage, nWidth, nHeight, 96);
+            nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+            if (MyCamera.MV_OK != nRet)
+            {
+                hIKControlCameraView.m_bGrabbing = false;
+                return 0;
+            }
+            return 0;
+
+        }
         public int SingleSnap()
         {
             m_cap.ImageGrabbed += SingleOffline_ImageGrabbed;
@@ -352,7 +419,7 @@ namespace Magnus_WPF_1.Source.Application
 
             m_cap.ImageGrabbed += Online_ImageGrabbed;
             m_cap.Start();
-            while(MainWindow.mainWindow.bEnableRunSequence)
+            while (MainWindow.mainWindow.bEnableRunSequence)
             {
 
                 //if (MainWindow.mainWindow == null)
@@ -378,14 +445,14 @@ namespace Magnus_WPF_1.Source.Application
                     m_CurrentSequenceDeviceID = 0;
                 if (m_CurrentSequenceDeviceID == 0)
                 {
-                        m_strCurrentLot = string.Format("TrayID_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+                    m_strCurrentLot = string.Format("TrayID_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
                 }
 
 
                 // Do Inspection
                 Master.InspectEvent[0].Set();
                 bool b = false;
-                while(!Master.InspectDoneEvent[0].WaitOne(10))
+                while (!Master.InspectDoneEvent[0].WaitOne(10))
                 {
                     if (MainWindow.mainWindow == null)
                         return;

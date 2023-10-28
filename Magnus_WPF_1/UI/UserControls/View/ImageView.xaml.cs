@@ -1,10 +1,5 @@
 ﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Emgu.CV.Ocl;
-using Emgu.CV.Structure;
-using Emgu.CV.UI;
 using Emgu.CV.WPF;
-using iTextSharp.text;
 using Magnus_WPF_1.Source.Algorithm;
 using Magnus_WPF_1.Source.Application;
 using Magnus_WPF_1.Source.Define;
@@ -12,27 +7,18 @@ using Magnus_WPF_1.Source.DrawingOverlay;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
 using System.Diagnostics;
-using System.Drawing;
 //using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-using ZedGraph;
 using CvImage = Emgu.CV.Mat;
 using Line = System.Windows.Shapes.Line;
 using LineArray = System.Collections.Generic.List<Emgu.CV.Structure.LineSegment2D>;
@@ -62,7 +48,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
         public TransformImage transform;
 
         public string nameImage;
-       // public DefectInfor defectInfor = new DefectInfor();
+        // public DefectInfor defectInfor = new DefectInfor();
         public bool IsCamStream = false;
 
         public int trackID;
@@ -163,8 +149,10 @@ namespace Magnus_WPF_1.UI.UserControls.View
                 _stride = _imageWidth * 4;
                 bufferImage = new byte[_stride * _imageHeight];
                 btm.CopyPixels(bufferImage, _stride, 0);
-                UpdateSourceImageColor(true);
-               // MainWindow.mainWindow.isInspectOffline = false;
+                UpdateSourceImageMono();
+
+                // UpdateSourceImageColor(true);
+                // MainWindow.mainWindow.isInspectOffline = false;
                 return true;
             }
             catch (Exception)
@@ -252,7 +240,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
         }
         public void UpdateSourceImageMono(bool isOnline = false)
         {
-           // //DebugMessage.WriteToDebugViewer(1, $"_imageWidth of track: {_imageWidth}");
+            // //DebugMessage.WriteToDebugViewer(1, $"_imageWidth of track: {_imageWidth}");
             ////DebugMessage.WriteToDebugViewer(1, $"_imageHeight of track: {_imageHeight}");
 
             lock (bufferImage)
@@ -522,7 +510,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             //try
             //{
             //    if (trackID == 0)
-            SolidColorBrush color = new SolidColorBrush(Colors.Yellow);   
+            SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
             for (int n = 0; n < array_edges.Count(); n++)
             {
                 EDDrawingOverlay.DrawLine(GridOverlay, array_edges[n].P1, array_edges[n].P2, color);
@@ -551,13 +539,13 @@ namespace Magnus_WPF_1.UI.UserControls.View
             DrawPolygonOverlay(ref p2, color, 1);
 
         }
-        public void DrawPolygonOverlay(ref List<System.Drawing.Point> polygon_Input, SolidColorBrush color,  int nLineWidth = 1)
+        public void DrawPolygonOverlay(ref List<System.Drawing.Point> polygon_Input, SolidColorBrush color, int nLineWidth = 1)
         {
             try
             {
                 EDDrawingOverlay.DrawPolygon(GridOverlay, polygon_Input, color, nLineWidth);
             }
-            catch{ }
+            catch { }
 
         }
 
@@ -567,7 +555,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             {
                 EDDrawingOverlay.DrawString(GridOverlay, text, X, Y, brushColor, fontsize);
             }
-            catch{ }
+            catch { }
         }
 
         public void DrawRegionOverlay(ref Mat mat_Region)
@@ -580,7 +568,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             catch { }
         }
 
-        public void DrawRectangle(Rectangles  rec, System.Windows.Media.Brush color)
+        public void DrawRectangle(Rectangles rec, System.Windows.Media.Brush color)
         {
             try
             {
@@ -717,51 +705,51 @@ namespace Magnus_WPF_1.UI.UserControls.View
                 return;
             //if (trackID == 0)
             //{
-                BitmapSource currentSource = (BitmapSource)image.Source;
-                CvImage imgBgr = BitmapSourceConvert.ToMat(currentSource);
-                positionInImage = true;
-                int iw = ((BitmapSource)image.Source).PixelWidth;
-                int ih = ((BitmapSource)image.Source).PixelHeight;
-                int stride = iw * 4;
-                byte[] pixels = new byte[stride * ih];
-                ((BitmapSource)image.Source).CopyPixels(pixels, stride, 0);
+            //BitmapSource currentSource = (BitmapSource)image.Source;
+            //CvImage imgBgr = BitmapSourceConvert.ToMat(currentSource);
+            //positionInImage = true;
+            //int iw = ((BitmapSource)image.Source).PixelWidth;
+            //int ih = ((BitmapSource)image.Source).PixelHeight;
+            //int stride = iw * 4;
+            //byte[] pixels = new byte[stride * ih];
+            //((BitmapSource)image.Source).CopyPixels(pixels, stride, 0);
 
-                double scaleX = image.ActualWidth / ((BitmapSource)image.Source).PixelWidth;
-                double scaleY = image.ActualHeight / ((BitmapSource)image.Source).PixelHeight;
+            //double scaleX = image.ActualWidth / ((BitmapSource)image.Source).PixelWidth;
+            //double scaleY = image.ActualHeight / ((BitmapSource)image.Source).PixelHeight;
 
-                if ((int)(a.X / scaleX) >= ((BitmapSource)image.Source).PixelWidth - 15 || (int)(a.Y / scaleY) >= ((BitmapSource)image.Source).PixelHeight - 15)
-                    positionInImage = false;
+            //if ((int)(a.X / scaleX) >= ((BitmapSource)image.Source).PixelWidth - 15 || (int)(a.Y / scaleY) >= ((BitmapSource)image.Source).PixelHeight - 15)
+            //    positionInImage = false;
 
-                int diX = (int)(a.X / scaleX) >= ((BitmapSource)image.Source).PixelWidth ? ((BitmapSource)image.Source).PixelWidth - 1 : (int)(a.X / scaleX);
-                int diY = (int)(a.Y / scaleY) >= ((BitmapSource)image.Source).PixelHeight ? ((BitmapSource)image.Source).PixelHeight - 1 : (int)(a.Y / scaleY);
-                int index = diY * (stride) + diX;
+            //int diX = (int)(a.X / scaleX) >= ((BitmapSource)image.Source).PixelWidth ? ((BitmapSource)image.Source).PixelWidth - 1 : (int)(a.X / scaleX);
+            //int diY = (int)(a.Y / scaleY) >= ((BitmapSource)image.Source).PixelHeight ? ((BitmapSource)image.Source).PixelHeight - 1 : (int)(a.Y / scaleY);
+            //int index = diY * (stride) + diX;
 
-                byte red = pixels[index < 0 ? 0 : index > stride - 1 ? 0 : index];   // index overside
-                System.Drawing.Color color = new System.Drawing.Color();
-                color = imgBgr.Bitmap.GetPixel(diX, diY);
-                System.Drawing.Color colorGray = new System.Drawing.Color();
-                CvImage imgGray = new CvImage();
-                CvInvoke.CvtColor(imgBgr, imgGray, Emgu.CV.CvEnum.ColorConversion.Rgb2Gray);
-                colorGray = imgGray.Bitmap.GetPixel(diX, diY);
-                ((MainWindow)(System.Windows.Application.Current.MainWindow)).UpdateRGBValue("[" + diX.ToString() + ", " + diY.ToString() + "]",
-                                                                                "[" + color.R.ToString() + "," + color.G.ToString() + "," + color.B.ToString() + "]",
-                                                                                "[" + colorGray.R.ToString() + "]");
-            //}
+            //byte red = pixels[index < 0 ? 0 : index > stride - 1 ? 0 : index];   // index overside
+            //System.Drawing.Color color = new System.Drawing.Color();
+            //color = imgBgr.Bitmap.GetPixel(diX, diY);
+            //System.Drawing.Color colorGray = new System.Drawing.Color();
+            //CvImage imgGray = new CvImage();
+            //CvInvoke.CvtColor(imgBgr, imgGray, Emgu.CV.CvEnum.ColorConversion.Rgb2Gray);
+            //colorGray = imgGray.Bitmap.GetPixel(diX, diY);
+            //((MainWindow)(System.Windows.Application.Current.MainWindow)).UpdateRGBValue("[" + diX.ToString() + ", " + diY.ToString() + "]",
+            //                                                                "[" + color.R.ToString() + "," + color.G.ToString() + "," + color.B.ToString() + "]",
+            //                                                                "[" + colorGray.R.ToString() + "]");
+            ////}
             //else if (trackID == 1 || trackID == 2)
             //{
-            //    int stride = _imageWidth;
-            //    int size = _imageHeight * stride;
+            int stride = _imageWidth;
+            int size = _imageHeight * stride;
 
-            //    double scaleX = image.ActualWidth / _imageWidth;
-            //    double scaleY = image.ActualHeight / _imageHeight;
+            double scaleX = image.ActualWidth / _imageWidth;
+            double scaleY = image.ActualHeight / _imageHeight;
 
-            //    int diX = (int)(a.X / scaleX) >= _imageWidth ? _imageWidth - 1 : (int)(a.X / scaleX);
-            //    int diY = (int)(a.Y / scaleY) >= _imageHeight ? _imageHeight - 1 : (int)(a.Y / scaleY);
-            //    int index = diY * (stride) + diX;
-            //    byte red = bufferImage[index < 0 ? 0 : index > size - 1 ? 0 : index];   // index overside
-            //    ((MainWindow)(System.Windows.Application.Current.MainWindow)).UpdateGrayValue(trackID,
-            //                                                                    "[" + diX.ToString() + ", " + diY.ToString() + "]",
-            //                                                                    "[" + red.ToString() + "]");
+            int diX = (int)(a.X / scaleX) >= _imageWidth ? _imageWidth - 1 : (int)(a.X / scaleX);
+            int diY = (int)(a.Y / scaleY) >= _imageHeight ? _imageHeight - 1 : (int)(a.Y / scaleY);
+            int index = diY * (stride) + diX;
+            byte red = bufferImage[index < 0 ? 0 : index > size - 1 ? 0 : index];   // index overside
+            ((MainWindow)(System.Windows.Application.Current.MainWindow)).UpdateGrayValue(trackID,
+                                                                            "[" + diX.ToString() + ", " + diY.ToString() + "]",
+                                                                            "[" + red.ToString() + "]");
             //}
         }
         #endregion
@@ -894,18 +882,20 @@ namespace Magnus_WPF_1.UI.UserControls.View
         public void loadTeachImageToUI(int nTrack = 0)
         {
 
-            string image_top_view = System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp");
-            if (!File.Exists(image_top_view))
+            string strImagePath = System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp");
+            if (!File.Exists(strImagePath))
                 return;
             else
             {
-                string[] nameImageArray = image_top_view.Split('\\');
+                string[] nameImageArray = strImagePath.Split('\\');
                 int leght = nameImageArray.Count();
                 string _nameImage = nameImageArray[leght - 1];
                 nameImage = _nameImage;
-                BitmapImage bitmap = new BitmapImage();
-                bitmap = MainWindow.mainWindow.master.LoadBitmap(image_top_view);
-                UpdateNewImage(bitmap);
+                //Color Image
+                //BitmapImage bitmap = new BitmapImage();
+                //bitmap = MainWindow.mainWindow.master.LoadBitmap(strImagePath);
+                //UpdateNewImage(bitmap);
+                UpdateNewImageMono(strImagePath);
                 GridOverlay.Children.Clear();
                 UpdateTextOverlay("", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
                 MainWindow.mainWindow.UpdateTitleDoc(0, string.Format("Name Image: {0}", " teachImage.bmp"), true);
@@ -936,7 +926,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
         //            controlWin.Visibility = Visibility.Visible;
         //            SetControlWin(Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi);
         //            break;
-                    
+
         //        case (int)TEACHSTEP.TEACH_DEVICELOCATION_TEACHED:
         //            L_DeviceLocationRoi_Temp = GetRectangle();
         //            controlWin.Visibility = Visibility.Collapsed;

@@ -1,23 +1,17 @@
-﻿using System;
+﻿using Emgu.CV;
+using Magnus_WPF_1.Source.Algorithm;
+using Magnus_WPF_1.Source.Define;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Media.Imaging;
-using Emgu.CV;
-using Emgu.CV.Aruco;
-using Emgu.CV.CvEnum;
-using Magnus_WPF_1.Source.Algorithm;
-using Magnus_WPF_1.Source.Define;
-using Magnus_WPF_1.UI.UserControls;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Magnus_WPF_1.Source.Application
 {
-    public class Master {
+    public class Master
+    {
         //private int width, height, dpi;
 
         private MainWindow mainWindow;
@@ -81,7 +75,7 @@ namespace Magnus_WPF_1.Source.Application
         {
             for (int nTrack = 0; nTrack < Application.m_nTrack; nTrack++)
             {
-                m_Tracks[nTrack].m_cap.Dispose();
+                //m_Tracks[nTrack].m_cap.Dispose();
                 InspectEvent[nTrack].Reset();
                 InspectEvent[nTrack].Dispose();
                 InspectDoneEvent[nTrack].Reset();
@@ -117,7 +111,7 @@ namespace Magnus_WPF_1.Source.Application
         private void ContructorDocComponent()
         {
             m_Tracks = new Track[Application.m_nTrack];
-            string [] nSeriCam = { "none", "none" };
+            string[] nSeriCam = { "02C89933333", "none" };
             for (int index_track = 0; index_track < Application.m_nTrack; index_track++)
             {
                 //for(int index_doc = 0; index_doc < Application.m_nDoc; index_doc++)
@@ -152,18 +146,22 @@ namespace Magnus_WPF_1.Source.Application
         public void loadTeachImageToUI(int nTrack = 0)
         {
 
-            string image_top_view = System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp");
-            if (!File.Exists(image_top_view))
+            string strImageFilePath = System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp");
+            if (!File.Exists(strImageFilePath))
                 return;
             else
             {
-                string[] nameImageArray = image_top_view.Split('\\');
+                string[] nameImageArray = strImageFilePath.Split('\\');
                 int leght = nameImageArray.Count();
                 string _nameImage = nameImageArray[leght - 1];
                 m_Tracks[nTrack].m_imageViews[0].nameImage = _nameImage;
-                BitmapImage bitmap = new BitmapImage();
-                bitmap = LoadBitmap(image_top_view);
-                m_Tracks[nTrack].m_imageViews[0].UpdateNewImage(bitmap);
+
+                //Color Image
+                //BitmapImage bitmap = new BitmapImage();
+                //bitmap = LoadBitmap(strImageFilePath);
+                //m_Tracks[nTrack].m_imageViews[0].UpdateNewImage(bitmap);
+                // Mono Image
+                m_Tracks[nTrack].m_imageViews[0].UpdateNewImageMono(strImageFilePath);
                 m_Tracks[nTrack].m_imageViews[0].GridOverlay.Children.Clear();
                 m_Tracks[nTrack].m_imageViews[0].UpdateTextOverlay("", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
                 mainWindow.UpdateTitleDoc(0, string.Format("Name Image: {0}", " teachImage.bmp"), true);
@@ -174,14 +172,14 @@ namespace Magnus_WPF_1.Source.Application
         {
             //for (int index_track = 0; index_track < Application.m_nTrack; index_track++)
             //{
-            if(bSingleSnap)
-                m_Tracks[0].SingleSnap();
-            else
-                m_Tracks[0].Snap();
-
-            //}
+                if (bSingleSnap)
+                    //m_Tracks[0].SingleSnap();
+                    m_Tracks[0].SingleSnap_HIKCamera();
+                else
+                    m_Tracks[0].Snap_HIKCamera();
+                //m_Tracks[0].Snap();
+           // }
         }
-
         internal void RunSequenceThread()
         {
             mainWindow.ResetMappingResult();
@@ -204,9 +202,9 @@ namespace Magnus_WPF_1.Source.Application
 
         internal void RunSaveInspectImageThread()
         {
-            while(MainWindow.mainWindow!= null)
+            while (MainWindow.mainWindow != null)
             {
-                
+
                 ImageSaveData data = new ImageSaveData();
                 lock (m_SaveInspectImageQueue)
                 {
@@ -220,7 +218,7 @@ namespace Magnus_WPF_1.Source.Application
                     string strLotIDFolder = Path.Combine(Application.pathImageSave, data.strLotID);
                     if (!Directory.Exists(strLotIDFolder))
                         Directory.CreateDirectory(strLotIDFolder);
-                    string path_image = Path.Combine(strLotIDFolder,"Device_" + (data.nDeviceID + 1).ToString() + ".bmp");
+                    string path_image = Path.Combine(strLotIDFolder, "Device_" + (data.nDeviceID + 1).ToString() + ".bmp");
                     CvInvoke.Imwrite(path_image, data.imageSave);
                 }
                 catch (Exception)
@@ -279,7 +277,7 @@ namespace Magnus_WPF_1.Source.Application
         public void InspectOffline(string strFolder)
         {
 
-            m_Tracks[0].InspectOffline( strFolder);
+            m_Tracks[0].InspectOffline(strFolder);
         }
     }
 

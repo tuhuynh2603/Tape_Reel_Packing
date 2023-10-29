@@ -40,7 +40,7 @@ namespace Magnus_WPF_1
         private LayoutDocument teachViewDoc;
         public static ImageView activeImageDock;
         public static
-        LayoutPanel layoutRoot;
+        LayoutPanel m_layout;
 
 
         private Point _startPositionDlg;
@@ -56,7 +56,7 @@ namespace Magnus_WPF_1
             }
         }
 
-        private LayoutPanel layoutPanel;
+        private LayoutPanel m_layoutPanel;
         public delegate void StateWindow(WindowState state);
         public static StateWindow changeStateWindow;
         public MainWindow()
@@ -70,14 +70,13 @@ namespace Magnus_WPF_1
             mainWindow = this;
             master = new Master(this);
 
-            master.m_SaveInspectImageThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread(true)));
+            //master.m_SaveInspectImageThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread(true)));
 
             enable_saveimage_btn.IsChecked = Source.Application.Application.m_bEnableSavingOnlineImage;
 
 
             ContrucUIComponent();
             MappingImageDockToAvalonDock();
-            SetupImageDockMouseFeature();
             InitCanvasMapping();
             StateChanged += delegate (object sender, EventArgs e)
             {
@@ -207,9 +206,9 @@ namespace Magnus_WPF_1
         {
             m_CanvasMovePoint = e.GetPosition(canvas_Mapping);
             int nID = Check_mapping_Cursor_ID(m_CanvasMovePoint);
-            master.m_Tracks[0].m_nCurrentClickMappingID = nID;
+            master.m_Tracks[activeImageDock.trackID].m_nCurrentClickMappingID = nID;
             if (btn_run_sequence.IsChecked == true)
-                Master.m_hardwareTriggerSnapEvent[0].Set();
+                Master.m_hardwareTriggerSnapEvent[activeImageDock.trackID].Set();
             else
                 Master.InspectEvent[0].Set();
         }
@@ -255,7 +254,7 @@ namespace Magnus_WPF_1
 
             // InitTeachDocument();
 
-            layoutPanel = new LayoutPanel();
+            m_layoutPanel = new LayoutPanel();
             mainPanelGroup = new LayoutDocumentPaneGroup();
             // mainPanelGroup.Orientation = Orientation.Horizontal;
 
@@ -306,15 +305,15 @@ namespace Magnus_WPF_1
             // statusUC.UpdateStatus("IDLE");
 
             #region Show UI
-            layoutRoot = new LayoutPanel();
-            layoutRoot.Orientation = Orientation.Vertical;
-            layoutRoot.Children.Add(mainPanelGroup);
+            m_layout = new LayoutPanel();
+            m_layout.Orientation = Orientation.Vertical;
+            m_layout.Children.Add(mainPanelGroup);
 
-            layoutPanel.Orientation = Orientation.Horizontal;
-            layoutPanel.Children.Add(layoutRoot);
+            m_layoutPanel.Orientation = Orientation.Horizontal;
+            m_layoutPanel.Children.Add(m_layout);
 
             layoutHPSF = new LayoutRoot();
-            layoutHPSF.RootPanel = layoutPanel;
+            layoutHPSF.RootPanel = m_layoutPanel;
             #endregion
         }
         public event PropertyChangedEventHandler PropertyChanged;
@@ -356,20 +355,6 @@ namespace Magnus_WPF_1
                 });
             }
         }
-        private void SetupImageDockMouseFeature()
-        {
-            for (int index_track = 0; index_track < Magnus_WPF_1.Source.Application.Application.m_nTrack; index_track++)
-            {
-                master.m_Tracks[index_track].m_imageViews[0].MouseLeftButtonDown += getChosenDoc;
-                master.m_Tracks[index_track].m_imageViews[0].PreviewMouseDoubleClick += ImageDoc_DoubleClick;
-            }
-        }
-
-        private void ImageDoc_DoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            ZoomDocPanel(0);
-            //getChosenDoc()
-        }
 
         bool isOneSpecificDocState = false;
         public void ZoomDocPanel(int trackID)
@@ -383,7 +368,7 @@ namespace Magnus_WPF_1
                 imagesViewDoc[trackID].CanFloat = false;
                 //imagesViewDoc[trackID].CanMove = false;
 
-                layoutPanel.ReplaceChildAt(trackID, bigPanelGroup);
+                m_layoutPanel.ReplaceChildAt(0, bigPanelGroup);
             }
             else
             {
@@ -393,11 +378,14 @@ namespace Magnus_WPF_1
                 //imagesViewDoc[trackID].CanMove = false;
                 bigTagPanel.ReplaceChild(imagesViewDoc[trackID], bigDoc);
                 imagesViewPane[trackID].Children.Add(imagesViewDoc[trackID]);
-                layoutPanel.ReplaceChildAt(trackID, layoutRoot);
+                m_layoutPanel.ReplaceChildAt(0, m_layout);
             }
             isOneSpecificDocState = !isOneSpecificDocState;
             child_PreviewMouseRightButtonDown(activeImageDock, null);
         }
+
+
+
         private void child_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             ImageView im = sender as ImageView;
@@ -410,10 +398,7 @@ namespace Magnus_WPF_1
         }
 
 
-        private void getChosenDoc(object sender, MouseButtonEventArgs e)
-        {
-            activeImageDock = sender as ImageView;
-        }
+
 
         private void TabablzControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -430,15 +415,15 @@ namespace Magnus_WPF_1
         {
             bEnableGrabCycle = (bool)inspect_cycle_btn.IsChecked;
 
-            if (master.threadGrabImageSimulateCycle == null)
+            if (master.thread_FullSequence[activeImageDock.trackID] == null)
             {
-                master.threadGrabImageSimulateCycle = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread()));
-                master.threadGrabImageSimulateCycle.Start();
+                master.thread_FullSequence[activeImageDock.trackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread()));
+                master.thread_FullSequence[activeImageDock.trackID].Start();
             }
-            else if (!master.threadGrabImageSimulateCycle.IsAlive)
+            else if (!master.thread_FullSequence[activeImageDock.trackID].IsAlive)
             {
-                master.threadGrabImageSimulateCycle = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread()));
-                master.threadGrabImageSimulateCycle.Start();
+                master.thread_FullSequence[activeImageDock.trackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread()));
+                master.thread_FullSequence[activeImageDock.trackID].Start();
             }
         }
 
@@ -459,9 +444,10 @@ namespace Magnus_WPF_1
             grd_PopupDialog.Children.Clear();
             if(master.m_Tracks[0].hIKControlCameraView != null)
                 grd_PopupDialog.Children.Add(master.m_Tracks[0].hIKControlCameraView);
-            //grd_Dialog_Settings.Margin = new Thickness(0, 160, 0, 0);
-            //grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Top;
-            //grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Left;
+
+            grd_Dialog_Settings.Margin = new Thickness(0, 160, 0, 0);
+            grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Top;
+            grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Left;
             //master.teachParameter.Width = 300;
             //master.teachParameter.Height = 600;
             //master.m_Tracks[0].m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autofocus, 1);
@@ -523,15 +509,15 @@ namespace Magnus_WPF_1
 
             Master.InspectEvent[master.m_nActiveTrack].Set();
 
-            if (master.threadGrabImageSimulateCycle == null)
+            if (master.thread_FullSequence[activeImageDock.trackID] == null)
             {
-                master.threadGrabImageSimulateCycle = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread(true)));
-                master.threadGrabImageSimulateCycle.Start();
+                master.thread_FullSequence[activeImageDock.trackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread(true)));
+                master.thread_FullSequence[activeImageDock.trackID].Start();
             }
-            else if (!master.threadGrabImageSimulateCycle.IsAlive)
+            else if (!master.thread_FullSequence[activeImageDock.trackID].IsAlive)
             {
-                master.threadGrabImageSimulateCycle = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread(true)));
-                master.threadGrabImageSimulateCycle.Start();
+                master.thread_FullSequence[activeImageDock.trackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread(true)));
+                master.thread_FullSequence[activeImageDock.trackID].Start();
             }
 
             //mainWindow.statisticView.UpdateValueStatistic(master.m_Tracks[0].m_nResult);
@@ -567,15 +553,15 @@ namespace Magnus_WPF_1
 
             Master.InspectEvent[0].Set();
 
-            if (master.threadGrabImageSimulateCycle == null)
+            if (master.thread_FullSequence[activeImageDock.trackID] == null)
             {
-                master.threadGrabImageSimulateCycle = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.InspectOffline(m_folderPath)));
-                master.threadGrabImageSimulateCycle.Start();
+                master.thread_FullSequence[activeImageDock.trackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.InspectOffline(m_folderPath)));
+                master.thread_FullSequence[activeImageDock.trackID].Start();
             }
-            else if (!master.threadGrabImageSimulateCycle.IsAlive)
+            else if (!master.thread_FullSequence[activeImageDock.trackID].IsAlive)
             {
-                master.threadGrabImageSimulateCycle = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.InspectOffline(m_folderPath)));
-                master.threadGrabImageSimulateCycle.Start();
+                master.thread_FullSequence[activeImageDock.trackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.InspectOffline(m_folderPath)));
+                master.thread_FullSequence[activeImageDock.trackID].Start();
             }
 
         }
@@ -651,7 +637,7 @@ namespace Magnus_WPF_1
             //}
         }
 
-        int nCurrentTeachingStep = -1;
+        //int nCurrentTeachingStep = -1;
         private void btn_abort_teach_Click(object sender, RoutedEventArgs e)
         {
             //if (Master.m_bIsTeaching)
@@ -670,29 +656,6 @@ namespace Magnus_WPF_1
         {
             if (Master.m_bIsTeaching)
                 Master.m_NextStepTeachEvent.Set();
-            //    nCurrentTeachingStep++;
-            //    if(nCurrentTeachingStep < (int)TEACHSTEP.TEACH_TOTALSTEP)
-            //        master.m_Tracks[0].m_imageViews[0].Teach(nCurrentTeachingStep);
-            //    else
-            //    {
-            //        var result = MessageBox.Show("Do you want to save teach parameter ?", "Save Teach Parameter", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            //        if (result == MessageBoxResult.Yes)
-            //        {
-            //            master.m_Tracks[0].m_imageViews[0].SetTeachParameterToCategories();
-            //            InspectionCore.SetTeachParameterToInspectionCore();
-            //            InspectionCore.SetTemplateImage();
-            //            //master.m_Tracks[0].m_imageViews[0].SaveTeachImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp"));
-            //            master.m_Tracks[0].m_imageViews[0].saveTemplateImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "templateImage_1.bmp"));
-            //            mainWindow.master.WriteTeachParam();
-            //            master.m_Tracks[0].m_imageViews[0].resultTeach.Children.Clear();
-            //            master.m_Tracks[0].m_imageViews[0].ClearOverlay();
-
-            //        }
-            //        nCurrentTeachingStep = -1;
-            //        SetDisableTeachButton();
-            //        master.loadTeachImageToUI();
-
-            //    }
 
         }
 
@@ -703,7 +666,7 @@ namespace Magnus_WPF_1
                 return;
 
             SetEnableTeachButton();
-            nCurrentTeachingStep = 0;
+            //nCurrentTeachingStep = 0;
             //master.m_Tracks[0].m_imageViews[0].Teach(nCurrentTeachingStep);
             master.TeachThread();
 
@@ -793,7 +756,7 @@ namespace Magnus_WPF_1
         {
             bEnableRunSequence = (bool)btn_run_sequence.IsChecked;
 
-            master.RunSequenceThread();
+            master.RunSequenceThread(activeImageDock.trackID);
 
 
         }

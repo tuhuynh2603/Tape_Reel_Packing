@@ -306,8 +306,8 @@
 
             
         </Grid>
-        
-            <Grid x:Name="grd_Dialog_Settings" 
+
+        <Grid x:Name="grd_Dialog_Settings" 
               Width="{Binding Path=DialogUCWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
               Panel.ZIndex="3"
               HorizontalAlignment="Left"
@@ -324,10 +324,14 @@
             <Grid.Effect>
                 <DropShadowEffect BlurRadius="2" ShadowDepth="1" Color="#FFAEAEAE"/>
             </Grid.Effect>
+            
             <Grid x:Name="grd_PopupDialog" SizeChanged="GridSettingChangedSize"></Grid>
+            <Grid x:Name="grd_CameraPopupDialog" SizeChanged="GridSettingChangedSize"></Grid>
+
         </Grid>
 
-            <Grid x:Name="Layout" Margin="0 130 0 0" 
+
+        <Grid x:Name="Layout" Margin="0 130 0 0" 
               
             HorizontalAlignment="Stretch" Background="Black">
 

@@ -18,13 +18,14 @@ namespace Magnus_WPF_1.Source.Hardware
         public MyCamera m_MyCamera = new MyCamera();
         public bool m_bGrabbing = false;
         Thread m_hReceiveThread = null;
-
+        string m_strCameraSerial;
         public HIKControlCameraView(string strCameraID)
         {
             InitializeComponent();
             //this.Closing += Window_Closing;
             DeviceListAcq();
             InitializeCamera(strCameraID);
+            m_strCameraSerial = strCameraID;
             // ch:设置采集连续模式 | en:Set Continues Aquisition Mode
 
         }
@@ -132,19 +133,19 @@ namespace Magnus_WPF_1.Source.Hardware
             InitializeCamera("");
 
             // ch:设置采集连续模式 | en:Set Continues Aquisition Mode
-            bnGetParam_Click(null, null);
+            //bnGetParam_Click(null, null);
 
             // ch:控件操作 | en:Control operation
             bnOpen.IsEnabled = false;
 
             bnClose.IsEnabled = true;
-            bnStartGrab.IsEnabled = true;
-            bnStopGrab.IsEnabled = false;
-            bnContinuesMode.IsEnabled = true;
-            bnContinuesMode.IsChecked = true;
-            bnTriggerMode.IsEnabled = true;
-            cbSoftTrigger.IsEnabled = false;
-            bnSoftTriggerOnce.IsEnabled = false;
+            //bnStartGrab.IsEnabled = true;
+            //bnStopGrab.IsEnabled = false;
+            //bnContinuesMode.IsEnabled = true;
+            //bnContinuesMode.IsChecked = true;
+            //bnTriggerMode.IsEnabled = true;
+            //cbSoftTrigger.IsEnabled = false;
+            //bnSoftTriggerOnce.IsEnabled = false;
 
             tbExposure.IsEnabled = true;
             tbGain.IsEnabled = true;
@@ -274,12 +275,12 @@ namespace Magnus_WPF_1.Source.Hardware
             bnOpen.IsEnabled = true;
 
             bnClose.IsEnabled = false;
-            bnStartGrab.IsEnabled = false;
-            bnStopGrab.IsEnabled = false;
-            bnContinuesMode.IsEnabled = false;
-            bnTriggerMode.IsEnabled = false;
-            cbSoftTrigger.IsEnabled = false;
-            bnSoftTriggerOnce.IsEnabled = false;
+            //bnStartGrab.IsEnabled = false;
+            //bnStopGrab.IsEnabled = false;
+            //bnContinuesMode.IsEnabled = false;
+            //bnTriggerMode.IsEnabled = false;
+            //cbSoftTrigger.IsEnabled = false;
+            //bnSoftTriggerOnce.IsEnabled = false;
 
             tbExposure.IsEnabled = false;
             tbGain.IsEnabled = false;
@@ -288,70 +289,70 @@ namespace Magnus_WPF_1.Source.Hardware
             bnSetParam.IsEnabled = false;
         }
 
-        private void bnContinuesMode_Checked(object sender, RoutedEventArgs e)
-        {
-            if (true == bnContinuesMode.IsChecked)
-            {
-                m_MyCamera.MV_CC_SetEnumValue_NET("TriggerMode", (uint)MyCamera.MV_CAM_TRIGGER_MODE.MV_TRIGGER_MODE_OFF);
-                cbSoftTrigger.IsEnabled = false;
-                bnSoftTriggerOnce.IsEnabled = false;
-            }
-        }
+        //private void bnContinuesMode_Checked(object sender, RoutedEventArgs e)
+        //{
+        //    //if (true == bnContinuesMode.IsChecked)
+        //    //{
+        //    //    m_MyCamera.MV_CC_SetEnumValue_NET("TriggerMode", (uint)MyCamera.MV_CAM_TRIGGER_MODE.MV_TRIGGER_MODE_OFF);
+        //    //    cbSoftTrigger.IsEnabled = false;
+        //    //    bnSoftTriggerOnce.IsEnabled = false;
+        //    //}
+        //}
 
-        private void bnTriggerMode_Checked(object sender, RoutedEventArgs e)
-        {
-            // ch:打开触发模式 | en:Open Trigger Mode
-            if (true == bnTriggerMode.IsChecked)
-            {
-                m_MyCamera.MV_CC_SetEnumValue_NET("TriggerMode", (uint)MyCamera.MV_CAM_TRIGGER_MODE.MV_TRIGGER_MODE_ON);
+        //private void bnTriggerMode_Checked(object sender, RoutedEventArgs e)
+        //{
+        //    // ch:打开触发模式 | en:Open Trigger Mode
+        //    //if (true == bnTriggerMode.IsChecked)
+        //    //{
+        //        //m_MyCamera.MV_CC_SetEnumValue_NET("TriggerMode", (uint)MyCamera.MV_CAM_TRIGGER_MODE.MV_TRIGGER_MODE_ON);
 
-                // ch:触发源选择 | en:Trigger source select;
-                if (true == cbSoftTrigger.IsChecked)
-                {
-                    m_MyCamera.MV_CC_SetEnumValue_NET("TriggerSource", (uint)MyCamera.MV_CAM_TRIGGER_SOURCE.MV_TRIGGER_SOURCE_SOFTWARE);
-                    if (m_bGrabbing)
-                    {
-                        bnSoftTriggerOnce.IsEnabled = true;
-                    }
-                }
-                else
-                {
-                    m_MyCamera.MV_CC_SetEnumValue_NET("TriggerSource", (uint)MyCamera.MV_CAM_TRIGGER_SOURCE.MV_TRIGGER_SOURCE_LINE0);
-                }
-                cbSoftTrigger.IsEnabled = true;
-            }
-        }
+        //        // ch:触发源选择 | en:Trigger source select;
+        //        //if (true == cbSoftTrigger.IsChecked)
+        //        //{
+        //            //m_MyCamera.MV_CC_SetEnumValue_NET("TriggerSource", (uint)MyCamera.MV_CAM_TRIGGER_SOURCE.MV_TRIGGER_SOURCE_SOFTWARE);
+        //        //    if (m_bGrabbing)
+        //        //    {
+        //        //        bnSoftTriggerOnce.IsEnabled = true;
+        //        //    }
+        //        //}
+        //        //else
+        //        //{
+        //        //    m_MyCamera.MV_CC_SetEnumValue_NET("TriggerSource", (uint)MyCamera.MV_CAM_TRIGGER_SOURCE.MV_TRIGGER_SOURCE_LINE0);
+        //        //}
+        //        //cbSoftTrigger.IsEnabled = true;
+        //    //}
+        //}
 
-        public void ReceiveThreadProcess()
-        {
-            MyCamera.MV_FRAME_OUT stFrameInfo = new MyCamera.MV_FRAME_OUT();
-            MyCamera.MV_DISPLAY_FRAME_INFO stDisplayInfo = new MyCamera.MV_DISPLAY_FRAME_INFO();
-            int nRet = MyCamera.MV_OK;
+        //public void ReceiveThreadProcess()
+        //{
+        //    //MyCamera.MV_FRAME_OUT stFrameInfo = new MyCamera.MV_FRAME_OUT();
+        //    //MyCamera.MV_DISPLAY_FRAME_INFO stDisplayInfo = new MyCamera.MV_DISPLAY_FRAME_INFO();
+        //    //int nRet = MyCamera.MV_OK;
 
-            while (m_bGrabbing)
-            {
-                nRet = m_MyCamera.MV_CC_GetImageBuffer_NET(ref stFrameInfo, 1000);
-                if (nRet == MyCamera.MV_OK)
-                {
-                    IntPtr hWnd = IntPtr.Zero;
+        //    //while (m_bGrabbing)
+        //    //{
+        //    //    nRet = m_MyCamera.MV_CC_GetImageBuffer_NET(ref stFrameInfo, 1000);
+        //    //    if (nRet == MyCamera.MV_OK)
+        //    //    {
+        //    //        IntPtr hWnd = IntPtr.Zero;
 
-                    System.Windows.Application.Current.Dispatcher.Invoke(new Action(() =>
-                        {
-                            hWnd = displayArea.Handle;
-                        }));
+        //    //        System.Windows.Application.Current.Dispatcher.Invoke(new Action(() =>
+        //    //            {
+        //    //                hWnd = displayArea.Handle;
+        //    //            }));
 
-                    stDisplayInfo.hWnd = hWnd;
-                    stDisplayInfo.pData = stFrameInfo.pBufAddr;
-                    stDisplayInfo.nDataLen = stFrameInfo.stFrameInfo.nFrameLen;
-                    stDisplayInfo.nWidth = stFrameInfo.stFrameInfo.nWidth;
-                    stDisplayInfo.nHeight = stFrameInfo.stFrameInfo.nHeight;
-                    stDisplayInfo.enPixelType = stFrameInfo.stFrameInfo.enPixelType;
-                    m_MyCamera.MV_CC_DisplayOneFrame_NET(ref stDisplayInfo);
+        //    //        stDisplayInfo.hWnd = hWnd;
+        //    //        stDisplayInfo.pData = stFrameInfo.pBufAddr;
+        //    //        stDisplayInfo.nDataLen = stFrameInfo.stFrameInfo.nFrameLen;
+        //    //        stDisplayInfo.nWidth = stFrameInfo.stFrameInfo.nWidth;
+        //    //        stDisplayInfo.nHeight = stFrameInfo.stFrameInfo.nHeight;
+        //    //        stDisplayInfo.enPixelType = stFrameInfo.stFrameInfo.enPixelType;
+        //    //        m_MyCamera.MV_CC_DisplayOneFrame_NET(ref stDisplayInfo);
 
-                    m_MyCamera.MV_CC_FreeImageBuffer_NET(ref stFrameInfo);
-                }
-            }
-        }
+        //    //        m_MyCamera.MV_CC_FreeImageBuffer_NET(ref stFrameInfo);
+        //    //    }
+        //    //}
+        //}
         public void CaptureAndGetImageBuffer (ref byte[] pGrabbedImgBuf, ref int nWidthImage, ref int nHeightImage)
         {
             //IGrabResult grabResult = camera.StreamGrabber.RetrieveResult(grabTimeOut, TimeoutHandling.Return);
@@ -380,79 +381,79 @@ namespace Magnus_WPF_1.Source.Hardware
             }
         }
 
-        private void bnStartGrab_Click(object sender, RoutedEventArgs e)
-        {
-            // ch:标志位置位true | en:Set position bit true
-            m_bGrabbing = true;
+        //private void bnStartGrab_Click(object sender, RoutedEventArgs e)
+        //{
+        //    // ch:标志位置位true | en:Set position bit true
+        //    m_bGrabbing = true;
 
-            m_hReceiveThread = new Thread(ReceiveThreadProcess);
-            m_hReceiveThread.Start();
+        //    m_hReceiveThread = new Thread(ReceiveThreadProcess);
+        //    m_hReceiveThread.Start();
 
-            // ch:开始采集 | en:Start Grabbing
-            int nRet = m_MyCamera.MV_CC_StartGrabbing_NET();
-            if (MyCamera.MV_OK != nRet)
-            {
-                m_bGrabbing = false;
-                ShowErrorMsg("Start Grabbing Fail!", nRet);
-                return;
-            }
+        //    // ch:开始采集 | en:Start Grabbing
+        //    int nRet = m_MyCamera.MV_CC_StartGrabbing_NET();
+        //    if (MyCamera.MV_OK != nRet)
+        //    {
+        //        m_bGrabbing = false;
+        //        ShowErrorMsg("Start Grabbing Fail!", nRet);
+        //        return;
+        //    }
 
-            // ch:控件操作 | en:Control Operation
-            bnStartGrab.IsEnabled = false;
-            bnStopGrab.IsEnabled = true;
+        //    // ch:控件操作 | en:Control Operation
+        //    bnStartGrab.IsEnabled = false;
+        //    bnStopGrab.IsEnabled = true;
 
-            if (true == bnTriggerMode.IsChecked && true == cbSoftTrigger.IsChecked)
-            {
-                bnSoftTriggerOnce.IsEnabled = true;
-            }
-        }
+        //    if (true == bnTriggerMode.IsChecked && true == cbSoftTrigger.IsChecked)
+        //    {
+        //        bnSoftTriggerOnce.IsEnabled = true;
+        //    }
+        //}
 
-        private void bnStopGrab_Click(object sender, RoutedEventArgs e)
-        {
-            // ch:标志位设为false | en:Set flag bit false
-            m_bGrabbing = false;
+        //private void bnStopGrab_Click(object sender, RoutedEventArgs e)
+        //{
+        //    // ch:标志位设为false | en:Set flag bit false
+        //    m_bGrabbing = false;
 
-            // ch:停止采集 | en:Stop Grabbing
-            int nRet = m_MyCamera.MV_CC_StopGrabbing_NET();
-            if (nRet != MyCamera.MV_OK)
-            {
-                ShowErrorMsg("Stop Grabbing Fail!", nRet);
-            }
+        //    // ch:停止采集 | en:Stop Grabbing
+        //    int nRet = m_MyCamera.MV_CC_StopGrabbing_NET();
+        //    if (nRet != MyCamera.MV_OK)
+        //    {
+        //        ShowErrorMsg("Stop Grabbing Fail!", nRet);
+        //    }
 
-            // ch:控件操作 | en:Control Operation
-            bnStartGrab.IsEnabled = true;
-            bnStopGrab.IsEnabled = false;
+        //    // ch:控件操作 | en:Control Operation
+        //    bnStartGrab.IsEnabled = true;
+        //    bnStopGrab.IsEnabled = false;
 
-            bnSoftTriggerOnce.IsEnabled = false;
-        }
+        //    bnSoftTriggerOnce.IsEnabled = false;
+        //}
 
-        private void bnSoftTriggerOnce_Click(object sender, RoutedEventArgs e)
-        {
-            // ch:触发命令 | en:Trigger command
-            int nRet = m_MyCamera.MV_CC_SetCommandValue_NET("TriggerSoftware");
-            if (MyCamera.MV_OK != nRet)
-            {
-                ShowErrorMsg("Trigger Software Fail!", nRet);
-            }
-        }
+        //private void bnSoftTriggerOnce_Click(object sender, RoutedEventArgs e)
+        //{
+        //    // ch:触发命令 | en:Trigger command
+        //    int nRet = m_MyCamera.MV_CC_SetCommandValue_NET("TriggerSoftware");
+        //    if (MyCamera.MV_OK != nRet)
+        //    {
+        //        ShowErrorMsg("Trigger Software Fail!", nRet);
+        //    }
+        //}
 
-        private void cbSoftTrigger_Checked(object sender, RoutedEventArgs e)
-        {
-            if (true == cbSoftTrigger.IsChecked)
-            {
-                // ch:触发源设为软触发 | en:Set trigger source as Software
-                m_MyCamera.MV_CC_SetEnumValue_NET("TriggerSource", (uint)MyCamera.MV_CAM_TRIGGER_SOURCE.MV_TRIGGER_SOURCE_SOFTWARE);
-                if (m_bGrabbing)
-                {
-                    bnSoftTriggerOnce.IsEnabled = true;
-                }
-            }
-            else
-            {
-                m_MyCamera.MV_CC_SetEnumValue_NET("TriggerSource", (uint)MyCamera.MV_CAM_TRIGGER_SOURCE.MV_TRIGGER_SOURCE_LINE0);
-                bnSoftTriggerOnce.IsEnabled = false;
-            }
-        }
+        //private void cbSoftTrigger_Checked(object sender, RoutedEventArgs e)
+        //{
+        //    if (true == cbSoftTrigger.IsChecked)
+        //    {
+        //        // ch:触发源设为软触发 | en:Set trigger source as Software
+        //        m_MyCamera.MV_CC_SetEnumValue_NET("TriggerSource", (uint)MyCamera.MV_CAM_TRIGGER_SOURCE.MV_TRIGGER_SOURCE_SOFTWARE);
+        //        if (m_bGrabbing)
+        //        {
+        //            bnSoftTriggerOnce.IsEnabled = true;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        m_MyCamera.MV_CC_SetEnumValue_NET("TriggerSource", (uint)MyCamera.MV_CAM_TRIGGER_SOURCE.MV_TRIGGER_SOURCE_LINE0);
+        //        bnSoftTriggerOnce.IsEnabled = false;
+        //    }
+        //}
 
         private void bnGetParam_Click(object sender, RoutedEventArgs e)
         {

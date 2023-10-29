@@ -114,6 +114,9 @@ namespace Magnus_WPF_1.UI.UserControls.View
             this.DataContext = this;
             InitializeComponent();
             dockPaneID += docID;
+            SetupImageDockMouseFeature();
+
+
         }
         public void SetBackgroundDoc(int trackID)
         {
@@ -1260,6 +1263,25 @@ namespace Magnus_WPF_1.UI.UserControls.View
         //    image.Source = BitmapSource.Create(_imageWidth, _imageHeight, _dpi, _dpi,
         //        PixelFormats.Gray8, BitmapPalettes.Gray256, bufferConvert, (PixelFormats.Gray8.BitsPerPixel + 7) / 8 * _imageWidth);
         //}
+
+        private void SetupImageDockMouseFeature()
+        {
+            MouseLeftButtonDown += getChosenDoc;
+            PreviewMouseDoubleClick += ImageDoc_DoubleClick;
+        }
+
+        private void getChosenDoc(object sender, MouseButtonEventArgs e)
+        {
+            //MainWindow.activeImageDock = sender as ImageView;
+            MainWindow.activeImageDock = this;
+
+        }
+
+        private void ImageDoc_DoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            MainWindow.mainWindow.ZoomDocPanel(trackID);
+            //getChosenDoc()
+        }
     }
 
     public enum RegionType
@@ -1308,4 +1330,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             this.y = y;
         }
     }
+
+
+
 }

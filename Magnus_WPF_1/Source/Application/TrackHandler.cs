@@ -9,10 +9,12 @@ using Magnus_WPF_1.UI.UserControls.View;
 using MvCamCtrl.NET;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -35,6 +37,9 @@ namespace Magnus_WPF_1.Source.Application
         public VideoCapture m_cap;
         public string m_strSeriCamera = "";
         Mat m_frame = new Mat();
+        public Thread threadInspectOnline;
+
+
         public Track(int indexTrack, int numdoc, string serieCam, MainWindow app)
         {
             m_nTrackID = indexTrack;
@@ -44,7 +49,6 @@ namespace Magnus_WPF_1.Source.Application
             if(serieCam != "none")
                 hIKControlCameraView = new HIKControlCameraView(serieCam);
             m_strSeriCamera = serieCam;
-
             //m_cap = new VideoCapture(0);
             //m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, m_Width);
             //m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, m_Height);
@@ -103,13 +107,13 @@ namespace Magnus_WPF_1.Source.Application
                 m_imageViews[0].UpdateNewImageColor(m_imageViews[0].bufferImage, imgg.ToBitmap().Width, imgg.ToBitmap().Height, 96);
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
-                    InspectionCore.LoadImage(m_imageViews[0].btmSource);
+                    InspectionCore.LoadImageToInspection(m_imageViews[0].btmSource);
                 });
 
                 m_nResult[m_nCurrentClickMappingID] = Inspect();
 
-                Master.InspectEvent[0].Reset();
-                Master.InspectDoneEvent[0].Set();
+                Master.InspectEvent[m_nTrackID].Reset();
+                Master.InspectDoneEvent[m_nTrackID].Set();
 
 
             }
@@ -186,27 +190,33 @@ namespace Magnus_WPF_1.Source.Application
                 foreach (FileSystemInfo item in items)
                 {
 
-                    while (!Master.InspectEvent[0].WaitOne(100))
+                    while (!Master.InspectEvent[m_nTrackID].WaitOne(100))
                     {
                         if (mainWindow == null)
                             return;
                     }
-                    Mat img_temp = new Mat();
-                    img_temp = CvInvoke.Imread(item.FullName, ImreadModes.Color);
                     Array.Clear(m_imageViews[0].bufferImage, 0, m_imageViews[0].bufferImage.Length);
-                    Image<Bgr, byte> imgg = img_temp.ToImage<Bgr, byte>();
-                    m_imageViews[0].bufferImage = BitmapToByteArray(imgg.ToBitmap());
-                    m_imageViews[0].UpdateNewImageColor(m_imageViews[0].bufferImage, imgg.ToBitmap().Width, imgg.ToBitmap().Height, 96);
+                    // Mono Image
+                    m_imageViews[0].UpdateNewImageMono(item.FullName);
+
+                    //Color Image
+                    //Mat img_temp = new Mat();
+                    //img_temp = CvInvoke.Imread(item.FullName, ImreadModes.Color);
+                    //Array.Clear(m_imageViews[0].bufferImage, 0, m_imageViews[0].bufferImage.Length);
+                    //Image<Bgr, byte> imgg = img_temp.ToImage<Bgr, byte>();
+                    //m_imageViews[0].bufferImage = BitmapToByteArray(imgg.ToBitmap());
+                    //m_imageViews[0].UpdateNewImageColor(m_imageViews[0].bufferImage, imgg.ToBitmap().Width, imgg.ToBitmap().Height, 96);
+
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        InspectionCore.LoadImage(m_imageViews[0].btmSource);
+                        InspectionCore.LoadImageToInspection(m_imageViews[0].btmSource);
                     });
 
 
-                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        InspectionCore.LoadImage(m_imageViews[0].btmSource);
-                    });
+                    //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    //{
+                    //    InspectionCore.LoadImage(m_imageViews[0].btmSource);
+                    //});
 
                     m_nCurrentClickMappingID = 0;
                     m_nResult[m_nCurrentClickMappingID] = Inspect();
@@ -214,10 +224,6 @@ namespace Magnus_WPF_1.Source.Application
 
                 }
 
-
-
-
-
             }
             catch
             {
@@ -225,52 +231,52 @@ namespace Magnus_WPF_1.Source.Application
         }
 
 
-        private void Online_ImageGrabbed(object sender, EventArgs e)
-        {
-            try
-            {
+        //private void Online_ImageGrabbed(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
 
-                if (MainWindow.mainWindow == null)
-                    return;
+        //        if (MainWindow.mainWindow == null)
+        //            return;
 
-                if (MainWindow.mainWindow.bEnableRunSequence == false)
-                    return;
+        //        if (MainWindow.mainWindow.bEnableRunSequence == false)
+        //            return;
 
-                if (!Master.InspectEvent[0].WaitOne(1))
-                    return;
+        //        if (!Master.InspectEvent[m_nTrackID].WaitOne(1))
+        //            return;
 
-                Array.Clear(m_imageViews[0].bufferImage, 0, m_imageViews[0].bufferImage.Length);
-                m_cap.Retrieve(m_frame);
-                Image<Bgr, byte> imgg = m_frame.ToImage<Bgr, byte>();
-                m_imageViews[0].bufferImage = BitmapToByteArray(imgg.ToBitmap());
-                m_imageViews[0].UpdateNewImageColor(m_imageViews[0].bufferImage, imgg.ToBitmap().Width, imgg.ToBitmap().Height, 96);
-                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                {
-                    InspectionCore.LoadImage(m_imageViews[0].btmSource);
+        //        Array.Clear(m_imageViews[0].bufferImage, 0, m_imageViews[0].bufferImage.Length);
+        //        m_cap.Retrieve(m_frame);
+        //        Image<Bgr, byte> imgg = m_frame.ToImage<Bgr, byte>();
+        //        m_imageViews[0].bufferImage = BitmapToByteArray(imgg.ToBitmap());
+        //        m_imageViews[0].UpdateNewImageColor(m_imageViews[0].bufferImage, imgg.ToBitmap().Width, imgg.ToBitmap().Height, 96);
+        //        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+        //        {
+        //            InspectionCore.LoadImageToInspection(m_imageViews[0].btmSource);
 
-                    if (Application.m_bEnableSavingOnlineImage == true)
-                    {
-                        ImageSaveData imageSaveData = new ImageSaveData();
-                        imageSaveData.nDeviceID = m_CurrentSequenceDeviceID;
-                        imageSaveData.strLotID = m_strCurrentLot;
-                        imageSaveData.imageSave = BitmapSourceConvert.ToMat(m_imageViews[0].btmSource).Clone();
-                        lock (Master.m_SaveInspectImageQueue)
-                        {
-                            Master.m_SaveInspectImageQueue.Enqueue(imageSaveData);
-                        }
-                    }
+        //            if (Application.m_bEnableSavingOnlineImage == true)
+        //            {
+        //                ImageSaveData imageSaveData = new ImageSaveData();
+        //                imageSaveData.nDeviceID = m_CurrentSequenceDeviceID;
+        //                imageSaveData.strLotID = m_strCurrentLot;
+        //                imageSaveData.imageSave = BitmapSourceConvert.ToMat(m_imageViews[0].btmSource).Clone();
+        //                lock (Master.m_SaveInspectImageQueue)
+        //                {
+        //                    Master.m_SaveInspectImageQueue.Enqueue(imageSaveData);
+        //                }
+        //            }
 
-                });
+        //        });
 
-                m_nResult[m_CurrentSequenceDeviceID] = Inspect();
-                ////
-                Master.InspectEvent[0].Reset();
-                Master.InspectDoneEvent[0].Set();
-            }
-            catch
-            {
-            }
-        }
+        //        m_nResult[m_CurrentSequenceDeviceID] = Inspect();
+        //        ////
+        //        Master.InspectEvent[m_nTrackID].Reset();
+        //        Master.InspectDoneEvent[m_nTrackID].Set();
+        //    }
+        //    catch
+        //    {
+        //    }
+        //}
 
         public static byte[] BitmapToByteArray(Bitmap bitmap)
         {
@@ -296,25 +302,25 @@ namespace Magnus_WPF_1.Source.Application
 
         }
 
-        public int Snap()
-        {
-            m_cap.ImageGrabbed += Video_ImageGrabbed;
+        //public int Snap()
+        //{
+        //    m_cap.ImageGrabbed += Video_ImageGrabbed;
 
-            m_cap.Start();
-            if (MainWindow.mainWindow == null)
-                return -1;
+        //    m_cap.Start();
+        //    if (MainWindow.mainWindow == null)
+        //        return -1;
 
-            while (MainWindow.mainWindow.bEnableGrabCycle)
-            {
-                if (MainWindow.mainWindow == null)
-                    return -1;
-            }
-            m_cap.Stop();
-            m_cap.ImageGrabbed -= Video_ImageGrabbed;
+        //    while (MainWindow.mainWindow.bEnableGrabCycle)
+        //    {
+        //        if (MainWindow.mainWindow == null)
+        //            return -1;
+        //    }
+        //    m_cap.Stop();
+        //    m_cap.ImageGrabbed -= Video_ImageGrabbed;
 
-            //m_cap.Dispose();
-            return 0;
-        }
+        //    //m_cap.Dispose();
+        //    return 0;
+        //}
 
         public int Snap_HIKCamera()
         {
@@ -390,54 +396,169 @@ namespace Magnus_WPF_1.Source.Application
             return 0;
 
         }
-        public int SingleSnap()
+        //public int SingleSnap()
+        //{
+        //    m_cap.ImageGrabbed += SingleOffline_ImageGrabbed;
+
+        //    m_cap.Start();
+        //    if (MainWindow.mainWindow == null)
+        //        return -1;
+        //    while (MainWindow.mainWindow.bEnableSingleSnapImages == false)
+        //    {
+        //        if (MainWindow.mainWindow == null)
+        //            return -1;
+        //    }
+        //    m_cap.Stop();
+        //    m_cap.ImageGrabbed -= SingleOffline_ImageGrabbed;
+
+        //    return 0;
+        //}
+
+
+        private void InspectionOnlineThread()
         {
-            m_cap.ImageGrabbed += SingleOffline_ImageGrabbed;
-
-            m_cap.Start();
-            if (MainWindow.mainWindow == null)
-                return -1;
-            while (MainWindow.mainWindow.bEnableSingleSnapImages == false)
+            try
             {
-                if (MainWindow.mainWindow == null)
-                    return -1;
-            }
-            m_cap.Stop();
-            m_cap.ImageGrabbed -= SingleOffline_ImageGrabbed;
 
-            return 0;
+                if (MainWindow.mainWindow == null)
+                    return;
+
+                if (MainWindow.mainWindow.bEnableRunSequence == false)
+                    return;
+
+                int nWidth = 0, nHeight = 0;
+
+                while (MainWindow.mainWindow.bEnableRunSequence && MainWindow.mainWindow != null)
+                {
+
+                    while (!Master.InspectEvent[m_nTrackID].WaitOne(10))
+                    {
+                        if (MainWindow.mainWindow == null)
+                            return;
+                        else
+                            if (!MainWindow.mainWindow.bEnableRunSequence)
+                            return;
+                    }
+                    int nRet = hIKControlCameraView.m_MyCamera.MV_CC_SetCommandValue_NET("TriggerSoftware");
+                    if (MyCamera.MV_OK != nRet)
+                    {
+                        //OutputDe("Trigger Software Fail!", nRet);
+                        nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+                        return ;
+                    }
+
+                    hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);
+                    m_imageViews[0].UpdateSourceImageMono();
+                    //m_imageViews[0].UpdateNewImageColor(m_imageViews[0].bufferImage, nWidth, nHeight, 96);
+                    if (MyCamera.MV_OK != nRet)
+                    {
+                        hIKControlCameraView.m_bGrabbing = false;
+                        nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+                        return ;
+                    }
+
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        InspectionCore.LoadImageToInspection(m_imageViews[0].btmSource);
+
+                        if (Application.m_bEnableSavingOnlineImage == true)
+                        {
+                            ImageSaveData imageSaveData = new ImageSaveData();
+                            imageSaveData.nDeviceID = m_CurrentSequenceDeviceID;
+                            imageSaveData.strLotID = m_strCurrentLot;
+                            imageSaveData.imageSave = BitmapSourceConvert.ToMat(m_imageViews[0].btmSource).Clone();
+                            lock (Master.m_SaveInspectImageQueue)
+                            {
+                                Master.m_SaveInspectImageQueue.Enqueue(imageSaveData);
+                            }
+                        }
+
+                    });
+
+
+                    Stopwatch timeIns = new Stopwatch();
+                    timeIns.Start();
+                    m_nResult[m_CurrentSequenceDeviceID] = Inspect();
+                    timeIns.Stop();
+                    Thread.Sleep(5);
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        m_imageViews[0].tbl_InspectTime.Text = timeIns.ElapsedMilliseconds.ToString();
+                    });
+
+                    ////
+                    Master.InspectEvent[m_nTrackID].Reset();
+                    Master.InspectDoneEvent[m_nTrackID].Set();
+
+
+
+                }
+
+            }
+            catch
+            {
+            }
         }
+
 
         public int m_CurrentSequenceDeviceID = -1;
         public int m_nCurrentClickMappingID = -1;
         public string m_strCurrentLot;
-        public void GrabAndInspectionSequence()
+        public void FullSequenceThread()
         {
+
             m_CurrentSequenceDeviceID = -1;
-
             m_strCurrentLot = string.Format("TrayID_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+            if (!hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
+                hIKControlCameraView.InitializeCamera(m_strSeriCamera);
 
-            m_cap.ImageGrabbed += Online_ImageGrabbed;
-            m_cap.Start();
+            int nRet = hIKControlCameraView.m_MyCamera.MV_CC_StartGrabbing_NET();
+            if (MyCamera.MV_OK != nRet)
+            {
+                hIKControlCameraView.m_bGrabbing = false;
+                return ;
+            }
+
+
+            if (threadInspectOnline == null)
+            {
+                threadInspectOnline = new System.Threading.Thread(new System.Threading.ThreadStart(() => InspectionOnlineThread()));
+                threadInspectOnline.Start();
+            }
+            else if (!threadInspectOnline.IsAlive)
+            {
+                threadInspectOnline = new System.Threading.Thread(new System.Threading.ThreadStart(() => InspectionOnlineThread()));
+                threadInspectOnline.Start();
+            }
+
+
+            //m_cap.ImageGrabbed += Online_ImageGrabbed;
+            //m_cap.Start();
             while (MainWindow.mainWindow.bEnableRunSequence)
             {
 
                 //if (MainWindow.mainWindow == null)
                 //    return;
 
-                while (!Master.m_hardwareTriggerSnapEvent[0].WaitOne(10))
+                while (!Master.m_hardwareTriggerSnapEvent[m_nTrackID].WaitOne(10))
                 {
                     if (MainWindow.mainWindow == null)
                         return;
 
                     if (!MainWindow.mainWindow.bEnableRunSequence)
                     {
-                        m_cap.Stop();
-                        m_cap.ImageGrabbed -= Online_ImageGrabbed;
+                        //m_cap.Stop();
+                        //m_cap.ImageGrabbed -= Online_ImageGrabbed;
+                        nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+
                         return;
                     }
 
                 }
+                //Snap camera
+
+                //
+
 
                 // Update Current Device ID
                 m_CurrentSequenceDeviceID++;
@@ -450,17 +571,18 @@ namespace Magnus_WPF_1.Source.Application
 
 
                 // Do Inspection
-                Master.InspectEvent[0].Set();
+                Master.InspectEvent[m_nTrackID].Set();
                 bool b = false;
-                while (!Master.InspectDoneEvent[0].WaitOne(10))
+                while (!Master.InspectDoneEvent[m_nTrackID].WaitOne(10))
                 {
                     if (MainWindow.mainWindow == null)
                         return;
 
                     if (!MainWindow.mainWindow.bEnableRunSequence)
                     {
-                        m_cap.Stop();
-                        m_cap.ImageGrabbed -= Online_ImageGrabbed;
+                        //m_cap.Stop();
+                        //m_cap.ImageGrabbed -= Online_ImageGrabbed;
+                        nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
                         return;
                     }
                 }
@@ -482,8 +604,9 @@ namespace Magnus_WPF_1.Source.Application
                 });
 
             }
-            m_cap.Stop();
-            m_cap.ImageGrabbed -= Online_ImageGrabbed;
+            //m_cap.Stop();
+            //m_cap.ImageGrabbed -= Online_ImageGrabbed;
+            nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
 
         }
 

@@ -34,10 +34,10 @@ namespace Magnus_WPF_1.Source.Application
         //public delegate void GrabDelegate();
         //public GrabDelegate grabDelegate;
 
-        public Thread threadGrabImageSimulateCycle;
+        public Thread[] thread_FullSequence;
         public Thread threadInspecOffline;
         public Thread m_TeachThread;
-        public Thread m_SaveInspectImageThread;
+        public Thread[] m_SaveInspectImageThread;
         public static Queue<ImageSaveData> m_SaveInspectImageQueue = new Queue<ImageSaveData>(); // create a queue to hold messages
         public BitmapSource btmSource;
 
@@ -45,29 +45,15 @@ namespace Magnus_WPF_1.Source.Application
         public Master(MainWindow app)
         {
             mainWindow = app;
-            ContructorDocComponent();
-            InspectEvent = new AutoResetEvent[Application.m_nTrack];
-            InspectDoneEvent = new AutoResetEvent[Application.m_nTrack];
-            m_hardwareTriggerSnapEvent = new AutoResetEvent[Application.m_nTrack];
             m_NextStepTeachEvent = new AutoResetEvent(false);
             m_bIsTeaching = false;
-            for (int n = 0; n < Application.m_nTrack; n++)
-            {
-                InspectEvent[n] = new AutoResetEvent(false);
-                InspectDoneEvent[n] = new AutoResetEvent(false);
-                m_hardwareTriggerSnapEvent[n] = new AutoResetEvent(false);
-            }
+
+            ContructorDocComponent();
+
 
             Application.CheckRegistry();
             Application.LoadRegistry();
             LoadRecipe();
-
-
-            if (m_SaveInspectImageThread == null)
-            {
-                m_SaveInspectImageThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => RunSaveInspectImageThread()));
-                m_SaveInspectImageThread.Start();
-            }
 
             m_nActiveTrack = 0;
         }
@@ -111,10 +97,27 @@ namespace Magnus_WPF_1.Source.Application
         private void ContructorDocComponent()
         {
             m_Tracks = new Track[Application.m_nTrack];
+            InspectEvent = new AutoResetEvent[Application.m_nTrack];
+            InspectDoneEvent = new AutoResetEvent[Application.m_nTrack];
+            m_hardwareTriggerSnapEvent = new AutoResetEvent[Application.m_nTrack];
+            m_SaveInspectImageThread = new Thread[Application.m_nTrack];
+            thread_FullSequence = new Thread[Application.m_nTrack];
             string[] nSeriCam = { "02C89933333", "none" };
             for (int index_track = 0; index_track < Application.m_nTrack; index_track++)
             {
                 //for(int index_doc = 0; index_doc < Application.m_nDoc; index_doc++)
+                InspectEvent[index_track] = new AutoResetEvent(false);
+                InspectDoneEvent[index_track] = new AutoResetEvent(false);
+                m_hardwareTriggerSnapEvent[index_track] = new AutoResetEvent(false);
+
+                if (m_SaveInspectImageThread[index_track] == null)
+                {
+                    m_SaveInspectImageThread[index_track] = new System.Threading.Thread(new System.Threading.ThreadStart(() => RunSaveInspectImageThread(index_track)));
+                    m_SaveInspectImageThread[index_track].Start();
+                }
+
+
+
                 m_Tracks[index_track] = new Track(index_track, 1, nSeriCam[index_track], mainWindow);
 
             }
@@ -180,27 +183,28 @@ namespace Magnus_WPF_1.Source.Application
                 //m_Tracks[0].Snap();
            // }
         }
-        internal void RunSequenceThread()
+        internal void RunSequenceThread(int nTrack)
         {
             mainWindow.ResetMappingResult();
             mainWindow.ResetStatisticResult();
-            InspectDoneEvent[0].Reset();
-            InspectEvent[0].Reset();
-            m_hardwareTriggerSnapEvent[0].Reset();
 
-            if (threadGrabImageSimulateCycle == null)
+            InspectDoneEvent[nTrack].Reset();
+            InspectEvent[nTrack].Reset();
+            m_hardwareTriggerSnapEvent[nTrack].Reset();
+
+            if (thread_FullSequence[nTrack] == null)
             {
-                threadGrabImageSimulateCycle = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[0].GrabAndInspectionSequence()));
-                threadGrabImageSimulateCycle.Start();
+                thread_FullSequence[nTrack] = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[nTrack].FullSequenceThread()));
+                thread_FullSequence[nTrack].Start();
             }
-            else if (!threadGrabImageSimulateCycle.IsAlive)
+            else if (!thread_FullSequence[nTrack].IsAlive)
             {
-                threadGrabImageSimulateCycle = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[0].GrabAndInspectionSequence()));
-                threadGrabImageSimulateCycle.Start();
+                thread_FullSequence[nTrack] = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[nTrack].FullSequenceThread()));
+                thread_FullSequence[nTrack].Start();
             }
         }
 
-        internal void RunSaveInspectImageThread()
+        internal void RunSaveInspectImageThread(int nTrack)
         {
             while (MainWindow.mainWindow != null)
             {
@@ -277,7 +281,7 @@ namespace Magnus_WPF_1.Source.Application
         public void InspectOffline(string strFolder)
         {
 
-            m_Tracks[0].InspectOffline(strFolder);
+            m_Tracks[MainWindow.activeImageDock.trackID].InspectOffline(strFolder);
         }
     }
 

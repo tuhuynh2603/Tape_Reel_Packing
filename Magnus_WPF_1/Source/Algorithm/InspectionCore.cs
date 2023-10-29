@@ -62,7 +62,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             return true;
         }
 
-        public static bool LoadImage(BitmapSource btmSource)
+        public static bool LoadImageToInspection(BitmapSource btmSource)
         {
             try
             {

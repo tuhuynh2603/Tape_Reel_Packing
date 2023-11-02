@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\App.xaml
-7-1706224797
+111873074761
 
-25-991579821
-38-1464031941
-MainWindow.xaml;MappingSetingUC.xaml;ResourceControl.xaml;Source\Hardware\HIKControlCameraView.xaml;TeachParametersUC.xaml;UI\UserControls\View\ImageView.xaml;UI\UserControls\View\StatisticView.xaml;
+29-249449555
+39300801954
+MainWindow.xaml;MappingSetingUC.xaml;PopupUserControl.xaml;ResourceControl.xaml;Source\Hardware\HIKControlCameraView.xaml;TeachParametersUC.xaml;UI\UserControls\LoginUser.xaml;UI\UserControls\OutputLogView.xaml;UI\UserControls\PixelRuler.xaml;UI\UserControls\View\ImageView.xaml;UI\UserControls\View\StatisticView.xaml;
 
 False
 

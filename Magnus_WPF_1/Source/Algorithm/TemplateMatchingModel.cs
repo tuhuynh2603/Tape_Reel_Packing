@@ -220,6 +220,8 @@ namespace Magnus_WPF_1.Source.Algorithm
              });
             //for (int index = 0; index < nStep; index++)
             //    CvTemplateMatching(img_ImageSource, list_templateImages[index], list_maskTemplateImages[index], ref rectTemplateMatchedPosition[index], ref dTemplateMatchedScore[index]);
+            //for (int index = 0; index < nStep; index++)
+            //    CvTemplateMatching(img_ImageSource, list_templateImages[index], list_maskTemplateImages[index], ref rectTemplateMatchedPosition[index], ref dTemplateMatchedScore[index]);
 
             var nMaxScoreIndex = dTemplateMatchedScore.ToList().LastIndexOf(dTemplateMatchedScore.Max());
             bool bFound = true;

@@ -124,6 +124,25 @@ namespace Magnus_WPF_1.Source.Algorithm
             return true;
         }
 
+        public static void GetWidthHeightRegion(ref CvImage source, ref int nWidth, ref int nHeight)
+        {
+            List<int> Rows = new List<int>();
+            List<int> Cols = new List<int>();
+
+            GetRegionPoints(ref source, Rows, Cols);
+            if (Rows.Count > 0)
+            {
+
+                nWidth = Cols.Max() - Cols.Min();
+                nHeight = Rows.Max() - Rows.Min();
+
+            }
+            else
+            {
+                nWidth = nHeight = 0;
+            }
+            return;
+        }
         // Connection
         public static bool Connection(ref CvImage source, ref CvImage connection, ref int numberOfConnection, ref CvImage stats, ref CvImage centroids)
         {

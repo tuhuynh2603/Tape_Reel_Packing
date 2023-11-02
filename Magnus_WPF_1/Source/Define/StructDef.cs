@@ -52,6 +52,49 @@ namespace Magnus_WPF_1.Source.Define
         NEGATIVE,
         POSITIVE
     };
+
+
+    public enum AccessLevel
+    {
+        Engineer = 3,
+        Operator = 2,
+        User = 1,
+        None = 0
+    }
+    public enum UISTate
+    {
+        IDLE_STATE,
+        IDLE_NOCAM_STATE,
+        LOGOUT,
+        LOGOUT_STATE,
+        STREAM_STATE,
+        CAMERASETTING_STATE,
+        LIGHTSETTING_STATE,
+        IO_STATE,
+        STOREIMAGE_STATE,
+        OFFLINEINSPECT_STATE,
+        ONLINEINSPECT_STATE,
+        INSPECT_STATE,
+        TRAIN_STATE,
+        ENGINEER,
+        ENGINEER_NO_CAM,
+        OPERATOR,
+        OPERATOR_NO_CAM,
+        USER,
+        USER_NO_CAM
+    }
+
+
+    public enum ERROR_CODE : int
+    {
+        PASS,
+        NO_PATTERN_FOUND,
+        OPPOSITE_CHIP,
+        NO_LABEL,
+        PROCESS_ERROR,
+        NUM_DEFECTS
+    };
+
     public struct LocationReference
     {
         public int deltaX { get; set; }

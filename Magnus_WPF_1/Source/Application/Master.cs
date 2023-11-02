@@ -22,6 +22,7 @@ namespace Magnus_WPF_1.Source.Application
         public MappingSetingUC mappingParameter = new MappingSetingUC();
         public static bool m_bIsTeaching;
         public static AutoResetEvent m_NextStepTeachEvent;
+        //public CommLog commLog = new CommLog();
 
         public static AutoResetEvent[] InspectEvent;
         public static AutoResetEvent[] InspectDoneEvent;
@@ -35,6 +36,7 @@ namespace Magnus_WPF_1.Source.Application
         //public GrabDelegate grabDelegate;
 
         public Thread[] thread_FullSequence;
+        public Thread[] thread_StreamCamera;
         public Thread threadInspecOffline;
         public Thread m_TeachThread;
         public Thread[] m_SaveInspectImageThread;
@@ -102,6 +104,7 @@ namespace Magnus_WPF_1.Source.Application
             m_hardwareTriggerSnapEvent = new AutoResetEvent[Application.m_nTrack];
             m_SaveInspectImageThread = new Thread[Application.m_nTrack];
             thread_FullSequence = new Thread[Application.m_nTrack];
+            thread_StreamCamera = new Thread[Application.m_nTrack];
             string[] nSeriCam = { "02C89933333", "none" };
             for (int index_track = 0; index_track < Application.m_nTrack; index_track++)
             {
@@ -171,7 +174,7 @@ namespace Magnus_WPF_1.Source.Application
             }
         }
 
-        internal void Grab_Image_Testing_Thread(bool bSingleSnap = false)
+        internal void Grab_Image_Thread(bool bSingleSnap = false)
         {
             //for (int index_track = 0; index_track < Application.m_nTrack; index_track++)
             //{
@@ -179,9 +182,47 @@ namespace Magnus_WPF_1.Source.Application
                     //m_Tracks[0].SingleSnap();
                     m_Tracks[0].SingleSnap_HIKCamera();
                 else
-                    m_Tracks[0].Snap_HIKCamera();
+                    m_Tracks[0].Stream_HIKCamera();
                 //m_Tracks[0].Snap();
            // }
+        }
+        string m_folderPath = @"C:\";
+        internal void RunOfflineSequenceThread(int nTrackID)
+        {
+            if (m_folderPath == @"C:\" || m_folderPath == "")
+                m_folderPath = Application.pathImageSave;
+            // Set the initial directory for the dialog box
+            System.Windows.Forms.FolderBrowserDialog folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+
+            folderBrowserDialog.SelectedPath = m_folderPath;
+
+            // Display the dialog box and wait for the user's response
+            System.Windows.Forms.DialogResult result = folderBrowserDialog.ShowDialog();
+
+            // If the user clicked the OK button, open the selected folder
+            if ((int)result == 1)
+            {
+                // Get the path of the selected folder
+                m_folderPath = folderBrowserDialog.SelectedPath;
+
+                // Open the folder using a DirectoryInfo or other appropriate method
+                // ...
+            }
+            else
+                return;
+
+            //Master.InspectEvent[0].Set();
+
+            if (thread_FullSequence[nTrackID] == null)
+            {
+                thread_FullSequence[nTrackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => InspectOffline(m_folderPath)));
+                thread_FullSequence[nTrackID].Start();
+            }
+            else if (!thread_FullSequence[nTrackID].IsAlive)
+            {
+                thread_FullSequence[nTrackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => InspectOffline(m_folderPath)));
+                thread_FullSequence[nTrackID].Start();
+            }
         }
         internal void RunSequenceThread(int nTrack)
         {
@@ -280,6 +321,7 @@ namespace Magnus_WPF_1.Source.Application
 
         public void InspectOffline(string strFolder)
         {
+
 
             m_Tracks[MainWindow.activeImageDock.trackID].InspectOffline(strFolder);
         }

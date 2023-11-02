@@ -17,6 +17,23 @@
         <Grid VerticalAlignment="Stretch"  Margin="0,0,0,30"
               HorizontalAlignment="Stretch"
               Background="#1a1a1a" ClipToBounds="True">
+
+            <DockPanel x:Name="panelSliderGray" Height="20" VerticalAlignment="Top"  Panel.ZIndex="2"
+                       Visibility="Collapsed"
+                       LastChildFill="True" Background="#FF1B1B27" Opacity="1">
+                <Slider x:Name="sldBinary" Margin="2 0 0 0"
+                        Width="250"
+                        Height="20" 
+                        Background="Transparent" 
+                        VerticalAlignment="Top" 
+                        HorizontalAlignment="Left"
+                        Value="{Binding Path=Text, ElementName=sldValueShow, Mode=TwoWay}"
+                        TickFrequency="1" Maximum="255" SmallChange="1" BorderBrush="#FFBD3F24" BorderThickness="1"  
+                        IsSnapToTickEnabled="True"
+                        ValueChanged="SldValueBinaChange"/>
+                <TextBox x:Name="sldValueShow" Width="30" Background="Transparent" Text="{Binding Path=Value, ElementName=sldBinary, Mode=TwoWay}" Foreground="Orange" TextAlignment="Center" FontSize="10"></TextBox>
+            </DockPanel>
+            
             <!--Overlay-->
             <Grid x:Name="grd_Dock" VerticalAlignment="Top" HorizontalAlignment="Left" Background="LightSlateGray">
                 <Image x:Name="image" Margin="0 0 0 0"

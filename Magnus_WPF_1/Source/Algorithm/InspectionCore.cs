@@ -5,6 +5,7 @@ using Emgu.CV.WPF;
 using Magnus_WPF_1.Source.Define;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,7 @@ using CvPointArray = Emgu.CV.Util.VectorOfPoint;
 
 namespace Magnus_WPF_1.Source.Algorithm
 {
+    using Magnus_WPF_1.Source.LogMessage;
     public class InspectionCore
     {
         public static Size globalImageSize;
@@ -174,19 +176,19 @@ namespace Magnus_WPF_1.Source.Algorithm
             //CvInvoke.WaitKey();
         }
 
-        public static int FindDeviceLocation(ref CvImage imgSource,
+        public static int FindDeviceLocation_Old(ref CvImage imgSource,
             ref List<Point> p_Regionpolygon, ref Point pCenter, ref Mat mat_DeviceLocationRegion, ref double nAngleOutput, ref double dScoreOutput)
         {
             if (m_TemplateImage.Gray == null)
                 return -99;
 
+            Stopwatch timeIns = new Stopwatch();
             CvImage img_thresholdRegion = new CvImage();
             CvImage img_openingRegionRegion = new CvImage();
             CvImage img_BiggestRegion = new CvImage();
             CvImage img_SelectRegion = new CvImage();
             CvImage img_DilationRegion = new CvImage();
 
-            CvImage img_Crop = new CvImage();
             CvImage region_Crop = new CvImage();
             mat_DeviceLocationRegion = new CvImage();
 
@@ -194,17 +196,24 @@ namespace Magnus_WPF_1.Source.Algorithm
                                                                                         (int)DeviceLocationParameter.m_L_DeviceLocationRoi.TopLeft.Y,
                                                                                         (int)DeviceLocationParameter.m_L_DeviceLocationRoi.Width,
                                                                                        (int)DeviceLocationParameter.m_L_DeviceLocationRoi.Height);
-            //Image<Gray, Byte> Image_Source_Crop_Temp = new Image<Gray, Byte>(imgSource.Bitmap);
-            CvImage rec_region = new CvImage();
-            rec_region = CvImage.Zeros(imgSource.Height, imgSource.Width, DepthType.Cv8U, 1);
-            CvInvoke.Rectangle(rec_region, rectDeviceLocation, new MCvScalar(255), -1);
+            CvImage region_SearchDeviceLocation = new CvImage();
+            region_SearchDeviceLocation = CvImage.Zeros(imgSource.Height, imgSource.Width, DepthType.Cv8U, 1);
+            CvInvoke.Rectangle(region_SearchDeviceLocation, rectDeviceLocation, new MCvScalar(255), -1);
+
+            //CvInvoke.WaitKey(0);
+            timeIns.Start();
             MagnusOpenCVLib.Threshold2(ref imgSource, ref img_thresholdRegion, DeviceLocationParameter.m_L_lowerThreshold, DeviceLocationParameter.m_L_upperThreshold);
-            CvInvoke.BitwiseAnd(img_thresholdRegion, rec_region, img_thresholdRegion);
+            LogMessage.WriteToDebugViewer(1, "Threshold 1 time: " + timeIns.ElapsedMilliseconds.ToString());
+            timeIns.Restart();
+
+            CvInvoke.BitwiseAnd(img_thresholdRegion, region_SearchDeviceLocation, img_thresholdRegion);
             MagnusOpenCVLib.OpeningRectangle(ref img_thresholdRegion, ref img_openingRegionRegion, DeviceLocationParameter.m_nOpeningMask, DeviceLocationParameter.m_nOpeningMask);
             MagnusOpenCVLib.SelectBiggestRegion(ref img_openingRegionRegion, ref mat_DeviceLocationRegion);
             List<System.Drawing.Rectangle> rectLabel = new List<System.Drawing.Rectangle>();
 
             MagnusOpenCVLib.SelectRegion(ref mat_DeviceLocationRegion, ref img_SelectRegion, ref rectLabel, DeviceLocationParameter.m_nMinWidthDevice, DeviceLocationParameter.m_nMinHeightDevice);
+            LogMessage.WriteToDebugViewer(1, "Select region time: " + timeIns.ElapsedMilliseconds.ToString());
+            timeIns.Restart();
             if (rectLabel == null)
                 return -99;
 
@@ -212,34 +221,48 @@ namespace Magnus_WPF_1.Source.Algorithm
             System.Drawing.Rectangle rectangleRoi = new System.Drawing.Rectangle();
             Image<Gray, Byte> ImageAfterDilationCrop = new Image<Gray, Byte>(imgSource.Bitmap);
             Image<Gray, Byte> Img = new Image<Gray, Byte>(imgSource.Bitmap);
-            MagnusOpenCVLib.CropImage(ref ImageAfterDilationCrop, ref Img, img_DilationRegion, ref rectangleRoi);
 
+            LogMessage.WriteToDebugViewer(1, "DilationRectangle time: " + timeIns.ElapsedMilliseconds.ToString());
+            timeIns.Restart();
+
+            //int nWidth = 0, nHeight = 0;
+            //MagnusOpenCVLib.GetWidthHeightRegion(ref img_DilationRegion, ref nWidth, ref nHeight);
+            //if(nWidth >= m_TemplateImage.Gray.Width && nHeight >= m_TemplateImage.Gray.Height)
+            //    MagnusOpenCVLib.CropImage(ref ImageAfterDilationCrop, ref Img, img_DilationRegion, ref rectangleRoi);
+            //else
+                MagnusOpenCVLib.CropImage(ref ImageAfterDilationCrop, ref Img, region_SearchDeviceLocation, ref rectangleRoi);
+
+            LogMessage.WriteToDebugViewer(1, "CropImage time: " + timeIns.ElapsedMilliseconds.ToString());
+            timeIns.Restart();
             System.Drawing.Rectangle rectMatchingPosition = new System.Drawing.Rectangle();
             bool bIsTemplateFounded = false;
-            if (ImageAfterDilationCrop.Width <= m_TemplateImage.Gray.Width || ImageAfterDilationCrop.Height <= m_TemplateImage.Gray.Height)
-            {
-                if (DeviceLocationParameter.m_dAngleResolutionTemplate >= 30)
-                    bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(imgSource, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_nStepTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
-                else
-                {
-                    bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(imgSource, m_TemplateImage.Gray, 0, 24, 15, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+            //if (ImageAfterDilationCrop.Width <= m_TemplateImage.Gray.Width || ImageAfterDilationCrop.Height <= m_TemplateImage.Gray.Height)
+            //{
+            //    if (DeviceLocationParameter.m_dAngleResolutionTemplate >= 30)
+            //        bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(imgSource, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_nStepTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+            //    else
+            //    {
+            //        bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(imgSource, m_TemplateImage.Gray, 0, 24, 15, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
 
-                    bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_KdTreeTemplateMatching(imgSource, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+            //        bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_KdTreeTemplateMatching(imgSource, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
 
-                }
-            }
-            else
-            {
-                if (DeviceLocationParameter.m_dAngleResolutionTemplate >= 30)
-                    bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(ImageAfterDilationCrop.Mat, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_nStepTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
-                else
-                {
+            //    }
+            //}
+            //else
+            //{
+                //if (DeviceLocationParameter.m_dAngleResolutionTemplate >= 30)
+                //    bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(ImageAfterDilationCrop.Mat, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_nStepTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+                //else
+                //{
                     bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(ImageAfterDilationCrop.Mat, m_TemplateImage.Gray, 0, 24, 15, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
 
                     bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_KdTreeTemplateMatching(ImageAfterDilationCrop.Mat, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
-                }
-            }
+                //}
+            //}
 
+
+            LogMessage.WriteToDebugViewer(1, "template Matching time: " + timeIns.ElapsedMilliseconds.ToString());
+            timeIns.Restart();
             List<Point> pPolygon = new List<Point>();
             pCenter = new Point((rectMatchingPosition.Left + rectMatchingPosition.Right) / 2 + rectangleRoi.Left,
                           (rectMatchingPosition.Top + rectMatchingPosition.Bottom) / 2 + rectangleRoi.Top);
@@ -269,6 +292,148 @@ namespace Magnus_WPF_1.Source.Algorithm
             p_Regionpolygon = RotatePolygon(pPolygon, -nAngleOutput, pCenter.X, pCenter.Y);
             p_Regionpolygon.Remove(pCenter);
 
+            LogMessage.WriteToDebugViewer(1, "FindNearestPoints time: " + timeIns.ElapsedMilliseconds.ToString());
+            timeIns.Stop();
+
+            if (bIsTemplateFounded)
+                return 0;
+            else
+                return -1;
+
+        }
+
+
+        public static int FindDeviceLocation(ref CvImage imgSource, ref List<Point> p_Regionpolygon, ref Point pCenter, ref Mat mat_DeviceLocationRegion, ref double nAngleOutput, ref double dScoreOutput)
+        {
+            if (m_TemplateImage.Gray == null)
+                return -99;
+
+            Stopwatch timeIns = new Stopwatch();
+            CvImage img_thresholdRegion = new CvImage();
+            CvImage img_openingRegionRegion = new CvImage();
+            CvImage img_BiggestRegion = new CvImage();
+            CvImage img_SelectRegion = new CvImage();
+            CvImage img_DilationRegion = new CvImage();
+
+            CvImage region_Crop = new CvImage();
+            mat_DeviceLocationRegion = new CvImage();
+
+            System.Drawing.Rectangle rectDeviceLocation = new System.Drawing.Rectangle((int)DeviceLocationParameter.m_L_DeviceLocationRoi.TopLeft.X,
+                                                                                        (int)DeviceLocationParameter.m_L_DeviceLocationRoi.TopLeft.Y,
+                                                                                        (int)DeviceLocationParameter.m_L_DeviceLocationRoi.Width,
+                                                                                       (int)DeviceLocationParameter.m_L_DeviceLocationRoi.Height);
+            CvImage region_SearchDeviceLocation = new CvImage();
+            region_SearchDeviceLocation = CvImage.Zeros(imgSource.Height, imgSource.Width, DepthType.Cv8U, 1);
+            CvInvoke.Rectangle(region_SearchDeviceLocation, rectDeviceLocation, new MCvScalar(255), -1);
+            //CvInvoke.WaitKey(0);
+            timeIns.Start();
+            MagnusOpenCVLib.Threshold2(ref imgSource, ref img_thresholdRegion, DeviceLocationParameter.m_L_lowerThreshold, DeviceLocationParameter.m_L_upperThreshold);
+            LogMessage.WriteToDebugViewer(1, "Threshold 1 time: " + timeIns.ElapsedMilliseconds.ToString());
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Threshold 1 time: " + timeIns.ElapsedMilliseconds.ToString());
+
+            });
+            timeIns.Restart();
+
+            CvInvoke.BitwiseAnd(img_thresholdRegion, region_SearchDeviceLocation, img_thresholdRegion);
+            MagnusOpenCVLib.OpeningRectangle(ref img_thresholdRegion, ref img_openingRegionRegion, DeviceLocationParameter.m_nOpeningMask, DeviceLocationParameter.m_nOpeningMask);
+            MagnusOpenCVLib.SelectBiggestRegion(ref img_openingRegionRegion, ref mat_DeviceLocationRegion);
+            List<System.Drawing.Rectangle> rectLabel = new List<System.Drawing.Rectangle>();
+
+            MagnusOpenCVLib.SelectRegion(ref mat_DeviceLocationRegion, ref img_SelectRegion, ref rectLabel, DeviceLocationParameter.m_nMinWidthDevice, DeviceLocationParameter.m_nMinHeightDevice);
+            LogMessage.WriteToDebugViewer(1, "Select region time: " + timeIns.ElapsedMilliseconds.ToString());
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Select region time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
+
+            });
+
+            timeIns.Restart();
+            if (rectLabel == null)
+                return -99;
+
+            MagnusOpenCVLib.DilationRectangle(ref img_SelectRegion, ref img_DilationRegion, DeviceLocationParameter.m_nDilationMask, DeviceLocationParameter.m_nDilationMask);
+            System.Drawing.Rectangle rectangleRoi = new System.Drawing.Rectangle();
+            Image<Gray, Byte> ImageAfterDilationCrop = new Image<Gray, Byte>(imgSource.Bitmap);
+            Image<Gray, Byte> Img = new Image<Gray, Byte>(imgSource.Bitmap);
+
+            LogMessage.WriteToDebugViewer(1, "DilationRectangle time: " + timeIns.ElapsedMilliseconds.ToString());
+            timeIns.Restart();
+
+            //int nWidth = 0, nHeight = 0;
+            //MagnusOpenCVLib.GetWidthHeightRegion(ref img_DilationRegion, ref nWidth, ref nHeight);
+            //LogMessage.WriteToDebugViewer(1, "GetWidthHeightRegion time: " + timeIns.ElapsedMilliseconds.ToString());
+            //timeIns.Restart();
+            //if(nWidth >= m_TemplateImage.Gray.Width && nHeight >= m_TemplateImage.Gray.Height)
+            //    MagnusOpenCVLib.CropImage(ref ImageAfterDilationCrop, ref Img, img_DilationRegion, ref rectangleRoi);
+            //else
+            MagnusOpenCVLib.CropImage(ref ImageAfterDilationCrop, ref Img, region_SearchDeviceLocation, ref rectangleRoi);
+
+
+            System.Drawing.Rectangle rectMatchingPosition = new System.Drawing.Rectangle();
+            bool bIsTemplateFounded = false;
+            //if (ImageAfterDilationCrop.Width <= m_TemplateImage.Gray.Width || ImageAfterDilationCrop.Height <= m_TemplateImage.Gray.Height)
+            //{
+            //    if (DeviceLocationParameter.m_dAngleResolutionTemplate >= 30)
+            //        bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(imgSource, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_nStepTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+            //    else
+            //    {
+            //        bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(imgSource, m_TemplateImage.Gray, 0, 24, 15, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+
+            //        bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_KdTreeTemplateMatching(imgSource, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+
+            //    }
+            //}
+            //else
+            //{
+            //if (DeviceLocationParameter.m_dAngleResolutionTemplate >= 30)
+            //    bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(ImageAfterDilationCrop.Mat, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_nStepTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+            //else
+            //{
+            LogMessage.WriteToDebugViewer(1, "CropImage time: " + timeIns.ElapsedMilliseconds.ToString());
+            timeIns.Restart();
+            //bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(ImageAfterDilationCrop.Mat, m_TemplateImage.Gray, 0, 24, 15, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+            //LogMessage.WriteToDebugViewer(1, "template Matching 1 time: " + timeIns.ElapsedMilliseconds.ToString());
+            //timeIns.Restart();
+            //bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_KdTreeTemplateMatching(ImageAfterDilationCrop.Mat, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+            ////}
+            //}
+
+
+            //LogMessage.WriteToDebugViewer(1, "template Matching 2 time: " + timeIns.ElapsedMilliseconds.ToString());
+            //timeIns.Restart();
+            List<Point> pPolygon = new List<Point>();
+            pCenter = new Point((rectMatchingPosition.Left + rectMatchingPosition.Right) / 2 + rectangleRoi.Left,
+                          (rectMatchingPosition.Top + rectMatchingPosition.Bottom) / 2 + rectangleRoi.Top);
+
+            //top bottom left right  x1 x2 y1 y2
+            Point po1 = new Point(rectMatchingPosition.Left + rectangleRoi.Left, rectMatchingPosition.Top + rectangleRoi.Top);
+            Point po2 = new Point(rectMatchingPosition.Right + rectangleRoi.Left, rectMatchingPosition.Top + rectangleRoi.Top);
+            Point po3 = new Point(rectMatchingPosition.Right + rectangleRoi.Left, rectMatchingPosition.Bottom + rectangleRoi.Top);
+            Point po4 = new Point(rectMatchingPosition.Left + rectangleRoi.Left, rectMatchingPosition.Bottom + rectangleRoi.Top);
+
+            pPolygon.Add(po1);
+            pPolygon.Add(po2);
+            pPolygon.Add(po3);
+            pPolygon.Add(po4);
+            pPolygon.Add(pCenter);
+
+            List<Point> p_Regionpolygon_temp = RotatePolygon(pPolygon, -nAngleOutput, pCenter.X, pCenter.Y);
+
+            int nminIndex = FindNearestPoints(imgSource, ref mat_DeviceLocationRegion, rectMatchingPosition, p_Regionpolygon_temp, (float)nAngleOutput);
+
+            nAngleOutput = nAngleOutput + (DeviceLocationParameter.m_nBlackCornerIndexTemplateImage - nminIndex) * 90;
+            if (nAngleOutput <= -180)
+                nAngleOutput = 360 - nAngleOutput;
+
+            if (nAngleOutput >= 180)
+                nAngleOutput = nAngleOutput - 360;
+            p_Regionpolygon = RotatePolygon(pPolygon, -nAngleOutput, pCenter.X, pCenter.Y);
+            p_Regionpolygon.Remove(pCenter);
+
+            LogMessage.WriteToDebugViewer(1, "FindNearestPoints time: " + timeIns.ElapsedMilliseconds.ToString());
+            timeIns.Stop();
 
             if (bIsTemplateFounded)
                 return 0;
@@ -352,11 +517,11 @@ namespace Magnus_WPF_1.Source.Algorithm
                                                                                         (int)rectDeviceLocationInput.Width,
                                                                                        (int)rectDeviceLocationInput.Height);
             //Image<Gray, Byte> Image_Source_Crop_Temp = new Image<Gray, Byte>(imgSource.Bitmap);
-            CvImage rec_region = new CvImage();
-            rec_region = CvImage.Zeros(m_TeachImage.Gray.Height, m_TeachImage.Gray.Width, DepthType.Cv8U, 1);
-            CvInvoke.Rectangle(rec_region, rectDeviceLocation, new MCvScalar(255), -1);
+            CvImage region_SearchDeviceLocation = new CvImage();
+            region_SearchDeviceLocation = CvImage.Zeros(m_TeachImage.Gray.Height, m_TeachImage.Gray.Width, DepthType.Cv8U, 1);
+            CvInvoke.Rectangle(region_SearchDeviceLocation, rectDeviceLocation, new MCvScalar(255), -1);
             MagnusOpenCVLib.Threshold2(ref m_TeachImage.Gray, ref img_thresholdRegion, DeviceLocationParameter.m_L_lowerThreshold, DeviceLocationParameter.m_L_upperThreshold);
-            CvInvoke.BitwiseAnd(img_thresholdRegion, rec_region, img_thresholdRegion);
+            CvInvoke.BitwiseAnd(img_thresholdRegion, region_SearchDeviceLocation, img_thresholdRegion);
             MagnusOpenCVLib.OpeningRectangle(ref img_thresholdRegion, ref img_openingRegionRegion, DeviceLocationParameter.m_nOpeningMask, DeviceLocationParameter.m_nOpeningMask);
             MagnusOpenCVLib.SelectBiggestRegion(ref img_openingRegionRegion, ref mat_DeviceLocationRegion);
             List<System.Drawing.Rectangle> rectLabel = new List<System.Drawing.Rectangle>();
@@ -369,32 +534,67 @@ namespace Magnus_WPF_1.Source.Algorithm
             System.Drawing.Rectangle rectangleRoi = new System.Drawing.Rectangle();
             Image<Gray, Byte> ImageAfterDilationCrop = new Image<Gray, Byte>(m_TeachImage.Gray.Bitmap);
             Image<Gray, Byte> Img = new Image<Gray, Byte>(m_TeachImage.Gray.Bitmap);
-            MagnusOpenCVLib.CropImage(ref ImageAfterDilationCrop, ref Img, img_DilationRegion, ref rectangleRoi);
 
-            bool bIsTemplateFounded = false;
-            if (ImageAfterDilationCrop.Width <= templateImageCropped.Width || ImageAfterDilationCrop.Height <= templateImageCropped.Height)
-            {
-                if (DeviceLocationParameter.m_dAngleResolutionTemplate >= 30)
-                    bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(m_TeachImage.Gray, templateImageCropped, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_nStepTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
-                else
-                {
-                    bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(m_TeachImage.Gray, templateImageCropped, 0, 12, 30, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
 
-                    bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_KdTreeTemplateMatching(m_TeachImage.Gray, templateImageCropped, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
-
-                }
-            }
+            int nWidth = 0, nHeight = 0;
+            MagnusOpenCVLib.GetWidthHeightRegion(ref img_DilationRegion, ref nWidth, ref nHeight);
+            if (nWidth >= m_TemplateImage.Gray.Width && nHeight >= m_TemplateImage.Gray.Height)
+                MagnusOpenCVLib.CropImage(ref ImageAfterDilationCrop, ref Img, img_DilationRegion, ref rectangleRoi);
             else
-            {
-                if (DeviceLocationParameter.m_dAngleResolutionTemplate >= 30)
-                    bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(ImageAfterDilationCrop.Mat, templateImageCropped, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_nStepTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
-                else
-                {
-                    bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(ImageAfterDilationCrop.Mat, templateImageCropped, 0, 12, 30, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+                MagnusOpenCVLib.CropImage(ref ImageAfterDilationCrop, ref Img, region_SearchDeviceLocation, ref rectangleRoi);
 
-                    bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_KdTreeTemplateMatching(ImageAfterDilationCrop.Mat, templateImageCropped, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
-                }
-            }
+            //System.Drawing.Rectangle rectMatchingPosition = new System.Drawing.Rectangle();
+            bool bIsTemplateFounded = false;
+            //if (ImageAfterDilationCrop.Width <= m_TemplateImage.Gray.Width || ImageAfterDilationCrop.Height <= m_TemplateImage.Gray.Height)
+            //{
+            //    if (DeviceLocationParameter.m_dAngleResolutionTemplate >= 30)
+            //        bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(imgSource, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_nStepTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+            //    else
+            //    {
+            //        bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(imgSource, m_TemplateImage.Gray, 0, 24, 15, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+
+            //        bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_KdTreeTemplateMatching(imgSource, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+
+            //    }
+            //}
+            //else
+            //{
+            //if (DeviceLocationParameter.m_dAngleResolutionTemplate >= 30)
+            //    bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(ImageAfterDilationCrop.Mat, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_nStepTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+            //else
+            //{
+            bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(ImageAfterDilationCrop.Mat, m_TemplateImage.Gray, 0, 24, 15, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+
+            bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_KdTreeTemplateMatching(ImageAfterDilationCrop.Mat, m_TemplateImage.Gray, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+            //}
+            //}
+
+            //MagnusOpenCVLib.CropImage(ref ImageAfterDilationCrop, ref Img, img_DilationRegion, ref rectangleRoi);
+
+            //bool bIsTemplateFounded = false;
+            //if (ImageAfterDilationCrop.Width <= templateImageCropped.Width || ImageAfterDilationCrop.Height <= templateImageCropped.Height)
+            //{
+            //    if (DeviceLocationParameter.m_dAngleResolutionTemplate >= 30)
+            //        bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(m_TeachImage.Gray, templateImageCropped, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_nStepTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+            //    else
+            //    {
+            //        bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(m_TeachImage.Gray, templateImageCropped, 0, 12, 30, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+
+            //        bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_KdTreeTemplateMatching(m_TeachImage.Gray, templateImageCropped, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+
+            //    }
+            //}
+            //else
+            //{
+            //    if (DeviceLocationParameter.m_dAngleResolutionTemplate >= 30)
+            //        bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(ImageAfterDilationCrop.Mat, templateImageCropped, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_nStepTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+            //    else
+            //    {
+            //        bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_TemplateMatching(ImageAfterDilationCrop.Mat, templateImageCropped, 0, 12, 30, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+
+            //        bIsTemplateFounded = m_TemplateMatchingModel.MAgnus_KdTreeTemplateMatching(ImageAfterDilationCrop.Mat, templateImageCropped, DeviceLocationParameter.m_dMinScoreTemplate, DeviceLocationParameter.m_dAngleResolutionTemplate, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput);
+            //    }
+            //}
 
             List<Point> pPolygon = new List<Point>();
             Point pCenter = new Point((rectMatchingPosition.Left + rectMatchingPosition.Right) / 2 + rectangleRoi.Left,

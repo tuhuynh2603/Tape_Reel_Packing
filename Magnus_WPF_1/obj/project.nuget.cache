@@ -1,18 +1,18 @@
 {
   "version": 2,
-  "dgSpecHash": "py/+R1e/iA/UXibo95xXA4KL0T7MGgCy9m2xhrM4Ve6FgT6OsG5OqdJbS1Z/i3gQdXhDJPxlRHIoW551uagghA==",
+  "dgSpecHash": "2qwCArXtK9bRbv1foXC2lsqT6+iVG4hG4ahkSrtOgRLbGIwKFcygHYSylfwVSxN28tm2SjBR00GAbMWJ67EpFQ==",
   "success": true,
   "projectFilePath": "C:\\Wisely\\C#\\Tape_Reel_Packing\\Magnus_WPF_1\\Magnus_WPF_1.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\huynh\\.nuget\\packages\\bouncycastle\\1.8.9\\bouncycastle.1.8.9.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\dragablz\\0.0.3.234\\dragablz.0.0.3.234.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\dynamiclanguageruntime\\1.3.4\\dynamiclanguageruntime.1.3.4.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\emgu.cv\\4.1.0.3420\\emgu.cv.4.1.0.3420.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\epplus\\4.5.3.1\\epplus.4.5.3.1.nupkg.sha512",
-    "C:\\Users\\huynh\\.nuget\\packages\\extended.wpf.toolkit\\2.9.0\\extended.wpf.toolkit.2.9.0.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\extended.wpf.toolkit\\3.8.2\\extended.wpf.toolkit.3.8.2.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\itextsharp\\5.5.13.3\\itextsharp.5.5.13.3.nupkg.sha512",
-    "C:\\Users\\huynh\\.nuget\\packages\\materialdesigncolors\\2.1.4\\materialdesigncolors.2.1.4.nupkg.sha512",
-    "C:\\Users\\huynh\\.nuget\\packages\\materialdesignthemes\\4.9.0\\materialdesignthemes.4.9.0.nupkg.sha512",
-    "C:\\Users\\huynh\\.nuget\\packages\\microsoft.xaml.behaviors.wpf\\1.1.39\\microsoft.xaml.behaviors.wpf.1.1.39.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\materialdesigncolors\\1.2.0\\materialdesigncolors.1.2.0.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\materialdesignthemes\\2.6.0\\materialdesignthemes.2.6.0.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\xceed.wpf.avalondock.themes.vs2013\\2.9.0.1\\xceed.wpf.avalondock.themes.vs2013.2.9.0.1.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\zedgraph\\5.1.7\\zedgraph.5.1.7.nupkg.sha512"
   ],

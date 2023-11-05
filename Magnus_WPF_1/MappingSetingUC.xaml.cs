@@ -51,7 +51,7 @@ namespace Magnus_WPF_1
             }
             return list;
         }
-        public bool UpdateMappingParameter(Dictionary<string, string> dictTeachParam)
+        public bool LoadMappingParamFromDictToUI(Dictionary<string, string> dictTeachParam)
         {
             this._dictMappingParam = dictTeachParam;
             try
@@ -177,7 +177,7 @@ namespace Magnus_WPF_1
 
         private void btn_cancel_Click(object sender, RoutedEventArgs e)
         {
-            UpdateMappingParameter(_dictMappingParam);
+            LoadMappingParamFromDictToUI(_dictMappingParam);
             MainWindow mainWindow = (MainWindow)System.Windows.Application.Current.MainWindow;
             mainWindow.mapping_parameters_btn.IsChecked = false;
         }

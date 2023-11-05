@@ -113,7 +113,7 @@ namespace Magnus_WPF_1.Source.Application
             ini.WriteValue(section, key, param);
         }
 
-        public static void LoadTeachParam()
+        public static void LoadTeachParamFromFileToDict()
         {
             string pathFile = Path.Combine(pathRecipe, currentRecipe, "TeachParameters.cfg");
             IniFile ini = new IniFile(pathFile);
@@ -178,15 +178,13 @@ namespace Magnus_WPF_1.Source.Application
 
         }
 
-        public static void LoadMappingParam()
+        public static void LoadMappingParamFromFile()
         {
             string pathFile = Path.Combine(pathRecipe, currentRecipe, "MappingParameters.cfg");
             IniFile ini = new IniFile(pathFile);
 
             ReadLine("MAPPING", "Number Device X", ini, ref dictMappingParam);
             ReadLine("MAPPING", "Number Device Y", ini, ref dictMappingParam);
-
-            InspectionCore.LoadTeachImageToInspectionCore();
         }
 
         public void WriteMappingParam()
@@ -220,11 +218,7 @@ namespace Magnus_WPF_1.Source.Application
 
         internal static void LoadRecipe()
         {
-            dictTeachParam.Clear();
-            dictMappingParam.Clear();
 
-            LoadTeachParam();
-            LoadMappingParam();
         }
     }
 }

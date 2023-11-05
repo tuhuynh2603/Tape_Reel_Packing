@@ -6,6 +6,7 @@ using Magnus_WPF_1.Source.Algorithm;
 using Magnus_WPF_1.Source.Define;
 using Magnus_WPF_1.Source.Hardware;
 using Magnus_WPF_1.UI.UserControls.View;
+using Magnus_WPF_1.UI.UserControls;
 using MvCamCtrl.NET;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,7 @@ using Rectangle = System.Drawing.Rectangle;
 namespace Magnus_WPF_1.Source.Application
 {
     using Magnus_WPF_1.Source.LogMessage;
+    using System.Numerics;
     public class Track
     {
         private MainWindow mainWindow;
@@ -41,9 +43,11 @@ namespace Magnus_WPF_1.Source.Application
         Mat m_frame = new Mat();
         public Thread threadInspectOnline;
 
+        public List<DefectInfor.DebugInfors> m_StepDebugInfors;
 
         public Track(int indexTrack, int numdoc, string serieCam, MainWindow app)
         {
+            m_StepDebugInfors = new List<DefectInfor.DebugInfors>();
             m_nTrackID = indexTrack;
             mainWindow = app;
             m_imageViews = new ImageView[numdoc];
@@ -99,14 +103,15 @@ namespace Magnus_WPF_1.Source.Application
 
         public int Inspect()
         {
+            if(MainWindow.mainWindow.m_bEnableDebug)
+                m_StepDebugInfors.Clear();
+
             List<Point> polygon = new List<Point>();
             Point pCenter = new Point();
             Mat mat_output = new Mat();
             double nAngleOutput = 0;
             double dScoreOutput = 0;
-            int nResult = InspectionCore.SimpleInspection(ref polygon, ref pCenter, ref mat_output, ref nAngleOutput, ref dScoreOutput);
-
-
+            int nResult = InspectionCore.SimpleInspection(ref polygon, ref pCenter, ref mat_output, ref nAngleOutput, ref dScoreOutput, ref m_StepDebugInfors, MainWindow.mainWindow.m_bEnableDebug);
             //Draw Result
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
@@ -146,80 +151,6 @@ namespace Magnus_WPF_1.Source.Application
             });
 
             return nResult;
-        }
-
-        public void InspectOffline(string strFolderPath)
-        {
-
-            //if (mainWindow.bEnableOfflineInspection)
-            //        return;
-
-            CheckInspectionOnlineThread();
-
-            mainWindow.bEnableOfflineInspection = true;
-
-            DirectoryInfo folder = new DirectoryInfo(strFolderPath);
-
-            // Get a list of items (files and directories) inside the folder
-            FileSystemInfo[] items = folder.GetFileSystemInfos();
-
-            // Loop through the items and print their names
-
-            while (mainWindow.bEnableOfflineInspection)
-            {
-                try
-                {
-                    while (!Master.m_hardwareTriggerSnapEvent[m_nTrackID].WaitOne(10))
-                    {
-                        if (mainWindow == null)
-                            return;
-
-                        if (!mainWindow.bEnableOfflineInspection)
-                            return;
-
-                    }
-                    bool bDeviceIDFound = false;
-                    foreach (FileSystemInfo item in items)
-                    {
-                        string strDeviceID = item.Name.Split('.')[0];
-                        strDeviceID = strDeviceID.Split('_')[1];
-                        int nDeviceID = Int32.Parse(strDeviceID);
-                        if (nDeviceID < 0 || nDeviceID >= m_nResult.Length)
-                            nDeviceID = 0;
-                        if (m_nCurrentClickMappingID != nDeviceID - 1)
-                            continue;
-                        bDeviceIDFound = true;
-                        Array.Clear(m_imageViews[0].bufferImage, 0, m_imageViews[0].bufferImage.Length);
-                        // Mono Image
-                        m_imageViews[0].UpdateNewImageMono(item.FullName);
-                    }
-                    if (bDeviceIDFound == false)
-                        continue;
-                    //Color Image
-                    //Mat img_temp = new Mat();
-                    //img_temp = CvInvoke.Imread(item.FullName, ImreadModes.Color);
-                    //Array.Clear(m_imageViews[0].bufferImage, 0, m_imageViews[0].bufferImage.Length);
-                    //Image<Bgr, byte> imgg = img_temp.ToImage<Bgr, byte>();
-                    //m_imageViews[0].bufferImage = BitmapToByteArray(imgg.ToBitmap());
-                    //m_imageViews[0].UpdateNewImageColor(m_imageViews[0].bufferImage, imgg.ToBitmap().Width, imgg.ToBitmap().Height, 96);
-
-                    Master.InspectDoneEvent[m_nTrackID].Reset();
-                    Master.InspectEvent[m_nTrackID].Set();
-                    //m_nResult[m_nCurrentClickMappingID] = Inspect();
-
-                    while (!Master.InspectDoneEvent[m_nTrackID].WaitOne(10))
-                    {
-                        if (mainWindow == null)
-                            return;
-
-                        if (!mainWindow.bEnableOfflineInspection)
-                            return;
-                    }
-                }
-                catch
-                {
-                }
-            }
         }
 
         public static byte[] BitmapToByteArray(Bitmap bitmap)
@@ -358,7 +289,6 @@ namespace Magnus_WPF_1.Source.Application
         //    return 0;
         //}
 
-
         private void InspectionOnlineThread()
         {
 
@@ -380,7 +310,7 @@ namespace Magnus_WPF_1.Source.Application
                     {
                         InspectionCore.LoadImageToInspection(m_imageViews[0].btmSource);
 
-                        if (Application.m_bEnableSavingOnlineImage == true)
+                        if (Application.m_bEnableSavingOnlineImage == true && MainWindow.mainWindow.bEnableRunSequence)
                         {
                             ImageSaveData imageSaveData = new ImageSaveData();
                             imageSaveData.nDeviceID = m_CurrentSequenceDeviceID;
@@ -404,6 +334,8 @@ namespace Magnus_WPF_1.Source.Application
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
+                        //MainWindow.mainWindow.UpdateDebugInfor();
+
                         m_imageViews[0].tbl_InspectTime.Text = timeIns.ElapsedMilliseconds.ToString();
 
                         // Update Statistics
@@ -411,21 +343,21 @@ namespace Magnus_WPF_1.Source.Application
                         {
                             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                             {
-                                mainWindow.ResetMappingResult();
+                                MainWindow.mainWindow.ResetMappingResult();
 
                             });
                         }
 
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            mainWindow.UpdateMappingResult(m_CurrentSequenceDeviceID, m_nResult[m_CurrentSequenceDeviceID]);
-                            mainWindow.UpdateStatisticResult(m_nResult[m_CurrentSequenceDeviceID]);
+                            MainWindow.mainWindow.UpdateMappingResult(m_CurrentSequenceDeviceID, m_nResult[m_CurrentSequenceDeviceID]);
+                            MainWindow.mainWindow.UpdateStatisticResult(m_nResult[m_CurrentSequenceDeviceID]);
                         });
 
                     });
 
                     ////
-                    Master.InspectEvent[m_nTrackID].Reset();
+                    //Master.InspectEvent[m_nTrackID].Reset();
                     Master.InspectDoneEvent[m_nTrackID].Set();
                 }
                 catch
@@ -440,6 +372,81 @@ namespace Magnus_WPF_1.Source.Application
         public int m_CurrentSequenceDeviceID = -1;
         public int m_nCurrentClickMappingID = -1;
         public string m_strCurrentLot;
+
+        public void InspectOffline(string strFolderPath)
+        {
+
+            //if (mainWindow.bEnableOfflineInspection)
+            //        return;
+
+            CheckInspectionOnlineThread();
+
+            MainWindow.mainWindow.bEnableOfflineInspection = true;
+
+            DirectoryInfo folder = new DirectoryInfo(strFolderPath);
+
+            // Get a list of items (files and directories) inside the folder
+            FileSystemInfo[] items = folder.GetFileSystemInfos();
+
+            // Loop through the items and print their names
+
+            while (MainWindow.mainWindow.bEnableOfflineInspection && !mainWindow.bEnableRunSequence)
+            {
+                try
+                {
+                    while (!Master.m_hardwareTriggerSnapEvent[m_nTrackID].WaitOne(10))
+                    {
+                        if (MainWindow.mainWindow == null)
+                            return;
+
+                        if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.bEnableRunSequence)
+                            return;
+
+                    }
+                    bool bDeviceIDFound = false;
+                    foreach (FileSystemInfo item in items)
+                    {
+                        string strDeviceID = item.Name.Split('.')[0];
+                        strDeviceID = strDeviceID.Split('_')[1];
+                        int nDeviceID = Int32.Parse(strDeviceID);
+                        if (nDeviceID < 0 || nDeviceID >= m_nResult.Length)
+                            nDeviceID = 0;
+                        if (m_nCurrentClickMappingID != nDeviceID - 1)
+                            continue;
+                        bDeviceIDFound = true;
+                        Array.Clear(m_imageViews[0].bufferImage, 0, m_imageViews[0].bufferImage.Length);
+                        // Mono Image
+                        m_imageViews[0].UpdateNewImageMono(item.FullName);
+                    }
+                    if (bDeviceIDFound == false)
+                        continue;
+                    //Color Image
+                    //Mat img_temp = new Mat();
+                    //img_temp = CvInvoke.Imread(item.FullName, ImreadModes.Color);
+                    //Array.Clear(m_imageViews[0].bufferImage, 0, m_imageViews[0].bufferImage.Length);
+                    //Image<Bgr, byte> imgg = img_temp.ToImage<Bgr, byte>();
+                    //m_imageViews[0].bufferImage = BitmapToByteArray(imgg.ToBitmap());
+                    //m_imageViews[0].UpdateNewImageColor(m_imageViews[0].bufferImage, imgg.ToBitmap().Width, imgg.ToBitmap().Height, 96);
+
+                    //Master.InspectDoneEvent[m_nTrackID].Reset();
+                    Master.InspectEvent[m_nTrackID].Set();
+                    //m_nResult[m_nCurrentClickMappingID] = Inspect();
+
+                    while (!Master.InspectDoneEvent[m_nTrackID].WaitOne(10))
+                    {
+                        if (MainWindow.mainWindow == null)
+                            return;
+
+                        if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.bEnableRunSequence)
+                            return;
+                    }
+                }
+                catch
+                {
+                }
+            }
+        }
+
         public void FullSequenceThread()
         {
 
@@ -569,18 +576,24 @@ namespace Magnus_WPF_1.Source.Application
         }
 
 
-        public void CheckInspectionOnlineThread()
+        public int CheckInspectionOnlineThread()
         {
             if (threadInspectOnline == null)
             {
+                Master.InspectDoneEvent[m_nTrackID].Reset();
+                Master.InspectEvent[m_nTrackID].Reset();
                 threadInspectOnline = new System.Threading.Thread(new System.Threading.ThreadStart(() => InspectionOnlineThread()));
                 threadInspectOnline.Start();
             }
             else if (!threadInspectOnline.IsAlive)
             {
+                Master.InspectDoneEvent[m_nTrackID].Reset();
+                Master.InspectEvent[m_nTrackID].Reset();
                 threadInspectOnline = new System.Threading.Thread(new System.Threading.ThreadStart(() => InspectionOnlineThread()));
                 threadInspectOnline.Start();
             }
+
+            return 0;
         }
 
     }

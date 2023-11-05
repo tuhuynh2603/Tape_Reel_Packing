@@ -20,9 +20,7 @@ namespace Magnus_WPF_1
 	/// </summary>
 	public partial class PopupUserControl : UserControl
 	{
-		public PopupUserControl()
-		{
-			InitializeComponent();
-		}
-	}
+
+
+    }
 }

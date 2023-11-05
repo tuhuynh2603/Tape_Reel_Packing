@@ -1,4 +1,5 @@
-﻿using Magnus_WPF_1.Source.Application;
+﻿using Magnus_WPF_1.Source.Algorithm;
+using Magnus_WPF_1.Source.Application;
 using Magnus_WPF_1.Source.Define;
 //using System.Windows.Forms;
 using Magnus_WPF_1.Source.LogMessage;
@@ -28,6 +29,8 @@ namespace Magnus_WPF_1
         public bool Logout = false;
 
         public static MainWindow mainWindow;
+        public OutputLogView outputLogView;
+        public DefectInfor defectInfor = new DefectInfor();
         public static string[] titles = new string[] { "Top View ", "Flap Side 1 ", "Flap Side 2 " };
 
         private int screenWidth = 2000;// System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width;
@@ -68,6 +71,34 @@ namespace Magnus_WPF_1
             }
         }
 
+        private double _dialogDefectHeight;
+        private double _dialogDefectWidth;
+        public double DialogDefectHeight
+        {
+            get { return _dialogDefectHeight; }
+            set
+            {
+                if (value != _dialogDefectHeight)
+                {
+                    _dialogDefectHeight = value;
+                    OnPropertyChanged("DialogDefectHeight");
+                }
+            }
+        }
+        public double DialogDefectWidth
+        {
+            get { return _dialogDefectWidth; }
+            set
+            {
+                if (value != _dialogDefectWidth)
+                {
+                    _dialogDefectWidth = value;
+                    OnPropertyChanged("DialogDefectWidth");
+                }
+            }
+        }
+
+
         private LayoutPanel m_layoutPanel;
         public delegate void StateWindow(WindowState state);
         public static StateWindow changeStateWindow;
@@ -81,10 +112,10 @@ namespace Magnus_WPF_1
 
             mainWindow = this;
             master = new Master(this);
-
+            outputLogView = new OutputLogView(this);
             //master.m_SaveInspectImageThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread(true)));
 
-            enable_saveimage_btn.IsChecked = Source.Application.Application.m_bEnableSavingOnlineImage;
+            btn_enable_saveimage.IsChecked = Source.Application.Application.m_bEnableSavingOnlineImage;
 
 
             ContrucUIComponent();
@@ -215,29 +246,16 @@ namespace Magnus_WPF_1
         }
 
 
-        bool bEnableDebug;
-        private void debug_btn_Checked(object sender, RoutedEventArgs e)
-        {
-
-            bEnableDebug = (bool)debug_btn.IsChecked;
-        }
-
-        private void debug_btn_Unchecked(object sender, RoutedEventArgs e)
-        {
-
-            bEnableDebug = (bool)debug_btn.IsChecked;
-        }
-
         public bool bEnableOfflineInspection;
 
-        private void inspect_offline_btn_Checked(object sender, RoutedEventArgs e)
+        private void btn_inspect_offline_Checked(object sender, RoutedEventArgs e)
         {
 
             bEnableOfflineInspection = (bool)inspect_offline_btn.IsChecked;
             master.RunOfflineSequenceThread(activeImageDock.trackID);
         }
 
-        private void inspect_offline_btn_UnChecked(object sender, RoutedEventArgs e)
+        private void btn_inspect_offline_UnChecked(object sender, RoutedEventArgs e)
         {
 
             bEnableOfflineInspection = (bool)inspect_offline_btn.IsChecked;
@@ -266,8 +284,15 @@ namespace Magnus_WPF_1
             int nID = Check_mapping_Cursor_ID(m_CanvasMovePoint);
             master.m_Tracks[activeImageDock.trackID].m_nCurrentClickMappingID = nID;
 
+            //if (m_bEnableDebug) {
+            //    InspectionCore.LoadImageToInspection(master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource);
+            //    master.m_Tracks[activeImageDock.trackID].Inspect();
+            //    UpdateDebugInfor();
+            //        return;
+            //}
+
             master.m_Tracks[activeImageDock.trackID].CheckInspectionOnlineThread();
-            if (btn_run_sequence.IsChecked == true || bEnableOfflineInspection)
+            if (bEnableRunSequence || bEnableOfflineInspection)
                 Master.m_hardwareTriggerSnapEvent[activeImageDock.trackID].Set();
             else
                 Master.InspectEvent[activeImageDock.trackID].Set();
@@ -285,7 +310,6 @@ namespace Magnus_WPF_1
             nDeviceID = -1;
         }
 
-        public OutputLogView outputLogView = new OutputLogView();
         public void InitBigDocPanel()
         {
             bigPanelGroup.Children.Add(bigTagPanel);
@@ -293,14 +317,14 @@ namespace Magnus_WPF_1
             bigTagPanel.DockHeight = new System.Windows.GridLength(screenHeight / 1);
             bigTagPanel.DockMinHeight = screenHeight / 1;
             bigTagPanel.DockMinWidth = screenWidth / 2;
-            bigPanelGroup.Children.Add(new LayoutDocumentPane(new LayoutDocument()
-            {
-                Content = outputLogView,
-                CanMove = false,
-                CanClose = false,
-                CanFloat = false,
-                Title = "Output Log"
-            }));
+            //bigPanelGroup.Children.Add(new LayoutDocumentPane(new LayoutDocument()
+            //{
+            //    Content = outputLogView,
+            //    CanMove = false,
+            //    CanClose = false,
+            //    CanFloat = false,
+            //    Title = "Output Log"
+            //}));
 
             bigTagPanel.Children.Add(bigDoc);
             bigDoc.Title = "Zoom Doc Panel";
@@ -372,7 +396,6 @@ namespace Magnus_WPF_1
                 }
             }
             #endregion
-
             // grd_Status_Offline.Children.Add(statusUC);
             // statusUC.UpdateStatus("IDLE");
 
@@ -381,7 +404,6 @@ namespace Magnus_WPF_1
             outPutLogViewDoc.Title = "Output Log View";
             outPutLogViewDoc.Content = outputLogView;
             outPutLogViewDoc.ContentId = "";
-
             outPutLogViewDoc.CanClose = false;
             outPutLogViewDoc.CanHide = false;
             outPutLogViewDoc.AutoHideMinWidth = screenWidth / 1;
@@ -402,7 +424,6 @@ namespace Magnus_WPF_1
             m_layout.Orientation = Orientation.Vertical;
             m_layout.Children.Add(mainPanelGroup);
             m_layout.Children.Add(outPutLogPaneGroup);
-
             m_layoutPanel.Orientation = Orientation.Horizontal;
             m_layoutPanel.Children.Add(m_layout);
 
@@ -505,7 +526,7 @@ namespace Magnus_WPF_1
         }
 
         public bool bEnableGrabCycle = false;
-        private void stream_camera_btn_Checked(object sender, RoutedEventArgs e)
+        private void btn_stream_camera_Checked(object sender, RoutedEventArgs e)
         {
             bEnableGrabCycle = (bool)stream_camera_btn.IsChecked;
 
@@ -521,13 +542,13 @@ namespace Magnus_WPF_1
             }
         }
 
-        private void stream_camera_btn_UnChecked(object sender, RoutedEventArgs e)
+        private void btn_stream_camera_UnChecked(object sender, RoutedEventArgs e)
         {
             bEnableGrabCycle = (bool)stream_camera_btn.IsChecked;
 
         }
 
-        private void Camera_Setting_Checked(object sender, RoutedEventArgs e)
+        private void btn_Camera_Setting_Checked(object sender, RoutedEventArgs e)
         {
             bool bEnable = (bool)camera_setting_btn.IsChecked;
 
@@ -553,7 +574,7 @@ namespace Magnus_WPF_1
 
         }
 
-        private void Camera_Setting_Unchecked(object sender, RoutedEventArgs e)
+        private void btn_Camera_Setting_Unchecked(object sender, RoutedEventArgs e)
         {
             bool bEnable = (bool)camera_setting_btn.IsChecked;
             grd_PopupDialog.Children.Clear();
@@ -565,7 +586,7 @@ namespace Magnus_WPF_1
 
         }
 
-        private void Inspect_Unchecked(object sender, RoutedEventArgs e)
+        private void btn_Inspect_Unchecked(object sender, RoutedEventArgs e)
         {
 
         }
@@ -588,18 +609,26 @@ namespace Magnus_WPF_1
             master.m_Tracks[0].m_imageViews[0].tbl_Value_gray.Text = valueGray;
         }
 
-        private void load_teach_image_btn_Click(object sender, RoutedEventArgs e)
+        private void btn_load_teach_image_Click(object sender, RoutedEventArgs e)
         {
             master.loadTeachImageToUI();
 
         }
 
-        public bool bEnableSingleSnapImages = true;
-        private void inspect_btn_Click(object sender, RoutedEventArgs e)
+        //public bool bEnableSingleSnapImages = true;
+        private void btn_inspect_Click(object sender, RoutedEventArgs e)
         {
 
-            if (bEnableSingleSnapImages)
-                bEnableSingleSnapImages = false;
+            //if (bEnableSingleSnapImages)
+            //    bEnableSingleSnapImages = false;
+
+            //if (m_bEnableDebug)
+            //{
+            //    InspectionCore.LoadImageToInspection(master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource);
+            //    master.m_Tracks[activeImageDock.trackID].Inspect();
+            //    UpdateDebugInfor();
+            //    return;
+            //}
 
             Master.InspectEvent[master.m_nActiveTrack].Set();
 
@@ -620,7 +649,7 @@ namespace Magnus_WPF_1
 
 
         //HIKControlCameraView cameraView = new HIKControlCameraView();
-        private void teach_parameters_btn_Checked(object sender, RoutedEventArgs e)
+        private void btn_teach_parameters_Checked(object sender, RoutedEventArgs e)
         {
             teach_parameters_btn.IsChecked = true;
             //_BEnableSavingOnlineImage = !_BEnableSavingOnlineImage;
@@ -646,7 +675,7 @@ namespace Magnus_WPF_1
 
         }
 
-        private void teach_parameters_btn_Unchecked(object sender, RoutedEventArgs e)
+        private void btn_teach_parameters_Unchecked(object sender, RoutedEventArgs e)
         {
             //master.m_Tracks[0].m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autofocus, 0);
 
@@ -732,7 +761,7 @@ namespace Magnus_WPF_1
             load_teach_image_btn.IsEnabled = false;
             stream_camera_btn.IsEnabled = false;
             teach_parameters_btn.IsEnabled = false;
-            save_teach_image_btn.IsEnabled = false;
+            btn_save_teach_image.IsEnabled = false;
 
         }
 
@@ -744,10 +773,10 @@ namespace Magnus_WPF_1
             load_teach_image_btn.IsEnabled = true;
             stream_camera_btn.IsEnabled = true;
             teach_parameters_btn.IsEnabled = true;
-            save_teach_image_btn.IsEnabled = true;
+            btn_save_teach_image.IsEnabled = true;
         }
 
-        private void save_teach_image_btn_Click(object sender, RoutedEventArgs e)
+        private void btn_save_teach_image_Click(object sender, RoutedEventArgs e)
         {
             var result = MessageBox.Show("Do you want to save as teach image ?", "Save as Teach Image", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
@@ -757,7 +786,7 @@ namespace Magnus_WPF_1
 
         }
 
-        private void mapping_parameters_btn_Unchecked(object sender, RoutedEventArgs e)
+        private void btn_mapping_parameters_Unchecked(object sender, RoutedEventArgs e)
         {
             mapping_parameters_btn.IsChecked = false;
             grd_PopupDialog.Children.Clear();
@@ -771,7 +800,7 @@ namespace Magnus_WPF_1
             //DisbleButtonStandard();
         }
 
-        private void mapping_parameters_btn_Checked(object sender, RoutedEventArgs e)
+        private void btn_mapping_parameters_Checked(object sender, RoutedEventArgs e)
         {
             mapping_parameters_btn.IsChecked = true;
 
@@ -790,16 +819,16 @@ namespace Magnus_WPF_1
             tab_controls.SelectedIndex = currentTabIndex;
         }
 
-        private void enable_saveimage_btn_Unchecked(object sender, RoutedEventArgs e)
+        private void btn_enable_saveimage_Unchecked(object sender, RoutedEventArgs e)
         {
             //master.applications.m_bEnableSavingOnlineImage = (bool) enable_saveimage_btn.IsChecked;
-            Source.Application.Application.m_bEnableSavingOnlineImage = (bool)enable_saveimage_btn.IsChecked;
+            Source.Application.Application.m_bEnableSavingOnlineImage = (bool)btn_enable_saveimage.IsChecked;
         }
 
-        private void enable_saveimage_btn_Checked(object sender, RoutedEventArgs e)
+        private void btn_enable_saveimage_Checked(object sender, RoutedEventArgs e)
         {
             //master.applications.m_bEnableSavingOnlineImage = (bool)enable_saveimage_btn.IsChecked;
-            Source.Application.Application.m_bEnableSavingOnlineImage = (bool)enable_saveimage_btn.IsChecked;
+            Source.Application.Application.m_bEnableSavingOnlineImage = (bool)btn_enable_saveimage.IsChecked;
 
         }
 
@@ -850,7 +879,7 @@ namespace Magnus_WPF_1
 
         }
 
-        private void online_btn_Checked(object sender, RoutedEventArgs e)
+        private void btn_online_Checked(object sender, RoutedEventArgs e)
         {
 
         }
@@ -893,12 +922,12 @@ namespace Magnus_WPF_1
         }
 
 
-        private void LogIn_Unchecked(object sender, RoutedEventArgs e)
+        private void btn_LogIn_Unchecked(object sender, RoutedEventArgs e)
         {
             //Source.Application.Application.loginUser.PreviewKeyDown -= Source.Application.Application.loginUser.KeyShortcut;
             //tabItem_Production.IsSelected = true;
         }
-        private void LogIn_Checked(object sender, RoutedEventArgs e)
+        private void btn_LogIn_Checked(object sender, RoutedEventArgs e)
         {
             //Source.Application.Application.loginUser.AssignMainWindow();
             //tt_DialogSettings.X = 0;
@@ -931,7 +960,7 @@ namespace Magnus_WPF_1
 
         }
 
-        public void Onlinebtn_click(object sender, RoutedEventArgs e)
+        public void btn_Online_click(object sender, RoutedEventArgs e)
         {
 
         }
@@ -950,6 +979,11 @@ namespace Magnus_WPF_1
             //}
             //master.ReleaseAllThread();
             //master.applications.KillCurrentProcess();
+        }
+
+         public void AddLineOutputLog(string text, int nStyle = (int)ERROR_CODE.PASS)
+        {
+            outputLogView.AddLineOutputLog(text, nStyle);
         }
 
         #region PIXEL RULER
@@ -971,50 +1005,6 @@ namespace Magnus_WPF_1
             pixelRuler.Finish();
         }
         #endregion
-
-        private Paragraph paragraphOutputLog;
-        public void AddLineOutputLog(string text, int nStyle = (int)ERROR_CODE.PASS)
-        {
-
-
-
-            if (text.Contains("[ Time ]"))
-            {
-                paragraphOutputLog = new Paragraph();
-
-                if (outputLogView.outputLog.Blocks.Count > 0)
-                    outputLogView.outputLog.Blocks.InsertBefore(outputLogView.outputLog.Blocks.FirstBlock, paragraphOutputLog);
-                else
-                {
-                    outputLogView.outputLog.Blocks.Add(paragraphOutputLog);
-
-                }
-            }
-            if (paragraphOutputLog == null)
-            {
-                paragraphOutputLog = new Paragraph();
-                outputLogView.outputLog.Blocks.Add(paragraphOutputLog);
-            }
-
-            else
-            {
-                //paragraphOutputLog.Inlines.Add(text + '\n');
-                if (nStyle == (int)ERROR_CODE.PASS)
-                {
-                    paragraphOutputLog.Inlines.Add(text + '\n');
-                }
-                else
-                {
-                    Label a = new Label();
-                    a.Content = text;
-                    a.Foreground = System.Windows.Media.Brushes.White;
-                    a.Background = System.Windows.Media.Brushes.Red;
-                    paragraphOutputLog.Inlines.Add(a);
-                    paragraphOutputLog.Inlines.Add("\n");
-                }
-            }
-        }
-
 
         private void btn_Binarize_Checked(object sender, RoutedEventArgs e)
         {
@@ -1073,6 +1063,9 @@ namespace Magnus_WPF_1
         }
         private void Binarize_MouseEnter(object sender, MouseEventArgs e)
         {
+            if (Header.PopupText == null)
+                return;
+
             Header.Margin = new Thickness(30, 0, 0, 0);
             Header.PopupText.HorizontalAlignment = HorizontalAlignment.Center;
             Header.PopupText.VerticalAlignment = VerticalAlignment.Center;
@@ -1080,6 +1073,83 @@ namespace Magnus_WPF_1
             popup_uc.IsOpen = true;
             Header.PopupText.Text = "Ctrl+B";
         }
+
+
+        #region Grid Defect Setting
+
+        public bool m_bEnableDebug;
+        private void btn_debug_Checked(object sender, RoutedEventArgs e)
+        {
+
+            m_bEnableDebug = (bool)debug_btn.IsChecked;
+            if (master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource.Width < 0)
+                return;
+
+            InspectionCore.LoadImageToInspection(master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource);
+            master.m_Tracks[activeImageDock.trackID].Inspect();
+            UpdateDebugInfor();
+            return;
+        }
+
+        private void btn_debug_Unchecked(object sender, RoutedEventArgs e)
+        {
+
+            m_bEnableDebug = (bool)debug_btn.IsChecked;
+            //grd_Defect.Children.Clear();
+            grd_Defect_Settings.Visibility = Visibility.Collapsed;
+            //defectInfor.lvDefect.ItemsSource = null;
+
+        }
+
+
+        GridView gridView = new GridView();
+        public void UpdateDebugInfor()
+        {
+            if (!m_bEnableDebug)
+            {
+                grd_Defect_Settings.Visibility = Visibility.Collapsed;
+                return;
+            }
+                //defectInfor.lvDefect.View = gridView;
+                defectInfor.lvDefect.ItemsSource = null;
+                defectInfor.lvDefect.ItemsSource = master.m_Tracks[activeImageDock.trackID].m_StepDebugInfors;
+                DialogDefectHeight = defectInfor.Height;
+                DialogDefectWidth = defectInfor.Width;
+
+                grd_Defect.Children.Clear();
+                grd_Defect.Children.Add(defectInfor);
+                //defectInfor.SvDefect.CanContentScroll = true;
+                grd_Defect.VerticalAlignment = VerticalAlignment.Top;
+                grd_Defect.HorizontalAlignment = HorizontalAlignment.Left;
+                grd_Defect_Settings.Visibility = Visibility.Visible;
+
+        }
+
+        private void grd_Defect_Settings_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            _startPositionDlg = e.GetPosition(this);
+            if (_startPositionDlg.X != 0 && _startPositionDlg.Y != 0)
+            {
+                _startOffsetPositionDlg = new Vector(tt_DefectSettings.X, tt_DefectSettings.Y);
+                grd_Defect_Settings.CaptureMouse();
+            }
+        }
+
+        private void grd_Defect_Settings_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (grd_Defect_Settings.IsMouseCaptured)
+            {
+                Vector offset = Point.Subtract(e.GetPosition(this), _startPositionDlg);
+                tt_DefectSettings.X = _startOffsetPositionDlg.X + offset.X;
+                tt_DefectSettings.Y = _startOffsetPositionDlg.Y + offset.Y;
+            }
+        }
+
+        private void grd_Defect_Settings_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            grd_Defect_Settings.ReleaseMouseCapture();
+        }
+        #endregion
 
     }
 }

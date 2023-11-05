@@ -62,6 +62,10 @@
               "target": "Package",
               "version": "[2.6.0, )"
             },
+            "System.Numerics.Vectors": {
+              "target": "Package",
+              "version": "[4.5.0, )"
+            },
             "Xceed.Wpf.AvalonDock.Themes.VS2013": {
               "target": "Package",
               "version": "[2.9.0.1, )"

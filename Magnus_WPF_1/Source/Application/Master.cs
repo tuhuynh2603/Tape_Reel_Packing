@@ -72,9 +72,14 @@ namespace Magnus_WPF_1.Source.Application
         }
         public void LoadRecipe(bool isLoadRecipeManualy = false)
         {
-            Application.LoadRecipe();
+            Application.dictMappingParam.Clear();
+            Application.LoadMappingParamFromFile();
+            mappingParameter.LoadMappingParamFromDictToUI(Application.dictMappingParam);
+
             #region Load Teach Paramter
-            if (!teachParameter.UpdateTeachParameter(Application.dictTeachParam))
+            Application.dictTeachParam.Clear();
+            Application.LoadTeachParamFromFileToDict();
+            if (!teachParameter.UpdateTeachParamFromDictToUI(Application.dictTeachParam))
             {
                 //MessageBox.Show("Can not load teach parameters", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -83,13 +88,11 @@ namespace Magnus_WPF_1.Source.Application
 
                 //DebugMessage.WriteToDebugViewer(2, string.Format("Load Teach Parameters Success "));
             }
-            InspectionCore.SetTeachParameterToInspectionCore();
+            InspectionCore.UpdateTeachParamFromUIToInspectionCore();
             InspectionCore.LoadTeachImageToInspectionCore();
-            InspectionCore.AutoTeach();
-
-
-            mappingParameter.UpdateMappingParameter(Application.dictMappingParam);
             #endregion
+
+            InspectionCore.AutoTeach();
         }
         #endregion
 
@@ -279,13 +282,13 @@ namespace Magnus_WPF_1.Source.Application
         {
             if (m_TeachThread == null)
             {
-                m_TeachThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[0].m_imageViews[0].TeachSequence()));
+                m_TeachThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].TeachSequence()));
                 m_TeachThread.SetApartmentState(ApartmentState.STA);
             }
             else
             {
                 m_TeachThread = null;
-                m_TeachThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[0].m_imageViews[0].TeachSequence()));
+                m_TeachThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].TeachSequence()));
                 m_TeachThread.SetApartmentState(ApartmentState.STA);
             }
             m_TeachThread.Start();

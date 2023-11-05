@@ -9,15 +9,17 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <xceedtk:PropertyGrid x:Name="pgr_PropertyGrid_Teach"
-                              SelectedObject="{Binding}" Margin="0,0,0,30"
-                              ShowTitle="True"
-                              ShowSearchBox="True"
-                              ShowSummary="True"
-                              Background="#FF322F2E" 
-                              Foreground="LightGray"></xceedtk:PropertyGrid>
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="30">
-            <Button Name="btn_ok" FontSize="8" Padding="0"
+        <StackPanel>
+            <xceedtk:PropertyGrid  x:Name="pgr_PropertyGrid_Teach"
+                                  SelectedObject="{Binding}" Margin="0,0,0,30"
+                                  ShowTitle="True"
+                                  ShowSearchBox="false"
+                                  ShowSummary="True"
+                                  Background="#FF322F2E" 
+                                  Foreground="LightGray"></xceedtk:PropertyGrid>
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="30">
+                <Button Name="btn_ok" FontSize="8" Padding="0"
                     Background="#FF343333"
                     Height="25" 
                     HorizontalAlignment="Center"
@@ -25,9 +27,9 @@
                     ToolTip="Save"
                     Click="btn_Save_Param_Teach_Click"
                     Width="40" BorderBrush="#FF352622">
-                <materialDesign:PackIcon Kind="UserCheck" Height="24" Width="24" Foreground="#FFFD1A12"/>
-            </Button>
-            <Button Name="btn_cancel" FontSize="8" Padding="0"
+                    <materialDesign:PackIcon Kind="UserCheck" Height="24" Width="24" Foreground="#FFFD1A12"/>
+                </Button>
+                <Button Name="btn_cancel" FontSize="8" Padding="0"
                     Background="#FF343333"
                     Height="25"
                     Margin="0,2,10,1"
@@ -35,8 +37,19 @@
                     HorizontalAlignment="Center"
                     Click="btn_Cancel_Save_Param_Teach_Click"
                     Width="40" BorderBrush="#FF352622">
-                <materialDesign:PackIcon Kind="RemoveCircle" Height="24" Width="24" Foreground="#FFFD1A12"/>
-            </Button>
+                    <materialDesign:PackIcon Kind="RemoveCircle" Height="24" Width="24" Foreground="#FFFD1A12"/>
+                </Button>
+            </StackPanel>
         </StackPanel>
+
+        <ComboBox Height="25" x:Name="track_ComboBox" Margin="50,-520,0,0" Foreground="Black" SelectedIndex="0"
+                          SelectionChanged="track_ComboBox_SelectionChanged">
+            <ComboBoxItem Content="Camera 1"></ComboBoxItem>
+            <ComboBoxItem Content="Camera 2"></ComboBoxItem>
+
+        </ComboBox>
+
     </Grid>
+    
+    
 </UserControl>

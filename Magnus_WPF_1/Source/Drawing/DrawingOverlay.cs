@@ -77,6 +77,19 @@ namespace Magnus_WPF_1.Source.DrawingOverlay
             if (Region == null)
                 return false;
             CvContourArray contourRegion = new CvContourArray();
+            //MagnusOpenCVLib.CountObj(Region);
+            if (Region.Width > 2000)
+            {
+                MagnusOpenCVLib.OpeningCircle(ref Region, ref Region, 2);
+                MagnusOpenCVLib.ClosingCircle(ref Region, ref Region, 2);
+            }
+
+            else
+            {
+                MagnusOpenCVLib.OpeningCircle(ref Region, ref Region, 1);
+                MagnusOpenCVLib.ClosingCircle(ref Region, ref Region, 1);
+            }
+
             MagnusOpenCVLib.GenContourRegion(ref Region, ref contourRegion, Emgu.CV.CvEnum.RetrType.Tree);
             for (int i = 0; i < contourRegion.Size; i++)
             {

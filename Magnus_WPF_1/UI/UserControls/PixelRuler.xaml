@@ -11,6 +11,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              BorderBrush="#FF00DFFF">
     <Grid>
+
         <TextBlock Text="Pixel Ruler" Name="titleDlg"
                    Foreground="WhiteSmoke" HorizontalAlignment="Center"
                    VerticalAlignment="Top" FontSize="14"

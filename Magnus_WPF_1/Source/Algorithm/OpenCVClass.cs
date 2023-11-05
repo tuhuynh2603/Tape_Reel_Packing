@@ -26,6 +26,14 @@ namespace Magnus_WPF_1.Source.Algorithm
         //*******************************************************************************************************************************************************//
         #region Internnal Inspection Function
         //Get Corner From Region
+        public static bool Different(CvImage regionSource, CvImage regionMask, ref CvImage regionOutput)
+        {
+            CvImage XOR_Region = new CvImage();
+            regionOutput = new CvImage();
+            CvInvoke.BitwiseXor(regionSource, regionMask, XOR_Region);
+            CvInvoke.BitwiseAnd(XOR_Region, regionSource, regionOutput);
+            return true;
+        }
 
         public static bool GetCornerFromRegion(ref CvImage region, List<Rectangle> corner, Size imgSize)
         {
@@ -866,9 +874,9 @@ namespace Magnus_WPF_1.Source.Algorithm
         // Hough Lines
         public static bool HoughLines(ref CvImage source, ref CvImage result, int houghCoeff, ref LineArray edges)
         {
-            MagnusOpenCVLib.ClosingRectangle(ref source, ref source, 5, 3);
+            //MagnusOpenCVLib.ClosingRectangle(ref source, ref source, 5, 3);
             CvPointFArray lines = new CvPointFArray();
-            CvInvoke.HoughLines(source, lines, 1, Math.PI / 180,
+            CvInvoke.HoughLines(source, lines, 1, Math.PI / 1800,
                        houghCoeff, 0, 0);
 
             if (lines.Size == 0)
@@ -1502,7 +1510,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             double x0 = a * rho, y0 = b * rho;
             Point pt1 = new Point((int)(x0 + 1000 * (-b)), (int)(y0 + 1000 * (a)));
             Point pt2 = new Point((int)(x0 - 1000 * (-b)), (int)(y0 - 1000 * (a)));
-            CvInvoke.Line(result, pt1, pt2, new MCvScalar(255), 1);
+            CvInvoke.Line(result, pt1, pt2, new MCvScalar(255), 5);
             return true;
         }
 

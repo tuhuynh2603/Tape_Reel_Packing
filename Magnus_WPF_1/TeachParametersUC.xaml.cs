@@ -20,7 +20,7 @@ namespace Magnus_WPF_1
     public partial class TeachParametersUC : UserControl
     {
         private Dictionary<string, string> _dictTeachParam = new Dictionary<string, string>();
-
+        int m_nTrackSelected = 0;
         public CategoryTeachParameter categoriesTeachParam = new CategoryTeachParameter();
 
         public TeachParametersUC()
@@ -50,7 +50,7 @@ namespace Magnus_WPF_1
             }
             return list;
         }
-        public bool UpdateTeachParameter(Dictionary<string, string> dictTeachParam)
+        public bool UpdateTeachParamFromDictToUI(Dictionary<string, string> dictTeachParam)
         {
             this._dictTeachParam = dictTeachParam;
             try
@@ -138,16 +138,47 @@ namespace Magnus_WPF_1
             pgr_PropertyGrid_Teach.Update();
             return true;
         }
-        public void UpdateDictionaryParam()
+
+        private void track_ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (m_nTrackSelected != track_ComboBox.SelectedIndex)
+                m_nTrackSelected = track_ComboBox.SelectedIndex;
+            {
+                ReloadParameterUI(m_nTrackSelected);
+            }
+
+        }
+
+        private void ReloadParameterUI(int nTrack)
+        {
+
+        }
+
+        public void LoadTeachParamFromUIToDict()
         {
             System.Reflection.PropertyInfo[] infos = categoriesTeachParam.GetType().GetProperties();
             System.Reflection.PropertyInfo[] infosApp = Application.Application.categoriesTeachParam.GetType().GetProperties();
 
+
             for (int i = 0; i < infos.Length; i++)
             {
-                infosApp[i].SetValue(Application.Application.categoriesTeachParam, infos[i].GetValue(categoriesTeachParam));
-                Type type = infos[i].PropertyType;
-                _dictTeachParam[infos[i].Name] = infos[i].GetValue(categoriesTeachParam).ToString();
+
+                var attributes = infos[i].GetCustomAttributes(typeof(BrowsableAttribute), true);
+
+                bool isBrowsable = true;
+                if (attributes.Length > 0)
+                {
+                    BrowsableAttribute browseAttr = (BrowsableAttribute)attributes[0];
+                    isBrowsable = browseAttr.Browsable;
+                    //Console.WriteLine($"Is MyProperty browsable? {isBrowsable}");
+                }
+
+                if (isBrowsable == true)
+                {
+                    infosApp[i].SetValue(Application.Application.categoriesTeachParam, infos[i].GetValue(categoriesTeachParam));
+                    Type type = infos[i].PropertyType;
+                    _dictTeachParam[infos[i].Name] = infos[i].GetValue(categoriesTeachParam).ToString();
+                }
             }
         }
 
@@ -155,15 +186,17 @@ namespace Magnus_WPF_1
         {
             SaveParameterTeachDefault();
         }
+        
+
         public bool SaveParameterTeachDefault()
         {
             try
             {
                 Mouse.OverrideCursor = Cursors.Wait;
-                UpdateDictionaryParam();
+                LoadTeachParamFromUIToDict();
                 MainWindow mainWindow = (MainWindow)System.Windows.Application.Current.MainWindow;
                 mainWindow.master.WriteTeachParam();
-                InspectionCore.SetTeachParameterToInspectionCore();
+                InspectionCore.UpdateTeachParamFromUIToInspectionCore();
                 Mouse.OverrideCursor = null;
                 mainWindow.teach_parameters_btn.IsChecked = false;
                 return true;
@@ -175,7 +208,7 @@ namespace Magnus_WPF_1
         }
         private void btn_Cancel_Save_Param_Teach_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            UpdateTeachParameter(_dictTeachParam);
+            UpdateTeachParamFromDictToUI(_dictTeachParam);
             MainWindow mainWindow = (MainWindow)System.Windows.Application.Current.MainWindow;
             mainWindow.teach_parameters_btn.IsChecked = false;
         }
@@ -185,6 +218,7 @@ namespace Magnus_WPF_1
         /// </summary>
         // [CategoryOrder("TOP SURFACE", 0)]
         [CategoryOrder("LOCATION", 0)]
+        [CategoryOrder("INSPECTION", 1)]
         //[CategoryOrder("TOP PATTERN", 1)]
         [DisplayName("Teach Parameter")]
         public class CategoryTeachParameter
@@ -221,7 +255,7 @@ namespace Magnus_WPF_1
             //[Browsable(false)]
             [Category("LOCATION")]
             [DisplayName("Opening Mask")]
-            [Range(3, 100)]
+            [Range(1, 500)]
             [DefaultValue(11)]
             [Description("")]
             [PropertyOrder(3)]
@@ -230,7 +264,7 @@ namespace Magnus_WPF_1
             //[Browsable(false)]
             [Category("LOCATION")]
             [DisplayName("Dilation Mask")]
-            [Range(3, 100)]
+            [Range(1, 500)]
             [DefaultValue(30)]
             [Description("")]
             [PropertyOrder(4)]
@@ -301,23 +335,53 @@ namespace Magnus_WPF_1
 
             #endregion
 
-            //#region TOP PATTERN
-            //[Category("TOP PATTERN")]
-            //[DisplayName("No Of Pattern")]
-            //[Range(1, 4)]
-            //[Description("Maximun Number Pattern Teaching")]
-            //[PropertyOrder(0)]
-            //[DefaultValue(1)]
-            //public int TP_noOfPattern { get; set; }
 
-            ////[Browsable(false)]
-            //[Category("TOP PATTERN")]
-            //[DisplayName("Roi No")]
-            //[Range(0, 5)]
-            //[Description("")]
-            //[PropertyOrder(1)]
-            //public List<Rectangles> TP_roiNo { get; set; }
-            //#endregion
+            #region LABEL
+
+            [Browsable(false)]
+            [Category("LABEL")]
+            [DisplayName("Device Location Roi")]
+            [Range(0, 5)]
+            [Description("")]
+            [PropertyOrder(0)]
+            public Rectangles LB_DeviceLocationRoi { get; set; }
+
+            //[Browsable(false)]
+            [Category("LABEL")]
+            [DisplayName("Lower Threshold")]
+            [Range(0, 255)]
+            [DefaultValue(0)]
+            [Description("")]
+            [PropertyOrder(1)]
+            public int LB_lowerThreshold { get; set; }
+            //[Browsable(false)]
+            [Category("LABEL")]
+            [DisplayName("Upper Threshold")]
+            [Range(0, 255)]
+            [DefaultValue(255)]
+            [Description("")]
+            [PropertyOrder(2)]
+            public int LB_upperThreshold { get; set; }
+
+            //[Browsable(false)]
+            [Category("LABEL")]
+            [DisplayName("Opening Mask")]
+            [Range(1, 500)]
+            [DefaultValue(11)]
+            [Description("")]
+            [PropertyOrder(3)]
+            public int LB_OpeningMask { get; set; }
+
+            //[Browsable(false)]
+            [Category("LABEL")]
+            [DisplayName("Dilation Mask")]
+            [Range(1, 500)]
+            [DefaultValue(30)]
+            [Description("")]
+            [PropertyOrder(4)]
+            public int LB_DilationMask { get; set; }
+
+            #endregion
         }
     }
 }

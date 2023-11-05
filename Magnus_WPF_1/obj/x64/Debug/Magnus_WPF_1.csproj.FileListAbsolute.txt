@@ -16,7 +16,6 @@ C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Xceed.Wpf.AvalonDock.T
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Xceed.Wpf.AvalonDock.Themes.Metro.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Xceed.Wpf.AvalonDock.Themes.VS2010.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Xceed.Wpf.AvalonDock.dll
-C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Xceed.Wpf.DataGrid.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Xceed.Wpf.Toolkit.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\de\Xceed.Wpf.AvalonDock.resources.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\es\Xceed.Wpf.AvalonDock.resources.dll
@@ -33,8 +32,6 @@ C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\MaterialDesignColors.d
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\MaterialDesignColors.pdb
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\MaterialDesignThemes.Wpf.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\MaterialDesignThemes.Wpf.pdb
-C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Microsoft.Xaml.Behaviors.dll
-C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Microsoft.Xaml.Behaviors.pdb
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Xceed.Wpf.AvalonDock.Themes.VS2013.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\ZedGraph.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\de\ZedGraph.resources.dll
@@ -75,3 +72,19 @@ C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Magnus_WPF_1.csproj.Co
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Magnus_WPF_1.csproj.CopyComplete
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Magnus_WPF_1.exe
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Magnus_WPF_1.pdb
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Microsoft.Dynamic.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Microsoft.Scripting.Metadata.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Microsoft.Scripting.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\cs-CZ\Xceed.Wpf.AvalonDock.resources.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\System.Numerics.Vectors.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Magnus_WPF_1.exe.config
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\PopupUserControl.g.cs
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\DefectInfor.g.cs
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\LoginUser.g.cs
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\OutputLogView.g.cs
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\PixelRuler.g.cs
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\PopupUserControl.baml
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\DefectInfor.baml
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\LoginUser.baml
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\OutputLogView.baml
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\PixelRuler.baml

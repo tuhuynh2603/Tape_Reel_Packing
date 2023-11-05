@@ -326,6 +326,25 @@ namespace Magnus_WPF_1.UI.UserControls.View
                 //DebugMessage.WriteToDebugViewer(1, $"End - Buffer camera:");
             }
         }
+
+        public void UpdateUIImageMono(byte[] buff)
+        {
+            // //DebugMessage.WriteToDebugViewer(1, $"_imageWidth of track: {_imageWidth}");
+            ////DebugMessage.WriteToDebugViewer(1, $"_imageHeight of track: {_imageHeight}");
+
+            lock (buff)
+            {
+            //DebugMessage.WriteToDebugViewer(1, $"Start - Buffer camera:");
+                image.Dispatcher.Invoke(() =>
+                {
+                    btmSource = BitmapSource.Create(_imageWidth, _imageHeight, _dpi, _dpi,
+                        PixelFormats.Gray8, BitmapPalettes.Gray256, buff, (PixelFormats.Gray8.BitsPerPixel + 7) / 8 * _imageWidth);
+                    image.Source = btmSource;
+                });
+                //DebugMessage.WriteToDebugViewer(1, $"enableGray: {enableGray}");
+            }
+        }
+
         public byte[] ConvertMonoToBinary()
         {
             long count = 0;
@@ -1005,7 +1024,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
         {
             Master.m_bIsTeaching = true;
             Master.m_NextStepTeachEvent.Reset();
-            Source.Application.Application.LoadTeachParam();
+            Source.Application.Application.LoadTeachParamFromFileToDict();
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
                 resultTeach.Children.Clear();
@@ -1137,7 +1156,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             if (result == MessageBoxResult.Yes)
             {
                 //SetTeachParameterToCategories();
-                InspectionCore.SetTeachParameterToInspectionCore();
+                InspectionCore.UpdateTeachParamFromUIToInspectionCore();
                 InspectionCore.SetTemplateImage();
                 saveTemplateImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "templateImage_1.bmp"));
                 MainWindow.mainWindow.master.WriteTeachParam();
@@ -1151,10 +1170,10 @@ namespace Magnus_WPF_1.UI.UserControls.View
             {
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
-                    MainWindow.mainWindow.master.teachParameter.UpdateTeachParameter(Source.Application.Application.dictTeachParam);
+                    MainWindow.mainWindow.master.teachParameter.UpdateTeachParamFromDictToUI(Source.Application.Application.dictTeachParam);
                 });
 
-                InspectionCore.SetTeachParameterToInspectionCore();
+                InspectionCore.UpdateTeachParamFromUIToInspectionCore();
                 InspectionCore.LoadTeachImageToInspectionCore();
                 //MainWindow.mainWindow.master.LoadRecipe();
             }

@@ -86,7 +86,10 @@ C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\Debug\cs-CZ\Xceed.Wpf.AvalonDock
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\Debug\Magnus_WPF_1.exe.config
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\Debug\PopupUserControl.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\Debug\PopupUserControl.baml
-C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\Debug\Magnus_WPF_1.csproj.AssemblyReference.cache
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\Debug\Microsoft.Dynamic.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\Debug\Microsoft.Scripting.Metadata.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\Debug\Microsoft.Scripting.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\Debug\Magnus_WPF_1.csproj.AssemblyReference.cache
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\Debug\System.Numerics.Vectors.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\Debug\UI\UserControls\DefectInfor.g.cs
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\Debug\UI\UserControls\DefectInfor.baml

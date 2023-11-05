@@ -61,15 +61,26 @@
         <GroupBox Margin="0 0 0 0"
                   Style="{DynamicResource GroupBoxStyle1}">
             <Grid>
-                <FlowDocumentScrollViewer Background="Transparent"
+                <FlowDocumentScrollViewer x:Name="flowDocumentSVOutputlog" Background="Transparent"
                                       Foreground="#FF9D4242" 
                                       SelectionBrush="#FF4092D3" 
-                                      BorderBrush="Transparent" >
+                                      BorderBrush="Transparent">
                     <FlowDocument x:Name="outputLog" Foreground="White" PagePadding="5"
                                   Background="Transparent"
                                   FontFamily="Microsoft New Tai Lue"
-                              FontSize="12">
-                    </FlowDocument>
+                                  
+                                  FontSize="12" >
+
+                        <FlowDocument.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Copy All" Command="Copy"/>
+                                <MenuItem Header="Delete All" 
+                                          Name="SentDelete"
+                                          Click="SentDelete_Click"/>
+                            </ContextMenu>
+                        </FlowDocument.ContextMenu>
+                        
+                    </FlowDocument >
                 </FlowDocumentScrollViewer>
             </Grid>
         </GroupBox>

@@ -71,7 +71,8 @@ namespace Magnus_WPF_1.UI.UserControls
                             MainWindow.mainWindow.master.m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].UpdateUIImageMono(Track.BitmapToByteArray(imgg.ToBitmap()));
                             //MainWindow.mainWindow.master.m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].image.Source = imgg;
                             Mat matRegion = item.mat_Region;
-                            MainWindow.mainWindow.master.m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].DrawRegionOverlay(ref matRegion);
+                            SolidColorBrush color = new SolidColorBrush(Colors.Cyan);
+                            MainWindow.mainWindow.master.m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].DrawRegionOverlay(matRegion, color);
                         });
                                                    
                         bIsSelected = false;

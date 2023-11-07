@@ -72,7 +72,7 @@ namespace Magnus_WPF_1.Source.DrawingOverlay
             return true;
         }
         //Draw Region
-        public static bool DrawRegion(Canvas GridOverlay, Emgu.CV.Mat Region, System.Windows.Media.Brush color, double thickness)
+        public static bool DrawRegion(Canvas GridOverlay, int ntrackID, Emgu.CV.Mat Region, System.Windows.Media.Brush color, double thickness)
         {
             if (Region == null)
                 return false;
@@ -101,8 +101,8 @@ namespace Magnus_WPF_1.Source.DrawingOverlay
                 double scaleHeight = 0;
                 GridOverlay.Dispatcher.Invoke(delegate
                 {
-                    int width_track = MainWindow.mainWindow.master.m_Tracks[0].m_imageViews[0]._imageWidth;
-                    int height_track = MainWindow.mainWindow.master.m_Tracks[0].m_imageViews[0]._imageHeight;
+                    int width_track = MainWindow.mainWindow.master.m_Tracks[ntrackID].m_imageViews[0]._imageWidth;
+                    int height_track = MainWindow.mainWindow.master.m_Tracks[ntrackID].m_imageViews[0]._imageHeight;
                     scaleWidth = GridOverlay.Width / width_track;
                     scaleHeight = GridOverlay.Height / height_track;
                 });

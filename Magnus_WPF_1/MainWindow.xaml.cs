@@ -1086,7 +1086,7 @@ namespace Magnus_WPF_1
                 return;
 
             InspectionCore.LoadImageToInspection(master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource);
-            master.m_Tracks[activeImageDock.trackID].Inspect();
+            master.m_Tracks[activeImageDock.trackID].Inspect(ref master.m_Tracks[activeImageDock.trackID]);
             UpdateDebugInfor();
             return;
         }

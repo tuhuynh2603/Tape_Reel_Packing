@@ -63,7 +63,15 @@ namespace Magnus_WPF_1
                     if (type.Name == "Int32")
                     {
                         int value = 0;
-                        bool success = Int32.TryParse(dictTeachParam[info.Name].ToString(), out value);
+                        bool success = true;
+
+                        string str_value = "";
+                        dictTeachParam.TryGetValue(info.Name, out str_value);
+                        if (str_value == null)
+                            value = (int)info.GetCustomAttribute<DefaultValueAttribute>().Value;
+                        else
+                            success = Int32.TryParse(dictTeachParam[info.Name].ToString(), out value);
+
                         if (success == false)
                             value = (int)info.GetCustomAttribute<DefaultValueAttribute>().Value;
                         info.SetValue(Application.Application.categoriesTeachParam, value);
@@ -76,7 +84,16 @@ namespace Magnus_WPF_1
                     else if (type.Name == "Double")
                     {
                         double value = 0.0;
-                        bool success = double.TryParse(dictTeachParam[info.Name].ToString(), out value);
+                        bool success = true;
+                        string str_value = "";
+                        dictTeachParam.TryGetValue(info.Name, out str_value);
+                        if (str_value == null)
+                        {
+                            value = (double)info.GetCustomAttribute<DefaultValueAttribute>().Value;
+                        }
+                        else
+                            success = double.TryParse(dictTeachParam[info.Name].ToString(), out value);
+
                         if (success == false)
                             value = (double)info.GetCustomAttribute<DefaultValueAttribute>().Value;
                         info.SetValue(Application.Application.categoriesTeachParam, value);
@@ -89,8 +106,10 @@ namespace Magnus_WPF_1
                         {
                             int[] value = new int[3];
                             List<int> listValue;
-                            if (dictTeachParam[info.Name] == "")
-                            {
+                            string str_value = "";
+                            dictTeachParam.TryGetValue(info.Name, out str_value);
+                            if (str_value == null)
+                            {   
                                 value = (int[])info.GetCustomAttribute<DefaultValueAttribute>().Value;
                                 listValue = new List<int>(value);
                             }
@@ -254,11 +273,29 @@ namespace Magnus_WPF_1
 
             //[Browsable(false)]
             [Category("LOCATION")]
+            [DisplayName("Lower Threshold Inner Chip")]
+            [Range(0, 255)]
+            [DefaultValue(0)]
+            [Description("")]
+            [PropertyOrder(3)]
+            public int L_lowerThresholdInnerChip { get; set; }
+            //[Browsable(false)]
+            [Category("LOCATION")]
+            [DisplayName("Upper Threshold Inner Chip")]
+            [Range(0, 255)]
+            [DefaultValue(255)]
+            [Description("")]
+            [PropertyOrder(4)]
+            public int L_upperThresholdInnerChip { get; set; }
+
+
+            //[Browsable(false)]
+            [Category("LOCATION")]
             [DisplayName("Opening Mask")]
             [Range(1, 500)]
             [DefaultValue(11)]
             [Description("")]
-            [PropertyOrder(3)]
+            [PropertyOrder(5)]
             public int L_OpeningMask { get; set; }
 
             //[Browsable(false)]
@@ -267,7 +304,7 @@ namespace Magnus_WPF_1
             [Range(1, 500)]
             [DefaultValue(30)]
             [Description("")]
-            [PropertyOrder(4)]
+            [PropertyOrder(6)]
             public int L_DilationMask { get; set; }
 
             //[Browsable(false)]
@@ -276,7 +313,7 @@ namespace Magnus_WPF_1
             [Range(0, 99999)]
             [DefaultValue(50)]
             [Description("")]
-            [PropertyOrder(5)]
+            [PropertyOrder(7)]
             public int L_MinWidthDevice { get; set; }
 
             //[Browsable(false)]
@@ -285,7 +322,7 @@ namespace Magnus_WPF_1
             [Range(0, 99999)]
             [DefaultValue(50)]
             [Description("")]
-            [PropertyOrder(6)]
+            [PropertyOrder(8)]
             public int L_MinHeightDevice { get; set; }
 
             [Browsable(false)]
@@ -293,7 +330,7 @@ namespace Magnus_WPF_1
             [DisplayName("Template Roi")]
             [Range(0, 5)]
             [Description("")]
-            [PropertyOrder(7)]
+            [PropertyOrder(9)]
             public Rectangles L_TemplateRoi { get; set; }
 
             //[Browsable(false)]
@@ -302,17 +339,17 @@ namespace Magnus_WPF_1
             [Range(1, 360)]
             [DefaultValue(4)]
             [Description("")]
-            [PropertyOrder(8)]
+            [PropertyOrder(10)]
             public int L_NumberSide { get; set; }
 
             //[Browsable(false)]
             [Category("LOCATION")]
-            [DisplayName("Angle Resolution")]
-            [Range(0.1, 360.0)]
-            [DefaultValue(90.0)]
-            [Description("")]
-            [PropertyOrder(9)]
-            public double L_AngleResolution { get; set; }
+            [DisplayName("Scale Image Ratio")]
+            [Range(0.1, 2)]
+            [DefaultValue(1)]
+            [Description("Before Inspecting, The image will be scaled by this value to reduce inspection time.")]
+            [PropertyOrder(11)]
+            public double L_ScaleImageRatio { get; set; }
 
             //[Browsable(false)]
             [Category("LOCATION")]
@@ -320,7 +357,7 @@ namespace Magnus_WPF_1
             [Range(0.0, 99999.0)]
             [DefaultValue(50.0)]
             [Description("")]
-            [PropertyOrder(10)]
+            [PropertyOrder(12)]
             public double L_MinScore { get; set; }
 
 
@@ -330,7 +367,7 @@ namespace Magnus_WPF_1
             [Range(0, 3)]
             [DefaultValue(0)]
             [Description("")]
-            [PropertyOrder(11)]
+            [PropertyOrder(13)]
             public int L_CornerIndex { get; set; }
 
             #endregion
@@ -344,7 +381,7 @@ namespace Magnus_WPF_1
             [Range(0, 5)]
             [Description("")]
             [PropertyOrder(0)]
-            public Rectangles LB_DeviceLocationRoi { get; set; }
+            public Rectangles LB_LabelnRoi { get; set; }
 
             //[Browsable(false)]
             [Category("LABEL")]

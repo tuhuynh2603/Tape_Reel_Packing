@@ -121,13 +121,16 @@ namespace Magnus_WPF_1.Source.Application
             ReadLine("LOCATION", "Device Location Roi", ini, ref dictTeachParam);
             ReadLine("LOCATION", "lower threshold", ini, ref dictTeachParam);
             ReadLine("LOCATION", "upper threshold", ini, ref dictTeachParam);
+            ReadLine("LOCATION", "lower threshold Inner Chip", ini, ref dictTeachParam);
+            ReadLine("LOCATION", "upper threshold Inner Chip", ini, ref dictTeachParam);
+
             ReadLine("LOCATION", "Opening Mask", ini, ref dictTeachParam);
             ReadLine("LOCATION", "Dilation Mask", ini, ref dictTeachParam);
             ReadLine("LOCATION", "Min Width Device", ini, ref dictTeachParam);
             ReadLine("LOCATION", "Min Height Device", ini, ref dictTeachParam);
             ReadLine("LOCATION", "Template Roi", ini, ref dictTeachParam);
             ReadLine("LOCATION", "Number Side", ini, ref dictTeachParam);
-            ReadLine("LOCATION", "Angle Resolution", ini, ref dictTeachParam);
+            ReadLine("LOCATION", "Scale Image Ratio", ini, ref dictTeachParam);
             ReadLine("LOCATION", "Min Score", ini, ref dictTeachParam);
             ReadLine("LOCATION", "Corner Index", ini, ref dictTeachParam);
 
@@ -151,6 +154,8 @@ namespace Magnus_WPF_1.Source.Application
             WriteLine("LOCATION", "Device Location Roi", ini, ConvertRectanglesToString(categoriesTeachParam.L_DeviceLocationRoi));
             WriteLine("LOCATION", "lower threshold", ini, categoriesTeachParam.L_lowerThreshold.ToString());
             WriteLine("LOCATION", "upper threshold", ini, categoriesTeachParam.L_upperThreshold.ToString());
+            WriteLine("LOCATION", "lower threshold Inner Chip", ini, categoriesTeachParam.L_lowerThresholdInnerChip.ToString());
+            WriteLine("LOCATION", "upper threshold Inner Chip", ini, categoriesTeachParam.L_upperThresholdInnerChip.ToString());
             WriteLine("LOCATION", "Opening Mask", ini, categoriesTeachParam.L_OpeningMask.ToString());
             WriteLine("LOCATION", "Dilation Mask", ini, categoriesTeachParam.L_DilationMask.ToString());
             WriteLine("LOCATION", "Min Width Device", ini, categoriesTeachParam.L_MinWidthDevice.ToString());
@@ -158,7 +163,7 @@ namespace Magnus_WPF_1.Source.Application
 
             WriteLine("LOCATION", "Template Roi", ini, ConvertRectanglesToString(categoriesTeachParam.L_TemplateRoi));
             WriteLine("LOCATION", "Number Side", ini, categoriesTeachParam.L_NumberSide.ToString());
-            WriteLine("LOCATION", "Angle Resolution", ini, categoriesTeachParam.L_AngleResolution.ToString());
+            WriteLine("LOCATION", "Scale Image Ratio", ini, categoriesTeachParam.L_ScaleImageRatio.ToString());
             WriteLine("LOCATION", "Min Score", ini, categoriesTeachParam.L_MinScore.ToString());
             WriteLine("LOCATION", "Corner Index", ini, categoriesTeachParam.L_CornerIndex.ToString());
 

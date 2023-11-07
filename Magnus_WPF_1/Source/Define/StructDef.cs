@@ -1,5 +1,7 @@
 ﻿//using System.Drawing;
+using Emgu.CV;
 using System.Windows;
+using System.Windows.Media;
 
 namespace Magnus_WPF_1.Source.Define
 {
@@ -113,6 +115,12 @@ namespace Magnus_WPF_1.Source.Define
         public static int StrokeThickness = 2;
 
     }
+    public struct ArrayOverLay
+    {
+        public Mat mat_Region { get; set; }
+        public System.Windows.Media.Color _color { get; set; }
+    };
+
     public struct Rectangles
     {
         private Point _topLeft;

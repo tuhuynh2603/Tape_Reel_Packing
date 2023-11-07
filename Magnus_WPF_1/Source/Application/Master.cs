@@ -40,6 +40,7 @@ namespace Magnus_WPF_1.Source.Application
         public Thread threadInspecOffline;
         public Thread m_TeachThread;
         public Thread[] m_SaveInspectImageThread;
+        public static List<ArrayOverLay>[] list_arrayOverlay;
         public static Queue<ImageSaveData> m_SaveInspectImageQueue = new Queue<ImageSaveData>(); // create a queue to hold messages
         public BitmapSource btmSource;
 
@@ -58,6 +59,8 @@ namespace Magnus_WPF_1.Source.Application
             LoadRecipe();
 
             m_nActiveTrack = 0;
+
+
         }
         public void DeleteMaster()
         {
@@ -108,6 +111,7 @@ namespace Magnus_WPF_1.Source.Application
             m_SaveInspectImageThread = new Thread[Application.m_nTrack];
             thread_FullSequence = new Thread[Application.m_nTrack];
             thread_StreamCamera = new Thread[Application.m_nTrack];
+            list_arrayOverlay = new List<ArrayOverLay>[Application.m_nTrack];
             string[] nSeriCam = { "02C89933333", "none" };
             for (int index_track = 0; index_track < Application.m_nTrack; index_track++)
             {
@@ -123,6 +127,7 @@ namespace Magnus_WPF_1.Source.Application
                 }
 
 
+                list_arrayOverlay[index_track] = new List<ArrayOverLay>();
 
                 m_Tracks[index_track] = new Track(index_track, 1, nSeriCam[index_track], mainWindow);
 

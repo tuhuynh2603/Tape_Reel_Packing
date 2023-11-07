@@ -44,10 +44,11 @@ namespace Magnus_WPF_1.Source.Application
         public Thread threadInspectOnline;
 
         public List<DefectInfor.DebugInfors> m_StepDebugInfors;
-
+        public List<ArrayOverLay> m_ArrayOverLay;
         public Track(int indexTrack, int numdoc, string serieCam, MainWindow app)
         {
             m_StepDebugInfors = new List<DefectInfor.DebugInfors>();
+            m_ArrayOverLay = new List<ArrayOverLay>();
             m_nTrackID = indexTrack;
             mainWindow = app;
             m_imageViews = new ImageView[numdoc];
@@ -101,24 +102,34 @@ namespace Magnus_WPF_1.Source.Application
             }
         }
 
-        public int Inspect()
+        public int Inspect(ref Track m_track)
         {
-            if(MainWindow.mainWindow.m_bEnableDebug)
+            //Track _track = m_track;
+
+            if (MainWindow.mainWindow.m_bEnableDebug)
                 m_StepDebugInfors.Clear();
 
-            List<Point> polygon = new List<Point>();
+            m_ArrayOverLay.Clear();
+            //Master.list_arrayOverlay[m_nTrackID].Clear();
+            int nResult;
             Point pCenter = new Point();
-            Mat mat_output = new Mat();
             double nAngleOutput = 0;
-            double dScoreOutput = 0;
-            int nResult = InspectionCore.SimpleInspection(ref polygon, ref pCenter, ref mat_output, ref nAngleOutput, ref dScoreOutput, ref m_StepDebugInfors, MainWindow.mainWindow.m_bEnableDebug);
+            //List<ArrayOverLay> list_overlayRegion = new List<ArrayOverLay>();
+            nResult = InspectionCore.SimpleInspection(ref m_ArrayOverLay, ref pCenter, ref nAngleOutput, ref m_StepDebugInfors, MainWindow.mainWindow.m_bEnableDebug);
             //Draw Result
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
                 m_imageViews[0].ClearOverlay();
                 m_imageViews[0].ClearText();
                 SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
-                m_imageViews[0].DrawPolygonOverlay(ref polygon, color, 1);
+                //m_imageViews[0].DrawPolygonOverlay(ref polygon, color, 1);
+                foreach(ArrayOverLay overlay in m_ArrayOverLay)
+                {
+                    SolidColorBrush c = new SolidColorBrush(overlay._color);
+                    m_imageViews[0].DrawRegionOverlay(overlay.mat_Region, c);
+
+                }
+
                 m_imageViews[0].DrawCrossPointOverlay(ref pCenter);
                 color = new SolidColorBrush(Colors.Yellow);
                 m_imageViews[0].DrawStringOverlay("(X, Y, Angle) = (" + pCenter.X.ToString() + ", " + pCenter.Y.ToString() + ", " + ((int)nAngleOutput).ToString() + ")", pCenter.X + 10, pCenter.Y, color, 20);
@@ -136,14 +147,14 @@ namespace Magnus_WPF_1.Source.Application
                     {
                         color = new SolidColorBrush(Colors.Red);
                         m_imageViews[0].DrawString("Not Good", 10, 10, color, 31);
-                        m_imageViews[0].DrawString("Score: " + ((int)dScoreOutput).ToString(), 10, 35, color, 31);
+                        //m_imageViews[0].DrawString("Score: " + ((int)dScoreOutput).ToString(), 10, 35, color, 31);
 
                     }
                     else
                     {
                         color = new SolidColorBrush(Colors.Green);
                         m_imageViews[0].DrawString(/*m_cap.GetCaptureProperty(CapProp.Focus).ToString() */ "Good", 10, 10, color, 31);
-                        m_imageViews[0].DrawString("Score: " + ((int)dScoreOutput).ToString(), 10, 35, color, 31);
+                        //m_imageViews[0].DrawString("Score: " + ((int)dScoreOutput).ToString(), 10, 35, color, 31);
 
                     }
 
@@ -327,7 +338,7 @@ namespace Magnus_WPF_1.Source.Application
 
                     Stopwatch timeIns = new Stopwatch();
                     timeIns.Start();
-                    m_nResult[m_CurrentSequenceDeviceID] = Inspect();
+                    m_nResult[m_CurrentSequenceDeviceID] = Inspect(ref mainWindow.master.m_Tracks[m_nTrackID]);
                     timeIns.Stop();
                     Thread.Sleep(5);
                     LogMessage.WriteToDebugViewer(1, "Total inspection time: " + timeIns.ElapsedMilliseconds.ToString());
@@ -583,14 +594,22 @@ namespace Magnus_WPF_1.Source.Application
                 Master.InspectDoneEvent[m_nTrackID].Reset();
                 Master.InspectEvent[m_nTrackID].Reset();
                 threadInspectOnline = new System.Threading.Thread(new System.Threading.ThreadStart(() => InspectionOnlineThread()));
+                threadInspectOnline.Name = m_nTrackID.ToString();
+                threadInspectOnline.SetApartmentState(ApartmentState.STA);
+                threadInspectOnline.IsBackground = true;
                 threadInspectOnline.Start();
+                threadInspectOnline.Priority = ThreadPriority.Normal;
             }
             else if (!threadInspectOnline.IsAlive)
             {
                 Master.InspectDoneEvent[m_nTrackID].Reset();
                 Master.InspectEvent[m_nTrackID].Reset();
                 threadInspectOnline = new System.Threading.Thread(new System.Threading.ThreadStart(() => InspectionOnlineThread()));
+                threadInspectOnline.Name = m_nTrackID.ToString();
+                threadInspectOnline.SetApartmentState(ApartmentState.STA);
+                threadInspectOnline.IsBackground = true;
                 threadInspectOnline.Start();
+                threadInspectOnline.Priority = ThreadPriority.Normal;
             }
 
             return 0;

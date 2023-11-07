@@ -580,12 +580,12 @@ namespace Magnus_WPF_1.UI.UserControls.View
             catch { }
         }
 
-        public void DrawRegionOverlay(ref Mat mat_Region)
+        public void DrawRegionOverlay(Mat mat_Region, SolidColorBrush color)
         {
-            SolidColorBrush color = new SolidColorBrush(Colors.Cyan);
+            //SolidColorBrush color = new SolidColorBrush(Colors.Cyan);
             try
             {
-                EDDrawingOverlay.DrawRegion(GridOverlay, mat_Region, color, 1);
+                EDDrawingOverlay.DrawRegion(GridOverlay, trackID, mat_Region, color, 1);
             }
             catch { }
         }
@@ -1140,7 +1140,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
                     SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
                     DrawPolygonOverlay(ref p_Regionpolygon, color, 1);
-                    DrawRegionOverlay(ref mat_DeviceLocationRegion);
+                    DrawRegionOverlay(mat_DeviceLocationRegion, color);
 
                     UpdateTextOverlay((nCurrentStep + 1).ToString()/* + "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "  Device Found", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
                     UpdateRegionOverlay();

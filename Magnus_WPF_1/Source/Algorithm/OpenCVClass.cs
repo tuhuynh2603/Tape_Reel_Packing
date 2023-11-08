@@ -697,10 +697,10 @@ namespace Magnus_WPF_1.Source.Algorithm
         // Binary Thresholding
         public static bool BinaryThresholding(ref CvImage source, ref CvImage result, int color, ref double usedThreshold, int offset, ref CvImage mask)
         {
-            usedThreshold = CvInvoke.Threshold(source, result, 0, 255, ((color == (int)COLOR.BLACK) ? ThresholdType.BinaryInv : ThresholdType.Binary) | ThresholdType.Otsu);
+            usedThreshold = CvInvoke.Threshold(source, result, 0, 255, ((color == (int)OBJECT_COLOR.BLACK) ? ThresholdType.BinaryInv : ThresholdType.Binary) | ThresholdType.Otsu);
             if (offset > 0)
-                CvInvoke.Threshold(source, result, usedThreshold + (color == (int)COLOR.BLACK ? 1 : -1) * offset,
-                          255, (color == (int)COLOR.BLACK) ? ThresholdType.BinaryInv : ThresholdType.Binary);
+                CvInvoke.Threshold(source, result, usedThreshold + (color == (int)OBJECT_COLOR.BLACK ? 1 : -1) * offset,
+                          255, (color == (int)OBJECT_COLOR.BLACK) ? ThresholdType.BinaryInv : ThresholdType.Binary);
             CvInvoke.BitwiseAnd(result, mask, result);
             return true;
         }
@@ -708,7 +708,7 @@ namespace Magnus_WPF_1.Source.Algorithm
         // Var Thresholding
         public static bool VarThresholding(ref CvImage source, ref CvImage result, int color, int blockSize, ref CvImage mask, double offset = 0)
         {
-            CvInvoke.AdaptiveThreshold(source, result, 255, AdaptiveThresholdType.MeanC, (color == (int)COLOR.BLACK) ? ThresholdType.BinaryInv : ThresholdType.BinaryInv, blockSize, offset * ((color == (int)COLOR.BLACK) ? 1 : -1));
+            CvInvoke.AdaptiveThreshold(source, result, 255, AdaptiveThresholdType.MeanC, (color == (int)OBJECT_COLOR.BLACK) ? ThresholdType.BinaryInv : ThresholdType.BinaryInv, blockSize, offset * ((color == (int)OBJECT_COLOR.BLACK) ? 1 : -1));
             CvInvoke.BitwiseAnd(result, mask, result);
             return true;
         }
@@ -1205,7 +1205,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             regionCrop.ROI = rectangleRoi;
             return true;
         }
-        public static bool getTemplateIns(ref CvImage templateIns, ref Image<Gray, byte> RegionRoi, ref CvImage templateTeach, ref Rectangle rectangleTemplateIns)
+        public static bool getTemplateIns(ref CvImage templateIns, ref Image<Gray, byte> RegionRoi, ref CvImage templateTeach, ref Rectangle rectangleTemplateIns,ref Size imageSize)
 
         {
             CvImage region = new CvImage();
@@ -1219,12 +1219,12 @@ namespace Magnus_WPF_1.Source.Algorithm
             CvImage Rectangle = new CvImage();
             CvImage Rectangle1 = new CvImage();
             CvImage RectangleResult = new CvImage();
-            MagnusOpenCVLib.DrawRect(ref Rectangle, rectangleTemplateIns, InspectionCore.globalImageSize, new MCvScalar(255));
+            MagnusOpenCVLib.DrawRect(ref Rectangle, rectangleTemplateIns, imageSize, new MCvScalar(255));
             rectangleTemplateIns.X = rectangleTemplateIns.X - maxLoc.X;
             rectangleTemplateIns.Y = rectangleTemplateIns.Y - maxLoc.Y;
             rectangleTemplateIns.Width = templateTeach.Width;
             rectangleTemplateIns.Height = templateTeach.Height;
-            MagnusOpenCVLib.DrawRect(ref Rectangle1, rectangleTemplateIns, InspectionCore.globalImageSize, new MCvScalar(255));
+            MagnusOpenCVLib.DrawRect(ref Rectangle1, rectangleTemplateIns, imageSize, new MCvScalar(255));
             CvInvoke.BitwiseAnd(Rectangle, Rectangle1, RectangleResult);
 
             Mat hier1 = new Mat();

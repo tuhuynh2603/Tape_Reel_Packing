@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Xceed.Wpf.AvalonDock.Layout;
+using Application = Magnus_WPF_1.Source.Application.Application;
 
 namespace Magnus_WPF_1
 {
@@ -216,34 +217,20 @@ namespace Magnus_WPF_1
             Canvas.SetTop(border_boundingbox_focus, 0);
             canvas_Mapping.Children.Add(border_boundingbox_focus);
 
+
+
+            border_boundingbox_clicked.Width = m_nWidthMappingRect;
+            border_boundingbox_clicked.Height = m_nWidthMappingRect;
+            border_boundingbox_clicked.BorderThickness = new Thickness(0);
+            border_boundingbox_clicked.BorderBrush = new SolidColorBrush(Colors.Yellow);
+            Canvas.SetLeft(border_boundingbox_clicked, 0);
+            Canvas.SetTop(border_boundingbox_clicked, 0);
+            canvas_Mapping.Children.Add(border_boundingbox_clicked);
+
         }
 
         int nDeviceID = -1;
-        private int Check_mapping_Cursor_ID(Point cur_point)
-        {
-            int nIDX = (int)(cur_point.X / m_nStepMappingRect);
-            int nIDY = (int)(cur_point.Y / m_nStepMappingRect);
 
-            if (nDeviceID != nIDX + nIDY * m_nDeviceX)
-            {
-                nDeviceID = nIDX + nIDY * m_nDeviceX;
-                if (nIDX < m_nDeviceX && nIDY < m_nDeviceY)
-                {
-                    Canvas.SetLeft(border_boundingbox_focus, m_nStepMappingRect * nIDX);
-                    Canvas.SetTop(border_boundingbox_focus, m_nStepMappingRect * nIDY);
-                    border_boundingbox_focus.BorderThickness = new Thickness(2);
-
-                }
-                else
-                {
-                    border_boundingbox_focus.BorderThickness = new Thickness(0);
-                }
-            }
-
-            //canvas_Mapping.Children.RemoveAt(nIDX + nIDY * 10);
-            return nIDX + nIDY * m_nDeviceX;
-
-        }
 
 
         public bool bEnableOfflineInspection;
@@ -277,11 +264,45 @@ namespace Magnus_WPF_1
             inspect_offline_btn.IsEnabled = true;
         }
 
+
+        private int Check_mapping_Cursor_ID(Point cur_point, bool bIsclicked)
+        {
+            int nIDX = (int)(cur_point.X / m_nStepMappingRect);
+            int nIDY = (int)(cur_point.Y / m_nStepMappingRect);
+
+            if (nDeviceID != nIDX + nIDY * m_nDeviceX)
+            {
+                nDeviceID = nIDX + nIDY * m_nDeviceX;
+                if (nIDX < m_nDeviceX && nIDY < m_nDeviceY)
+                {
+                    Canvas.SetLeft(border_boundingbox_focus, m_nStepMappingRect * nIDX);
+                    Canvas.SetTop(border_boundingbox_focus, m_nStepMappingRect * nIDY);
+                    border_boundingbox_focus.BorderThickness = new Thickness(2);
+                }
+                else
+                {
+                    border_boundingbox_focus.BorderThickness = new Thickness(0);
+                    //border_boundingbox_clicked.BorderThickness = new Thickness(0);
+
+                }
+            }
+
+            if (bIsclicked)
+            {
+                Canvas.SetLeft(border_boundingbox_clicked, m_nStepMappingRect * nIDX);
+                Canvas.SetTop(border_boundingbox_clicked, m_nStepMappingRect * nIDY);
+                border_boundingbox_clicked.BorderThickness = new Thickness(2);
+            }
+
+            //canvas_Mapping.Children.RemoveAt(nIDX + nIDY * 10);
+            return nIDX + nIDY * m_nDeviceX;
+
+        }
         private void canvas_Mapping_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
 
             m_CanvasMovePoint = e.GetPosition(canvas_Mapping);
-            int nID = Check_mapping_Cursor_ID(m_CanvasMovePoint);
+            int nID = Check_mapping_Cursor_ID(m_CanvasMovePoint, true);
             master.m_Tracks[activeImageDock.trackID].m_nCurrentClickMappingID = nID;
 
             //if (m_bEnableDebug) {
@@ -301,7 +322,7 @@ namespace Magnus_WPF_1
         private void canvas_Mapping_MouseMove(object sender, MouseEventArgs e)
         {
             m_CanvasMovePoint = e.GetPosition(canvas_Mapping);
-            Check_mapping_Cursor_ID(m_CanvasMovePoint);
+            Check_mapping_Cursor_ID(m_CanvasMovePoint, false);
         }
 
         private void canvas_Mapping_MouseLeave(object sender, MouseEventArgs e)
@@ -611,7 +632,7 @@ namespace Magnus_WPF_1
 
         private void btn_load_teach_image_Click(object sender, RoutedEventArgs e)
         {
-            master.loadTeachImageToUI();
+            master.loadTeachImageToUI(activeImageDock.trackID);
 
         }
 
@@ -630,7 +651,7 @@ namespace Magnus_WPF_1
             //    return;
             //}
 
-            Master.InspectEvent[master.m_nActiveTrack].Set();
+            Master.InspectEvent[activeImageDock.trackID].Set();
 
             //if (master.thread_FullSequence[activeImageDock.trackID] == null)
             //{
@@ -668,7 +689,7 @@ namespace Magnus_WPF_1
             master.teachParameter.Width = 300;
             master.teachParameter.Height = 600;
             //master.m_Tracks[0].m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autofocus, 1);
-
+            master.teachParameter.ReloadParameterUI(activeImageDock.trackID);
             grd_PopupDialog.Children.Add(master.teachParameter);
             //grd_PopupDialog.Children.Add(master.m_Tracks[]);
             tab_controls.SelectedIndex = currentTabIndex;
@@ -726,10 +747,15 @@ namespace Magnus_WPF_1
             //nCurrentTeachingStep = -1;
             Master.m_bIsTeaching = false;
             SetDisableTeachButton();
-            master.loadTeachImageToUI();
-            master.m_Tracks[0].m_imageViews[0].resultTeach.Children.Clear();
-            master.m_Tracks[0].m_imageViews[0].ClearOverlay();
-            master.m_Tracks[0].m_imageViews[0].controlWin.Visibility = Visibility.Collapsed;
+            for (int nTrack = 0; nTrack < Application.m_nTrack; nTrack++)
+            {
+                master.loadTeachImageToUI(nTrack);
+                master.m_Tracks[nTrack].m_imageViews[0].resultTeach.Children.Clear();
+                master.m_Tracks[nTrack].m_imageViews[0].ClearOverlay();
+                master.m_Tracks[nTrack].m_imageViews[0].controlWin.Visibility = Visibility.Collapsed;
+            }
+
+
 
         }
 
@@ -781,7 +807,8 @@ namespace Magnus_WPF_1
             var result = MessageBox.Show("Do you want to save as teach image ?", "Save as Teach Image", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
             {
-                master.m_Tracks[0].m_imageViews[0].SaveTeachImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp"));
+                master.SaveUITeachImage(activeImageDock.trackID);
+                //master.m_Tracks[0].m_imageViews[0].SaveTeachImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp"));
             }
 
         }
@@ -1085,7 +1112,7 @@ namespace Magnus_WPF_1
             if (master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource.Width < 0)
                 return;
 
-            InspectionCore.LoadImageToInspection(master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource);
+            master.m_Tracks[activeImageDock.trackID].m_InspectionCore.LoadImageToInspection(master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource);
             master.m_Tracks[activeImageDock.trackID].Inspect(ref master.m_Tracks[activeImageDock.trackID]);
             UpdateDebugInfor();
             return;

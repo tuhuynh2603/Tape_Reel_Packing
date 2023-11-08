@@ -19,63 +19,73 @@ using CvContourArray = Emgu.CV.Util.VectorOfVectorOfPoint;
 
 namespace Magnus_WPF_1.Source.Algorithm
 {
+    using Magnus_WPF_1.Source.Application;
     using Magnus_WPF_1.Source.LogMessage;
-    using static Magnus_WPF_1.Source.Application.Track;
-
     public class InspectionCore
     {
-        public static Size globalImageSize;
-        static TemplateMatchingModel m_TemplateMatchingModel = new TemplateMatchingModel();
+        public  Size globalImageSize;
+        TemplateMatchingModel m_TemplateMatchingModel = new TemplateMatchingModel();
         public struct ImageTarget
         {
             public CvImage Gray;
             public CvImage Bgr;
         }
 
-        public struct DeviceLocationParameter
+        public class DeviceLocationParameter
         {
-            public static Rectangles m_L_DeviceLocationRoi = new Rectangles();
-            public static int m_L_lowerThreshold = 0;
-            public static int m_L_upperThreshold = 255;
+            public/* static*/ Rectangles m_L_DeviceLocationRoi = new Rectangles();
+            public THRESHOLD_TYPE m_L_ThresholdType = THRESHOLD_TYPE.BINARY_THRESHOLD;
+            public OBJECT_COLOR m_L_ObjectColor = OBJECT_COLOR.BLACK;
+            public/* static*/ int m_L_lowerThreshold = 0;
+            public/* static*/ int m_L_upperThreshold = 255;
 
-            public static int m_L_lowerThresholdInnerChip = 0;
-            public static int m_L_upperThresholdInnerChip = 255;
+            public/* static*/ int m_L_lowerThresholdInnerChip = 0;
+            public/* static*/ int m_L_upperThresholdInnerChip = 255;
 
-            public static int m_nOpeningMask = 11;
-            public static int m_nMinWidthDevice = 50;
-            public static int m_nMinHeightDevice = 50;
-            public static int m_nDilationMask = 30;
+            public/* static*/ int m_nOpeningMask = 11;
+            public/* static*/ int m_nMinWidthDevice = 50;
+            public/* static*/ int m_nMinHeightDevice = 50;
+            public/* static*/ int m_nDilationMask = 30;
 
-            public static Rectangles m_L_TemplateRoi = new Rectangles();
-            public static int m_nStepTemplate = 4;
-            public static double m_dScaleImageRatio = 0.1;
-            public static double m_dMinScoreTemplate = 50.0;
-            public static int m_nBlackCornerIndexTemplateImage = 0;
+            public/* static*/ Rectangles m_L_TemplateRoi = new Rectangles();
+            public/* static*/ int m_nStepTemplate = 4;
+            public/* static*/ double m_dScaleImageRatio = 0.1;
+            public/* static*/ double m_dMinScoreTemplate = 50.0;
+            public/* static*/ int m_nBlackCornerIndexTemplateImage = 0;
         }
 
-        public struct SurfaceDefectParameter
+        public class SurfaceDefectParameter
         {
 
         }
 
-        public static ImageTarget m_SourceImage;
-        public static ImageTarget m_TeachImage;
-        public static ImageTarget m_TemplateImage;
+        public /*static*/ ImageTarget m_SourceImage;
+        public /*static*/ ImageTarget m_TeachImage;
+        public /*static*/ ImageTarget m_TemplateImage;
 
-        public static DeviceLocationParameter m_DeviceLocationParameter;
+        public /*static*/ DeviceLocationParameter m_DeviceLocationParameter;
+        public /*static*/ SurfaceDefectParameter m_SurfaceDefectParameter;
 
-
-        public static bool Initialize()
+        public InspectionCore(ref Size mImageSize)
         {
+            globalImageSize = new Size(mImageSize.Width, mImageSize.Height);
             m_SourceImage = new ImageTarget();
             m_TeachImage = new ImageTarget();
             m_TemplateImage = new ImageTarget();
             m_DeviceLocationParameter = new DeviceLocationParameter();
-            globalImageSize = new Size(Application.Track.m_Width, Application.Track.m_Height);
-            return true;
+            m_SurfaceDefectParameter = new SurfaceDefectParameter();
         }
+        //public /*static*/ bool Initialize()
+        //{
+        //    m_SourceImage = new ImageTarget();
+        //    m_TeachImage = new ImageTarget();
+        //    m_TemplateImage = new ImageTarget();
+        //    m_DeviceLocationParameter = new DeviceLocationParameter();
+        //    globalImageSize = new Size(Application.Track.m_Width, Application.Track.m_Height);
+        //    return true;
+        //}
 
-        public static bool LoadImageToInspection(BitmapSource btmSource)
+        public /*static*/ bool LoadImageToInspection(BitmapSource btmSource)
         {
             try
             {
@@ -92,7 +102,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             return true;
         }
 
-        public static bool LoadOfflineImage(string strPath)
+        public /*static*/ bool LoadOfflineImage(string strPath)
         {
             try
             {
@@ -107,64 +117,77 @@ namespace Magnus_WPF_1.Source.Algorithm
             }
         }
 
-        public static void SaveTemplateImage(string strTemplateImageFile)
+        //public /*static*/ void SaveTemplateImage(string strTemplateImageFile)
+        //{
+        //    try
+        //    {
+        //        CvInvoke.Imwrite(strTemplateImageFile, m_TemplateImage.Gray);
+        //    }
+        //    catch
+        //    {
+
+        //    }
+        //}
+
+        //public /*static*/ void SaveInspectImage(string strPath, string strDeviceID)
+        //{
+        //    try
+        //    {
+        //        if (Directory.Exists(strPath) == false)
+        //        {
+        //            Directory.CreateDirectory(strPath);
+        //        }
+
+        //        string strImageName = System.IO.Path.Combine(strPath, "Device_" + strDeviceID + ".bmp");
+        //        if (Directory.Exists(strPath))
+        //            CvInvoke.Imwrite(strImageName, m_SourceImage.Gray);
+
+        //    }
+        //    catch { }
+        //}
+        public /*static*/ bool UpdateTeachParamFromUIToInspectionCore()
         {
-            try
-            {
-                CvInvoke.Imwrite(strTemplateImageFile, m_TemplateImage.Gray);
-            }
-            catch
-            {
 
-            }
-        }
+            m_DeviceLocationParameter.m_L_ThresholdType = Source.Application.Application.categoriesTeachParam.L_ThresholdType;
+            m_DeviceLocationParameter.m_L_ObjectColor = Source.Application.Application.categoriesTeachParam.L_ObjectColor;
 
-        public static void SaveInspectImage(string strPath, string strDeviceID)
-        {
-            try
-            {
-                if (Directory.Exists(strPath) == false)
-                {
-                    Directory.CreateDirectory(strPath);
-                }
+            
+            m_DeviceLocationParameter.m_L_lowerThreshold = Source.Application.Application.categoriesTeachParam.L_lowerThreshold;
+            m_DeviceLocationParameter.m_L_upperThreshold = Source.Application.Application.categoriesTeachParam.L_upperThreshold;
 
-                string strImageName = System.IO.Path.Combine(strPath, "Device_" + strDeviceID + ".bmp");
-                if (Directory.Exists(strPath))
-                    CvInvoke.Imwrite(strImageName, m_SourceImage.Gray);
-
-            }
-            catch { }
-        }
-        public static bool UpdateTeachParamFromUIToInspectionCore()
-        {
-            DeviceLocationParameter.m_L_lowerThreshold = Source.Application.Application.categoriesTeachParam.L_lowerThreshold;
-            DeviceLocationParameter.m_L_upperThreshold = Source.Application.Application.categoriesTeachParam.L_upperThreshold;
-
-            DeviceLocationParameter.m_L_lowerThresholdInnerChip = Source.Application.Application.categoriesTeachParam.L_lowerThresholdInnerChip;
-            DeviceLocationParameter.m_L_upperThresholdInnerChip = Source.Application.Application.categoriesTeachParam.L_upperThresholdInnerChip;
+            m_DeviceLocationParameter.m_L_lowerThresholdInnerChip = Source.Application.Application.categoriesTeachParam.L_lowerThresholdInnerChip;
+            m_DeviceLocationParameter.m_L_upperThresholdInnerChip = Source.Application.Application.categoriesTeachParam.L_upperThresholdInnerChip;
 
 
-            DeviceLocationParameter.m_L_DeviceLocationRoi = Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi;
-            DeviceLocationParameter.m_nOpeningMask = Source.Application.Application.categoriesTeachParam.L_OpeningMask;
-            DeviceLocationParameter.m_nDilationMask = Source.Application.Application.categoriesTeachParam.L_DilationMask;
-            DeviceLocationParameter.m_nMinWidthDevice = Source.Application.Application.categoriesTeachParam.L_MinWidthDevice;
-            DeviceLocationParameter.m_nMinHeightDevice = Source.Application.Application.categoriesTeachParam.L_MinHeightDevice;
-            DeviceLocationParameter.m_L_TemplateRoi = Source.Application.Application.categoriesTeachParam.L_TemplateRoi;
-            DeviceLocationParameter.m_nStepTemplate = Source.Application.Application.categoriesTeachParam.L_NumberSide;
-            DeviceLocationParameter.m_dScaleImageRatio = Source.Application.Application.categoriesTeachParam.L_ScaleImageRatio;
-            DeviceLocationParameter.m_dMinScoreTemplate = Source.Application.Application.categoriesTeachParam.L_MinScore;
-            DeviceLocationParameter.m_nBlackCornerIndexTemplateImage = Source.Application.Application.categoriesTeachParam.L_CornerIndex;
+            if (Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.Width > globalImageSize.Width)
+                Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi = new Rectangles(new System.Windows.Point(300,300), 300,300);
+
+            m_DeviceLocationParameter.m_L_DeviceLocationRoi = Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi;
+
+            m_DeviceLocationParameter.m_nOpeningMask = Source.Application.Application.categoriesTeachParam.L_OpeningMask;
+            m_DeviceLocationParameter.m_nDilationMask = Source.Application.Application.categoriesTeachParam.L_DilationMask;
+            m_DeviceLocationParameter.m_nMinWidthDevice = Source.Application.Application.categoriesTeachParam.L_MinWidthDevice;
+            m_DeviceLocationParameter.m_nMinHeightDevice = Source.Application.Application.categoriesTeachParam.L_MinHeightDevice;
+
+            if (Source.Application.Application.categoriesTeachParam.L_TemplateRoi.Width > globalImageSize.Width)
+                Source.Application.Application.categoriesTeachParam.L_TemplateRoi = new Rectangles(new System.Windows.Point(300, 300), 300, 300);
+            m_DeviceLocationParameter.m_L_TemplateRoi = Source.Application.Application.categoriesTeachParam.L_TemplateRoi;
+
+            m_DeviceLocationParameter.m_nStepTemplate = Source.Application.Application.categoriesTeachParam.L_NumberSide;
+            m_DeviceLocationParameter.m_dScaleImageRatio = Source.Application.Application.categoriesTeachParam.L_ScaleImageRatio;
+            m_DeviceLocationParameter.m_dMinScoreTemplate = Source.Application.Application.categoriesTeachParam.L_MinScore;
+            m_DeviceLocationParameter.m_nBlackCornerIndexTemplateImage = Source.Application.Application.categoriesTeachParam.L_CornerIndex;
             //master.m_Tracks[0].m_imageViews[0].SaveTeachImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp"));
             //master.m_Tracks[0].m_imageViews[0].saveTemplateImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "templateImage_1.bmp"));
             return true;
         }
-        public static bool LoadTeachImageToInspectionCore()
+        public /*static*/ bool LoadTeachImageToInspectionCore(int nTrack)
         {
             try
             {
-                m_SourceImage.Gray = CvInvoke.Imread(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp"), Emgu.CV.CvEnum.ImreadModes.Grayscale);
-                m_TeachImage.Gray = CvInvoke.Imread(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp"), Emgu.CV.CvEnum.ImreadModes.Grayscale);
-                m_TemplateImage.Gray = CvInvoke.Imread(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "templateImage_1.bmp"), Emgu.CV.CvEnum.ImreadModes.Grayscale);
+                m_SourceImage.Gray =   CvInvoke.Imread(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_Track" + (nTrack +1).ToString() + ".bmp"), Emgu.CV.CvEnum.ImreadModes.Grayscale);
+                m_TeachImage.Gray =    CvInvoke.Imread(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_Track" + (nTrack + 1).ToString() + ".bmp"), Emgu.CV.CvEnum.ImreadModes.Grayscale);
+                m_TemplateImage.Gray = CvInvoke.Imread(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "templateImage_Track" + (nTrack + 1).ToString() + ".bmp"), Emgu.CV.CvEnum.ImreadModes.Grayscale);
 
             }
             catch { }
@@ -172,7 +195,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             return true;
         }
 
-        public static void PushBackDebugInfors(CvImage debugImage, CvImage debugRegion, string debugMessage, bool bEnableDebug, ref List<DefectInfor.DebugInfors> debugInfors)
+        public /*static*/ void PushBackDebugInfors(CvImage debugImage, CvImage debugRegion, string debugMessage, bool bEnableDebug, ref List<DefectInfor.DebugInfors> debugInfors)
         {
             if (!bEnableDebug)
             {
@@ -190,18 +213,19 @@ namespace Magnus_WPF_1.Source.Algorithm
 
         }
 
-        public static void AddRegionOverlay(ref List<ArrayOverLay> list_arrayOverlay, Mat mat_region, System.Windows.Media.Color color)
+        public /*static*/ void AddRegionOverlay(ref List<ArrayOverLay> list_arrayOverlay, Mat mat_region, System.Windows.Media.Color color)
         {
 
             if (mat_region.Width == 0)
                 mat_region = CvImage.Zeros(m_SourceImage.Gray.Height, m_SourceImage.Gray.Width, DepthType.Cv8U, 1);
+
             CvImage zoomedRegion = new CvImage(m_SourceImage.Gray.Height, m_SourceImage.Gray.Width, DepthType.Cv8U, 1);
             CvInvoke.Resize(mat_region, zoomedRegion, new System.Drawing.Size(zoomedRegion.Width, zoomedRegion.Height));
             list_arrayOverlay.Add(new ArrayOverLay() { mat_Region = zoomedRegion, _color = color });
 
         }
 
-        public static int SimpleInspection(ref List<ArrayOverLay> list_arrayOverlay, ref Point pCenter, ref double nAngleOutput, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug = false)
+        public /*static*/ int SimpleInspection(ref List<ArrayOverLay> list_arrayOverlay, ref Point pCenter, ref double nAngleOutput, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug = false)
         {
             int nError;
             Stopwatch timeIns = new Stopwatch();
@@ -220,14 +244,14 @@ namespace Magnus_WPF_1.Source.Algorithm
             return nError;
         }
 
-        public static void SetTemplateImage()
+        public /*static*/ void SetTemplateImage()
         {
             Image<Gray, Byte> imgCropped = new Image<Gray, byte>(m_TeachImage.Gray.Bitmap);
             System.Drawing.Rectangle rec = new System.Drawing.Rectangle();
-            rec.X = (int)DeviceLocationParameter.m_L_TemplateRoi.TopLeft.X;
-            rec.Y = (int)DeviceLocationParameter.m_L_TemplateRoi.TopLeft.Y;
-            rec.Width = (int)DeviceLocationParameter.m_L_TemplateRoi.Width;
-            rec.Height = (int)DeviceLocationParameter.m_L_TemplateRoi.Height;
+            rec.X = (int)m_DeviceLocationParameter.m_L_TemplateRoi.TopLeft.X;
+            rec.Y = (int)m_DeviceLocationParameter.m_L_TemplateRoi.TopLeft.Y;
+            rec.Width = (int)m_DeviceLocationParameter.m_L_TemplateRoi.Width;
+            rec.Height = (int)m_DeviceLocationParameter.m_L_TemplateRoi.Height;
             imgCropped.ROI = rec;
             m_TemplateImage.Gray = imgCropped.Mat.Clone();
             //CvInvoke.Imshow("Template Image", m_TemplateImage.Gray);
@@ -360,7 +384,7 @@ namespace Magnus_WPF_1.Source.Algorithm
 
         //}
 
-        public static int FindDeviceLocation_Zoom(ref CvImage imgSource, ref List<ArrayOverLay> list_arrayOverlay, ref Point pCenter, ref double nAngleOutput, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug = false)
+        public /*static*/ int FindDeviceLocation_Zoom(ref CvImage imgSource, ref List<ArrayOverLay> list_arrayOverlay, ref Point pCenter, ref double nAngleOutput, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug = false)
         {
             Stopwatch timeIns = new Stopwatch();
 
@@ -368,7 +392,7 @@ namespace Magnus_WPF_1.Source.Algorithm
                 return -99;
             timeIns.Start();
 
-            CvImage zoomedInImage = new CvImage((int)(imgSource.Height * DeviceLocationParameter.m_dScaleImageRatio), (int)(imgSource.Width * DeviceLocationParameter.m_dScaleImageRatio), DepthType.Cv8U, 3);
+            CvImage zoomedInImage = new CvImage((int)(imgSource.Height * m_DeviceLocationParameter.m_dScaleImageRatio), (int)(imgSource.Width * m_DeviceLocationParameter.m_dScaleImageRatio), DepthType.Cv8U, 3);
             CvInvoke.Resize(imgSource, zoomedInImage, new System.Drawing.Size(zoomedInImage.Width, zoomedInImage.Height));
             CvImage img_thresholdRegion = new CvImage();
             CvImage img_BiggestRegion = new CvImage();
@@ -378,86 +402,91 @@ namespace Magnus_WPF_1.Source.Algorithm
 
             CvImage region_Crop = new CvImage();
             //mat_DeviceLocationRegion = new CvImage();
-            System.Drawing.Rectangle rectDeviceLocation = new System.Drawing.Rectangle((int)(DeviceLocationParameter.m_L_DeviceLocationRoi.TopLeft.X * DeviceLocationParameter.m_dScaleImageRatio),
-                                                                                        (int)(DeviceLocationParameter.m_L_DeviceLocationRoi.TopLeft.Y * DeviceLocationParameter.m_dScaleImageRatio),
-                                                                                        (int)(DeviceLocationParameter.m_L_DeviceLocationRoi.Width * DeviceLocationParameter.m_dScaleImageRatio),
-                                                                                       (int)(DeviceLocationParameter.m_L_DeviceLocationRoi.Height * DeviceLocationParameter.m_dScaleImageRatio));
+            System.Drawing.Rectangle rectDeviceLocation = new System.Drawing.Rectangle((int)(m_DeviceLocationParameter.m_L_DeviceLocationRoi.TopLeft.X * m_DeviceLocationParameter.m_dScaleImageRatio),
+                                                                                        (int)(m_DeviceLocationParameter.m_L_DeviceLocationRoi.TopLeft.Y * m_DeviceLocationParameter.m_dScaleImageRatio),
+                                                                                        (int)(m_DeviceLocationParameter.m_L_DeviceLocationRoi.Width * m_DeviceLocationParameter.m_dScaleImageRatio),
+                                                                                       (int)(m_DeviceLocationParameter.m_L_DeviceLocationRoi.Height * m_DeviceLocationParameter.m_dScaleImageRatio));
             CvImage region_SearchDeviceLocation = new CvImage();
             region_SearchDeviceLocation = CvImage.Zeros(zoomedInImage.Height, zoomedInImage.Width, DepthType.Cv8U, 1);
             CvInvoke.Rectangle(region_SearchDeviceLocation, rectDeviceLocation, new MCvScalar(255), -1);
             //CvInvoke.WaitKey(0);
             timeIns.Restart();
-            MagnusOpenCVLib.Threshold2(ref zoomedInImage, ref img_thresholdRegion, DeviceLocationParameter.m_L_lowerThreshold, DeviceLocationParameter.m_L_upperThreshold);
-            PushBackDebugInfors(imgSource, img_thresholdRegion, "img_thresholdRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
-            timeIns.Restart();
 
-            //CvImage mat_IntersectionRegion = new CvImage();
-            CvInvoke.BitwiseAnd(img_thresholdRegion, region_SearchDeviceLocation, img_thresholdRegion);
-            PushBackDebugInfors(imgSource, img_thresholdRegion, "region after Intersection with Device Location ROI (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
-            timeIns.Restart();
+            if (m_DeviceLocationParameter.m_L_ThresholdType.GetHashCode() == (int)THRESHOLD_TYPE.BINARY_THRESHOLD)
+            {
+                MagnusOpenCVLib.Threshold2(ref zoomedInImage, ref img_thresholdRegion, m_DeviceLocationParameter.m_L_lowerThreshold, m_DeviceLocationParameter.m_L_upperThreshold);
+                PushBackDebugInfors(imgSource, img_thresholdRegion, "img_thresholdRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                timeIns.Restart();
 
-            //CvImage region_VarThreshold = new CvImage();
-            MagnusOpenCVLib.VarThresholding(ref zoomedInImage, ref img_thresholdRegion, (int)COLOR.BLACK, 2* ((int)(DeviceLocationParameter.m_nMinWidthDevice/2)) + 3, ref region_SearchDeviceLocation, DeviceLocationParameter.m_L_upperThreshold);
-            PushBackDebugInfors(imgSource, img_thresholdRegion, "VarThresholding. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
-            timeIns.Restart();
+                //CvImage mat_IntersectionRegion = new CvImage();
+                CvInvoke.BitwiseAnd(img_thresholdRegion, region_SearchDeviceLocation, img_thresholdRegion);
+                PushBackDebugInfors(imgSource, img_thresholdRegion, "region after Intersection with Device Location ROI (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                timeIns.Restart();
+            }
+            else//if (m_DeviceLocationParameter.m_L_ThresholdType.GetHashCode() == (int)THRESHOLD_TYPE.VAR_THRESHOLD)
+            {
 
+                //CvImage region_VarThreshold = new CvImage();
+                MagnusOpenCVLib.VarThresholding(ref zoomedInImage, ref img_thresholdRegion, (int)m_DeviceLocationParameter.m_L_ObjectColor, 2 * ((int)(m_DeviceLocationParameter.m_nMinWidthDevice / 2)) + 3, ref region_SearchDeviceLocation, m_DeviceLocationParameter.m_L_upperThreshold);
+                PushBackDebugInfors(imgSource, img_thresholdRegion, "VarThresholding. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                timeIns.Restart();
+            }
 
-            CvImage img_ClosingRegion = new CvImage();
-            MagnusOpenCVLib.ClosingCircle(ref img_thresholdRegion, ref img_ClosingRegion, DeviceLocationParameter.m_nDilationMask);
-            PushBackDebugInfors(imgSource, img_ClosingRegion, "region after ClosingCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
-            timeIns.Restart();
-
-
-            CvImage img_openingRegionRegion = new CvImage();
-            MagnusOpenCVLib.OpeningCircle(ref img_ClosingRegion, ref img_openingRegionRegion, DeviceLocationParameter.m_nOpeningMask);
-            PushBackDebugInfors(imgSource, img_openingRegionRegion, "region after OpeningRectangle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            CvImage img_MophoRegion = new CvImage();
+            MagnusOpenCVLib.ClosingCircle(ref img_thresholdRegion, ref img_MophoRegion, m_DeviceLocationParameter.m_nDilationMask);
+            PushBackDebugInfors(imgSource, img_MophoRegion, "Outer region after ClosingCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
 
             CvImage mat_BiggestRegion = new CvImage();
-            MagnusOpenCVLib.SelectBiggestRegion(ref img_openingRegionRegion, ref mat_BiggestRegion);
+            MagnusOpenCVLib.SelectBiggestRegion(ref img_MophoRegion, ref mat_BiggestRegion);
             CvInvoke.FindNonZero(mat_BiggestRegion, point_regions);
+            PushBackDebugInfors(imgSource, mat_BiggestRegion, "Outer region after SelectBiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+
             if (point_regions.Size == 0)
                 return -1;
 
-            PushBackDebugInfors(imgSource, mat_BiggestRegion, "region after SelectBiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            CvImage mat_FillUpBlackRegion = new CvImage();
+            MagnusOpenCVLib.FillUp(ref mat_BiggestRegion, ref mat_FillUpBlackRegion);
+            PushBackDebugInfors(imgSource, mat_FillUpBlackRegion, "Outer region after FillUp SelectBiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
-            //AddRegionOverlay(ref list_arrayOverlay, mat_BiggestRegion, Colors.Red);
-            //list_arrayOverlay.Add(new ArrayOverLay() { mat_Region = mat_BiggestRegion, _color = new SolidColorBrush(Colors.DarkGreen) });
 
-
-            //// find exact inner chip region ( segment a single chip)
-            CvImage mat_FillUpRegion = new CvImage();
-            MagnusOpenCVLib.FillUp(ref mat_BiggestRegion, ref mat_FillUpRegion);
-            PushBackDebugInfors(imgSource, mat_FillUpRegion, "region after FillUp SelectBiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            //////////////////////////////////////////////////
+            ////  segment single chip region
+            CvImage img_thresholdInnerRegion = new CvImage();
+            MagnusOpenCVLib.Threshold2(ref zoomedInImage, ref img_thresholdInnerRegion, m_DeviceLocationParameter.m_L_lowerThresholdInnerChip, m_DeviceLocationParameter.m_L_upperThresholdInnerChip);
+            PushBackDebugInfors(imgSource, img_thresholdInnerRegion, "Inner threshold Region. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
             CvImage mat_InnerChipRegion = new CvImage();
-            CvInvoke.BitwiseXor(mat_FillUpRegion, mat_BiggestRegion, mat_InnerChipRegion);
-            PushBackDebugInfors(imgSource, mat_InnerChipRegion, "Inner Chip Region. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            CvInvoke.BitwiseAnd(img_thresholdInnerRegion, mat_FillUpBlackRegion, mat_InnerChipRegion);
+            PushBackDebugInfors(imgSource, mat_InnerChipRegion, "Inner threshold region after Intersection with Black FillUp Region (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
+
             CvImage mat_InnerChipFillUpRegion = new CvImage();
             MagnusOpenCVLib.FillUp(ref mat_InnerChipRegion, ref mat_InnerChipFillUpRegion);
             PushBackDebugInfors(imgSource, mat_InnerChipFillUpRegion, "Inner Chip Region after FillUp. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
 
             CvImage mat_InnerChipOpeningRegion = new CvImage();
-            MagnusOpenCVLib.OpeningCircle(ref mat_InnerChipRegion, ref mat_InnerChipOpeningRegion, 3);
+            MagnusOpenCVLib.OpeningCircle(ref mat_InnerChipFillUpRegion, ref mat_InnerChipOpeningRegion, m_DeviceLocationParameter.m_nOpeningMask);
             PushBackDebugInfors(imgSource, mat_InnerChipOpeningRegion, "Inner Chip Region after Opening. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
 
             CvImage mat_BiggestInnerChipRegion = new CvImage();
             MagnusOpenCVLib.SelectBiggestRegion(ref mat_InnerChipOpeningRegion, ref mat_BiggestInnerChipRegion);
+            PushBackDebugInfors(imgSource, mat_BiggestInnerChipRegion, "Inner Chip Region after select BiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+
             CvInvoke.FindNonZero(mat_BiggestInnerChipRegion, point_regions);
             if (point_regions.Size == 0)
                 return -1;
-
-            PushBackDebugInfors(imgSource, mat_BiggestInnerChipRegion, "Inner Chip Region after select BiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
-            //list_arrayOverlay.Add(new ArrayOverLay() { mat_Region = mat_BiggestInnerChipRegion, _color = new SolidColorBrush(Colors.Cyan) });
-
             /////////////
             CvContourArray contours = new CvContourArray();
             MagnusOpenCVLib.GenContourRegion(ref mat_BiggestInnerChipRegion, ref contours, RetrType.External);
             RotatedRect rotateRect_Device = CvInvoke.MinAreaRect(contours[0]);
-            PointF[] pttt = rotateRect_Device.GetVertices();
+
+
+            //PointF[] pttt = rotateRect_Device.GetVertices();
             //PointF[] ptttFull;
             //foreach (PointF pt in pttt)
             //{
@@ -465,29 +494,48 @@ namespace Magnus_WPF_1.Source.Algorithm
             //}
             //pttt = pttt * 3;
 
-            List<Point> pPolygon = new List<Point>();
+            //List<Point> pPolygon = new List<Point>();
             
-            Point po1 = new Point((int)pttt[0].X, (int)pttt[0].X);
-            Point po2 = new Point((int)pttt[1].X, (int)pttt[1].X);
-            Point po3 = new Point((int)pttt[2].X, (int)pttt[2].X);
-            Point po4 = new Point((int)pttt[3].X, (int)pttt[3].X);
-            pCenter = new Point((int)rotateRect_Device.Center.X, (int)rotateRect_Device.Center.Y);
-            pPolygon.Add(po1);
-            pPolygon.Add(po2);
-            pPolygon.Add(po3);
-            pPolygon.Add(po4);
-            pPolygon.Add(pCenter);
+            //Point po1 = new Point((int)pttt[0].X, (int)pttt[0].X);
+            //Point po2 = new Point((int)pttt[1].X, (int)pttt[1].X);
+            //Point po3 = new Point((int)pttt[2].X, (int)pttt[2].X);
+            //Point po4 = new Point((int)pttt[3].X, (int)pttt[3].X);
+            //pPolygon.Add(po1);
+            //pPolygon.Add(po2);
+            //pPolygon.Add(po3);
+            //pPolygon.Add(po4);
+            //pPolygon.Add(pCenter);
 
             //List<Point> p_Regionpolygon_temp = RotatePolygon(pPolygon, -nAngleOutput, pCenter.X, pCenter.Y);
 
             int nminIndex = FindNearestPoints_Debug(zoomedInImage, rotateRect_Device, ref list_arrayOverlay, ref debugInfors, bEnableDebug);
+            if (nminIndex < 0)
+                return -1;
 
-            nAngleOutput = nAngleOutput + (DeviceLocationParameter.m_nBlackCornerIndexTemplateImage - nminIndex) * 90;
+            nAngleOutput = nAngleOutput + (m_DeviceLocationParameter.m_nBlackCornerIndexTemplateImage - nminIndex) * 90;
             if (nAngleOutput <= -180)
                 nAngleOutput = 360 - nAngleOutput;
 
             if (nAngleOutput >= 180)
                 nAngleOutput = nAngleOutput - 360;
+
+            timeIns.Restart();
+            CvImage mat_point = new CvImage();
+            mat_point = CvImage.Zeros(zoomedInImage.Height, zoomedInImage.Width, DepthType.Cv8U, 1);
+            System.Drawing.Rectangle rect_center = new System.Drawing.Rectangle((int)(rotateRect_Device.Center.X ),
+                                                                            (int)(rotateRect_Device.Center.Y),
+                                                                            (int)(4),
+                                                                           (int)(4));
+
+            CvInvoke.Rectangle(mat_point, rect_center, new MCvScalar(255), -1);
+            PushBackDebugInfors(imgSource, mat_point, "Center Chip Region . (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+
+            AddRegionOverlay(ref list_arrayOverlay, mat_point, Colors.Yellow);
+
+            //pCenter = new Point((int)rotateRect_Device.Center.X, (int)rotateRect_Device.Center.Y);
+
+
 
             //p_Regionpolygon = RotatePolygon(pPolygon, -nAngleOutput, pCenter.X, pCenter.Y);
             //p_Regionpolygon.Remove(pCenter);
@@ -633,7 +681,7 @@ namespace Magnus_WPF_1.Source.Algorithm
 
         //}
 
-        public static int FindNearestPoints_Debug(CvImage imgSourceInput, RotatedRect rotateRect_Device, ref List<ArrayOverLay> list_arrayOverlay, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug)
+        public int FindNearestPoints_Debug(CvImage imgSourceInput, RotatedRect rotateRect_Device, ref List<ArrayOverLay> list_arrayOverlay, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug)
         {
 
             Stopwatch timeIns = new Stopwatch();
@@ -643,12 +691,12 @@ namespace Magnus_WPF_1.Source.Algorithm
             CvImage rec_region2 = new CvImage();
             rec_region2 = CvImage.Zeros(imgSourceInput.Height, imgSourceInput.Width, DepthType.Cv8U, 1);
             MagnusOpenCVLib.GenRectangle2(rec_region2, rotateRect_Device, new MCvScalar(255), 1);
-            PushBackDebugInfors(imgSourceInput, rec_region2, "region after GenRectangle2. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, rec_region2, "Inner region after GenRectangle2. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             AddRegionOverlay(ref list_arrayOverlay, rec_region2, Colors.Yellow);
 
             CvImage rec_regionChipFillup = new CvImage();
             MagnusOpenCVLib.FillUp(ref rec_region2, ref rec_regionChipFillup);
-            PushBackDebugInfors(imgSourceInput, rec_regionChipFillup, "region after FillUp. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, rec_regionChipFillup, "Inner region after FillUp. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
 
             ////////////////////////////////
             // Begin Attract corner of chip///
@@ -656,28 +704,55 @@ namespace Magnus_WPF_1.Source.Algorithm
             CvImage fillup_Region = new CvImage();
             CvImage mat_Thresholdregion = new CvImage();
             timeIns.Restart();
-            MagnusOpenCVLib.Threshold2(ref imgSourceInput, ref mat_Thresholdregion, DeviceLocationParameter.m_L_lowerThresholdInnerChip, DeviceLocationParameter.m_L_upperThresholdInnerChip);
-            timeIns.Restart();
+            MagnusOpenCVLib.Threshold2(ref imgSourceInput, ref mat_Thresholdregion, m_DeviceLocationParameter.m_L_lowerThresholdInnerChip, m_DeviceLocationParameter.m_L_upperThresholdInnerChip);
             CvInvoke.BitwiseAnd(mat_Thresholdregion, rec_regionChipFillup, mat_Thresholdregion);
-            PushBackDebugInfors(imgSourceInput, mat_Thresholdregion, "BitwiseAnd. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, mat_Thresholdregion, "Inner rect Threshold region . (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
 
-            MagnusOpenCVLib.OpeningCircle(ref mat_Thresholdregion, ref mat_Thresholdregion, 5);
-            PushBackDebugInfors(imgSourceInput, mat_Thresholdregion, "OpeningCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            CvImage mat_ThresholdFillupRegion = new CvImage();
+            MagnusOpenCVLib.FillUp(ref mat_Thresholdregion, ref mat_ThresholdFillupRegion);
+            PushBackDebugInfors(imgSourceInput, mat_ThresholdFillupRegion, "Inner Threshold Region after FillUp. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+
+            CvImage mat_openingRegionTemp = new CvImage();
+            MagnusOpenCVLib.OpeningCircle(ref mat_ThresholdFillupRegion, ref mat_openingRegionTemp, m_DeviceLocationParameter.m_nOpeningMask);
+            PushBackDebugInfors(imgSourceInput, mat_openingRegionTemp, "Inner Region after OpeningCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
 
             CvImage mat_BiggestRegion = new CvImage();
-            MagnusOpenCVLib.SelectBiggestRegion(ref mat_Thresholdregion, ref mat_BiggestRegion);
+            MagnusOpenCVLib.SelectBiggestRegion(ref mat_openingRegionTemp, ref mat_BiggestRegion);
+            PushBackDebugInfors(imgSourceInput, mat_BiggestRegion, "Inner Region after SelectBiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+
             CvInvoke.FindNonZero(mat_BiggestRegion, regionPoints);
             if (regionPoints.Size == 0)
                 return -1;
 
-            PushBackDebugInfors(imgSourceInput, mat_BiggestRegion, "SelectBiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
-            timeIns.Restart();
-            MagnusOpenCVLib.FillUp(ref mat_BiggestRegion, ref mat_BiggestRegion);
-            PushBackDebugInfors(imgSourceInput, mat_BiggestRegion, "region after FillUp. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
-            timeIns.Restart();
             AddRegionOverlay(ref list_arrayOverlay, mat_BiggestRegion, Colors.Cyan);
+
+            //Detect Special Chip corner
+            CvImage mat_CornerChipRegion = new CvImage();
+            CvInvoke.BitwiseXor(rec_regionChipFillup, mat_BiggestRegion, mat_CornerChipRegion);
+            PushBackDebugInfors(imgSourceInput, mat_CornerChipRegion, "Corner Chip Region after sub inner region and inner rect. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+
+            CvImage mat_openingCornerRegion = new CvImage();
+            MagnusOpenCVLib.OpeningCircle(ref mat_CornerChipRegion, ref mat_openingCornerRegion, (int)(m_DeviceLocationParameter.m_nOpeningMask/2 + 1));
+            PushBackDebugInfors(imgSourceInput, mat_openingCornerRegion, "Corner Chip Region after OpeningCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+
+            CvImage mat_CornerBiggestRegion = new CvImage();
+            MagnusOpenCVLib.SelectBiggestRegion(ref mat_openingCornerRegion, ref mat_CornerBiggestRegion);
+            PushBackDebugInfors(imgSourceInput, mat_CornerBiggestRegion, "Corner Chip Region after SelectBiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+
+
+
+            CvInvoke.FindNonZero(mat_CornerBiggestRegion, regionPoints);
+            if (regionPoints.Size == 0)
+                return -1;
+            AddRegionOverlay(ref list_arrayOverlay, mat_CornerBiggestRegion, Colors.Blue);
+
 
             CvInvoke.FindNonZero(mat_BiggestRegion, regionPoints);
             System.Drawing.Rectangle rect_temp = CvInvoke.BoundingRectangle(regionPoints);
@@ -748,66 +823,66 @@ namespace Magnus_WPF_1.Source.Algorithm
         //}
 
 
-        public static int AutoTeachDatumLocation(ref List<Point> p_Regionpolygon, Rectangles rectDeviceLocationInput, Rectangles rectTemplateInput, ref Mat mat_DeviceLocationRegion, ref System.Drawing.Rectangle rectMatchingPosition, ref double nAngleOutput, ref double dScoreOutput, ref int nCornerIndex)
+        public int AutoTeachDatumLocation(ref List<Point> p_Regionpolygon, Rectangles rectDeviceLocationInput, Rectangles rectTemplateInput, ref Mat mat_DeviceLocationRegion, ref System.Drawing.Rectangle rectMatchingPosition, ref double nAngleOutput, ref double dScoreOutput, ref int nCornerIndex)
         {
 
-            if (m_TeachImage.Gray == null)
-                return -99;
+            //if (m_TeachImage.Gray == null)
+            //    return -99;
 
-            CvImage img_thresholdRegion = new CvImage();
-            CvImage img_openingRegionRegion = new CvImage();
-            CvImage img_BiggestRegion = new CvImage();
-            CvImage img_SelectRegion = new CvImage();
-            CvImage img_DilationRegion = new CvImage();
+            //CvImage img_thresholdRegion = new CvImage();
+            //CvImage img_openingRegionRegion = new CvImage();
+            //CvImage img_BiggestRegion = new CvImage();
+            //CvImage img_SelectRegion = new CvImage();
+            //CvImage img_DilationRegion = new CvImage();
 
-            CvImage img_Crop = new CvImage();
-            CvImage region_Crop = new CvImage();
-            mat_DeviceLocationRegion = new CvImage();
-
-
-            Image<Gray, Byte> imgCropped = new Image<Gray, byte>(m_TeachImage.Gray.Bitmap);
-            System.Drawing.Rectangle rec = new System.Drawing.Rectangle();
-            CvImage templateImageCropped = new CvImage();
-            rec.X = (int)rectTemplateInput.TopLeft.X;
-            rec.Y = (int)rectTemplateInput.TopLeft.Y;
-            rec.Width = (int)rectTemplateInput.Width;
-            rec.Height = (int)rectTemplateInput.Height;
-            imgCropped.ROI = rec;
-            templateImageCropped = imgCropped.Mat.Clone();
-            //CvInvoke.Imshow("Template Image", templateImageCropped);
-            //CvInvoke.WaitKey();
+            //CvImage img_Crop = new CvImage();
+            //CvImage region_Crop = new CvImage();
+            //mat_DeviceLocationRegion = new CvImage();
 
 
-            System.Drawing.Rectangle rectDeviceLocation = new System.Drawing.Rectangle((int)rectDeviceLocationInput.TopLeft.X,
-                                                                                        (int)rectDeviceLocationInput.TopLeft.Y,
-                                                                                        (int)rectDeviceLocationInput.Width,
-                                                                                       (int)rectDeviceLocationInput.Height);
-            //Image<Gray, Byte> Image_Source_Crop_Temp = new Image<Gray, Byte>(imgSource.Bitmap);
-            CvImage region_SearchDeviceLocation = new CvImage();
-            region_SearchDeviceLocation = CvImage.Zeros(m_TeachImage.Gray.Height, m_TeachImage.Gray.Width, DepthType.Cv8U, 1);
-            CvInvoke.Rectangle(region_SearchDeviceLocation, rectDeviceLocation, new MCvScalar(255), -1);
-            MagnusOpenCVLib.Threshold2(ref m_TeachImage.Gray, ref img_thresholdRegion, DeviceLocationParameter.m_L_lowerThreshold, DeviceLocationParameter.m_L_upperThreshold);
-            CvInvoke.BitwiseAnd(img_thresholdRegion, region_SearchDeviceLocation, img_thresholdRegion);
-            MagnusOpenCVLib.OpeningRectangle(ref img_thresholdRegion, ref img_openingRegionRegion, DeviceLocationParameter.m_nOpeningMask, DeviceLocationParameter.m_nOpeningMask);
-            MagnusOpenCVLib.SelectBiggestRegion(ref img_openingRegionRegion, ref mat_DeviceLocationRegion);
-            List<System.Drawing.Rectangle> rectLabel = new List<System.Drawing.Rectangle>();
-
-            MagnusOpenCVLib.SelectRegion(ref mat_DeviceLocationRegion, ref img_SelectRegion, ref rectLabel, DeviceLocationParameter.m_nMinWidthDevice, DeviceLocationParameter.m_nMinHeightDevice);
-            if (rectLabel == null)
-                return -99;
-
-            MagnusOpenCVLib.DilationRectangle(ref img_SelectRegion, ref img_DilationRegion, DeviceLocationParameter.m_nDilationMask, DeviceLocationParameter.m_nDilationMask);
-            System.Drawing.Rectangle rectangleRoi = new System.Drawing.Rectangle();
-            Image<Gray, Byte> ImageAfterDilationCrop = new Image<Gray, Byte>(m_TeachImage.Gray.Bitmap);
-            Image<Gray, Byte> Img = new Image<Gray, Byte>(m_TeachImage.Gray.Bitmap);
+            //Image<Gray, Byte> imgCropped = new Image<Gray, byte>(m_TeachImage.Gray.Bitmap);
+            //System.Drawing.Rectangle rec = new System.Drawing.Rectangle();
+            //CvImage templateImageCropped = new CvImage();
+            //rec.X = (int)rectTemplateInput.TopLeft.X;
+            //rec.Y = (int)rectTemplateInput.TopLeft.Y;
+            //rec.Width = (int)rectTemplateInput.Width;
+            //rec.Height = (int)rectTemplateInput.Height;
+            //imgCropped.ROI = rec;
+            //templateImageCropped = imgCropped.Mat.Clone();
+            ////CvInvoke.Imshow("Template Image", templateImageCropped);
+            ////CvInvoke.WaitKey();
 
 
-            int nWidth = 0, nHeight = 0;
-            MagnusOpenCVLib.GetWidthHeightRegion(ref img_DilationRegion, ref nWidth, ref nHeight);
-            if (nWidth >= m_TemplateImage.Gray.Width && nHeight >= m_TemplateImage.Gray.Height)
-                MagnusOpenCVLib.CropImage(ref ImageAfterDilationCrop, ref Img, img_DilationRegion, ref rectangleRoi);
-            else
-                MagnusOpenCVLib.CropImage(ref ImageAfterDilationCrop, ref Img, region_SearchDeviceLocation, ref rectangleRoi);
+            //System.Drawing.Rectangle rectDeviceLocation = new System.Drawing.Rectangle((int)rectDeviceLocationInput.TopLeft.X,
+            //                                                                            (int)rectDeviceLocationInput.TopLeft.Y,
+            //                                                                            (int)rectDeviceLocationInput.Width,
+            //                                                                           (int)rectDeviceLocationInput.Height);
+            ////Image<Gray, Byte> Image_Source_Crop_Temp = new Image<Gray, Byte>(imgSource.Bitmap);
+            //CvImage region_SearchDeviceLocation = new CvImage();
+            //region_SearchDeviceLocation = CvImage.Zeros(m_TeachImage.Gray.Height, m_TeachImage.Gray.Width, DepthType.Cv8U, 1);
+            //CvInvoke.Rectangle(region_SearchDeviceLocation, rectDeviceLocation, new MCvScalar(255), -1);
+            //MagnusOpenCVLib.Threshold2(ref m_TeachImage.Gray, ref img_thresholdRegion, m_DeviceLocationParameter.m_L_lowerThreshold, m_DeviceLocationParameter.m_L_upperThreshold);
+            //CvInvoke.BitwiseAnd(img_thresholdRegion, region_SearchDeviceLocation, img_thresholdRegion);
+            //MagnusOpenCVLib.OpeningRectangle(ref img_thresholdRegion, ref img_openingRegionRegion, m_DeviceLocationParameter.m_nOpeningMask, m_DeviceLocationParameter.m_nOpeningMask);
+            //MagnusOpenCVLib.SelectBiggestRegion(ref img_openingRegionRegion, ref mat_DeviceLocationRegion);
+            //List<System.Drawing.Rectangle> rectLabel = new List<System.Drawing.Rectangle>();
+
+            //MagnusOpenCVLib.SelectRegion(ref mat_DeviceLocationRegion, ref img_SelectRegion, ref rectLabel, m_DeviceLocationParameter.m_nMinWidthDevice, m_DeviceLocationParameter.m_nMinHeightDevice);
+            //if (rectLabel == null)
+            //    return -99;
+
+            //MagnusOpenCVLib.DilationRectangle(ref img_SelectRegion, ref img_DilationRegion, m_DeviceLocationParameter.m_nDilationMask, m_DeviceLocationParameter.m_nDilationMask);
+            //System.Drawing.Rectangle rectangleRoi = new System.Drawing.Rectangle();
+            //Image<Gray, Byte> ImageAfterDilationCrop = new Image<Gray, Byte>(m_TeachImage.Gray.Bitmap);
+            //Image<Gray, Byte> Img = new Image<Gray, Byte>(m_TeachImage.Gray.Bitmap);
+
+
+            //int nWidth = 0, nHeight = 0;
+            //MagnusOpenCVLib.GetWidthHeightRegion(ref img_DilationRegion, ref nWidth, ref nHeight);
+            //if (nWidth >= m_TemplateImage.Gray.Width && nHeight >= m_TemplateImage.Gray.Height)
+            //    MagnusOpenCVLib.CropImage(ref ImageAfterDilationCrop, ref Img, img_DilationRegion, ref rectangleRoi);
+            //else
+            //    MagnusOpenCVLib.CropImage(ref ImageAfterDilationCrop, ref Img, region_SearchDeviceLocation, ref rectangleRoi);
 
             //System.Drawing.Rectangle rectMatchingPosition = new System.Drawing.Rectangle();
             //bool bIsTemplateFounded = false;
@@ -915,7 +990,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             return new Point((int)newX, (int)newY);
         }
 
-        internal static void AutoTeach()
+        internal  void AutoTeach()
         {
 
             List<System.Drawing.Point> p_Regionpolygon = new List<System.Drawing.Point>();
@@ -924,8 +999,8 @@ namespace Magnus_WPF_1.Source.Algorithm
             double dScoreOutput = 0.0;
             int nCornerIndex = 0;
             System.Drawing.Rectangle rectMatchingPosition = new System.Drawing.Rectangle();
-            InspectionCore.AutoTeachDatumLocation(ref p_Regionpolygon, DeviceLocationParameter.m_L_DeviceLocationRoi, DeviceLocationParameter.m_L_TemplateRoi, ref mat_DeviceLocationRegion, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput, ref nCornerIndex);
-            DeviceLocationParameter.m_nBlackCornerIndexTemplateImage = nCornerIndex;
+            //AutoTeachDatumLocation(ref p_Regionpolygon, m_DeviceLocationParameter.m_L_DeviceLocationRoi, m_DeviceLocationParameter.m_L_TemplateRoi, ref mat_DeviceLocationRegion, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput, ref nCornerIndex);
+            m_DeviceLocationParameter.m_nBlackCornerIndexTemplateImage = nCornerIndex;
         }
     }
 }

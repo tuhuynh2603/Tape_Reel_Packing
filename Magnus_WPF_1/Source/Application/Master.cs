@@ -24,8 +24,8 @@ namespace Magnus_WPF_1.Source.Application
         public static AutoResetEvent m_NextStepTeachEvent;
         //public CommLog commLog = new CommLog();
 
-        public static AutoResetEvent[] InspectEvent;
-        public static AutoResetEvent[] InspectDoneEvent;
+        public static ManualResetEvent[] InspectEvent;
+        public static ManualResetEvent[] InspectDoneEvent;
         public static AutoResetEvent[] m_hardwareTriggerSnapEvent;
         // public AutoDeleteImagesDlg m_AutoDeleteImagesDlg = new AutoDeleteImagesDlg();
 
@@ -50,12 +50,12 @@ namespace Magnus_WPF_1.Source.Application
             mainWindow = app;
             m_NextStepTeachEvent = new AutoResetEvent(false);
             m_bIsTeaching = false;
-
+            Application.CheckRegistry();
+            Application.LoadRegistry();
             ContructorDocComponent();
 
 
-            Application.CheckRegistry();
-            Application.LoadRegistry();
+
             LoadRecipe();
 
             m_nActiveTrack = 0;
@@ -67,9 +67,9 @@ namespace Magnus_WPF_1.Source.Application
             for (int nTrack = 0; nTrack < Application.m_nTrack; nTrack++)
             {
                 //m_Tracks[nTrack].m_cap.Dispose();
-                InspectEvent[nTrack].Reset();
+                InspectEvent[nTrack].Set();
                 InspectEvent[nTrack].Dispose();
-                InspectDoneEvent[nTrack].Reset();
+                InspectDoneEvent[nTrack].Set();
                 InspectDoneEvent[nTrack].Dispose();
             }
         }
@@ -80,22 +80,20 @@ namespace Magnus_WPF_1.Source.Application
             mappingParameter.LoadMappingParamFromDictToUI(Application.dictMappingParam);
 
             #region Load Teach Paramter
-            Application.dictTeachParam.Clear();
-            Application.LoadTeachParamFromFileToDict();
-            if (!teachParameter.UpdateTeachParamFromDictToUI(Application.dictTeachParam))
+            for(int nTrack = 0; nTrack < Application.m_nTrack; nTrack++)
             {
-                //MessageBox.Show("Can not load teach parameters", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            else
-            {
+                Application.dictTeachParam.Clear();
+                Application.LoadTeachParamFromFileToDict(ref nTrack);
 
-                //DebugMessage.WriteToDebugViewer(2, string.Format("Load Teach Parameters Success "));
-            }
-            InspectionCore.UpdateTeachParamFromUIToInspectionCore();
-            InspectionCore.LoadTeachImageToInspectionCore();
-            #endregion
+                //m_Tracks[nTrack].m_InspectionCore.LoadTeachImageToInspectionCore(nTrack);
+                teachParameter.UpdateTeachParamFromDictToUI(Application.dictTeachParam);
 
-            InspectionCore.AutoTeach();
+                m_Tracks[nTrack].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
+                m_Tracks[nTrack].m_InspectionCore.LoadTeachImageToInspectionCore(nTrack);
+                #endregion
+                m_Tracks[nTrack].m_InspectionCore.AutoTeach();
+            }    
+
         }
         #endregion
 
@@ -105,19 +103,20 @@ namespace Magnus_WPF_1.Source.Application
         private void ContructorDocComponent()
         {
             m_Tracks = new Track[Application.m_nTrack];
-            InspectEvent = new AutoResetEvent[Application.m_nTrack];
-            InspectDoneEvent = new AutoResetEvent[Application.m_nTrack];
+            InspectEvent = new ManualResetEvent[Application.m_nTrack];
+            InspectDoneEvent = new ManualResetEvent[Application.m_nTrack];
             m_hardwareTriggerSnapEvent = new AutoResetEvent[Application.m_nTrack];
             m_SaveInspectImageThread = new Thread[Application.m_nTrack];
             thread_FullSequence = new Thread[Application.m_nTrack];
             thread_StreamCamera = new Thread[Application.m_nTrack];
             list_arrayOverlay = new List<ArrayOverLay>[Application.m_nTrack];
-            string[] nSeriCam = { "02C89933333", "none" };
+            //string[] nSeriCam = { "02C89933333", "none" };
+            
             for (int index_track = 0; index_track < Application.m_nTrack; index_track++)
             {
                 //for(int index_doc = 0; index_doc < Application.m_nDoc; index_doc++)
-                InspectEvent[index_track] = new AutoResetEvent(false);
-                InspectDoneEvent[index_track] = new AutoResetEvent(false);
+                InspectEvent[index_track] = new ManualResetEvent(false);
+                InspectDoneEvent[index_track] = new ManualResetEvent(false);
                 m_hardwareTriggerSnapEvent[index_track] = new AutoResetEvent(false);
 
                 if (m_SaveInspectImageThread[index_track] == null)
@@ -129,7 +128,7 @@ namespace Magnus_WPF_1.Source.Application
 
                 list_arrayOverlay[index_track] = new List<ArrayOverLay>();
 
-                m_Tracks[index_track] = new Track(index_track, 1, nSeriCam[index_track], mainWindow);
+                m_Tracks[index_track] = new Track(index_track, 1, Application.m_strCameraSerial[index_track], mainWindow);
 
             }
         }
@@ -157,10 +156,10 @@ namespace Magnus_WPF_1.Source.Application
             return bitmap;
         }
 
-        public void loadTeachImageToUI(int nTrack = 0)
+        public void loadTeachImageToUI(int nTrack)
         {
 
-            string strImageFilePath = System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp");
+            string strImageFilePath = System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_Track" + (nTrack + 1).ToString() +".bmp");
             if (!File.Exists(strImageFilePath))
                 return;
             else
@@ -181,6 +180,37 @@ namespace Magnus_WPF_1.Source.Application
                 mainWindow.UpdateTitleDoc(0, string.Format("Name Image: {0}", " teachImage.bmp"), true);
             }
         }
+
+        public void SaveUITeachImage(int nTrack)
+        {
+            string strImageFilePath = System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_Track" + (nTrack + 1).ToString() + ".bmp");
+            try
+            {
+                if (File.Exists(strImageFilePath))
+                    File.Delete(strImageFilePath);
+                BitmapSource _bitmapImage = btmSource;
+                string path_image = strImageFilePath;
+                using (FileStream stream = new FileStream(path_image, FileMode.CreateNew))
+                {
+                    BitmapEncoder encoder = new BmpBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create((BitmapSource)_bitmapImage));
+                    encoder.Save(stream);
+                    _bitmapImage.Freeze();
+                    stream.Dispose();
+                    stream.Close();
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        public void SaveTemplateImage(int nTrackID)
+        {
+            string pathFileImage = System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "templateImage_Track"+ (nTrackID + 1).ToString() + ".bmp");
+            CvInvoke.Imwrite(pathFileImage, m_Tracks[nTrackID].m_InspectionCore.m_TemplateImage.Gray);
+        }
+
 
         internal void Grab_Image_Thread(bool bSingleSnap = false)
         {
@@ -223,12 +253,12 @@ namespace Magnus_WPF_1.Source.Application
 
             if (thread_FullSequence[nTrackID] == null)
             {
-                thread_FullSequence[nTrackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => InspectOffline(m_folderPath)));
+                thread_FullSequence[nTrackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => InspectOffline(m_folderPath, nTrackID)));
                 thread_FullSequence[nTrackID].Start();
             }
             else if (!thread_FullSequence[nTrackID].IsAlive)
             {
-                thread_FullSequence[nTrackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => InspectOffline(m_folderPath)));
+                thread_FullSequence[nTrackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => InspectOffline(m_folderPath, nTrackID)));
                 thread_FullSequence[nTrackID].Start();
             }
         }
@@ -287,13 +317,13 @@ namespace Magnus_WPF_1.Source.Application
         {
             if (m_TeachThread == null)
             {
-                m_TeachThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].TeachSequence()));
+                m_TeachThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].TeachSequence(MainWindow.activeImageDock.trackID)));
                 m_TeachThread.SetApartmentState(ApartmentState.STA);
             }
             else
             {
                 m_TeachThread = null;
-                m_TeachThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].TeachSequence()));
+                m_TeachThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].TeachSequence(MainWindow.activeImageDock.trackID)));
                 m_TeachThread.SetApartmentState(ApartmentState.STA);
             }
             m_TeachThread.Start();
@@ -305,11 +335,11 @@ namespace Magnus_WPF_1.Source.Application
         {
         }
 
-        public void WriteTeachParam()
+        public void WriteTeachParam(int nTrack)
         {
             try
             {
-                applications.WriteTeachParam();
+                applications.WriteTeachParam(nTrack);
             }
             catch (Exception)
             {
@@ -327,11 +357,11 @@ namespace Magnus_WPF_1.Source.Application
             }
         }
 
-        public void InspectOffline(string strFolder)
+        public void InspectOffline(string strFolder, int nTrack)
         {
 
 
-            m_Tracks[MainWindow.activeImageDock.trackID].InspectOffline(strFolder);
+            m_Tracks[nTrack].InspectOffline(strFolder);
         }
     }
 

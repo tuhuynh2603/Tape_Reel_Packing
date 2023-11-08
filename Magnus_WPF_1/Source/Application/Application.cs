@@ -23,7 +23,7 @@ namespace Magnus_WPF_1.Source.Application
         public static string currentRecipe;// = "Recipe1";
         public static string pathRegistry;
         public static string pathImageSave;
-
+        public static List<string> m_strCameraSerial;
         public static void CheckRegistry()
         {
             pathRegistry = "Software\\HD Vision\\SemiConductor_1";
@@ -69,6 +69,20 @@ namespace Magnus_WPF_1.Source.Application
             else
                 pathImageSave = (string)registerPreferences.GetValue("Folder: Image Save");
             #endregion
+
+
+            m_strCameraSerial = new List<string>();
+            for (int nTrack = 0; nTrack < m_nTrack; nTrack++)
+            {
+                if ((string)registerPreferences.GetValue("Camera"+ (nTrack+1).ToString() + " IP Serial: ") == "" || (string)registerPreferences.GetValue("Camera" + (nTrack + 1).ToString() + " IP Serial: ") == null)
+                {
+                    m_strCameraSerial.Add(""); /*+ "\\"+ (string)registerPreferences.GetValue("Recipe")*/;
+                    registerPreferences.SetValue("Camera" + (nTrack + 1).ToString() + " IP Serial: ", m_strCameraSerial[nTrack]);
+                }
+                else
+                    m_strCameraSerial.Add((string)registerPreferences.GetValue("Camera" + (nTrack + 1).ToString() + " IP Serial: "));
+            }
+
         }
         static void ReadLine(string section, string key, IniFile ini, ref Dictionary<string, string> dictionary)
         {
@@ -113,12 +127,49 @@ namespace Magnus_WPF_1.Source.Application
             ini.WriteValue(section, key, param);
         }
 
-        public static void LoadTeachParamFromFileToDict()
+        public static CameraSettingParam cameraSettingParam = new CameraSettingParam();
+        public static void LoadCamSetting(int nTrack)
         {
-            string pathFile = Path.Combine(pathRecipe, currentRecipe, "TeachParameters.cfg");
+
+            #region USB Camera
+            string strRecipePath = Path.Combine(pathRecipe, currentRecipe);
+            string pathCam = Path.Combine(strRecipePath, "camera_Track" + (nTrack + 1).ToString() + ".cam");
+            IniFile ini = new IniFile(pathCam);
+            cameraSettingParam.gain = (float)ini.ReadValue("Camera Setting", "gain", 5.0);
+            cameraSettingParam.exposureTime = (int)ini.ReadValue("Camera Setting", "exposure time", 10000);
+            cameraSettingParam.softwareTrigger = ini.ReadValue("Camera Setting", "software trigger", false);
+            cameraSettingParam.frameRate = (float)ini.ReadValue("Camera Setting", "FrameRate", 17);
+            #endregion
+
+            if (!Directory.Exists(strRecipePath))
+            {
+                Directory.CreateDirectory(strRecipePath);
+                WriteCamSetting(nTrack);
+            }
+        }
+        public static void WriteCamSetting(int nTrack)
+        {
+                #region USB Camera
+                string pathCam = Path.Combine(pathRecipe, currentRecipe, "camera_Track" + (nTrack + 1).ToString() +".cam");
+                IniFile ini = new IniFile(pathCam);
+                ini.WriteValue("Camera Setting", "gain", cameraSettingParam.gain);
+                ini.WriteValue("Camera Setting", "exposure time", cameraSettingParam.exposureTime);
+                ini.WriteValue("Camera Setting", "software trigger", cameraSettingParam.softwareTrigger);
+                ini.WriteValue("Camera Setting", "FrameRate", cameraSettingParam.frameRate);
+                #endregion
+        }
+
+        public static void LoadTeachParamFromFileToDict(ref int nTrack)
+        {
+            if (currentRecipe == null || pathRecipe == null)
+                return;
+            string strFileName = "TeachParameters_Track" + (nTrack+1).ToString() + ".cfg";
+            string pathFile = Path.Combine(pathRecipe, currentRecipe, strFileName);
             IniFile ini = new IniFile(pathFile);
 
             ReadLine("LOCATION", "Device Location Roi", ini, ref dictTeachParam);
+            ReadLine("LOCATION", "Threshold Type", ini, ref dictTeachParam);
+            ReadLine("LOCATION", "Object Color", ini, ref dictTeachParam);
             ReadLine("LOCATION", "lower threshold", ini, ref dictTeachParam);
             ReadLine("LOCATION", "upper threshold", ini, ref dictTeachParam);
             ReadLine("LOCATION", "lower threshold Inner Chip", ini, ref dictTeachParam);
@@ -133,10 +184,6 @@ namespace Magnus_WPF_1.Source.Application
             ReadLine("LOCATION", "Scale Image Ratio", ini, ref dictTeachParam);
             ReadLine("LOCATION", "Min Score", ini, ref dictTeachParam);
             ReadLine("LOCATION", "Corner Index", ini, ref dictTeachParam);
-
-            InspectionCore.LoadTeachImageToInspectionCore();
-
-
             //ReadLine("TOP PATTERN", "no of pattern", ini, ref dictTeachParam);
             ////ReadLine("TOP PATTERN", "no of pattern", ini, ref categoriesTeachParam.TP_noOfPattern);
             ////categoriesTeachParam.TP_noOfPattern = dictTeachParam[]
@@ -147,11 +194,16 @@ namespace Magnus_WPF_1.Source.Application
             //        ReadLine("TOP PATTERN", "roi no " + (n + 1).ToString(), ini, ref dictTeachParam);
             //}
         }
-        public void WriteTeachParam()
+        public void WriteTeachParam(int nTrack)
         {
-            string pathFile = Path.Combine(pathRecipe, currentRecipe, "TeachParameters.cfg");
+            string strFileName = "TeachParameters_Track" + (nTrack + 1).ToString() + ".cfg";
+            string pathFile = Path.Combine(pathRecipe, currentRecipe, strFileName);
             IniFile ini = new IniFile(pathFile);
             WriteLine("LOCATION", "Device Location Roi", ini, ConvertRectanglesToString(categoriesTeachParam.L_DeviceLocationRoi));
+            WriteLine("LOCATION", "Threshold Type", ini, categoriesTeachParam.L_ThresholdType.ToString());
+            WriteLine("LOCATION", "Object Color", ini, categoriesTeachParam.L_ObjectColor.ToString());
+
+            
             WriteLine("LOCATION", "lower threshold", ini, categoriesTeachParam.L_lowerThreshold.ToString());
             WriteLine("LOCATION", "upper threshold", ini, categoriesTeachParam.L_upperThreshold.ToString());
             WriteLine("LOCATION", "lower threshold Inner Chip", ini, categoriesTeachParam.L_lowerThresholdInnerChip.ToString());

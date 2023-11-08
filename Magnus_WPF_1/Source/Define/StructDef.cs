@@ -37,12 +37,15 @@ namespace Magnus_WPF_1.Source.Define
         BOTTOM_RIGHT,
         BOTTOM_LEFT
     };
-    public enum COLOR : int
+    public enum OBJECT_COLOR : int
     {
-        BLACK,
-        WHITE,
+        BLACK = 0,
+        WHITE = 1,
         ANY_COLOR
     };
+
+    
+
     public enum DIRECTION : int
     {
         X,
@@ -53,6 +56,12 @@ namespace Magnus_WPF_1.Source.Define
     {
         NEGATIVE,
         POSITIVE
+    };
+
+    public enum THRESHOLD_TYPE :int
+    {
+        BINARY_THRESHOLD = 0,
+        VAR_THRESHOLD = 1   
     };
 
 
@@ -103,6 +112,14 @@ namespace Magnus_WPF_1.Source.Define
         public int deltaY { get; set; }
         public int width { get; set; }
         public int height { get; set; }
+    }
+
+    public struct CameraSettingParam
+    {
+        public bool softwareTrigger;
+        public float exposureTime;
+        public float frameRate;
+        public float gain;
     }
 
     public static class DefautTeachingSequence

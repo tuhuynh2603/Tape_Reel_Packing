@@ -74,6 +74,26 @@ namespace Magnus_WPF_1
                     {
                         info.SetValue(Application.Application.categoriesMappingParam, dictTeachParam[info.Name] == "white" ? Colors.White : Colors.Black);
                     }
+                    else if (type.Name == "THRESHOLD_TYPE")
+                    {
+                        THRESHOLD_TYPE value;
+                        bool success = Enum.TryParse(_dictMappingParam.Values.ElementAt(i), out value);
+                        if (success == false)
+                            value = (THRESHOLD_TYPE)info.GetCustomAttribute<DefaultValueAttribute>().Value;
+                        info.SetValue(Application.Application.categoriesMappingParam, value);
+                        info.SetValue(categoriesMappingParam, value);
+                    }
+
+                    else if (type.Name == "OBJECT_COLOR")
+                    {
+                        OBJECT_COLOR value;
+                        bool success = Enum.TryParse(_dictMappingParam.Values.ElementAt(i), out value);
+                        if (success == false)
+                            value = (OBJECT_COLOR)info.GetCustomAttribute<DefaultValueAttribute>().Value;
+                        info.SetValue(Application.Application.categoriesMappingParam, value);
+                        info.SetValue(categoriesMappingParam, value);
+                    }
+
                     else if (type.Name == "Double")
                     {
                         double value = 0.0;

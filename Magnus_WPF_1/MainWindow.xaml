@@ -721,6 +721,7 @@
                             Margin="9,20,9,1">-->
                         <Canvas Margin="10" x:Name="canvas_Mapping" MouseMove="canvas_Mapping_MouseMove" HorizontalAlignment="Left" MouseLeftButtonDown="canvas_Mapping_MouseLeftButtonDown" MouseLeave="canvas_Mapping_MouseLeave">
                             <Border x:Name="border_boundingbox_focus"></Border>
+                            <Border x:Name="border_boundingbox_clicked"></Border>
                             <!--<Label x:Name="lb_canvas_MappingID"
                                    Width="30" Height="30" Background="AliceBlue" Foreground="Black" FontSize="10" MouseLeave="Fl_MouseLeave" MouseEnter="Fl_MouseEnter"></Label>-->
                         </Canvas>

@@ -901,10 +901,10 @@ namespace Magnus_WPF_1.UI.UserControls.View
             resultTeach.Children.Add(tbl_Status1);
         }
 
-        public void loadTeachImageToUI(int nTrack = 0)
+        public void loadTeachImageToUI(int nTrack)
         {
 
-            string strImagePath = System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp");
+            string strImagePath = System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_Track" + (nTrack+1).ToString() +".bmp");
             if (!File.Exists(strImagePath))
                 return;
             else
@@ -1009,7 +1009,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
                     {
                         controlWin.Visibility = Visibility.Collapsed;
                         MainWindow.mainWindow.SetDisableTeachButton();
-                        MainWindow.mainWindow.master.loadTeachImageToUI();
+                        MainWindow.mainWindow.master.loadTeachImageToUI(trackID);
                         Master.m_bIsTeaching = false;
 
                     });
@@ -1020,21 +1020,26 @@ namespace Magnus_WPF_1.UI.UserControls.View
         }
 
         List<Rectangles> L_PVIArea = new List<Rectangles>();
-        public void TeachSequence()
+        public void TeachSequence(int nTeachTrackID)
         {
             Master.m_bIsTeaching = true;
             Master.m_NextStepTeachEvent.Reset();
-            Source.Application.Application.LoadTeachParamFromFileToDict();
+            Source.Application.Application.LoadTeachParamFromFileToDict(ref nTeachTrackID);
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
                 resultTeach.Children.Clear();
                 ClearOverlay();
-                loadTeachImageToUI();
+                loadTeachImageToUI(nTeachTrackID);
             });
 
             // now only teach device location so only TP_roiNo
             int nCurrentStep = 0;
             Rectangles L_DeviceLocationRoi_Temp = Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi;
+            //if (L_DeviceLocationRoi_Temp.Width > _imageWidth)
+            //{
+            //    L_DeviceLocationRoi_Temp.Width = _imageWidth;
+            //    L_DeviceLocationRoi_Temp.Height = _imageHeight;
+            //}
 
             if (true)
             {
@@ -1065,48 +1070,48 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
                 nCurrentStep++;
             }
-            if (true)
-            {
-                if (L_PVIArea.Count() < 5)
-                {
-                    L_PVIArea.Clear();
+            //if (true)
+            //{
+            //    if (L_PVIArea.Count() < 5)
+            //    {
+            //        L_PVIArea.Clear();
 
-                    for (int nPVIArea = 0; nPVIArea < 5; nPVIArea++)
-                    {
-                        L_PVIArea.Add(Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi);
-                    }
-                }
-                for (int nPVIArea = 0; nPVIArea < 5; nPVIArea++)
-                {
-                    Rectangles lPVIAreaTemp = L_PVIArea[nPVIArea];
-                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Please Locate Pvi Area " + nPVIArea.ToString(), "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
-                        controlWin.Visibility = Visibility.Visible;
-                        SetControlWin(lPVIAreaTemp);
-                    });
+            //        for (int nPVIArea = 0; nPVIArea < 5; nPVIArea++)
+            //        {
+            //            L_PVIArea.Add(Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi);
+            //        }
+            //    }
+            //    for (int nPVIArea = 0; nPVIArea < 5; nPVIArea++)
+            //    {
+            //        Rectangles lPVIAreaTemp = L_PVIArea[nPVIArea];
+            //        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            //        {
+            //            UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Please Locate Pvi Area " + nPVIArea.ToString(), "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+            //            controlWin.Visibility = Visibility.Visible;
+            //            SetControlWin(lPVIAreaTemp);
+            //        });
 
-                    if (waitNextTeachStep() < 0)
-                        return;
+            //        if (waitNextTeachStep() < 0)
+            //            return;
 
-                    nCurrentStep++;
+            //        nCurrentStep++;
 
-                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        L_PVIArea[nPVIArea] = (GetRectangle());
-                        //Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi = L_DeviceLocationRoi_Temp;
-                        controlWin.Visibility = Visibility.Collapsed;
-                        UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Pvi Area " + nPVIArea.ToString() + " is Taught", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
-                        UpdateRegionOverlay();
+            //        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            //        {
+            //            L_PVIArea[nPVIArea] = (GetRectangle());
+            //            //Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi = L_DeviceLocationRoi_Temp;
+            //            controlWin.Visibility = Visibility.Collapsed;
+            //            UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Pvi Area " + nPVIArea.ToString() + " is Taught", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+            //            UpdateRegionOverlay();
 
-                    });
+            //        });
 
-                    if (waitNextTeachStep() < 0)
-                        return;
+            //        if (waitNextTeachStep() < 0)
+            //            return;
 
-                    nCurrentStep++;
-                }
-            }
+            //        nCurrentStep++;
+            //    }
+            //}
 
             if (true)
             {
@@ -1134,7 +1139,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
                     double dScoreOutput = 0.0;
                     int L_CornerIndex_Temp = 0;
                     System.Drawing.Rectangle rectMatchingPosition = new System.Drawing.Rectangle();
-                    InspectionCore.AutoTeachDatumLocation(ref p_Regionpolygon, L_DeviceLocationRoi_Temp, L_TemplateRoi_Temp, ref mat_DeviceLocationRegion, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput, ref L_CornerIndex_Temp);
+                    MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.AutoTeachDatumLocation(ref p_Regionpolygon, L_DeviceLocationRoi_Temp, L_TemplateRoi_Temp, ref mat_DeviceLocationRegion, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput, ref L_CornerIndex_Temp);
                     Source.Application.Application.categoriesTeachParam.L_TemplateRoi = L_TemplateRoi_Temp;
                     Source.Application.Application.categoriesTeachParam.L_CornerIndex = L_CornerIndex_Temp;
 
@@ -1156,10 +1161,10 @@ namespace Magnus_WPF_1.UI.UserControls.View
             if (result == MessageBoxResult.Yes)
             {
                 //SetTeachParameterToCategories();
-                InspectionCore.UpdateTeachParamFromUIToInspectionCore();
-                InspectionCore.SetTemplateImage();
-                saveTemplateImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "templateImage_1.bmp"));
-                MainWindow.mainWindow.master.WriteTeachParam();
+                MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
+                MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.SetTemplateImage();
+                MainWindow.mainWindow.master.SaveTemplateImage(nTeachTrackID);
+                MainWindow.mainWindow.master.WriteTeachParam(nTeachTrackID);
                 //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 //{
                 //    //resultTeach.Children.Clear();
@@ -1173,8 +1178,8 @@ namespace Magnus_WPF_1.UI.UserControls.View
                     MainWindow.mainWindow.master.teachParameter.UpdateTeachParamFromDictToUI(Source.Application.Application.dictTeachParam);
                 });
 
-                InspectionCore.UpdateTeachParamFromUIToInspectionCore();
-                InspectionCore.LoadTeachImageToInspectionCore();
+                MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
+                MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.LoadTeachImageToInspectionCore(nTeachTrackID);
                 //MainWindow.mainWindow.master.LoadRecipe();
             }
 
@@ -1182,7 +1187,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             {
                 ClearOverlay();
                 MainWindow.mainWindow.SetDisableTeachButton();
-                MainWindow.mainWindow.master.loadTeachImageToUI();
+                MainWindow.mainWindow.master.loadTeachImageToUI(nTeachTrackID);
                 Master.m_bIsTeaching = false;
 
             });
@@ -1239,36 +1244,6 @@ namespace Magnus_WPF_1.UI.UserControls.View
             Canvas.SetLeft(rec, GetRectangle().TopLeft.X * scaleX);
             GridOverlay.Children.Add(rec);
         }
-        public void SaveTeachImage(string pathFileImage)
-        {
-            try
-            {
-                if (File.Exists(pathFileImage))
-                    File.Delete(pathFileImage);
-                BitmapSource _bitmapImage = btmSource;
-                string path_image = pathFileImage;
-                using (FileStream stream = new FileStream(path_image, FileMode.CreateNew))
-                {
-                    BitmapEncoder encoder = new BmpBitmapEncoder();
-                    encoder.Frames.Add(BitmapFrame.Create((BitmapSource)_bitmapImage));
-                    encoder.Save(stream);
-                    _bitmapImage.Freeze();
-                    stream.Dispose();
-                    stream.Close();
-                }
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        public void saveTemplateImage(string pathFileImage)
-        {
-            InspectionCore.SaveTemplateImage(pathFileImage);
-        }
-
-
-
         //private void SldValueBinaChange(object sender, RoutedPropertyChangedEventArgs<double> e)
         //{
         //    valueSliderGray = (int)sldBinary.Value;

@@ -17,15 +17,17 @@ namespace Magnus_WPF_1.Source.Hardware
         MyCamera.MV_CC_DEVICE_INFO_LIST m_stDeviceList = new MyCamera.MV_CC_DEVICE_INFO_LIST();
         public MyCamera m_MyCamera = new MyCamera();
         public bool m_bGrabbing = false;
-        Thread m_hReceiveThread = null;
+        //Thread m_hReceiveThread = null;
         string m_strCameraSerial;
-        public HIKControlCameraView(string strCameraID)
+        int m_nTrack;
+        public HIKControlCameraView(string strCameraID, int nTrack)
         {
             InitializeComponent();
             //this.Closing += Window_Closing;
             DeviceListAcq();
             InitializeCamera(strCameraID);
             m_strCameraSerial = strCameraID;
+            m_nTrack = nTrack;
             // ch:设置采集连续模式 | en:Set Continues Aquisition Mode
 
         }
@@ -130,7 +132,7 @@ namespace Magnus_WPF_1.Source.Hardware
                 return;
             }
 
-            InitializeCamera("");
+            InitializeCamera(m_strCameraSerial);
 
             // ch:设置采集连续模式 | en:Set Continues Aquisition Mode
             //bnGetParam_Click(null, null);
@@ -256,11 +258,49 @@ namespace Magnus_WPF_1.Source.Hardware
             m_MyCamera.MV_CC_SetEnumValue_NET("AcquisitionMode", (uint)MyCamera.MV_CAM_ACQUISITION_MODE.MV_ACQ_MODE_CONTINUOUS);
             m_MyCamera.MV_CC_SetEnumValue_NET("TriggerMode", (uint)MyCamera.MV_CAM_TRIGGER_MODE.MV_TRIGGER_MODE_ON);
             m_MyCamera.MV_CC_SetEnumValue_NET("TriggerSource", (uint)MyCamera.MV_CAM_TRIGGER_SOURCE.MV_TRIGGER_SOURCE_SOFTWARE);
-
+            if(!SetParameterToCamera(Application.Application.cameraSettingParam.exposureTime, Application.Application.cameraSettingParam.gain, Application.Application.cameraSettingParam.frameRate))
+            {
+                float expose = 0;
+                float gain = 0;
+                float frameRate = 0;
+                GetCameraParameter(ref expose, ref gain, ref frameRate);
+                Application.Application.cameraSettingParam.gain = gain;
+                Application.Application.cameraSettingParam.exposureTime = expose;
+                Application.Application.cameraSettingParam.frameRate = frameRate;
+                Application.Application.WriteCamSetting(m_nTrack);
+            }    
         }
 
         private void bnClose_Click(object sender, RoutedEventArgs e)
         {
+
+            var result = MessageBox.Show("Do you want to save camera parameters ?", "", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+
+                try
+                {
+                    float.Parse(tbExposure.Text);
+                    float.Parse(tbGain.Text);
+                    float.Parse(tbFrameRate.Text);
+                }
+                catch
+                {
+                    ShowErrorMsg("Please enter correct type!", 0);
+                    return;
+                }
+
+                if (SetParameterToCamera(Application.Application.cameraSettingParam.exposureTime, Application.Application.cameraSettingParam.gain, Application.Application.cameraSettingParam.frameRate))
+                {
+                    Application.Application.cameraSettingParam.gain = float.Parse(tbGain.Text);
+                    Application.Application.cameraSettingParam.exposureTime = float.Parse(tbExposure.Text);
+                    Application.Application.cameraSettingParam.frameRate = float.Parse(tbFrameRate.Text);
+                    Application.Application.WriteCamSetting(m_nTrack);
+                }
+                //return;
+                //master.m_Tracks[0].m_imageViews[0].SaveTeachImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp"));
+            }
+
             // ch:取流标志位清零 | en:Reset flow flag bit
             if (m_bGrabbing == true)
             {
@@ -287,6 +327,7 @@ namespace Magnus_WPF_1.Source.Hardware
             tbFrameRate.IsEnabled = false;
             bnGetParam.IsEnabled = false;
             bnSetParam.IsEnabled = false;
+
         }
 
         //private void bnContinuesMode_Checked(object sender, RoutedEventArgs e)
@@ -457,32 +498,41 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void bnGetParam_Click(object sender, RoutedEventArgs e)
         {
-            GetCameraParameter();
+            float expose = 0;
+            float gain = 0;
+            float frameRate = 0;
+            GetCameraParameter(ref expose, ref gain, ref frameRate);
+            MyCamera.MVCC_FLOATVALUE stParam = new MyCamera.MVCC_FLOATVALUE();
+            int nRet = m_MyCamera.MV_CC_GetFloatValue_NET("ExposureTime", ref stParam);
+            tbExposure.Text = expose.ToString("F1");
+            tbGain.Text = gain.ToString("F1");
+            tbFrameRate.Text = frameRate.ToString("F1");
         }
-        public void GetCameraParameter()
+        public void GetCameraParameter(ref float expose, ref float gain, ref float frameRate)
         {
             MyCamera.MVCC_FLOATVALUE stParam = new MyCamera.MVCC_FLOATVALUE();
             int nRet = m_MyCamera.MV_CC_GetFloatValue_NET("ExposureTime", ref stParam);
             if (MyCamera.MV_OK == nRet)
             {
-                tbExposure.Text = stParam.fCurValue.ToString("F1");
+                expose= stParam.fCurValue;
             }
 
             nRet = m_MyCamera.MV_CC_GetFloatValue_NET("Gain", ref stParam);
             if (MyCamera.MV_OK == nRet)
             {
-                tbGain.Text = stParam.fCurValue.ToString("F1");
+                gain = stParam.fCurValue;
             }
 
             nRet = m_MyCamera.MV_CC_GetFloatValue_NET("ResultingFrameRate", ref stParam);
             if (MyCamera.MV_OK == nRet)
             {
-                tbFrameRate.Text = stParam.fCurValue.ToString("F1");
+                frameRate = stParam.fCurValue;
             }
         }
 
         private void bnSetParam_Click(object sender, RoutedEventArgs e)
         {
+
             try
             {
                 float.Parse(tbExposure.Text);
@@ -495,29 +545,41 @@ namespace Magnus_WPF_1.Source.Hardware
                 return;
             }
 
+            SetParameterToCamera(float.Parse(tbExposure.Text), float.Parse(tbGain.Text), float.Parse(tbFrameRate.Text));
+
+
+        }
+
+        public bool SetParameterToCamera(float fExpose, float fGain, float fFrameRate)
+        {
             m_MyCamera.MV_CC_SetEnumValue_NET("ExposureAuto", 0);
-            int nRet = m_MyCamera.MV_CC_SetFloatValue_NET("ExposureTime", float.Parse(tbExposure.Text));
+            int nRet = m_MyCamera.MV_CC_SetFloatValue_NET("ExposureTime", fExpose);
             if (nRet != MyCamera.MV_OK)
             {
                 ShowErrorMsg("Set Exposure Time Fail!", nRet);
+                return false;
             }
 
             m_MyCamera.MV_CC_SetEnumValue_NET("GainAuto", 0);
-            nRet = m_MyCamera.MV_CC_SetFloatValue_NET("Gain", float.Parse(tbGain.Text));
+            nRet = m_MyCamera.MV_CC_SetFloatValue_NET("Gain", fGain);
             if (nRet != MyCamera.MV_OK)
             {
                 ShowErrorMsg("Set Gain Fail!", nRet);
+                return false;
             }
 
-            nRet = m_MyCamera.MV_CC_SetFloatValue_NET("AcquisitionFrameRate", float.Parse(tbFrameRate.Text));
+            nRet = m_MyCamera.MV_CC_SetFloatValue_NET("AcquisitionFrameRate", fFrameRate);
             if (nRet != MyCamera.MV_OK)
             {
                 ShowErrorMsg("Set Frame Rate Fail!", nRet);
+                return false;
             }
+            return true;
         }
-
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+
+
             bnClose_Click(null, null);
         }
     }

@@ -427,7 +427,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             {
 
                 //CvImage region_VarThreshold = new CvImage();
-                MagnusOpenCVLib.VarThresholding(ref zoomedInImage, ref img_thresholdRegion, (int)m_DeviceLocationParameter.m_L_ObjectColor, 2 * ((int)(m_DeviceLocationParameter.m_nMinWidthDevice / 2)) + 3, ref region_SearchDeviceLocation, m_DeviceLocationParameter.m_L_upperThreshold);
+                MagnusOpenCVLib.VarThresholding(ref zoomedInImage, ref img_thresholdRegion, (int)m_DeviceLocationParameter.m_L_ObjectColor, 2 * ((int)(m_DeviceLocationParameter.m_nMinWidthDevice / 4)) + 3, ref region_SearchDeviceLocation, m_DeviceLocationParameter.m_L_upperThreshold);
                 PushBackDebugInfors(imgSource, img_thresholdRegion, "VarThresholding. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
                 timeIns.Restart();
             }
@@ -437,18 +437,28 @@ namespace Magnus_WPF_1.Source.Algorithm
             PushBackDebugInfors(imgSource, img_MophoRegion, "Outer region after ClosingCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
 
-            CvImage mat_BiggestRegion = new CvImage();
-            MagnusOpenCVLib.SelectBiggestRegion(ref img_MophoRegion, ref mat_BiggestRegion);
-            CvInvoke.FindNonZero(mat_BiggestRegion, point_regions);
-            PushBackDebugInfors(imgSource, mat_BiggestRegion, "Outer region after SelectBiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            List<Rectangle> rect_SelectRectangle = new List<Rectangle>();
+            CvImage mat_selectedtRegions = new CvImage();
+
+            MagnusOpenCVLib.SelectRegion(ref img_MophoRegion, ref mat_selectedtRegions, ref rect_SelectRectangle, m_DeviceLocationParameter.m_nMinWidthDevice, m_DeviceLocationParameter.m_nMinHeightDevice);
+            PushBackDebugInfors(imgSource, mat_selectedtRegions, "Outer region after SelectRegion with Width and Height. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
 
+            //CvImage mat_selectedtThresholdRegions = new CvImage();
+            //MagnusOpenCVLib.Threshold2(ref mat_selectedtRegions, ref mat_selectedtThresholdRegions, 1, 2);
+            //PushBackDebugInfors(imgSource, mat_selectedtThresholdRegions, "Outer region after Selecting first region. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            //timeIns.Restart();
+
+            CvInvoke.FindNonZero(mat_selectedtRegions, point_regions);
             if (point_regions.Size == 0)
                 return -1;
 
+            //CvImage mat_BiggestRegion = new CvImage();
+            //MagnusOpenCVLib.SelectBiggestRegion(ref mat_selectedtThresholdRegions, ref mat_BiggestRegion);
+
             CvImage mat_FillUpBlackRegion = new CvImage();
-            MagnusOpenCVLib.FillUp(ref mat_BiggestRegion, ref mat_FillUpBlackRegion);
-            PushBackDebugInfors(imgSource, mat_FillUpBlackRegion, "Outer region after FillUp SelectBiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            MagnusOpenCVLib.FillUp(ref mat_selectedtRegions, ref mat_FillUpBlackRegion);
+            PushBackDebugInfors(imgSource, mat_FillUpBlackRegion, "Outer region after FillUp Select Region. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
 
             //////////////////////////////////////////////////
@@ -512,12 +522,12 @@ namespace Magnus_WPF_1.Source.Algorithm
             if (nminIndex < 0)
                 return -1;
 
-            nAngleOutput = nAngleOutput + (m_DeviceLocationParameter.m_nBlackCornerIndexTemplateImage - nminIndex) * 90;
-            if (nAngleOutput <= -180)
-                nAngleOutput = 360 - nAngleOutput;
+            nAngleOutput =  rotateRect_Device.Angle;// rotateRect_Device.Angle + (m_DeviceLocationParameter.m_nBlackCornerIndexTemplateImage - nminIndex) * 90;
+            //if (nAngleOutput <= -180)
+            //    nAngleOutput = 360 - nAngleOutput;
 
-            if (nAngleOutput >= 180)
-                nAngleOutput = nAngleOutput - 360;
+            //if (nAngleOutput >= 180)
+            //    nAngleOutput = nAngleOutput - 360;
 
             timeIns.Restart();
             CvImage mat_point = new CvImage();
@@ -533,7 +543,7 @@ namespace Magnus_WPF_1.Source.Algorithm
 
             AddRegionOverlay(ref list_arrayOverlay, mat_point, Colors.Yellow);
 
-            //pCenter = new Point((int)rotateRect_Device.Center.X, (int)rotateRect_Device.Center.Y);
+            pCenter = new Point((int)(rotateRect_Device.Center.X/m_DeviceLocationParameter.m_dScaleImageRatio), (int)(rotateRect_Device.Center.Y / m_DeviceLocationParameter.m_dScaleImageRatio));
 
 
 

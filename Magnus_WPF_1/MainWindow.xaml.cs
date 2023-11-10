@@ -99,6 +99,66 @@ namespace Magnus_WPF_1
             }
         }
 
+        #region STATE OF CONNECTION PLC 
+        //name port
+        private string _portReceive;
+        private string _portSent;
+        private string _color_portReceive;
+        private string _color_portSent;
+        public string PortReceive
+        {
+            get { return _portReceive; }
+            set
+            {
+                if (value != _portReceive)
+                {
+                    _portReceive = value;
+                    OnPropertyChanged("PortReceive");
+                }
+            }
+        }
+
+        public string PortSent
+        {
+            get { return _portSent; }
+            set
+            {
+                if (value != _portSent)
+                {
+                    _portSent = value;
+                    OnPropertyChanged("PortSent");
+                }
+            }
+        }
+        // Color
+        public string Color_PortReceive
+        {
+            get { return _color_portReceive; }
+            set
+            {
+                if (value != _color_portReceive)
+                {
+                    _color_portReceive = value;
+                    OnPropertyChanged("Color_PortReceive");
+                }
+            }
+        }
+        public string Color_PortSent
+        {
+            get { return _color_portSent; }
+            set
+            {
+                if (value != _color_portSent)
+                {
+                    _color_portSent = value;
+                    OnPropertyChanged("Color_PortSent");
+                }
+            }
+        }
+
+        #endregion
+
+
 
         private LayoutPanel m_layoutPanel;
         public delegate void StateWindow(WindowState state);
@@ -251,17 +311,37 @@ namespace Magnus_WPF_1
         public bool bEnableRunSequence = false;
         private void btn_run_sequence_Checked(object sender, RoutedEventArgs e)
         {
+            Run_Sequence(activeImageDock.trackID);
+        }
+        public void Run_Sequence(int nTrack = (int)TRACK_TYPE.TRACK_ALL)
+        {
+            btn_run_sequence.IsChecked = true;
             bEnableRunSequence = (bool)btn_run_sequence.IsChecked;
 
             inspect_offline_btn.IsEnabled = false;
+            if (nTrack == (int)TRACK_TYPE.TRACK_ALL)
+            {
+                for (int n = 0; n < Application.m_nTrack; n++)
+                {
+                    master.RunSequenceThread(n);
+                }
+            }
+            else
+                master.RunSequenceThread(nTrack);
 
-            master.RunSequenceThread(activeImageDock.trackID);
+
+            Master.commHIKRobot.CreateAndSendMessageToHIKRobot(SignalFromVision.Vision_Ready);
+        }
+        public void Stop_Sequence(int nTrack = (int)TRACK_TYPE.TRACK_ALL)
+        {
+            bEnableRunSequence = false;
+            inspect_offline_btn.IsEnabled = true;
+            btn_run_sequence.IsChecked = false;
         }
 
         private void btn_run_sequence_Unchecked(object sender, RoutedEventArgs e)
         {
-            bEnableRunSequence = (bool)btn_run_sequence.IsChecked;
-            inspect_offline_btn.IsEnabled = true;
+            Stop_Sequence(activeImageDock.trackID);
         }
 
 
@@ -868,16 +948,16 @@ namespace Magnus_WPF_1
 
             arr_imageMapping[nID].Source = new BitmapImage(new Uri(path, UriKind.Relative));
         }
-        public void ResetMappingResult()
+        public void ResetMappingResult(int nTrackID = (int)TRACK_TYPE.TRACK_CAM1)
         {
             string path = @"/Resources/gray-chip.png";
             for (int nID = 0; nID < arr_imageMapping.Length; nID++)
                 arr_imageMapping[nID].Source = new BitmapImage(new Uri(path, UriKind.Relative));
         }
 
-        public void ResetStatisticResult()
+        public void ResetStatisticResult(int nTrackID = (int)TRACK_TYPE.TRACK_CAM1)
         {
-            statisticView.ClearStatistic();
+            statisticView.ClearStatistic(nTrackID);
         }
 
         internal void UpdateStatisticResult(int nResult)

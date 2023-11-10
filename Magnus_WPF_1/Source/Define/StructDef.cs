@@ -95,6 +95,26 @@ namespace Magnus_WPF_1.Source.Define
         USER_NO_CAM
     }
 
+    public enum SignalFromRobot : int
+    {
+        Robot_Start_Sequence = 0,
+        Robot_Stop_Sequence = 1,
+        Robot_Trigger_Camera = 2,
+        Robot_Swap_Recipe = 3,
+        Robot_Move_Done = 4,
+        Robot_Error = 5,
+        Robot_Reset_Software = 6
+    }
+    public enum SignalFromVision : int
+    {
+        Vision_Ready = 0,
+        Vision_Go_Home = 1,
+        Vision_Absolute_Move = 2,
+        Vision_Relative_Move = 3,
+        Vision_Go_Pick = 4,
+        Vision_Reset_Software_Done = 5
+    }
+
 
     public enum ERROR_CODE : int
     {
@@ -260,5 +280,11 @@ namespace Magnus_WPF_1.Source.Define
         public int nDeviceID;
         public string strLotID;
         public Emgu.CV.Mat imageSave;
+    }
+    public enum TRACK_TYPE :int
+    {
+        TRACK_CAM1 = 0,
+        TRACK_CAM2 = 1,
+        TRACK_ALL = 2
     }
 }

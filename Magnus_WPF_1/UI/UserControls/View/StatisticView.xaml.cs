@@ -31,7 +31,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             listSummary[3].valueSummary = Math.Round((listSummary[1].valueSummary / listSummary[0].valueSummary) * 100, 2);
             lboxStatistic.ItemsSource = null; lboxStatistic.ItemsSource = listSummary;
         }
-        public void ClearStatistic()
+        public void ClearStatistic(int nTrackID)
         {
             foreach (var def in listSummary)
             {

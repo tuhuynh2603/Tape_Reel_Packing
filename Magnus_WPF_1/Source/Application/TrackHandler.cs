@@ -107,68 +107,6 @@ namespace Magnus_WPF_1.Source.Application
             }
         }
 
-        public int Inspect(ref Track m_track)
-        {
-            //Track _track = m_track;
-
-            if (MainWindow.mainWindow.m_bEnableDebug)
-                m_StepDebugInfors.Clear();
-
-            m_ArrayOverLay.Clear();
-            //Master.list_arrayOverlay[m_nTrackID].Clear();
-            int nResult;
-            Point pCenter = new Point();
-            double nAngleOutput = 0;
-            //List<ArrayOverLay> list_overlayRegion = new List<ArrayOverLay>();
-            nResult = m_InspectionCore.SimpleInspection(ref m_ArrayOverLay, ref pCenter, ref nAngleOutput, ref m_StepDebugInfors, MainWindow.mainWindow.m_bEnableDebug);
-            //Draw Result
-            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                m_imageViews[0].ClearOverlay();
-                m_imageViews[0].ClearText();
-                SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
-                //m_imageViews[0].DrawPolygonOverlay(ref polygon, color, 1);
-                foreach(ArrayOverLay overlay in m_ArrayOverLay)
-                {
-                    SolidColorBrush c = new SolidColorBrush(overlay._color);
-                    m_imageViews[0].DrawRegionOverlay(overlay.mat_Region, c);
-
-                }
-
-                m_imageViews[0].DrawCrossPointOverlay(ref pCenter);
-                color = new SolidColorBrush(Colors.Yellow);
-                m_imageViews[0].DrawStringOverlay("(X, Y, Angle) = (" + pCenter.X.ToString() + ", " + pCenter.Y.ToString() + ", " + ((int)nAngleOutput).ToString() + ")", pCenter.X + 10, pCenter.Y, color, 20);
-
-                //m_imageViews[0].DrawRegionOverlay(ref mat_output);
-
-                if (nResult == -99)
-                {
-                    color = new SolidColorBrush(Colors.Red);
-                    m_imageViews[0].DrawString("Device not found! ", 10, 10, color, 31);
-                }
-                else
-                {
-                    if (nResult == -1)
-                    {
-                        color = new SolidColorBrush(Colors.Red);
-                        m_imageViews[0].DrawString("Not Good", 10, 10, color, 31);
-                        //m_imageViews[0].DrawString("Score: " + ((int)dScoreOutput).ToString(), 10, 35, color, 31);
-
-                    }
-                    else
-                    {
-                        color = new SolidColorBrush(Colors.Green);
-                        m_imageViews[0].DrawString(/*m_cap.GetCaptureProperty(CapProp.Focus).ToString() */ "Good", 10, 10, color, 31);
-                        //m_imageViews[0].DrawString("Score: " + ((int)dScoreOutput).ToString(), 10, 35, color, 31);
-
-                    }
-
-                }
-            });
-
-            return nResult;
-        }
-
         public static byte[] BitmapToByteArray(Bitmap bitmap)
         {
 
@@ -305,6 +243,81 @@ namespace Magnus_WPF_1.Source.Application
         //    return 0;
         //}
 
+
+        public int Inspect(ref Track m_track)
+        {
+            //Track _track = m_track;
+
+            if (MainWindow.mainWindow.m_bEnableDebug)
+                m_StepDebugInfors.Clear();
+
+            m_ArrayOverLay.Clear();
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                m_imageViews[0].ClearOverlay();
+                m_imageViews[0].ClearText();
+            });
+            //Master.list_arrayOverlay[m_nTrackID].Clear();
+            int nResult;
+            Point pCenter = new Point();
+            double nAngleOutput = 0;
+            //List<ArrayOverLay> list_overlayRegion = new List<ArrayOverLay>();
+            nResult = m_InspectionCore.SimpleInspection(ref m_ArrayOverLay, ref pCenter, ref nAngleOutput, ref m_StepDebugInfors, MainWindow.mainWindow.m_bEnableDebug);
+
+            // calculate robot pick point X,Y,Angle
+
+            // Send result to Robot
+            string strResult = $"{nResult}_{pCenter.X *1.11}_{pCenter.Y *1.11}_{nAngleOutput}";
+            Master.commHIKRobot.CreateAndSendMessageToHIKRobot(SignalFromVision.Vision_Go_Pick, strResult);
+
+            //Draw Result
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                //m_imageViews[0].ClearOverlay();
+                //m_imageViews[0].ClearText();
+                SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
+                //m_imageViews[0].DrawPolygonOverlay(ref polygon, color, 1);
+                foreach (ArrayOverLay overlay in m_ArrayOverLay)
+                {
+                    SolidColorBrush c = new SolidColorBrush(overlay._color);
+                    m_imageViews[0].DrawRegionOverlay(overlay.mat_Region, c);
+
+                }
+
+                //m_imageViews[0].DrawCrossPointOverlay(ref pCenter);
+                color = new SolidColorBrush(Colors.Yellow);
+                m_imageViews[0].DrawStringOverlay("(X, Y, Angle) = (" + pCenter.X.ToString() + ", " + pCenter.Y.ToString() + ", " + ((int)nAngleOutput).ToString() + ")", pCenter.X + 10, pCenter.Y, color, 20);
+
+                //m_imageViews[0].DrawRegionOverlay(ref mat_output);
+
+                if (nResult == -99)
+                {
+                    color = new SolidColorBrush(Colors.Red);
+                    m_imageViews[0].DrawString("Device not found! ", 10, 10, color, 31);
+                }
+                else
+                {
+                    if (nResult == -1)
+                    {
+                        color = new SolidColorBrush(Colors.Red);
+                        m_imageViews[0].DrawString("Not Good", 10, 10, color, 31);
+                        //m_imageViews[0].DrawString("Score: " + ((int)dScoreOutput).ToString(), 10, 35, color, 31);
+
+                    }
+                    else
+                    {
+                        color = new SolidColorBrush(Colors.Green);
+                        m_imageViews[0].DrawString(/*m_cap.GetCaptureProperty(CapProp.Focus).ToString() */ "Good", 10, 10, color, 31);
+                        //m_imageViews[0].DrawString("Score: " + ((int)dScoreOutput).ToString(), 10, 35, color, 31);
+
+                    }
+
+                }
+            });
+
+            return nResult;
+        }
+
         private void InspectionOnlineThread()
         {
             Master.InspectEvent[m_nTrackID].Reset();
@@ -345,6 +358,11 @@ namespace Magnus_WPF_1.Source.Application
                     Stopwatch timeIns = new Stopwatch();
                     timeIns.Start();
                     m_nResult[m_CurrentSequenceDeviceID] = Inspect(ref mainWindow.master.m_Tracks[m_nTrackID]);
+                    ////
+                    //Master.InspectEvent[m_nTrackID].Reset();
+                    Master.InspectDoneEvent[m_nTrackID].Set();
+
+
                     timeIns.Stop();
                     Thread.Sleep(5);
                     LogMessage.WriteToDebugViewer(1, "Total inspection time: " + timeIns.ElapsedMilliseconds.ToString());
@@ -360,7 +378,7 @@ namespace Magnus_WPF_1.Source.Application
                         {
                             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                             {
-                                MainWindow.mainWindow.ResetMappingResult();
+                                MainWindow.mainWindow.ResetMappingResult(m_nTrackID);
 
                             });
                         }
@@ -372,10 +390,6 @@ namespace Magnus_WPF_1.Source.Application
                         });
 
                     });
-
-                    ////
-                    //Master.InspectEvent[m_nTrackID].Reset();
-                    Master.InspectDoneEvent[m_nTrackID].Set();
                 }
                 catch (Exception e)
                 {
@@ -449,7 +463,6 @@ namespace Magnus_WPF_1.Source.Application
                     //m_imageViews[0].bufferImage = BitmapToByteArray(imgg.ToBitmap());
                     //m_imageViews[0].UpdateNewImageColor(m_imageViews[0].bufferImage, imgg.ToBitmap().Width, imgg.ToBitmap().Height, 96);
 
-                    //Master.InspectDoneEvent[m_nTrackID].Reset();
                     Master.InspectEvent[m_nTrackID].Set();
                     //m_nResult[m_nCurrentClickMappingID] = Inspect();
                     Master.InspectDoneEvent[m_nTrackID].Reset();
@@ -478,6 +491,7 @@ namespace Magnus_WPF_1.Source.Application
             CheckInspectionOnlineThread();
 
             int nWidth = 0, nHeight = 0;
+            //Todo If Reset lot ID, need to create new lot ID and reset current Device ID to 0
             m_CurrentSequenceDeviceID = -1;
             m_strCurrentLot = string.Format("TrayID_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
             if (!hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
@@ -569,8 +583,13 @@ namespace Magnus_WPF_1.Source.Application
                         return;
                     }
                 }
-                Master.InspectDoneEvent[m_nTrackID].Reset();
 
+                // Send result to Robot
+                //string strResult = m_nResult[m_CurrentSequenceDeviceID].ToString(); 
+                //Master.commHIKRobot.CreateAndSendMessageToHIKRobot(SignalFromVision.Vision_Go_Pick, strResult);
+
+
+                Master.InspectDoneEvent[m_nTrackID].Reset();
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
                     ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Full sequence time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);

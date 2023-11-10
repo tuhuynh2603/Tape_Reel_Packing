@@ -1,6 +1,7 @@
 ﻿using Emgu.CV;
 using Magnus_WPF_1.Source.Algorithm;
 using Magnus_WPF_1.Source.Define;
+using Magnus_WPF_1.Source.Hardware;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +19,7 @@ namespace Magnus_WPF_1.Source.Application
         public Track[] m_Tracks;
         public int m_nActiveTrack;
         public Application applications = new Application();
+        public static CommHiwinRobot commHIKRobot ;
         public TeachParametersUC teachParameter = new TeachParametersUC();
         public MappingSetingUC mappingParameter = new MappingSetingUC();
         public static bool m_bIsTeaching;
@@ -55,6 +57,7 @@ namespace Magnus_WPF_1.Source.Application
             ContructorDocComponent();
 
 
+            commHIKRobot = new CommHiwinRobot();
 
             LoadRecipe();
 
@@ -264,8 +267,9 @@ namespace Magnus_WPF_1.Source.Application
         }
         internal void RunSequenceThread(int nTrack)
         {
-            mainWindow.ResetMappingResult();
-            mainWindow.ResetStatisticResult();
+            mainWindow.ResetMappingResult(nTrack);
+            mainWindow.ResetStatisticResult(nTrack);
+
 
             InspectDoneEvent[nTrack].Reset();
             InspectEvent[nTrack].Reset();

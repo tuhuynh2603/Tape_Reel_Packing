@@ -1,6 +1,7 @@
 ﻿using Magnus_WPF_1.Source.Algorithm;
 using Magnus_WPF_1.Source.Define;
 using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Magnus_WPF_1.Source.Application
 {
     public class Application
     {
-        public static int m_nTrack = 2;
+        public static int m_nTrack = (int)TRACK_TYPE.TRACK_ALL;
         public static int m_nDoc = 1;
         public static bool m_bEnableSavingOnlineImage = true;
 
@@ -273,9 +274,6 @@ namespace Magnus_WPF_1.Source.Application
             return format;
         }
 
-        internal static void LoadRecipe()
-        {
 
-        }
     }
 }

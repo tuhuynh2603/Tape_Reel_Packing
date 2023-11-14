@@ -27,11 +27,11 @@ namespace Magnus_WPF_1.Source.Hardware
 		const int BUFLEN = 255;
 		public int[] nReceiveMessage;
 		public int[] nReceiveMessageBkUp;
-        private bool isVisionReady;
-        private bool isVisonGoOnline;
-        private bool isVisionBusy;
-        private bool isPLCTriggerOnline;
-        private bool isCompletedBusy;
+        //private bool isVisionReady;
+        //private bool isVisonGoOnline;
+        //private bool isVisionBusy;
+        //private bool isPLCTriggerOnline;
+        //private bool isCompletedBusy;
 		private MainWindow main;
 
 		Thread CommSequenceThread;

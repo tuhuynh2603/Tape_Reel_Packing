@@ -93,6 +93,7 @@ namespace Magnus_WPF_1.Source.Application
             try
             {
                 Array.Clear(m_imageViews[0].bufferImage, 0, m_imageViews[0].bufferImage.Length);
+                
                 m_cap.SetCaptureProperty(CapProp.Autofocus, 0);
                 //m_cap.SetCaptureProperty(CapProp.Focus, InspectionCore.DeviceLocationParameter.m_nStepTemplate);
                 m_cap.Retrieve(m_frame);
@@ -266,13 +267,20 @@ namespace Magnus_WPF_1.Source.Application
 
             // calculate robot pick point X,Y,Angle
 
+            Stopwatch timeIns = new Stopwatch();
+            timeIns.Start();
             // Send result to Robot
             string strResult = $"{nResult}_{pCenter.X *1.11}_{pCenter.Y *1.11}_{nAngleOutput}";
-            Master.commHIKRobot.CreateAndSendMessageToHIKRobot(SignalFromVision.Vision_Go_Pick, strResult);
+            //Master.commHIKRobot.CreateAndSendMessageToHIKRobot(SignalFromVision.Vision_Go_Pick, strResult);
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("send message from vision to robot time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
 
+            });
             //Draw Result
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
+                timeIns.Restart();
                 //m_imageViews[0].ClearOverlay();
                 //m_imageViews[0].ClearText();
                 SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
@@ -313,7 +321,17 @@ namespace Magnus_WPF_1.Source.Application
                     }
 
                 }
+
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Draw Overlay time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
+
+                });
+
+                LogMessage.WriteToDebugViewer(1, "Draw Overlay time: " + timeIns.ElapsedMilliseconds.ToString());
+
             });
+
 
             return nResult;
         }
@@ -548,8 +566,6 @@ namespace Magnus_WPF_1.Source.Application
                 }
 
                 m_imageViews[0].UpdateSourceImageMono();
-                //
-
                 // Update Current Device ID
                 m_CurrentSequenceDeviceID++;
                 if (m_CurrentSequenceDeviceID >= Source.Application.Application.categoriesMappingParam.M_NumberDeviceX * Source.Application.Application.categoriesMappingParam.M_NumberDeviceY)

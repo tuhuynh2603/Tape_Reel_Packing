@@ -1,7 +1,7 @@
 ﻿using Emgu.CV;
 using Magnus_WPF_1.Source.Algorithm;
 using Magnus_WPF_1.Source.Define;
-using Magnus_WPF_1.Source.Hardware;
+using Magnus_WPF_1.Source.Hardware.SDKHrobot;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +11,7 @@ using System.Windows.Media.Imaging;
 
 namespace Magnus_WPF_1.Source.Application
 {
+    using Magnus_WPF_1.Source.Hardware;
     public class Master
     {
         //private int width, height, dpi;
@@ -45,6 +46,7 @@ namespace Magnus_WPF_1.Source.Application
         public static List<ArrayOverLay>[] list_arrayOverlay;
         public static Queue<ImageSaveData> m_SaveInspectImageQueue = new Queue<ImageSaveData>(); // create a queue to hold messages
         public BitmapSource btmSource;
+        public HiWinRobotInterface m_hiWinRobotInterface;
 
         #region Contructor Master
         public Master(MainWindow app)
@@ -57,12 +59,12 @@ namespace Magnus_WPF_1.Source.Application
             ContructorDocComponent();
 
 
-            commHIKRobot = new CommHiwinRobot();
+            //commHIKRobot = new CommHiwinRobot();
 
             LoadRecipe();
+            m_hiWinRobotInterface = new HiWinRobotInterface();
 
             m_nActiveTrack = 0;
-
 
         }
         public void DeleteMaster()
@@ -366,6 +368,29 @@ namespace Magnus_WPF_1.Source.Application
 
 
             m_Tracks[nTrack].InspectOffline(strFolder);
+        }
+
+        internal void OpenHiwinRobotDialog(bool bIschecked = false)
+        {
+            //HiWinRobotInterface.m_hiWinRobotUserControl.Visibility = System.Windows.Visibility.Visible;
+            //defectInfor.lvDefect.View = gridView;
+            if (bIschecked)
+            {
+                MainWindow.mainWindow.grd_Defect.Height = m_hiWinRobotInterface.m_hiWinRobotUserControl.Height;
+                MainWindow.mainWindow.grd_Defect.Width = m_hiWinRobotInterface.m_hiWinRobotUserControl.Width;
+
+                MainWindow.mainWindow.grd_Defect.Children.Clear();
+                MainWindow.mainWindow.grd_Defect.Children.Add(m_hiWinRobotInterface.m_hiWinRobotUserControl);
+                //defectInfor.SvDefect.CanContentScroll = true;
+                //MainWindow.mainWindow.grd_Defect.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                //MainWindow.mainWindow.grd_Defect.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+                MainWindow.mainWindow.grd_Defect_Settings.Visibility = System.Windows.Visibility.Visible;
+            }
+            else
+            {
+                MainWindow.mainWindow.grd_Defect.Children.Clear();
+                MainWindow.mainWindow.grd_Defect_Settings.Visibility = System.Windows.Visibility.Collapsed;
+            }
         }
     }
 

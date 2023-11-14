@@ -66,6 +66,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
         //public TransformImage transform;
 
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName)
         {
@@ -81,6 +82,8 @@ namespace Magnus_WPF_1.UI.UserControls.View
                 OnPropertyChanged("visibleRGB");
             }
         }
+
+
         private double _OldWidth = 0;
         public double OldWidth
         {

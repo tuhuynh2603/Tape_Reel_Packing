@@ -33,7 +33,7 @@
           "lib/net452/Microsoft.Scripting.dll": {}
         }
       },
-      "EMGU.CV/4.1.0.3420": {
+      "EMGU.CV/4.1.0.3408": {
         "type": "package",
         "dependencies": {
           "ZedGraph": "[5.1.7]"
@@ -50,23 +50,50 @@
           "build/EMGU.CV.targets": {}
         }
       },
-      "EPPlus/4.5.3.1": {
+      "EPPlus/7.0.1": {
         "type": "package",
+        "dependencies": {
+          "EPPlus.Interfaces": "6.1.1",
+          "EPPlus.System.Drawing": "6.1.1",
+          "Microsoft.IO.RecyclableMemoryStream": "1.4.1",
+          "System.ComponentModel.Annotations": "5.0.0"
+        },
         "frameworkAssemblies": [
           "PresentationCore",
           "System",
           "System.Core",
           "System.Data",
-          "System.Drawing",
           "System.Security",
+          "System.Threading.Tasks",
           "System.Xml",
           "System.configuration"
         ],
         "compile": {
-          "lib/net40/EPPlus.dll": {}
+          "lib/net462/EPPlus.dll": {}
         },
         "runtime": {
-          "lib/net40/EPPlus.dll": {}
+          "lib/net462/EPPlus.dll": {}
+        }
+      },
+      "EPPlus.Interfaces/6.1.1": {
+        "type": "package",
+        "compile": {
+          "lib/net462/EPPlus.Interfaces.dll": {}
+        },
+        "runtime": {
+          "lib/net462/EPPlus.Interfaces.dll": {}
+        }
+      },
+      "EPPlus.System.Drawing/6.1.1": {
+        "type": "package",
+        "dependencies": {
+          "EPPlus.Interfaces": "6.1.1"
+        },
+        "compile": {
+          "lib/net462/EPPlus.System.Drawing.dll": {}
+        },
+        "runtime": {
+          "lib/net462/EPPlus.System.Drawing.dll": {}
         }
       },
       "Extended.Wpf.Toolkit/3.8.2": {
@@ -152,6 +179,28 @@
         },
         "runtime": {
           "lib/net45/MaterialDesignThemes.Wpf.dll": {}
+        }
+      },
+      "Microsoft.IO.RecyclableMemoryStream/1.4.1": {
+        "type": "package",
+        "compile": {
+          "lib/net46/Microsoft.IO.RecyclableMemoryStream.dll": {}
+        },
+        "runtime": {
+          "lib/net46/Microsoft.IO.RecyclableMemoryStream.dll": {}
+        }
+      },
+      "System.ComponentModel.Annotations/5.0.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System.ComponentModel.DataAnnotations",
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net461/System.ComponentModel.Annotations.dll": {}
+        },
+        "runtime": {
+          "lib/net461/System.ComponentModel.Annotations.dll": {}
         }
       },
       "System.Numerics.Vectors/4.5.0": {
@@ -262,7 +311,7 @@
           "lib/net452/Microsoft.Scripting.dll": {}
         }
       },
-      "EMGU.CV/4.1.0.3420": {
+      "EMGU.CV/4.1.0.3408": {
         "type": "package",
         "dependencies": {
           "ZedGraph": "[5.1.7]"
@@ -279,23 +328,50 @@
           "build/EMGU.CV.targets": {}
         }
       },
-      "EPPlus/4.5.3.1": {
+      "EPPlus/7.0.1": {
         "type": "package",
+        "dependencies": {
+          "EPPlus.Interfaces": "6.1.1",
+          "EPPlus.System.Drawing": "6.1.1",
+          "Microsoft.IO.RecyclableMemoryStream": "1.4.1",
+          "System.ComponentModel.Annotations": "5.0.0"
+        },
         "frameworkAssemblies": [
           "PresentationCore",
           "System",
           "System.Core",
           "System.Data",
-          "System.Drawing",
           "System.Security",
+          "System.Threading.Tasks",
           "System.Xml",
           "System.configuration"
         ],
         "compile": {
-          "lib/net40/EPPlus.dll": {}
+          "lib/net462/EPPlus.dll": {}
         },
         "runtime": {
-          "lib/net40/EPPlus.dll": {}
+          "lib/net462/EPPlus.dll": {}
+        }
+      },
+      "EPPlus.Interfaces/6.1.1": {
+        "type": "package",
+        "compile": {
+          "lib/net462/EPPlus.Interfaces.dll": {}
+        },
+        "runtime": {
+          "lib/net462/EPPlus.Interfaces.dll": {}
+        }
+      },
+      "EPPlus.System.Drawing/6.1.1": {
+        "type": "package",
+        "dependencies": {
+          "EPPlus.Interfaces": "6.1.1"
+        },
+        "compile": {
+          "lib/net462/EPPlus.System.Drawing.dll": {}
+        },
+        "runtime": {
+          "lib/net462/EPPlus.System.Drawing.dll": {}
         }
       },
       "Extended.Wpf.Toolkit/3.8.2": {
@@ -381,6 +457,28 @@
         },
         "runtime": {
           "lib/net45/MaterialDesignThemes.Wpf.dll": {}
+        }
+      },
+      "Microsoft.IO.RecyclableMemoryStream/1.4.1": {
+        "type": "package",
+        "compile": {
+          "lib/net46/Microsoft.IO.RecyclableMemoryStream.dll": {}
+        },
+        "runtime": {
+          "lib/net46/Microsoft.IO.RecyclableMemoryStream.dll": {}
+        }
+      },
+      "System.ComponentModel.Annotations/5.0.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System.ComponentModel.DataAnnotations",
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net461/System.ComponentModel.Annotations.dll": {}
+        },
+        "runtime": {
+          "lib/net461/System.ComponentModel.Annotations.dll": {}
         }
       },
       "System.Numerics.Vectors/4.5.0": {
@@ -491,7 +589,7 @@
           "lib/net452/Microsoft.Scripting.dll": {}
         }
       },
-      "EMGU.CV/4.1.0.3420": {
+      "EMGU.CV/4.1.0.3408": {
         "type": "package",
         "dependencies": {
           "ZedGraph": "[5.1.7]"
@@ -508,23 +606,50 @@
           "build/EMGU.CV.targets": {}
         }
       },
-      "EPPlus/4.5.3.1": {
+      "EPPlus/7.0.1": {
         "type": "package",
+        "dependencies": {
+          "EPPlus.Interfaces": "6.1.1",
+          "EPPlus.System.Drawing": "6.1.1",
+          "Microsoft.IO.RecyclableMemoryStream": "1.4.1",
+          "System.ComponentModel.Annotations": "5.0.0"
+        },
         "frameworkAssemblies": [
           "PresentationCore",
           "System",
           "System.Core",
           "System.Data",
-          "System.Drawing",
           "System.Security",
+          "System.Threading.Tasks",
           "System.Xml",
           "System.configuration"
         ],
         "compile": {
-          "lib/net40/EPPlus.dll": {}
+          "lib/net462/EPPlus.dll": {}
         },
         "runtime": {
-          "lib/net40/EPPlus.dll": {}
+          "lib/net462/EPPlus.dll": {}
+        }
+      },
+      "EPPlus.Interfaces/6.1.1": {
+        "type": "package",
+        "compile": {
+          "lib/net462/EPPlus.Interfaces.dll": {}
+        },
+        "runtime": {
+          "lib/net462/EPPlus.Interfaces.dll": {}
+        }
+      },
+      "EPPlus.System.Drawing/6.1.1": {
+        "type": "package",
+        "dependencies": {
+          "EPPlus.Interfaces": "6.1.1"
+        },
+        "compile": {
+          "lib/net462/EPPlus.System.Drawing.dll": {}
+        },
+        "runtime": {
+          "lib/net462/EPPlus.System.Drawing.dll": {}
         }
       },
       "Extended.Wpf.Toolkit/3.8.2": {
@@ -610,6 +735,28 @@
         },
         "runtime": {
           "lib/net45/MaterialDesignThemes.Wpf.dll": {}
+        }
+      },
+      "Microsoft.IO.RecyclableMemoryStream/1.4.1": {
+        "type": "package",
+        "compile": {
+          "lib/net46/Microsoft.IO.RecyclableMemoryStream.dll": {}
+        },
+        "runtime": {
+          "lib/net46/Microsoft.IO.RecyclableMemoryStream.dll": {}
+        }
+      },
+      "System.ComponentModel.Annotations/5.0.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System.ComponentModel.DataAnnotations",
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net461/System.ComponentModel.Annotations.dll": {}
+        },
+        "runtime": {
+          "lib/net461/System.ComponentModel.Annotations.dll": {}
         }
       },
       "System.Numerics.Vectors/4.5.0": {
@@ -720,7 +867,7 @@
           "lib/net452/Microsoft.Scripting.dll": {}
         }
       },
-      "EMGU.CV/4.1.0.3420": {
+      "EMGU.CV/4.1.0.3408": {
         "type": "package",
         "dependencies": {
           "ZedGraph": "[5.1.7]"
@@ -737,23 +884,50 @@
           "build/EMGU.CV.targets": {}
         }
       },
-      "EPPlus/4.5.3.1": {
+      "EPPlus/7.0.1": {
         "type": "package",
+        "dependencies": {
+          "EPPlus.Interfaces": "6.1.1",
+          "EPPlus.System.Drawing": "6.1.1",
+          "Microsoft.IO.RecyclableMemoryStream": "1.4.1",
+          "System.ComponentModel.Annotations": "5.0.0"
+        },
         "frameworkAssemblies": [
           "PresentationCore",
           "System",
           "System.Core",
           "System.Data",
-          "System.Drawing",
           "System.Security",
+          "System.Threading.Tasks",
           "System.Xml",
           "System.configuration"
         ],
         "compile": {
-          "lib/net40/EPPlus.dll": {}
+          "lib/net462/EPPlus.dll": {}
         },
         "runtime": {
-          "lib/net40/EPPlus.dll": {}
+          "lib/net462/EPPlus.dll": {}
+        }
+      },
+      "EPPlus.Interfaces/6.1.1": {
+        "type": "package",
+        "compile": {
+          "lib/net462/EPPlus.Interfaces.dll": {}
+        },
+        "runtime": {
+          "lib/net462/EPPlus.Interfaces.dll": {}
+        }
+      },
+      "EPPlus.System.Drawing/6.1.1": {
+        "type": "package",
+        "dependencies": {
+          "EPPlus.Interfaces": "6.1.1"
+        },
+        "compile": {
+          "lib/net462/EPPlus.System.Drawing.dll": {}
+        },
+        "runtime": {
+          "lib/net462/EPPlus.System.Drawing.dll": {}
         }
       },
       "Extended.Wpf.Toolkit/3.8.2": {
@@ -839,6 +1013,28 @@
         },
         "runtime": {
           "lib/net45/MaterialDesignThemes.Wpf.dll": {}
+        }
+      },
+      "Microsoft.IO.RecyclableMemoryStream/1.4.1": {
+        "type": "package",
+        "compile": {
+          "lib/net46/Microsoft.IO.RecyclableMemoryStream.dll": {}
+        },
+        "runtime": {
+          "lib/net46/Microsoft.IO.RecyclableMemoryStream.dll": {}
+        }
+      },
+      "System.ComponentModel.Annotations/5.0.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System.ComponentModel.DataAnnotations",
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net461/System.ComponentModel.Annotations.dll": {}
+        },
+        "runtime": {
+          "lib/net461/System.ComponentModel.Annotations.dll": {}
         }
       },
       "System.Numerics.Vectors/4.5.0": {
@@ -1277,10 +1473,10 @@
         "lib/netstandard2.0/Microsoft.Scripting.xml"
       ]
     },
-    "EMGU.CV/4.1.0.3420": {
-      "sha512": "xfPeylkBxyljYrycj4exs+ptfSwM3Q53smtiD6jxHVhLg3sqaorTwh/ojz+d3CgaAwkFjwjOXT1fkqnJwif+cA==",
+    "EMGU.CV/4.1.0.3408": {
+      "sha512": "prcN4ILMwYyozHB+hlwMtWMW+0ELQYTZyqOsQMh1ee0jYy2/X2klLEZPicWZ0vRNzuXbb/c/R31Rib/L/7QjIA==",
       "type": "package",
-      "path": "emgu.cv/4.1.0.3420",
+      "path": "emgu.cv/4.1.0.3408",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1296,7 +1492,7 @@
         "build/x86/msvcp140.dll",
         "build/x86/opencv_ffmpeg410.dll",
         "build/x86/vcruntime140.dll",
-        "emgu.cv.4.1.0.3420.nupkg.sha512",
+        "emgu.cv.4.1.0.3408.nupkg.sha512",
         "emgu.cv.nuspec",
         "lib/net35/Emgu.CV.UI.XML",
         "lib/net35/Emgu.CV.UI.dll",
@@ -1304,22 +1500,71 @@
         "lib/net35/Emgu.CV.World.xml"
       ]
     },
-    "EPPlus/4.5.3.1": {
-      "sha512": "2BFgconr3ZxC95P2KkEzcagdlGTBC14BD/39oy7GDHuJMqrJl3nvrHEegNTdIvlOG46T+AaI416zJQ5qBIzi8g==",
+    "EPPlus/7.0.1": {
+      "sha512": "eNTOmxcexmUskNUb4PQNNNtsqP5LXfNYBMkVnze1G09KmGxXgVB7kd6Ogm3/6NZSZmRisMjsyUKa0rUoExhJGA==",
       "type": "package",
-      "path": "epplus/4.5.3.1",
+      "path": "epplus/7.0.1",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "epplus.4.5.3.1.nupkg.sha512",
+        "EPPlusLogo.png",
+        "epplus.7.0.1.nupkg.sha512",
         "epplus.nuspec",
         "lib/net35/EPPlus.dll",
         "lib/net35/EPPlus.xml",
-        "lib/net40/EPPlus.dll",
-        "lib/net40/EPPlus.xml",
+        "lib/net462/EPPlus.dll",
+        "lib/net462/EPPlus.xml",
+        "lib/net6.0/EPPlus.dll",
+        "lib/net6.0/EPPlus.xml",
+        "lib/net7.0/EPPlus.dll",
+        "lib/net7.0/EPPlus.xml",
         "lib/netstandard2.0/EPPlus.dll",
         "lib/netstandard2.0/EPPlus.xml",
+        "lib/netstandard2.1/EPPlus.dll",
+        "lib/netstandard2.1/EPPlus.xml",
+        "license.md",
+        "readme.md",
         "readme.txt"
+      ]
+    },
+    "EPPlus.Interfaces/6.1.1": {
+      "sha512": "y7dkrOoE1ZR9Vgy1Jf2rEIaTf3SHlUjYt01NklP+F5Qh7S2ruPbzTcpYLRWMeXiG8XL8h2jqX4CyIkFt3NQGZw==",
+      "type": "package",
+      "path": "epplus.interfaces/6.1.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "EPPlusLogo.png",
+        "epplus.interfaces.6.1.1.nupkg.sha512",
+        "epplus.interfaces.nuspec",
+        "lib/net35/EPPlus.Interfaces.dll",
+        "lib/net462/EPPlus.Interfaces.dll",
+        "lib/net6.0/EPPlus.Interfaces.dll",
+        "lib/net7.0/EPPlus.Interfaces.dll",
+        "lib/netstandard2.0/EPPlus.Interfaces.dll",
+        "lib/netstandard2.1/EPPlus.Interfaces.dll",
+        "license.md",
+        "readme.md"
+      ]
+    },
+    "EPPlus.System.Drawing/6.1.1": {
+      "sha512": "lRF5gHYrmkHOOiLMI0t6q8zNYjUrzRgAM5BCXumv5xiqXko8fx3AWI+HCNZfhEqVFGOop+42KfR5GiUcCoyoMw==",
+      "type": "package",
+      "path": "epplus.system.drawing/6.1.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "EPPlusLogo.png",
+        "epplus.system.drawing.6.1.1.nupkg.sha512",
+        "epplus.system.drawing.nuspec",
+        "lib/net35/EPPlus.System.Drawing.dll",
+        "lib/net462/EPPlus.System.Drawing.dll",
+        "lib/net6.0/EPPlus.System.Drawing.dll",
+        "lib/net7.0/EPPlus.System.Drawing.dll",
+        "lib/netstandard2.0/EPPlus.System.Drawing.dll",
+        "lib/netstandard2.1/EPPlus.System.Drawing.dll",
+        "license.md",
+        "readme.md"
       ]
     },
     "Extended.Wpf.Toolkit/3.8.2": {
@@ -1546,6 +1791,121 @@
         "src/net45/ValidationAssist.cs"
       ]
     },
+    "Microsoft.IO.RecyclableMemoryStream/1.4.1": {
+      "sha512": "6A0fyZkxoUUj1dpXzLAWwI89YmKZ+ZSp1DCg+gN6llcXJwfYo1IIQZoCkuo6T7vUxw/w1CSk/Pl04NQ4fno+DQ==",
+      "type": "package",
+      "path": "microsoft.io.recyclablememorystream/1.4.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net40/Microsoft.IO.RecyclableMemoryStream.dll",
+        "lib/net40/Microsoft.IO.RecyclableMemoryStream.xml",
+        "lib/net45/Microsoft.IO.RecyclableMemoryStream.dll",
+        "lib/net45/Microsoft.IO.RecyclableMemoryStream.xml",
+        "lib/net46/Microsoft.IO.RecyclableMemoryStream.dll",
+        "lib/net46/Microsoft.IO.RecyclableMemoryStream.xml",
+        "lib/netcoreapp2.1/Microsoft.IO.RecyclableMemoryStream.dll",
+        "lib/netcoreapp2.1/Microsoft.IO.RecyclableMemoryStream.xml",
+        "lib/netstandard1.4/Microsoft.IO.RecyclableMemoryStream.dll",
+        "lib/netstandard1.4/Microsoft.IO.RecyclableMemoryStream.xml",
+        "lib/netstandard2.0/Microsoft.IO.RecyclableMemoryStream.dll",
+        "lib/netstandard2.0/Microsoft.IO.RecyclableMemoryStream.xml",
+        "lib/netstandard2.1/Microsoft.IO.RecyclableMemoryStream.dll",
+        "lib/netstandard2.1/Microsoft.IO.RecyclableMemoryStream.xml",
+        "microsoft.io.recyclablememorystream.1.4.1.nupkg.sha512",
+        "microsoft.io.recyclablememorystream.nuspec"
+      ]
+    },
+    "System.ComponentModel.Annotations/5.0.0": {
+      "sha512": "dMkqfy2el8A8/I76n2Hi1oBFEbG1SfxD2l5nhwXV3XjlnOmwxJlQbYpJH4W51odnU9sARCSAgv7S3CyAFMkpYg==",
+      "type": "package",
+      "path": "system.componentmodel.annotations/5.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net45/_._",
+        "lib/net461/System.ComponentModel.Annotations.dll",
+        "lib/netcore50/System.ComponentModel.Annotations.dll",
+        "lib/netstandard1.4/System.ComponentModel.Annotations.dll",
+        "lib/netstandard2.0/System.ComponentModel.Annotations.dll",
+        "lib/netstandard2.1/System.ComponentModel.Annotations.dll",
+        "lib/netstandard2.1/System.ComponentModel.Annotations.xml",
+        "lib/portable-net45+win8/_._",
+        "lib/win8/_._",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net45/_._",
+        "ref/net461/System.ComponentModel.Annotations.dll",
+        "ref/net461/System.ComponentModel.Annotations.xml",
+        "ref/netcore50/System.ComponentModel.Annotations.dll",
+        "ref/netcore50/System.ComponentModel.Annotations.xml",
+        "ref/netcore50/de/System.ComponentModel.Annotations.xml",
+        "ref/netcore50/es/System.ComponentModel.Annotations.xml",
+        "ref/netcore50/fr/System.ComponentModel.Annotations.xml",
+        "ref/netcore50/it/System.ComponentModel.Annotations.xml",
+        "ref/netcore50/ja/System.ComponentModel.Annotations.xml",
+        "ref/netcore50/ko/System.ComponentModel.Annotations.xml",
+        "ref/netcore50/ru/System.ComponentModel.Annotations.xml",
+        "ref/netcore50/zh-hans/System.ComponentModel.Annotations.xml",
+        "ref/netcore50/zh-hant/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.1/System.ComponentModel.Annotations.dll",
+        "ref/netstandard1.1/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.1/de/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.1/es/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.1/fr/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.1/it/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.1/ja/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.1/ko/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.1/ru/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.1/zh-hans/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.1/zh-hant/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.3/System.ComponentModel.Annotations.dll",
+        "ref/netstandard1.3/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.3/de/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.3/es/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.3/fr/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.3/it/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.3/ja/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.3/ko/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.3/ru/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.3/zh-hans/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.3/zh-hant/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.4/System.ComponentModel.Annotations.dll",
+        "ref/netstandard1.4/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.4/de/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.4/es/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.4/fr/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.4/it/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.4/ja/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.4/ko/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.4/ru/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.4/zh-hans/System.ComponentModel.Annotations.xml",
+        "ref/netstandard1.4/zh-hant/System.ComponentModel.Annotations.xml",
+        "ref/netstandard2.0/System.ComponentModel.Annotations.dll",
+        "ref/netstandard2.0/System.ComponentModel.Annotations.xml",
+        "ref/netstandard2.1/System.ComponentModel.Annotations.dll",
+        "ref/netstandard2.1/System.ComponentModel.Annotations.xml",
+        "ref/portable-net45+win8/_._",
+        "ref/win8/_._",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._",
+        "system.componentmodel.annotations.5.0.0.nupkg.sha512",
+        "system.componentmodel.annotations.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
+      ]
+    },
     "System.Numerics.Vectors/4.5.0": {
       "sha512": "QQTlPTl06J/iiDbJCiepZ4H//BVraReU4O4EoRw1U02H5TLUIT7xn3GnDp9AXPSlJUDyFs4uWjWafNX6WrAojQ==",
       "type": "package",
@@ -1637,8 +1997,8 @@
     ".NETFramework,Version=v4.7.2": [
       "Dragablz >= 0.0.3.234",
       "DynamicLanguageRuntime >= 1.3.4",
-      "EPPlus >= 4.5.3.1",
-      "Emgu.CV >= 4.1.0.3420",
+      "EPPlus >= 7.0.1",
+      "Emgu.CV >= 4.1.0.3408",
       "Extended.Wpf.Toolkit >= 3.8.2",
       "MaterialDesignColors >= 1.2.0",
       "MaterialDesignThemes >= 2.6.0",
@@ -1690,11 +2050,11 @@
           },
           "EPPlus": {
             "target": "Package",
-            "version": "[4.5.3.1, )"
+            "version": "[7.0.1, )"
           },
           "Emgu.CV": {
             "target": "Package",
-            "version": "[4.1.0.3420, )"
+            "version": "[4.1.0.3408, )"
           },
           "Extended.Wpf.Toolkit": {
             "target": "Package",

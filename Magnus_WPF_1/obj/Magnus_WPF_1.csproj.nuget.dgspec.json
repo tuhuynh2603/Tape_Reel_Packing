@@ -44,11 +44,11 @@
             },
             "EPPlus": {
               "target": "Package",
-              "version": "[4.5.3.1, )"
+              "version": "[7.0.1, )"
             },
             "Emgu.CV": {
               "target": "Package",
-              "version": "[4.1.0.3420, )"
+              "version": "[4.1.0.3408, )"
             },
             "Extended.Wpf.Toolkit": {
               "target": "Package",

@@ -330,7 +330,7 @@ namespace Magnus_WPF_1
                 master.RunSequenceThread(nTrack);
 
 
-            Master.commHIKRobot.CreateAndSendMessageToHIKRobot(SignalFromVision.Vision_Ready);
+            //Master.commHIKRobot.CreateAndSendMessageToHIKRobot(SignalFromVision.Vision_Ready);
         }
         public void Stop_Sequence(int nTrack = (int)TRACK_TYPE.TRACK_ALL)
         {
@@ -1019,14 +1019,20 @@ namespace Magnus_WPF_1
         {
             //master.commLog.ClearCommLog();
         }
-        private void btn_CommLog_Click(object sender, RoutedEventArgs e)
+
+
+        private void btn_CommLog_Checked(object sender, RoutedEventArgs e)
         {
-            //if (!isOpenCommLog)
-            //{
-            //    isOpenCommLog = true;
-            //    WindowHelper win = new WindowHelper(master.commLog);
-            //}
+            isOpenCommLog = (bool)btn_CommLog.IsChecked;
+            master.OpenHiwinRobotDialog(isOpenCommLog);
         }
+
+        private void btn_CommLog_Unchecked(object sender, RoutedEventArgs e)
+        {
+            isOpenCommLog = (bool)btn_CommLog.IsChecked;
+            master.OpenHiwinRobotDialog(isOpenCommLog);
+        }
+
 
 
         private void btn_LogIn_Unchecked(object sender, RoutedEventArgs e)
@@ -1226,8 +1232,8 @@ namespace Magnus_WPF_1
                 grd_Defect.Children.Clear();
                 grd_Defect.Children.Add(defectInfor);
                 //defectInfor.SvDefect.CanContentScroll = true;
-                grd_Defect.VerticalAlignment = VerticalAlignment.Top;
-                grd_Defect.HorizontalAlignment = HorizontalAlignment.Left;
+                //grd_Defect.VerticalAlignment = VerticalAlignment.Top;
+                //grd_Defect.HorizontalAlignment = HorizontalAlignment.Left;
                 grd_Defect_Settings.Visibility = Visibility.Visible;
 
         }
@@ -1257,6 +1263,7 @@ namespace Magnus_WPF_1
             grd_Defect_Settings.ReleaseMouseCapture();
         }
         #endregion
+
 
     }
 }

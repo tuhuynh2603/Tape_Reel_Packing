@@ -60,11 +60,11 @@ namespace Magnus_WPF_1.Source.Hardware
                         byte[] buff = new byte[1024];
                         int length = stream.Read(buff, 0, 1024);
                         Array.Copy(buff, 0, data, 0, length);
-                        string txtdebug = $"Port{port}: ";
-                        for (int i = 0; i < length; i++)
-                        {
-                            txtdebug += buff[i].ToString();
-                        }
+                        //string txtdebug = $"Port{port}: ";
+                        //for (int i = 0; i < length; i++)
+                        //{
+                        //    txtdebug += buff[i].ToString();
+                        //}
                         //DebugMessage.WriteToDebugViewer(8, string.Format("Receive Sucessfully Port " + CommPLC.commSequence.port.ToString()));
                         return length;
                     }
@@ -111,11 +111,11 @@ namespace Magnus_WPF_1.Source.Hardware
                         //DateTime.Now.Millisecond.ToString() + "  ";
                         //MainWindow.mainWindow.master.commLog.VisionToPLCLog(timeTriggerToPLC + Application.ConvertByteArrayToString(buff));
 
-                        string txtdebug = $"Port{port}: ";
-                        for (int i = 0; i < buff.Length; i++)
-                        {
-                            txtdebug += buff[i].ToString();
-                        }
+                        //string txtdebug = $"Port{port}: ";
+                        //for (int i = 0; i < buff.Length; i++)
+                        //{
+                        //    txtdebug += buff[i].ToString();
+                        //}
                         //DebugMessage.WriteToDebugViewer(9, txtdebug);
                         //DebugMessage.WriteToDebugViewer(8, string.Format("Sent Sucessfully Port " + CommPLC.commLotInfo.port.ToString()));
                         return true;

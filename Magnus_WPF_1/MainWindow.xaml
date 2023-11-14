@@ -542,17 +542,18 @@
                     </TextBlock>
                 </Border>
                 <!--CommLog-->
-                <RibbonButton Name="btn_CommLog" Visibility="Visible"
-                            Label="Comm Log"
+                <ToggleButton Name="btn_CommLog" Visibility="Visible"
+                            Content="Comm Log"
                             Margin="10 0 0 0 "
                             BorderBrush="AliceBlue"       
                             Height="18" 
                             Foreground="GhostWhite" 
                             FontSize="13"
-                            Click="btn_CommLog_Click"
-                            MouseOverBackground="{StaticResource BgButton}"
-                            Width="70">
-                </RibbonButton>
+                            Checked="btn_CommLog_Checked"
+                            Unchecked="btn_CommLog_Unchecked"
+                            Width="70"
+                            IsChecked="False">
+                </ToggleButton>
                 <!--AcessLevel-->
                 <Label Content="Access Level:"
                            Foreground="#00BFFF"

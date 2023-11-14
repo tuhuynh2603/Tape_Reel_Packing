@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -35,16 +36,37 @@ namespace Magnus_WPF_1.Source.Hardware
             _m_txtRobotIPAddress = strIPAddress;
 
             combo_JogType.Items.Clear();
-            combo_JogType.Items.Add("Joint");
+            //combo_JogType.Items.Add("Joint");
             combo_JogType.Items.Add("XYZ");
+            combo_JogType.SelectedIndex = 1;
             SetMovingButtonLabel();
 
             combo_MoveTypes.Items.Add("Absolute");
             combo_MoveTypes.Items.Add("Relative");
+            combo_MoveTypes.SelectedIndex = 1;
 
             int bServoOnOff = HWinRobot.get_motor_state(HiWinRobotInterface.m_DeviceID);
             toggle_ServoOnOff.IsChecked = bServoOnOff == 0 ? false : true;
 
+            //m_nAccRatioPercentValue = 10;
+            //m_PTPSpeedPercentValue = 10;
+            //m_nLinearSpeedValue = 10;
+            //m_nOverridePercent = 10;
+            //m_nStepRelativeValue = 1000;
+
+            //slider_AccRatioPercent.Value = 10;
+            //slider_LinearSpeed.Value = 100;
+            //slider_PTPSpeedPercent.Value = 10;
+            //slider_OverridePercent.Value = 10;
+            //slider_StepRelative.Value = 1000;
+
+            slider_AccRatioPercentShow.Text = "10";
+            slider_LinearSpeedShow.Text = "100";
+            slider_PTPSpeedPercentShow.Text = "10";
+            slider_OverridePercentShow.Text = "10";
+            slider_StepRelativeShow.Text = "1000";
+
+            this.DataContext = this;
         }
 
         private string _m_txtRobotIPAddress = "127.0.0.1";
@@ -211,6 +233,9 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void toggle_ServoOnOff_Click(object sender, RoutedEventArgs e)
         {
+            HWinRobot.jog_stop(HiWinRobotInterface.m_DeviceID);
+            LogMessage.LogMessage.WriteToDebugViewer(2, "Stop Move");
+
             int bServoOnOff = HWinRobot.get_motor_state(HiWinRobotInterface.m_DeviceID);
             if (bServoOnOff == 0)
             {
@@ -263,7 +288,18 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void button_setTo_ChoosenPos_Click(object sender, RoutedEventArgs e)
         {
+            if (dataGrid_all_robot_Positions.SelectedIndex >= m_List_sequencePointData.Count || dataGrid_all_robot_Positions.SelectedIndex < 0)
+                return;
 
+            SetMotorSpeed();
+            m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex] = HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_DeviceID, m_List_sequencePointData.Count, "123");
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (MainWindow.mainWindow.master == null)
+                    return;
+                dataGrid_all_robot_Positions.ItemsSource = null;
+                dataGrid_all_robot_Positions.ItemsSource = m_List_sequencePointData;
+            });
         }
 
         private void button_Save_Sequence_Click(object sender, RoutedEventArgs e)
@@ -346,121 +382,99 @@ namespace Magnus_WPF_1.Source.Hardware
             LogMessage.LogMessage.WriteToDebugViewer(2, "Stop Move Clicked");
         }
 
-
+        Thread m_Thread;
         private void button_negative_Move1_MouseLeftButtonDown(object sender, RoutedEventArgs e)
         {
-            double[] dValue = new double[6];
-            HiWinRobotInterface.wait_for_stop_motion(HiWinRobotInterface.m_DeviceID);
-            HWinRobot.get_current_position(HiWinRobotInterface.m_DeviceID, dValue);
-            if (combo_MoveTypes.SelectedIndex == (int)MOVETYPES.AbsoluteMove)
-                dValue[0] = m_nStepRelativeValue/1000;
-            else
-                dValue[0] -= m_nStepRelativeValue/1000;
-
-            SetMotorSpeed();
-            HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, 0, dValue);
-            //HWinRobot.ptp_rel_pos(HiWinRobotInterface.m_DeviceID,)
+            int nIndex = combo_MoveTypes.SelectedIndex;
+            m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MoveMotor(0, nIndex, -1)));
+            m_Thread.Start();
         }
 
         private void button_positive_Move1_MouseLeftButtonDown(object sender, RoutedEventArgs e)
         {
-            double[] dValue = new double[6];
-            HiWinRobotInterface.wait_for_stop_motion(HiWinRobotInterface.m_DeviceID);
-            HWinRobot.get_current_position(HiWinRobotInterface.m_DeviceID, dValue);
-            if (combo_MoveTypes.SelectedIndex == (int)MOVETYPES.AbsoluteMove)
-                dValue[0] = m_nStepRelativeValue / 1000;
-            else
-                dValue[0] -= m_nStepRelativeValue / 1000;
-            HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, 0, dValue);
+            int nIndex = combo_MoveTypes.SelectedIndex;
+            m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MoveMotor(0, nIndex, 1)));
+            m_Thread.Start();
         }
 
         private void button_negative_Move2_MouseLeftButtonDown(object sender, RoutedEventArgs e)
         {
-            double[] dValue = new double[6];
-            HiWinRobotInterface.wait_for_stop_motion(HiWinRobotInterface.m_DeviceID);
-            HWinRobot.get_current_position(HiWinRobotInterface.m_DeviceID, dValue);
-            if (combo_MoveTypes.SelectedIndex == (int)MOVETYPES.AbsoluteMove)
-                dValue[1] = m_nStepRelativeValue / 1000;
-            else
-                dValue[1] += (Double)(Math.Abs(m_nStepRelativeValue) / 1000.0);
-            SetMotorSpeed();
-            HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, 0, dValue);
-            //HWinRobot.ptp_rel_pos(HiWinRobotInterface.m_DeviceID,)
+            int nIndex = combo_MoveTypes.SelectedIndex;
+            m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MoveMotor(1, nIndex, -1)));
+            m_Thread.Start();
         }
 
         private void button_positive_Move2_MouseLeftButtonDown(object sender, RoutedEventArgs e)
         {
-            double[] dValue = new double[6];
-            HiWinRobotInterface.wait_for_stop_motion(HiWinRobotInterface.m_DeviceID);
-            HWinRobot.get_current_position(HiWinRobotInterface.m_DeviceID, dValue);
-            if (combo_MoveTypes.SelectedIndex == (int)MOVETYPES.AbsoluteMove)
-                dValue[1] = m_nStepRelativeValue / 1000;
-            else
-                dValue[1] += (Double)(Math.Abs(m_nStepRelativeValue) / 1000.0);
-            HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, 0, dValue);
-
+            int nIndex = combo_MoveTypes.SelectedIndex;
+            m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MoveMotor(1, nIndex, 1)));
+            m_Thread.Start();
         }
 
 
         private void button_negative_Move3_MouseLeftButtonDown(object sender, RoutedEventArgs e)
         {
-            double[] dValue = new double[6];
-            HiWinRobotInterface.wait_for_stop_motion(HiWinRobotInterface.m_DeviceID);
-            HWinRobot.get_current_position(HiWinRobotInterface.m_DeviceID, dValue);
-            if (combo_MoveTypes.SelectedIndex == (int)MOVETYPES.AbsoluteMove)
-                dValue[2] = (Double)(m_nStepRelativeValue / 1000.0);
-            else
-                dValue[2] += (Double)(Math.Abs(m_nStepRelativeValue) / 1000.0);
-            SetMotorSpeed();
-            HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, 0, dValue);
-            //HWinRobot.ptp_rel_pos(HiWinRobotInterface.m_DeviceID,)
+            int nIndex = combo_MoveTypes.SelectedIndex;
+            m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MoveMotor(2, nIndex, -1)));
+            m_Thread.Start();
         }
 
         private void button_positive_Move3_MouseLeftButtonDown(object sender, RoutedEventArgs e)
         {
-            double[] dValue = new double[6];
-            HiWinRobotInterface.wait_for_stop_motion(HiWinRobotInterface.m_DeviceID);
-            HWinRobot.get_current_position(HiWinRobotInterface.m_DeviceID, dValue);
-            if (combo_MoveTypes.SelectedIndex == (int)MOVETYPES.AbsoluteMove)
-                dValue[2] = (Double)(m_nStepRelativeValue / 1000.0);
-            else
-                dValue[2] += (Double)(Math.Abs(m_nStepRelativeValue) / 1000.0);
-            HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, 0, dValue);
-
+            int nIndex = combo_MoveTypes.SelectedIndex;
+            m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MoveMotor(2, nIndex, 1)));
+            m_Thread.Start();
         }
 
         private void button_negative_Move4_MouseLeftButtonDown(object sender, RoutedEventArgs e)
         {
-            double[] dValue = new double[6];
-            HiWinRobotInterface.wait_for_stop_motion(HiWinRobotInterface.m_DeviceID);
-            HWinRobot.get_current_position(HiWinRobotInterface.m_DeviceID, dValue);
-            if (combo_MoveTypes.SelectedIndex == (int)MOVETYPES.AbsoluteMove)
-                dValue[5] = (Double)(m_nStepRelativeValue / 1000.0);
-            else
-                dValue[5] += (Double)(Math.Abs(m_nStepRelativeValue) / 1000.0);
-            SetMotorSpeed();
-            HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, 0, dValue);
-            //HWinRobot.ptp_rel_pos(HiWinRobotInterface.m_DeviceID,)
+            int nIndex = combo_MoveTypes.SelectedIndex;
+            m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MoveMotor(5, nIndex, -1)));
+            m_Thread.Start();
         }
 
         private void button_positive_Move4_MouseLeftButtonDown(object sender, RoutedEventArgs e)
         {
-            double[] dValue = new double[6];
-            HiWinRobotInterface.wait_for_stop_motion(HiWinRobotInterface.m_DeviceID);
-            HWinRobot.get_current_position(HiWinRobotInterface.m_DeviceID, dValue);
-            if (combo_MoveTypes.SelectedIndex == (int)MOVETYPES.AbsoluteMove)
-                dValue[5] = (Double)(m_nStepRelativeValue / 1000.0);
-            else
-                dValue[5] += (Double)(Math.Abs(m_nStepRelativeValue) / 1000.0);
+            int nIndex = combo_MoveTypes.SelectedIndex;
+            m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MoveMotor(5, nIndex, 1)));
+            m_Thread.Start();
+        }
 
-            HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, 0, dValue);
+        public void MoveMotor(int nMotorID, int nType, int ndirection)
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (HWinRobot.get_motion_state(HiWinRobotInterface.m_DeviceID) != 1)
+                    return;
 
+                //MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(HiWinRobotInterface.m_DeviceID);
+                if (combo_MoveTypes.SelectedIndex == (int)MOVETYPES.AbsoluteMove)
+                {
+                    double[] dValue = new double[6];
+                    HWinRobot.get_current_position(HiWinRobotInterface.m_DeviceID, dValue);
+                    dValue[nMotorID] = (Double)(m_nStepRelativeValue / 1000.0);
+                    HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, 0, dValue);
+                }
+                else
+                {
+                    double[] dValue = { 0, 0, 0, 0, 0, 0 };
+                    dValue[nMotorID] = (Double)(Math.Abs(m_nStepRelativeValue) / 1000.0) * ndirection;
+                    HWinRobot.ptp_rel_pos(HiWinRobotInterface.m_DeviceID, 0, dValue);
+                }
+                //dValue[nMotorID] += (Double)(Math.Abs(m_nStepRelativeValue) / 1000.0) * ndirection;
+
+                //MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(HiWinRobotInterface.m_DeviceID);
+                //double[] dValue2 = { 2, 0, 0, 0, 0, 1};
+                //HWinRobot.ptp_rel_pos(HiWinRobotInterface.m_DeviceID, 0, dValue2);
+            });
         }
 
         private void button_Home_Move_Click(object sender, RoutedEventArgs e)
         {
-            HiWinRobotInterface.wait_for_stop_motion(HiWinRobotInterface.m_DeviceID);
-            HWinRobot.jog_home(HiWinRobotInterface.m_DeviceID);
+            int nIndex = combo_MoveTypes.SelectedIndex;
+            m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MainWindow.mainWindow.master.m_hiWinRobotInterface.HomeMove()));
+            m_Thread.Start();
+
         }
     }
 }

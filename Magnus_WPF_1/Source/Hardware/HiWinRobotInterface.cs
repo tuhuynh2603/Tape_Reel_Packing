@@ -13,6 +13,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
     {
 
         public Thread m_hikThread;
+        public bool m_bIsStop = false;
 
         public class positionData
         {
@@ -80,8 +81,8 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         public HiWinRobotInterface()
         {
             InitRobotParameter();
-            m_hiWinRobotUserControl = new HiWinRobotUserControl(m_strAddress);
             ConnectoHIKRobot(m_strAddress);
+            m_hiWinRobotUserControl = new HiWinRobotUserControl(m_strAddress);
         }
         public void ConnectoHIKRobot(string strAddress = "127.0.0.1")
         {
@@ -159,8 +160,12 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         public static int m_DeviceID = -1;
         public void InitDataGridview(int device_id, bool breset = false)
         {
+            bool[] bEnableUpddate = { false, false, false };
             if (breset)
             {
+                bEnableUpddate[0] = true;
+                bEnableUpddate[1] = true;
+                bEnableUpddate[2] = true;
                 m_ListPositionData.Clear();
                 double[] d_value = new double[6];
                 HWinRobot.get_current_position(device_id, d_value);
@@ -183,14 +188,14 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
                 m_ListInputData.Clear();
 
-                for (int nIO = 1; nIO < 16; nIO++)
+                for (int nIO = 0; nIO < 16; nIO++)
                 {
-                    m_ListInputData.Add(new positionData() { m_field = "DI " + nIO.ToString(), m_value = HWinRobot.get_digital_input(device_id, nIO), m_unit = "" });
+                    m_ListInputData.Add(new positionData() { m_field = "DI " + (nIO + 1).ToString(), m_value = HWinRobot.get_digital_input(device_id, nIO + 1), m_unit = "" });
                 }
 
-                for (int nIO = 1; nIO < 16; nIO++)
+                for (int nIO = 0; nIO < 16; nIO++)
                 {
-                    m_ListOutputData.Add(new positionData() { m_field = "DO " + nIO.ToString(), m_value = HWinRobot.get_digital_output(device_id, nIO), m_unit = "" });
+                    m_ListOutputData.Add(new positionData() { m_field = "DO " + (nIO + 1).ToString(), m_value = HWinRobot.get_digital_output(device_id, nIO + 1), m_unit = "" });
                 }
 
             }
@@ -199,6 +204,13 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
                 double[] d_value = new double[6];
                 HWinRobot.get_current_position(device_id, d_value);
+                int[] n_value = new int[6];
+                HWinRobot.get_encoder_count(device_id, n_value);
+
+                for (int n = 0; n < 6; n++)
+                    if (m_ListPositionData[n].m_value != d_value[n])
+                        bEnableUpddate[0] = true;
+
                 m_ListPositionData[0].m_value = d_value[0];
                 m_ListPositionData[1].m_value = d_value[1];
                 m_ListPositionData[2].m_value = d_value[2];
@@ -206,36 +218,61 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 m_ListPositionData[4].m_value = d_value[4];
                 m_ListPositionData[5].m_value = d_value[5];
 
-                int[] n_value = new int[6];
-                HWinRobot.get_encoder_count(device_id, n_value);
+
+                for (int n = 0; n < 6; n++)
+                    if (m_ListPositionData[n + 6].m_value != n_value[n])
+                        bEnableUpddate[0] = true;
+
                 m_ListPositionData[6].m_value = n_value[0];
                 m_ListPositionData[7].m_value = n_value[1];
                 m_ListPositionData[8].m_value = n_value[2];
                 m_ListPositionData[9].m_value = n_value[3];
                 m_ListPositionData[10].m_value = n_value[4];
                 m_ListPositionData[11].m_value = n_value[5];
-                for (int nIO = 1; nIO < 16; nIO++)
+                for (int nIO = 0; nIO < 16; nIO++)
                 {
-                    m_ListInputData[nIO - 1].m_value = HWinRobot.get_digital_input(device_id, nIO);
+                    int nvalue = HWinRobot.get_digital_input(device_id, nIO + 1);
+                    if ((int)m_ListInputData[nIO].m_value != nvalue)
+                        bEnableUpddate[1] = true;
+
+                    m_ListInputData[nIO].m_value = nvalue;
                 }
 
-                for (int nIO = 1; nIO < 16; nIO++)
+                for (int nIO = 0; nIO < 16; nIO++)
                 {
-                    m_ListOutputData[nIO - 1].m_value = HWinRobot.get_digital_output(device_id, nIO);
+
+                    int nvalue = HWinRobot.get_digital_output(device_id, nIO + 1);
+                    if ((int)m_ListInputData[nIO].m_value != nvalue)
+                        bEnableUpddate[2] = true;
+
+                    m_ListOutputData[nIO].m_value = nvalue;
                 }
 
+                //HWinRobot.get_alarm_code
             }
+
 
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
                 if (MainWindow.mainWindow.master == null)
                     return;
-                m_hiWinRobotUserControl.dataGrid_robot_Position.ItemsSource = null;
-                m_hiWinRobotUserControl.dataGrid_robot_Position.ItemsSource = m_ListPositionData;
-                m_hiWinRobotUserControl.dataGrid_robot_Input.ItemsSource = null;
-                m_hiWinRobotUserControl.dataGrid_robot_Input.ItemsSource = m_ListInputData;
-                m_hiWinRobotUserControl.dataGrid_robot_Output.ItemsSource = null;
-                m_hiWinRobotUserControl.dataGrid_robot_Output.ItemsSource = m_ListOutputData;
+
+                if (bEnableUpddate[0] || m_hiWinRobotUserControl.dataGrid_robot_Position.ItemsSource == null)
+                {
+                    m_hiWinRobotUserControl.dataGrid_robot_Position.ItemsSource = null;
+                    m_hiWinRobotUserControl.dataGrid_robot_Position.ItemsSource = m_ListPositionData;
+                }
+                if (bEnableUpddate[1] || m_hiWinRobotUserControl.dataGrid_robot_Input.ItemsSource == null)
+                {
+                    m_hiWinRobotUserControl.dataGrid_robot_Input.ItemsSource = null;
+                    m_hiWinRobotUserControl.dataGrid_robot_Input.ItemsSource = m_ListInputData;
+                }
+                if (bEnableUpddate[2] || m_hiWinRobotUserControl.dataGrid_robot_Output.ItemsSource == null)
+                {
+                    m_hiWinRobotUserControl.dataGrid_robot_Output.ItemsSource = null;
+                    m_hiWinRobotUserControl.dataGrid_robot_Output.ItemsSource = m_ListOutputData;
+                }
+
             });
 
         }
@@ -248,30 +285,17 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
         public bool Thread_function(int device_id)
         {
-            //while (true)
-            //{
-            //    if (MainWindow.mainWindow == null)
-            //    {
-            //        HWinRobot.disconnect(m_DeviceID);
-            //        return false ;
-            //    }
+            while (MainWindow.mainWindow != null)
+            {
 
-            //    if (MainWindow.isOpenCommLog)
-            //    {
-            //        wait_for_stop_motion(device_id);
-            //        HWinRobot.jog_home(m_DeviceID);
-            //        double[] cp1 = { -190, 400, -90, 0, 0, 90 };
-            //        wait_for_stop_motion(device_id);
-            //        MoveToPosition(device_id, 0, cp1);
-            //        double[] cp2 = { -90, 350, -90, 0, 0, 0 };
-            //        wait_for_stop_motion(device_id);
-            //        MoveToPosition(device_id, 0, cp2);
-            //        Thread.Sleep(5000);
+                if (MainWindow.isOpenCommLog)
+                {
 
-            //    }
-            //    Thread.Sleep(1000);
+                }
+                Thread.Sleep(100);
 
-            //}
+            }
+            HWinRobot.disconnect(m_DeviceID);
             return true;
         }
 
@@ -280,7 +304,12 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             if (MainWindow.mainWindow == null)
                 HWinRobot.disconnect(m_DeviceID);
 
-            InitDataGridview(0);
+            if (MainWindow.isOpenCommLog)
+            {
+                InitDataGridview(0);
+
+            }
+
             LogMessage.LogMessage.WriteToDebugViewer(1, "timer");
         }
 
@@ -301,33 +330,27 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             return wait_for_stop_motion(ndeviceid);
         }
 
-        public bool MoveSingleJoint(int nDeviceid, int nmode, double[]p)
-        {
-            //HWinRobot.(ndeviceid, nmode, p);
 
-            return wait_for_stop_motion(nDeviceid);
-        }
-
-        public static bool wait_for_stop_motion(int device_id)
+        public bool wait_for_stop_motion(int device_id)
         {
             while (HWinRobot.get_motion_state(device_id) != 1)
             {
-                if (HWinRobot.get_connection_level(device_id) == -1)
+                if (m_bIsStop)
                 {
-                    return false;  // The robot is not connected anymore
+                    
+                    lock (this)
+                    {
+                        m_bIsStop = false;
+                    }
+
+                    return false;
+
                 }
-                Thread.Sleep(10);
+                Thread.Sleep(30);
             }
             return true;
         }
 
-        public static void wait_for_stop(int device_id)
-        {
-            while (HWinRobot.get_motion_state(device_id) != 1 && HWinRobot.get_connection_level(device_id) != -1)
-            {
-                Thread.Sleep(30);
-            }
-        }
         public static void SoftLimitExample(int device_id)
         {
             double[] joint_low_limit = { -20, -20, -35, -20, 0, 0 };
@@ -348,35 +371,35 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             HWinRobot.get_joint_soft_limit_config(device_id, ref re_bool, joint_low_limit, joint_high_limit);
             Console.WriteLine("Enable Joint SoftLimit: " + re_bool);
             HWinRobot.jog_home(device_id);
-            wait_for_stop(device_id);
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(device_id);
             Thread.Sleep(1000);
             for (int i = 0; i < 4; i++)
             {
                 HWinRobot.jog(device_id, 1, i, -1);
-                wait_for_stop(device_id);
+                MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(device_id);
                 Console.WriteLine("On the limits of SoftLimit");
             }
             for (int i = 0; i < 4; i++)
             {
                 HWinRobot.jog(device_id, 1, i, 1);
-                wait_for_stop(device_id);
+                MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(device_id);
                 Console.WriteLine("On the limits of SoftLimit");
             }
             HWinRobot.enable_joint_soft_limit(device_id, false);
 
             // run cartesian softlimit
             HWinRobot.ptp_axis(device_id, 0, joint_home);
-            wait_for_stop(device_id);
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(device_id);
             HWinRobot.set_cart_soft_limit(device_id, cart_low_limit, cart_high_limit);
             HWinRobot.enable_cart_soft_limit(device_id, true);
             HWinRobot.get_cart_soft_limit_config(device_id, ref re_bool, cart_low_limit, cart_high_limit);
             Console.WriteLine("Enable Cart SoftLimit: " + re_bool);
             HWinRobot.lin_pos(device_id, 0, 0, cart_home);
-            wait_for_stop(device_id);
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(device_id);
             for (int i = 0; i < 3; i++)
             {
                 HWinRobot.jog(device_id, 0, i, -1);
-                wait_for_stop(device_id);
+                MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(device_id);
                 Console.WriteLine("On the limits of SoftLimit");
                 Console.WriteLine("");
                 HWinRobot.clear_alarm(device_id);
@@ -385,7 +408,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             for (int i = 0; i < 3; i++)
             {
                 HWinRobot.jog(device_id, 0, i, 1);
-                wait_for_stop(device_id);
+                MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(device_id);
                 Console.WriteLine("On the limits of SoftLimit");
                 Console.WriteLine("");
                 HWinRobot.clear_alarm(device_id);
@@ -411,6 +434,22 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         }
 
 
+        public void StopMotor()
+        {
+            lock (this)
+            {
+                m_bIsStop = true;
+            }
+            HWinRobot.jog_stop(HiWinRobotInterface.m_DeviceID);
+        }
+
+
+        public void HomeMove()
+        {
+            HWinRobot.jog_stop(m_DeviceID);
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(m_DeviceID);
+            HWinRobot.jog_home(m_DeviceID);
+        }
         //public static void EventFun(UInt16 cmd, UInt16 rlt, ref UInt16 Msg, int len)
         //{
         //    Console.WriteLine("Command: " + cmd + " Resault: " + rlt);

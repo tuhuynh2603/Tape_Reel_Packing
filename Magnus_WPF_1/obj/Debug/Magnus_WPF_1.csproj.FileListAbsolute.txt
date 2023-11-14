@@ -98,3 +98,4 @@ C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\Debug\sv\ZedGraph.resources.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\Debug\tr\ZedGraph.resources.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\Debug\zh-cn\ZedGraph.resources.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\Debug\zh-tw\ZedGraph.resources.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\Debug\Magnus_WPF_1.csproj.AssemblyReference.cache

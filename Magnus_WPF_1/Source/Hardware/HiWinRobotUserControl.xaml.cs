@@ -30,6 +30,8 @@ namespace Magnus_WPF_1.Source.Hardware
             AbsoluteMove = 0,
             RelativeMove = 1
         }
+
+        public static string m_strAlarmMessage = "";
         public HiWinRobotUserControl(string strIPAddress)
         {
             InitializeComponent();
@@ -46,7 +48,7 @@ namespace Magnus_WPF_1.Source.Hardware
             combo_MoveTypes.SelectedIndex = 1;
 
             int bServoOnOff = HWinRobot.get_motor_state(HiWinRobotInterface.m_DeviceID);
-            toggle_ServoOnOff.IsChecked = bServoOnOff == 0 ? false : true;
+            //toggle_ServoOnOff.IsChecked = bServoOnOff == 0 ? false : true;
 
             //m_nAccRatioPercentValue = 10;
             //m_PTPSpeedPercentValue = 10;
@@ -240,12 +242,18 @@ namespace Magnus_WPF_1.Source.Hardware
             if (bServoOnOff == 0)
             {
                 HWinRobot.set_motor_state(HiWinRobotInterface.m_DeviceID, 1);
+                toggle_ServoOnOff.Background = new SolidColorBrush(Colors.Green);
+                toggle_ServoOnOff.Content = "Servo ON";
+
             }
             else
             {
                 HWinRobot.set_motor_state(HiWinRobotInterface.m_DeviceID, 0);
+                toggle_ServoOnOff.Background = new SolidColorBrush(Colors.Gray);
+                toggle_ServoOnOff.Content = "Servo OFF";
+
             }
-            toggle_ServoOnOff.IsChecked = bServoOnOff == 0 ? false : true;
+            //toggle_ServoOnOff.IsChecked = bServoOnOff == 0 ? false : true;
         }
 
         public void SetMotorSpeed()
@@ -474,6 +482,25 @@ namespace Magnus_WPF_1.Source.Hardware
             int nIndex = combo_MoveTypes.SelectedIndex;
             m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MainWindow.mainWindow.master.m_hiWinRobotInterface.HomeMove()));
             m_Thread.Start();
+
+        }
+
+        private void button_ResetAlarm_Click(object sender, RoutedEventArgs e)
+        {
+            HWinRobot.clear_alarm(HiWinRobotInterface.m_DeviceID);
+            label_Alarm.Content = "";
+
+        }
+
+        public bool b_button_RobotConnect = true;
+        private void button_RobotConnect_Checked(object sender, RoutedEventArgs e)
+        {
+            b_button_RobotConnect = (bool)button_RobotConnect.IsChecked;
+        }
+
+        private void button_RobotConnect_Unchecked(object sender, RoutedEventArgs e)
+        {
+            b_button_RobotConnect = (bool)button_RobotConnect.IsChecked;
 
         }
     }

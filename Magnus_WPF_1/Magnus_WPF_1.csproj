@@ -123,7 +123,7 @@
     <Compile Include="Source\Application\TrackHandler.cs" />
     <Compile Include="Source\Define\StructDef.cs" />
     <Compile Include="Source\Drawing\DrawingOverlay.cs" />
-    <Compile Include="Source\Hardware\CommHiwinRobot.cs" />
+    <Compile Include="Source\Hardware\CommBarCodeReader.cs" />
     <Compile Include="Source\Hardware\CommInterface.cs" />
     <Compile Include="Source\Hardware\HIKControlCameraView.xaml.cs">
       <DependentUpon>HIKControlCameraView.xaml</DependentUpon>

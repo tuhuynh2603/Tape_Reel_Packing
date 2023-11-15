@@ -8,9 +8,9 @@
              d:DesignHeight="550" d:DesignWidth="700">
     <Grid Background="AliceBlue">
         <Grid.RowDefinitions>
-            <RowDefinition Height="75"></RowDefinition>
-            <RowDefinition Height="340"></RowDefinition>
-            <RowDefinition Height="135"></RowDefinition>
+            <RowDefinition Height="100"></RowDefinition>
+            <RowDefinition Height="3.4*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Width="Auto">
@@ -29,15 +29,15 @@
                         </Grid.ColumnDefinitions>
                         <Grid Grid.Column="0">
                             <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
+                                <RowDefinition Height="1*"></RowDefinition>
+                                <RowDefinition Height="50"></RowDefinition>
                             </Grid.RowDefinitions>
 
                             <Label Grid.Row="0" Content="Status" BorderThickness="1" BorderBrush="Black" VerticalAlignment="Stretch" Background="WhiteSmoke" HorizontalContentAlignment="Center"></Label>
-                            <Label x:Name="label_Alarm" Grid.Row="1" BorderThickness="1" BorderBrush="Black"   Background="Wheat" VerticalAlignment="Stretch"></Label>
+                            <Label x:Name="label_Alarm" Grid.Row="1" BorderThickness="1" BorderBrush="Black"   Background="Wheat"></Label>
                         </Grid>
 
-                        <Button Grid.Column="1" Content="Reset Alarm" Margin="5,5,5,5"></Button>
+                        <Button Grid.Column="1" Content="Reset Alarm" Click="button_ResetAlarm_Click"></Button>
                         
                     </Grid>
                     <Grid Grid.Column="1">
@@ -60,7 +60,13 @@
                             </StackPanel>
                         </Border>
                     </Grid>
-                    <Button   Grid.Column="2" Content="Connect" Width="Auto" Background="LightGray" VerticalContentAlignment="Center"></Button>
+                    <ToggleButton x:Name="button_RobotConnect"  
+                                  Checked="button_RobotConnect_Checked" 
+                                  Unchecked="button_RobotConnect_Unchecked" 
+                                  IsChecked="True" Grid.Column="2" 
+                                  Content="N/A" Width="Auto" 
+                                  Background="LightGray" 
+                                  VerticalContentAlignment="Center"></ToggleButton>
                 </Grid>
 
             </Border>

@@ -348,6 +348,7 @@ namespace Magnus_WPF_1.Source.Application
                     {
                         if (MainWindow.mainWindow == null)
                             return;
+                        Thread.Sleep(5);
                     }
                     Master.InspectEvent[m_nTrackID].Reset();
 

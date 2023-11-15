@@ -101,60 +101,63 @@ namespace Magnus_WPF_1
 
         #region STATE OF CONNECTION PLC 
         //name port
-        private string _portReceive;
-        private string _portSent;
-        private string _color_portReceive;
-        private string _color_portSent;
-        public string PortReceive
+        //private string _barcodeReaderStatus;
+        //public string barcodeReaderStatus
+        //{
+        //    get { return _barcodeReaderStatus; }
+        //    set
+        //    {
+        //        if (value != _barcodeReaderStatus)
+        //        {
+        //            _barcodeReaderStatus = value;
+        //            OnPropertyChanged("barcodeReaderStatus");
+        //        }
+        //    }
+        //}
+
+        // Color
+        private string _color_barcodeReaderStatus;
+        public string color_barcodeReaderStatus
         {
-            get { return _portReceive; }
+            get { return _color_barcodeReaderStatus; }
             set
             {
-                if (value != _portReceive)
+                if (value != _color_barcodeReaderStatus)
                 {
-                    _portReceive = value;
-                    OnPropertyChanged("PortReceive");
+                    _color_barcodeReaderStatus = value;
+                    OnPropertyChanged("color_barcodeReaderStatus");
                 }
             }
         }
 
-        public string PortSent
+        //private string _text_RobotStatus;
+        //public string text_RobotStatus
+        //{
+        //    get { return _text_RobotStatus; }
+        //    set
+        //    {
+        //        if (value != _text_RobotStatus)
+        //        {
+        //            _text_RobotStatus = value;
+        //            OnPropertyChanged("text_RobotStatus");
+        //        }
+        //    }
+        //}
+
+        private string _color_RobotStatus;
+        public string color_RobotStatus
         {
-            get { return _portSent; }
+            get { return _color_RobotStatus; }
             set
             {
-                if (value != _portSent)
+                if (value != _color_RobotStatus)
                 {
-                    _portSent = value;
-                    OnPropertyChanged("PortSent");
+                    _color_RobotStatus = value;
+                    OnPropertyChanged("color_RobotStatus");
                 }
             }
         }
-        // Color
-        public string Color_PortReceive
-        {
-            get { return _color_portReceive; }
-            set
-            {
-                if (value != _color_portReceive)
-                {
-                    _color_portReceive = value;
-                    OnPropertyChanged("Color_PortReceive");
-                }
-            }
-        }
-        public string Color_PortSent
-        {
-            get { return _color_portSent; }
-            set
-            {
-                if (value != _color_portSent)
-                {
-                    _color_portSent = value;
-                    OnPropertyChanged("Color_PortSent");
-                }
-            }
-        }
+
 
         #endregion
 
@@ -1014,24 +1017,24 @@ namespace Magnus_WPF_1
         }
 
 
-        public static bool isOpenCommLog = false;
+        public static bool isRobotControllerOpen = false;
         private void btn_Clear_Comm_Click(object sender, RoutedEventArgs e)
         {
             //master.commLog.ClearCommLog();
         }
 
 
-        private void btn_CommLog_Checked(object sender, RoutedEventArgs e)
-        {
-            isOpenCommLog = (bool)btn_CommLog.IsChecked;
-            master.OpenHiwinRobotDialog(isOpenCommLog);
-        }
+        //private void btn_CommLog_Checked(object sender, RoutedEventArgs e)
+        //{
+        //    isRobotControllerOpen = (bool)btn_CommLog.IsChecked;
+        //    master.OpenHiwinRobotDialog(isRobotControllerOpen);
+        //}
 
-        private void btn_CommLog_Unchecked(object sender, RoutedEventArgs e)
-        {
-            isOpenCommLog = (bool)btn_CommLog.IsChecked;
-            master.OpenHiwinRobotDialog(isOpenCommLog);
-        }
+        //private void btn_CommLog_Unchecked(object sender, RoutedEventArgs e)
+        //{
+        //    isRobotControllerOpen = (bool)btn_CommLog.IsChecked;
+        //    master.OpenHiwinRobotDialog(isRobotControllerOpen);
+        //}
 
 
 
@@ -1216,6 +1219,8 @@ namespace Magnus_WPF_1
 
 
         GridView gridView = new GridView();
+        private string _color_portReceive;
+
         public void UpdateDebugInfor()
         {
             if (!m_bEnableDebug)
@@ -1262,8 +1267,29 @@ namespace Magnus_WPF_1
         {
             grd_Defect_Settings.ReleaseMouseCapture();
         }
+
         #endregion
 
+        private void btn_Robot_Controller_Checked(object sender, RoutedEventArgs e)
+        {
+            isRobotControllerOpen = (bool)btn_Robot_Controller.IsChecked;
+            master.OpenHiwinRobotDialog(isRobotControllerOpen);
+        }
 
+        private void btn_Robot_Controller_Unchecked(object sender, RoutedEventArgs e)
+        {
+            isRobotControllerOpen = (bool)btn_Robot_Controller.IsChecked;
+            master.OpenHiwinRobotDialog(isRobotControllerOpen);
+        }
+
+        private void btn_BarCodeReader_Setting_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btn_BarCodeReader_Setting_Unchecked(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

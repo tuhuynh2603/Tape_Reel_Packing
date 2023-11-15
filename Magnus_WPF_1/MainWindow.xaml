@@ -226,24 +226,6 @@
                                                             Checked="btn_inspect_offline_Checked"
                                                             Unchecked="btn_inspect_offline_UnChecked"/>
 
-                                    <RibbonToggleButton Name="stream_camera_btn"
-                                                            Label="Camera"
-                                                            LargeImageSource="Resources\camera-custom.png" Foreground="GhostWhite"
-                                                            Checked="btn_stream_camera_Checked"
-                                                            Unchecked="btn_stream_camera_UnChecked"
-                                                            CheckedBackground="{StaticResource CheckedButtonStyle}"
-                                                            MouseOverBackground="{StaticResource MouseOverButtonStyle}"
-                                                            Width="auto"/>
-
-
-                                    <RibbonToggleButton Name="camera_setting_btn"
-                                                            Label="Camera Setting"
-                                                            LargeImageSource="Resources\camera-custom.png" Foreground="GhostWhite"
-                                                            Checked="btn_Camera_Setting_Checked"
-                                                            Unchecked="btn_Camera_Setting_Unchecked"
-                                                            CheckedBackground="{StaticResource CheckedButtonStyle}"
-                                                            MouseOverBackground="{StaticResource MouseOverButtonStyle}"
-                                                            Width="auto"/>
 
                                     <RibbonButton Name="load_teach_image_btn"
                                                             Label="Load Teach Image"
@@ -318,38 +300,127 @@
                             </Border>
 
                             <Border BorderBrush="GhostWhite" BorderThickness="0,0,1,0" Margin="0,3,0,0">
-
-                                <RibbonGroup Name="hardware_group">
-                                    <RibbonGroup.Style>
-                                        <Style TargetType="RibbonGroup">
-                                            <Setter Property="FontSize" Value="12"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Path=IsUseSmallIcon, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Value="True">
-                                                    <Setter Property="FontSize" Value="11"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </RibbonGroup.Style>
-                                    <RibbonGroup.Header>
-                                        <TextBlock Text="Hardware" Name="groupHardware"
+                                <Grid>
+                                    <RibbonGroup Name="hardware_group">
+                                        <RibbonGroup.Style>
+                                            <Style TargetType="RibbonGroup">
+                                                <Setter Property="FontSize" Value="12"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Path=IsUseSmallIcon, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Value="True">
+                                                        <Setter Property="FontSize" Value="11"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </RibbonGroup.Style>
+                                        <RibbonGroup.Header>
+                                            <TextBlock Text="Hardware" Name="groupHardware"
                                                         FontFamily="Microsoft New Tai Lue"
                                                         Foreground="#FFD6F9FF" FontSize="13"
                                                         FontWeight="Bold">
-                                            <TextBlock.Effect>
-                                                <BlurEffect Radius="0.1"/>
-                                            </TextBlock.Effect>
-                                        </TextBlock>
-                                    </RibbonGroup.Header>
+                                                <TextBlock.Effect>
+                                                    <BlurEffect Radius="0.1"/>
+                                                </TextBlock.Effect>
+                                            </TextBlock>
+                                        </RibbonGroup.Header>
 
-                                    <RibbonButton x:Name="btn_COM_Connection"
-                                                        Label="COM Communication"
+
+                                        <Grid Margin="0,-30,0,0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="3*"></RowDefinition>
+                                                <RowDefinition Height="5*"></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                            <Grid Grid.Row="1">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <RibbonToggleButton Name="stream_camera_btn" Grid.Column="0"
+                                                        Label="Stream Camera"
+                                                        LargeImageSource="Resources\camera-custom.png" Foreground="GhostWhite"
+                                                        Checked="btn_stream_camera_Checked"
+                                                        Unchecked="btn_stream_camera_UnChecked"
+                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
+                                                        MouseOverBackground="{StaticResource MouseOverButtonStyle}"
+                                                        Width="auto"/>
+
+                                                <RibbonToggleButton Name="camera_setting_btn" Grid.Column="1"
+                                                        Label="Camera Setting"
+                                                        LargeImageSource="Resources\camera-custom.png" Foreground="GhostWhite"
+                                                        Checked="btn_Camera_Setting_Checked"
+                                                        Unchecked="btn_Camera_Setting_Unchecked"
+                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
+                                                        MouseOverBackground="{StaticResource MouseOverButtonStyle}"
+                                                        Width="auto"/>
+                                            </Grid>
+                    
+                                            <Label x:Name="label_Camera_Status" Margin="0,0,0,5" FontSize="10" Grid.Row="0" Content="Disconnected" VerticalContentAlignment="Top"  HorizontalContentAlignment="Center" BorderThickness="3,3,3,0" BorderBrush="#FF2662B1">
+                                                <Label.Foreground>
+                                                    <SolidColorBrush Color="{Binding color_RobotStatus}">
+                                                    </SolidColorBrush>
+                                                </Label.Foreground>
+
+                                            </Label>
+
+
+                                        </Grid>
+
+                                        <Grid Margin="0,-30,0,0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="3*"></RowDefinition>
+                                                <RowDefinition Height="5*"></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                                <RibbonToggleButton x:Name="btn_Robot_Controller" Grid.Row="1"
+                                                        Label="ROBOT Controller"
                                                         LargeImageSource="Resources/network.png"
                                                         Foreground="White"
                                                         IsEnabled="true"
-                                                        Click="btn_abort_teach_Click"
+                                                        Checked="btn_Robot_Controller_Checked"
+                                                        Unchecked="btn_Robot_Controller_Unchecked"
+                                                        IsChecked="False"
                                                         MouseOverBackground="{StaticResource BgButton}" 
-                                                        Width="100"/>
-                                </RibbonGroup>
+                                                        Width="Auto"/>
+
+                                            <Label x:Name="label_Robot_Status" Margin="0,0,0,5" FontSize="10" Grid.Row="0" Content="Disconnected" VerticalContentAlignment="Top" 
+                                                   BorderThickness="3,3,3,0" BorderBrush="#FF2662B1">
+                                                <Label.Foreground>
+                                                    <SolidColorBrush Color="{Binding color_RobotStatus}">
+                                                    </SolidColorBrush>
+                                                </Label.Foreground>
+                                            </Label>
+
+                                        </Grid>
+                            
+
+                                        <Grid Margin="0,-30,0,0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="3*"></RowDefinition>
+                                                <RowDefinition Height="5*"></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                            <RibbonToggleButton x:Name="btn_BarCodeReader_Setting" Grid.Row="1"
+                                                        Label="Barcode Reader Setting"
+                                                        LargeImageSource="Resources/network.png"
+                                                        Foreground="White"                          
+                                                        IsEnabled="true"
+                                                        Checked="btn_BarCodeReader_Setting_Checked"
+                                                        Unchecked="btn_BarCodeReader_Setting_Unchecked"
+                                                        IsChecked="False"
+                                                        MouseOverBackground="{StaticResource BgButton}" 
+                                                        Width="Auto">
+                                                
+                                            </RibbonToggleButton>
+
+                                            <Label x:Name="label_Barcode_Status"  Margin="0,0,0,5" FontSize="10" Grid.Row="0" Content="Disconnected" VerticalContentAlignment="Top" BorderThickness="3,3,3,0" BorderBrush="#FF2662B1">
+                                                <Label.Foreground>
+                                                    <SolidColorBrush Color="{Binding color_barcodeReaderStatus}">
+                                                    </SolidColorBrush>
+                                                </Label.Foreground>
+
+                                            </Label>
+                                        </Grid>
+
+                                    </RibbonGroup>
+
+                                </Grid>
                             </Border>
                         </StackPanel>
                     </TabItem>
@@ -432,7 +503,7 @@
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top"
                         Orientation="Horizontal" Height="25">
                 <!--Manage Recipe-->
-                <Border BorderBrush="#707070" Width="580" BorderThickness="1" 
+                <Border BorderBrush="#707070" Width="380" BorderThickness="1" 
                         VerticalAlignment="Center"
                         
                         CornerRadius="5">
@@ -542,7 +613,7 @@
                     </TextBlock>
                 </Border>
                 <!--CommLog-->
-                <ToggleButton Name="btn_CommLog" Visibility="Visible"
+                <!--<ToggleButton Name="btn_CommLog" Visibility="Visible"
                             Content="Comm Log"
                             Margin="10 0 0 0 "
                             BorderBrush="AliceBlue"       
@@ -553,7 +624,7 @@
                             Unchecked="btn_CommLog_Unchecked"
                             Width="70"
                             IsChecked="False">
-                </ToggleButton>
+                </ToggleButton>-->
                 <!--AcessLevel-->
                 <Label Content="Access Level:"
                            Foreground="#00BFFF"

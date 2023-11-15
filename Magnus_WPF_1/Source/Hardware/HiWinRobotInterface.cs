@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 {
@@ -14,7 +15,8 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
         public Thread m_hikThread;
         public bool m_bIsStop = false;
-
+        public bool m_bMustConnectAgain = true;
+        public int m_HRSSMode = -1;
         public class positionData
         {
             public string m_field { get; set; }
@@ -57,12 +59,13 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         }
 
         public HiWinRobotUserControl m_hiWinRobotUserControl;
-        public string m_strAddress = "";
+        public string m_strRobotIPAddress = "";
+        public System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
 
 
         public void InitRobotParameter()
         {
-            m_strAddress = GetCommInfo("Comm::IpAddress", m_strAddress);
+            m_strRobotIPAddress = GetCommInfo("Robot Comm::IpAddress", m_strRobotIPAddress);
         }
 
         public static string GetCommInfo(string key, string defaults)
@@ -81,18 +84,24 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         public HiWinRobotInterface()
         {
             InitRobotParameter();
-            ConnectoHIKRobot(m_strAddress);
-            m_hiWinRobotUserControl = new HiWinRobotUserControl(m_strAddress);
+            ConnectoHIKRobot(m_strRobotIPAddress);
+            m_hiWinRobotUserControl = new HiWinRobotUserControl(m_strRobotIPAddress);
+            InitDataGridview(m_DeviceID, true);
+            m_hikThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => Thread_function()));
+            m_hikThread.Start();
+            //dispatcherTimer.Tick += dispatcherTimer_Tick;
+            //dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 200);
+            //dispatcherTimer.Start();
         }
         public void ConnectoHIKRobot(string strAddress = "127.0.0.1")
         {
 
-            m_strAddress = strAddress;
-            int device_id = -1;
+            m_strRobotIPAddress = strAddress;
+            m_DeviceID = -1;
             try
             {
-                device_id = HWinRobot.open_connection(strAddress, 1, callback);
-                HWinRobot.clear_alarm(device_id);
+                HWinRobot.disconnect(m_DeviceID);
+                m_DeviceID = HWinRobot.open_connection(strAddress, 1, callback);
             }
             catch (Exception e)
             {
@@ -100,9 +109,10 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
             };
 
-            if (device_id >= 0)
+            if (m_DeviceID >= 0)
             {
-                m_DeviceID = device_id;
+                HWinRobot.clear_alarm(m_DeviceID);
+
                 int client_L = -1, client_s = -1, client_rev = -1;
                 int server_L = -1, server_s = -1, server_rev = -1;
                 LogMessage.LogMessage.WriteToDebugViewer(1, "connect successful.");
@@ -111,7 +121,11 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 LogMessage.LogMessage.WriteToDebugViewer(1, "HRSDK Release Ver:" + v);
 
                 HWinRobot.get_hrsdk_sdkver(ref client_L, ref client_s, ref client_rev);
-                HWinRobot.get_hrss_sdkver(device_id, ref server_L, ref server_s, ref server_rev);
+                HWinRobot.get_hrss_sdkver(m_DeviceID, ref server_L, ref server_s, ref server_rev);
+                // if HRSSMode != 3 it mean we cannot control robot by software
+                // Mode 2: Auto
+                // Mode 3: External control
+                //Mode 0, mode 1: dont know
                 LogMessage.LogMessage.WriteToDebugViewer(1, $"HRSDK Connection Ver: {client_L}.{client_s}.{client_rev}");
                 LogMessage.LogMessage.WriteToDebugViewer(1, $"HRSS Connection Ver: {server_L}.{server_s}.{server_rev}");
                 if (client_L != server_L)
@@ -123,27 +137,68 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                     LogMessage.LogMessage.WriteToDebugViewer(1, "Some APIs not support.");
                 }
 
-                int level = HWinRobot.get_connection_level(device_id);
+                int level = HWinRobot.get_connection_level(m_DeviceID);
                 LogMessage.LogMessage.WriteToDebugViewer(1, "level:" + level);
 
-                //HWinRobot.set_connection_level(device_id, 1);
-                //level = HWinRobot.get_connection_level(device_id);
-                //LogMessage.LogMessage.WriteToDebugViewer(1, "level:" + level);
+                HWinRobot.set_connection_level(m_DeviceID, 1);
+                level = HWinRobot.get_connection_level(m_DeviceID);
+                LogMessage.LogMessage.WriteToDebugViewer(1, "level:" + level);
 
                 //Disconnect(device_id);
-                InitDataGridview(device_id, true);
-
-                System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-                dispatcherTimer.Tick += dispatcherTimer_Tick;
-                dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 200);
-                dispatcherTimer.Start();
-
                 //HWinRobot.set_connection_level(device_id, 1);
                 //level = HWinRobot.get_connection_level(device_id);
                 //LogMessage.LogMessage.WriteToDebugViewer(1, "level:" + level);
 
-                m_hikThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => Thread_function(0)));
-                m_hikThread.Start();
+                //m_hikThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => Thread_function(0)));
+                //m_hikThread.Start();
+            }
+            else
+            {
+                LogMessage.LogMessage.WriteToDebugViewer(1, "connect failure.");
+            }
+        }
+
+        public void ReconnectToHIKRobot()
+        {
+            InitRobotParameter();
+            //dispatcherTimer.Stop();
+            try
+            {
+                HWinRobot.disconnect(m_DeviceID);               
+                m_DeviceID = HWinRobot.open_connection(m_strRobotIPAddress, 1, callback);
+
+            }
+            catch (Exception e)
+            {
+                LogMessage.LogMessage.WriteToDebugViewer(1, "connect failed.");
+
+            };
+
+            if (m_DeviceID >= 0)
+            {
+
+                HWinRobot.clear_alarm(m_DeviceID);
+                int nHRSS = HWinRobot.get_hrss_mode(m_DeviceID);
+                //LogMessage.LogMessage.WriteToDebugViewer(1, "HRSS mode " + nHRSS.ToString());
+
+                if (nHRSS != 3)
+                {
+                    HWinRobot.disconnect(m_DeviceID);
+                    m_DeviceID = -1;
+                    LogMessage.LogMessage.WriteToDebugViewer(1, "connect failed.");
+                    return;
+                }
+
+                LogMessage.LogMessage.WriteToDebugViewer(1, "connect successful.");
+                StringBuilder v = new StringBuilder(100);
+                HWinRobot.get_hrsdk_version(v);
+                HWinRobot.set_connection_level(m_DeviceID, 1);
+                int level = HWinRobot.get_connection_level(m_DeviceID);
+
+                // Turn on Motor to allow Moving
+                HWinRobot.set_motor_state(m_DeviceID, 1);
+                //dispatcherTimer.Start();
+
             }
             else
             {
@@ -248,7 +303,6 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                     m_ListOutputData[nIO].m_value = nvalue;
                 }
 
-                //HWinRobot.get_alarm_code
             }
 
 
@@ -273,44 +327,311 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                     m_hiWinRobotUserControl.dataGrid_robot_Output.ItemsSource = m_ListOutputData;
                 }
 
+
+                if(HiWinRobotUserControl.m_strAlarmMessage.Length >0)
+                {
+                    m_hiWinRobotUserControl.label_Alarm.Content = HiWinRobotUserControl.m_strAlarmMessage;
+                }    
             });
 
         }
 
         public static void EventFun(UInt16 cmd, UInt16 rlt, ref UInt16 Msg, int len)
         {
-            LogMessage.LogMessage.WriteToDebugViewer(1, "Command: " + cmd + " Resault: " + rlt);
+            //Console.Clear();
+            String info_p = "";
+            unsafe
+            {
+                fixed (UInt16* p = &Msg)
+                {
+                    for (int i = 0; i < len; i++)
+                    {
+                        info_p += (char)p[i];
+                    }
+                }
+            }
+
+            if (rlt != 4702)
+            {
+
+                //LogMessage.LogMessage.WriteToDebugViewer(1,"Command: " + cmd + "  Result: " + rlt + "  Msg: " + info_p + "  len: " + len);
+                HiWinRobotUserControl.m_strAlarmMessage = info_p;
+            }
+            if (cmd == 0)
+            {
+                string[] info = info_p.Split(',');
+                switch (rlt)
+                {
+                    case 4030:
+                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] HRSS alarm notify: " + info_p);
+
+                        break;
+                    case 4145:
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] System Output" + info[0] + " : " + info[1]);
+                        break;
+                    case 4702:
+                             //LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] Robot Information");
+
+                        //Todo: Need to move to Main thread to prevent crash on Child 
+
+                        //int nHRSSModeTemp = -1;
+                        //int.TryParse(info[0], out nHRSSModeTemp);
+                        ////if (MainWindow.mainWindow.master != null && nHRSSModeTemp != MainWindow.mainWindow.master.m_hiWinRobotInterface.m_HRSSMode)
+                        ////{
+                        ////    MainWindow.mainWindow.master.m_hiWinRobotInterface.m_HRSSMode = nHRSSModeTemp;
+                        ////    if (MainWindow.mainWindow.master.m_hiWinRobotInterface.m_HRSSMode == 3)
+                        ////    {
+                        ////        MainWindow.mainWindow.master.m_hiWinRobotInterface.m_bMustConnectAgain = true;
+                        ////    }
+                        ////}
+                        LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] HRSS Mode: " + info[0]);
+                        if (info[0] == "3")
+                        {
+                            LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Operation Mode: " + info[1]);
+                            LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Override Ratio: " + info[2]);
+                            LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Motor State: " + info[3]);
+                            LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Exe File Name: " + info[4]);
+                            LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Function Output: " + info[5]);
+                            if (info[6] != "0")
+                                LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Alarm Count: " + info[6]);
+                            LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Keep Alive: " + info[7]);
+                            if (info[8] == "2")
+                                LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Motion Status: " + info[8]);
+
+                            LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] payload: " + info[9]);
+                            LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Speed: " + info[10]); // safe: 0   normal: 1
+                            if (info[14] != "")
+                            {
+                                //LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Move Done!. Position: " + info[11]);
+                                LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Move Done! Coor: {0}, {1}, {2}, {3}, {4}, {5} ", info[14], info[15], info[16], info[17], info[18], info[19]));
+                                LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Joint: {0}, {1}, {2}, {3}, {4}, {5} ", info[20], info[21], info[22], info[23], info[24], info[25]));
+                            }
+                            LogMessage.LogMessage.WriteToDebugViewer(1, "");
+                        }
+                        break;
+                    case 4703:
+                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Timer {0}: {1} ", Int32.Parse(info[0]) + 1, info[1]));
+                        break;
+                    case 4704:
+                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Counter {0}: {1}", Int32.Parse(info[0]) + 1, info[1]));
+                        break;
+                    case 4705:
+                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] MI {0}: {1}", Int32.Parse(info[0]) + 1, info[1]));
+                        break;
+                    case 4706:
+                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] MO {0}: {1}", Int32.Parse(info[0]) + 1, info[1]));
+                        break;
+                    case 4707:
+                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] SI {0}: {1}", Int32.Parse(info[0]) + 1, info[1]));
+                        break;
+                    case 4708:
+                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] SO {0}: {1}", Int32.Parse(info[0]) + 1, info[1]));
+                        break;
+                    case 4710:
+                        ShowPRNotification(info);
+                        break;
+                    case 4711:
+                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] DI {0}: {1}", Int32.Parse(info[0]), info[1]));
+                        break;
+                    case 4712:
+                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] DO {0}: {1}", Int32.Parse(info[0]), info[1]));
+                        break;
+                    case 4714:
+                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Utilization start notify: " + info_p));
+                        break;
+                    case 4715:
+                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Utilization end notify: " + info_p));
+                        break;
+                }
+            }
+            else if (cmd == 13)
+            {
+                 LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] HRSS Disconnected!");
+            }
+            else if (cmd == 1450)
+            {
+                switch (rlt)
+                {
+                    case 4028:
+                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] HRSS start clear alarm");
+                        break;
+                    case 4029:
+                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] HRSS finish clear alarm");
+                        break;
+                }
+            }
+            else if (cmd == 1456)
+            {
+                 LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] SET_SPEED_LIMIT: " + Msg);
+            }
+            else if (cmd == 2161)
+            {
+                switch (rlt)
+                {
+                    case 0:
+                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] DOWNLOAD_LOG_FILE: " + Msg);
+                        break;
+                    case 201:
+                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] FILE_IS_NOT_EXIST: " + Msg);
+                        break;
+                }
+            }
+            else if (cmd == 4000)
+            {
+                switch (rlt)
+                {
+                    case 0:
+                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] run ext task start cmd: ");
+                        break;
+                    case 201:
+                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] ext task already exist.");
+                        break;
+                }
+            }
+            else if (cmd == 4001)
+            {
+                switch (rlt)
+                {
+                    case 2006:
+                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] task start motion already exist.");
+                        break;
+                    case 4012:
+                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] task start file name error.");
+                        break;
+                    case 4013:
+                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] task start already exist.");
+                        break;
+                    case 4014:
+                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] task start Run.");
+                        break;
+                }
+
+            }
+            else if (cmd == 4004)
+            {
+                switch (rlt)
+                {
+                    case 4018:
+                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] task abort finish.");
+                        break;
+                }
+            }
+            else if (cmd == 4009)
+            {
+                switch (rlt)
+                {
+                    case 0:
+                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] Download file.");
+                        break;
+                    case 201:
+                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] File is not exist.");
+                        break;
+                }
+            }
+            else if (cmd == 4010)
+            {
+                 LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] Send file.");
+            }
+            else if (cmd == 4018)
+            {
+                 LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] SAVE_DATABASE");
+            }
+            else if (cmd == 4019)
+            {
+                 LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] LOAD_DATABASE");
+            }
+            else if (cmd == 4709)
+            {
+                 LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] Save module IO.");
+            }
+
+            void ShowPRNotification(string[] info)
+            {
+                int pr_len = Convert.ToInt32(info[0]);
+                int pr_type = -1, pr_num = -1;
+
+                for (int i = 0; i < pr_len; i++)
+                {
+                    pr_num = Convert.ToInt32(info[1 + 11 * i]);
+                    pr_type = Convert.ToInt32(info[2 + 11 * i]);
+                     LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] PR {0}: {1} \n" +
+                                       "Pos: {2}, {3}, {4}, {5}, {6}, {7} Ext: {8}, {9}, {10}", pr_num, pr_type, // Type  1:Degree  2:Cartesian
+                                       info[3 + 11 * i], info[4 + 11 * i], info[5 + 11 * i], info[6 + 11 * i], info[7 + 11 * i], info[8 + 11 * i],
+                                       info[9 + 11 * i], info[10 + 11 * i], info[11 + 11 * i]));
+                }
+            }
         }
         private static HWinRobot.CallBackFun callback = new HWinRobot.CallBackFun(EventFun);
 
-        public bool Thread_function(int device_id)
+        public void Thread_function()
         {
             while (MainWindow.mainWindow != null)
             {
-
-                if (MainWindow.isOpenCommLog)
+                //Connect button
+                if (m_hiWinRobotUserControl.b_button_RobotConnect == true)
                 {
+                    if (m_DeviceID < 0)
+                    {
+                        ReconnectToHIKRobot();
+                        Thread.Sleep(1000);
 
+                    }
+                    else if (MainWindow.isRobotControllerOpen)
+                    {
+                        InitDataGridview(m_DeviceID);
+
+                    }
+
+                    // Change mode during using software
+                    if (HWinRobot.get_hrss_mode(m_DeviceID) != 3 && m_DeviceID >= 0)
+                    {
+                        HWinRobot.disconnect(m_DeviceID);
+                        m_DeviceID = -1;
+
+                    }
                 }
-                Thread.Sleep(100);
+                //Disconnect button
+                else
+                {
+                    if (m_DeviceID >= 0)
+                    {
+                        HWinRobot.disconnect(m_DeviceID);
+                        m_DeviceID = -1;
+                    }
+                            
+                }
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    if (m_DeviceID >= 0)
+                    {
+                        m_hiWinRobotUserControl.button_RobotConnect.Content = "Connected";
+                        m_hiWinRobotUserControl.button_RobotConnect.Background = new SolidColorBrush(Colors.Green);
+                        MainWindow.mainWindow.label_Robot_Status.Background = new SolidColorBrush(Colors.Green);
+                        MainWindow.mainWindow.label_Robot_Status.Content = m_strRobotIPAddress;
+                        MainWindow.mainWindow.color_RobotStatus = "Black";
+                    }
+                    else
+                    {
+                        m_hiWinRobotUserControl.button_RobotConnect.Content = "Disconnected";
+                        m_hiWinRobotUserControl.button_RobotConnect.Background = new SolidColorBrush(Colors.Gray);
+                        MainWindow.mainWindow.color_RobotStatus = "Black";
+                        MainWindow.mainWindow.label_Robot_Status.Content = m_strRobotIPAddress;
+                        MainWindow.mainWindow.label_Robot_Status.Background = new SolidColorBrush(Colors.Gray);
 
+                    }
+                });
+
+
+
+
+                Thread.Sleep(100);
             }
             HWinRobot.disconnect(m_DeviceID);
-            return true;
+            return;
         }
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            if (MainWindow.mainWindow == null)
-                HWinRobot.disconnect(m_DeviceID);
-
-            if (MainWindow.isOpenCommLog)
-            {
-                InitDataGridview(0);
-
-            }
-
-            LogMessage.LogMessage.WriteToDebugViewer(1, "timer");
         }
 
         public void Disconnect(int device_id)

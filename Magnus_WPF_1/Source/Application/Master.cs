@@ -20,7 +20,7 @@ namespace Magnus_WPF_1.Source.Application
         public Track[] m_Tracks;
         public int m_nActiveTrack;
         public Application applications = new Application();
-        public static CommHiwinRobot commHIKRobot ;
+        public static CommBarCodeReader commHIKRobot ;
         public TeachParametersUC teachParameter = new TeachParametersUC();
         public MappingSetingUC mappingParameter = new MappingSetingUC();
         public static bool m_bIsTeaching;
@@ -376,6 +376,8 @@ namespace Magnus_WPF_1.Source.Application
             //defectInfor.lvDefect.View = gridView;
             if (bIschecked)
             {
+                m_hiWinRobotInterface.dispatcherTimer.Start();
+
                 MainWindow.mainWindow.grd_Defect.Height = m_hiWinRobotInterface.m_hiWinRobotUserControl.Height;
                 MainWindow.mainWindow.grd_Defect.Width = m_hiWinRobotInterface.m_hiWinRobotUserControl.Width;
 
@@ -388,6 +390,8 @@ namespace Magnus_WPF_1.Source.Application
             }
             else
             {
+                m_hiWinRobotInterface.dispatcherTimer.Stop();
+
                 MainWindow.mainWindow.grd_Defect.Children.Clear();
                 MainWindow.mainWindow.grd_Defect_Settings.Visibility = System.Windows.Visibility.Collapsed;
             }

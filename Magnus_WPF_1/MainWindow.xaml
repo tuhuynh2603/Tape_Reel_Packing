@@ -354,10 +354,10 @@
                                             </Grid>
                     
                                             <Label x:Name="label_Camera_Status" Margin="0,0,0,5" FontSize="10" Grid.Row="0" Content="Disconnected" VerticalContentAlignment="Top"  HorizontalContentAlignment="Center" BorderThickness="3,3,3,0" BorderBrush="#FF2662B1">
-                                                <Label.Foreground>
+                                                <!--<Label.Foreground>
                                                     <SolidColorBrush Color="{Binding color_RobotStatus}">
                                                     </SolidColorBrush>
-                                                </Label.Foreground>
+                                                </Label.Foreground>-->
 
                                             </Label>
 

@@ -117,21 +117,23 @@ namespace Magnus_WPF_1.Source.Hardware
                         //    txtdebug += buff[i].ToString();
                         //}
                         //DebugMessage.WriteToDebugViewer(9, txtdebug);
-                        //DebugMessage.WriteToDebugViewer(8, string.Format("Sent Sucessfully Port " + CommPLC.commLotInfo.port.ToString()));
+                        LogMessage.LogMessage.WriteToDebugViewer(8, string.Format("Sent Sucessfully at " + IPaddress + ":" + port.ToString()));
                         return true;
                     }
                     else
                     {
                         //if (MainWindow.mainWindow.master != null)
-                            //MainWindow.mainWindow.master.commPLC.UpdataStatePLC(CommPLC.commLotInfo.port, false);
+                        //MainWindow.mainWindow.master.commPLC.UpdataStatePLC(CommPLC.commLotInfo.port, false);
                         //DebugMessage.WriteToDebugViewer(8, string.Format("Disconnect At Port " + CommPLC.commLotInfo.port.ToString()));
+                        LogMessage.LogMessage.WriteToDebugViewer(8, string.Format("Sent Failed at " + IPaddress + ":" + port.ToString()));
+
                     }
                 }
                 catch
                 {
                     //if (MainWindow.mainWindow.master != null)
                     //    MainWindow.mainWindow.master.commPLC.UpdataStatePLC(CommPLC.commLotInfo.port, false);
-                    //DebugMessage.WriteToDebugViewer(8, string.Format("Disconnect At Port " + CommPLC.commLotInfo.port.ToString()));
+                    LogMessage.LogMessage.WriteToDebugViewer(8, string.Format("Sent Failed at " + IPaddress + ":" + port.ToString()));
                 }
                 try
                 {

@@ -1,0 +1,47 @@
+﻿<UserControl x:Class="Magnus_WPF_1.Source.Hardware.BarCodeReaderView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Magnus_WPF_1.Source.Hardware"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="700"
+             >
+    <Window Height="Auto">
+
+        <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0">
+                    <Label Content="Reader IP"></Label>
+                    <ComboBox></ComboBox>
+                <Button x:Name="Connect" Click="Connect_Click"></Button>
+                </StackPanel>
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Content="Command"></Label>
+                    <ComboBox Grid.Row="1"></ComboBox>
+                    <ListView Grid.Row="2"></ListView>
+                </Grid>
+
+                <Grid Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Content="Config"></Label>
+                    <Button  Grid.Row="1" Content="Receive Files"></Button>
+                    <Button  Grid.Row="2" Content="Send Files"></Button>
+                </Grid>
+
+            </Grid>
+    </Window>
+</UserControl>

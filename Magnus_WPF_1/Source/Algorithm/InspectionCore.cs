@@ -23,7 +23,7 @@ namespace Magnus_WPF_1.Source.Algorithm
     using Magnus_WPF_1.Source.LogMessage;
     public class InspectionCore
     {
-        public  Size globalImageSize;
+        public Size globalImageSize;
         TemplateMatchingModel m_TemplateMatchingModel = new TemplateMatchingModel();
         public struct ImageTarget
         {
@@ -52,6 +52,14 @@ namespace Magnus_WPF_1.Source.Algorithm
             public/* static*/ double m_dScaleImageRatio = 0.1;
             public/* static*/ double m_dMinScoreTemplate = 50.0;
             public/* static*/ int m_nBlackCornerIndexTemplateImage = 0;
+
+        }
+
+        public class DeviceLocationResult
+        {
+           public PointF m_dCenterDevicePoint = new PointF(0, 0);
+            public PointF m_dCornerDevicePoint = new PointF(0, 0);
+           public double m_dAngleOxDevice = 0.0;
         }
 
         public class SurfaceDefectParameter
@@ -65,7 +73,7 @@ namespace Magnus_WPF_1.Source.Algorithm
 
         public /*static*/ DeviceLocationParameter m_DeviceLocationParameter;
         public /*static*/ SurfaceDefectParameter m_SurfaceDefectParameter;
-
+        public DeviceLocationResult m_DeviceLocationResult;
         public InspectionCore(ref Size mImageSize)
         {
             globalImageSize = new Size(mImageSize.Width, mImageSize.Height);
@@ -74,6 +82,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             m_TemplateImage = new ImageTarget();
             m_DeviceLocationParameter = new DeviceLocationParameter();
             m_SurfaceDefectParameter = new SurfaceDefectParameter();
+            m_DeviceLocationResult = new DeviceLocationResult();
         }
         //public /*static*/ bool Initialize()
         //{
@@ -225,14 +234,14 @@ namespace Magnus_WPF_1.Source.Algorithm
 
         }
 
-        public /*static*/ int SimpleInspection(ref List<ArrayOverLay> list_arrayOverlay, ref Point pCenter, ref double nAngleOutput, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug = false)
+        public /*static*/ int SimpleInspection(ref ImageTarget InspectImage, ref List<ArrayOverLay> list_arrayOverlay, ref PointF pCenter, ref PointF pCorner, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug = false)
         {
             int nError;
             Stopwatch timeIns = new Stopwatch();
             timeIns.Start();
             //double dScale = 3;
-            nError = FindDeviceLocation_Zoom(ref m_SourceImage.Gray,
-                                             ref list_arrayOverlay, ref pCenter, ref nAngleOutput, ref  debugInfors, bEnableDebug);
+            nError = FindDeviceLocation_Zoom(ref InspectImage.Gray,
+                                             ref list_arrayOverlay, ref pCenter, ref pCorner, ref  debugInfors, bEnableDebug);
 
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
@@ -384,7 +393,7 @@ namespace Magnus_WPF_1.Source.Algorithm
 
         //}
 
-        public /*static*/ int FindDeviceLocation_Zoom(ref CvImage imgSource, ref List<ArrayOverLay> list_arrayOverlay, ref Point pCenter, ref double nAngleOutput, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug = false)
+        public /*static*/ int FindDeviceLocation_Zoom(ref CvImage imgSource, ref List<ArrayOverLay> list_arrayOverlay, ref PointF pCenter, ref PointF pCorner, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug = false)
         {
             Stopwatch timeIns = new Stopwatch();
 
@@ -505,7 +514,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             //pttt = pttt * 3;
 
             //List<Point> pPolygon = new List<Point>();
-            
+
             //Point po1 = new Point((int)pttt[0].X, (int)pttt[0].X);
             //Point po2 = new Point((int)pttt[1].X, (int)pttt[1].X);
             //Point po3 = new Point((int)pttt[2].X, (int)pttt[2].X);
@@ -518,11 +527,49 @@ namespace Magnus_WPF_1.Source.Algorithm
 
             //List<Point> p_Regionpolygon_temp = RotatePolygon(pPolygon, -nAngleOutput, pCenter.X, pCenter.Y);
 
-            int nminIndex = FindNearestPoints_Debug(zoomedInImage, rotateRect_Device, ref list_arrayOverlay, ref debugInfors, bEnableDebug);
-            if (nminIndex < 0)
+            pCorner = FindNearestPoints_Debug(zoomedInImage, rotateRect_Device, ref list_arrayOverlay, ref debugInfors, bEnableDebug);
+            if (pCorner.X + pCorner.Y ==0)
                 return -1;
 
-            nAngleOutput =  rotateRect_Device.Angle;// rotateRect_Device.Angle + (m_DeviceLocationParameter.m_nBlackCornerIndexTemplateImage - nminIndex) * 90;
+            pCorner.X = pCorner.X / (float)m_DeviceLocationParameter.m_dScaleImageRatio;
+            pCorner.Y = pCorner.Y / (float)m_DeviceLocationParameter.m_dScaleImageRatio;
+
+            pCenter = new Point((int)(rotateRect_Device.Center.X / m_DeviceLocationParameter.m_dScaleImageRatio), (int)(rotateRect_Device.Center.Y / m_DeviceLocationParameter.m_dScaleImageRatio));
+
+            //double dOx_Angle = AngleWithXAxis(pCornerPoint.X - rotateRect_Device.Center.X, pCornerPoint.Y - rotateRect_Device.Center.Y);
+
+            //double AngleWithXAxis(double xa, double ya)
+            //{
+            //    // Calculate the angle in radians
+            //    double thetaRad = Math.Atan2(ya, xa);
+
+            //    // Convert radians to degrees
+            //    double thetaDeg = Math.Round((180 / Math.PI) * thetaRad, 2);
+
+            //    return thetaDeg;
+            //}
+
+            //double AngleBetweenVectors(double xa, double ya, double xb, double yb)
+            //{
+            //    // Calculate the dot product
+            //    double dotProduct = xa * xb + ya * yb;
+
+            //    // Calculate the magnitudes of the vectors
+            //    double magnitudeA = Math.Sqrt(xa * xa + ya * ya);
+            //    double magnitudeB = Math.Sqrt(xb * xb + yb * yb);
+
+            //    // Calculate the angle in radians
+            //    double thetaRad = Math.Acos(dotProduct / (magnitudeA * magnitudeB));
+
+            //    // Convert radians to degrees
+            //    double thetaDeg = Math.Round((180 / Math.PI) * thetaRad, 2);
+
+            //    return thetaDeg;
+            //}
+
+
+
+            //nAngleOutput = dOx_Angle;// rotateRect_Device.Angle + (m_DeviceLocationParameter.m_nBlackCornerIndexTemplateImage - nminIndex) * 90;
             //if (nAngleOutput <= -180)
             //    nAngleOutput = 360 - nAngleOutput;
 
@@ -540,10 +587,8 @@ namespace Magnus_WPF_1.Source.Algorithm
             CvInvoke.Rectangle(mat_point, rect_center, new MCvScalar(255), -1);
             PushBackDebugInfors(imgSource, mat_point, "Center Chip Region . (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
-
             AddRegionOverlay(ref list_arrayOverlay, mat_point, Colors.Yellow);
 
-            pCenter = new Point((int)(rotateRect_Device.Center.X/m_DeviceLocationParameter.m_dScaleImageRatio), (int)(rotateRect_Device.Center.Y / m_DeviceLocationParameter.m_dScaleImageRatio));
 
 
 
@@ -558,13 +603,14 @@ namespace Magnus_WPF_1.Source.Algorithm
             });
             timeIns.Stop();
 
-            return -1;
+            return 0;
             //if (false)
             //    return 0;
             //else
             //    return -1;
 
         }
+
 
         //public static int FindDeviceLocation(ref CvImage imgSource, ref List<Point> p_Regionpolygon, ref Point pCenter, ref Mat mat_DeviceLocationRegion, ref double nAngleOutput, ref double dScoreOutput)
         //{
@@ -691,7 +737,7 @@ namespace Magnus_WPF_1.Source.Algorithm
 
         //}
 
-        public int FindNearestPoints_Debug(CvImage imgSourceInput, RotatedRect rotateRect_Device, ref List<ArrayOverLay> list_arrayOverlay, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug)
+        public PointF FindNearestPoints_Debug(CvImage imgSourceInput, RotatedRect rotateRect_Device, ref List<ArrayOverLay> list_arrayOverlay, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug)
         {
 
             Stopwatch timeIns = new Stopwatch();
@@ -736,7 +782,7 @@ namespace Magnus_WPF_1.Source.Algorithm
 
             CvInvoke.FindNonZero(mat_BiggestRegion, regionPoints);
             if (regionPoints.Size == 0)
-                return -1;
+                return new PointF(0,0);
 
             AddRegionOverlay(ref list_arrayOverlay, mat_BiggestRegion, Colors.Cyan);
 
@@ -760,17 +806,16 @@ namespace Magnus_WPF_1.Source.Algorithm
 
             CvInvoke.FindNonZero(mat_CornerBiggestRegion, regionPoints);
             if (regionPoints.Size == 0)
-                return -1;
+                return new PointF(0, 0);
             AddRegionOverlay(ref list_arrayOverlay, mat_CornerBiggestRegion, Colors.Blue);
 
-
-            CvInvoke.FindNonZero(mat_BiggestRegion, regionPoints);
+            CvInvoke.FindNonZero(mat_CornerBiggestRegion, regionPoints);
             System.Drawing.Rectangle rect_temp = CvInvoke.BoundingRectangle(regionPoints);
             Point Center_Point = new Point(rect_temp.Left + rect_temp.Width / 2, rect_temp.Top + rect_temp.Height / 2);
+            PointF[] points = rotateRect_Device.GetVertices();
             double minDistance = 9999999;
             int nminIndex = -1;
-            PointF[] points = rotateRect_Device.GetVertices();
-            for (int n = 0; n < rotateRect_Device.GetVertices().Count() - 1; n++)
+            for (int n = 0; n < rotateRect_Device.GetVertices().Count(); n++)
             {
                 double distance_Square = (points[n].X - Center_Point.X) * (points[n].X - Center_Point.X) + (points[n].Y - Center_Point.Y) * (points[n].Y - Center_Point.Y);
                 if (distance_Square < minDistance)
@@ -780,7 +825,7 @@ namespace Magnus_WPF_1.Source.Algorithm
                 }
             }
 
-            return nminIndex;
+            return points[nminIndex];
         }
 
         //public static int FindNearestPoints(CvImage imgSourceInput, ref CvImage deviceLocationThresholdRegion, System.Drawing.Rectangle rectMatchingPosition, List<Point> polygonInput, float fAngleInput)
@@ -998,19 +1043,6 @@ namespace Magnus_WPF_1.Source.Algorithm
             double newY = x * sinRadians + y * cosRadians + midy;
 
             return new Point((int)newX, (int)newY);
-        }
-
-        internal  void AutoTeach()
-        {
-
-            List<System.Drawing.Point> p_Regionpolygon = new List<System.Drawing.Point>();
-            Mat mat_DeviceLocationRegion = new Mat();
-            double nAngleOutput = 0.0;
-            double dScoreOutput = 0.0;
-            int nCornerIndex = 0;
-            System.Drawing.Rectangle rectMatchingPosition = new System.Drawing.Rectangle();
-            //AutoTeachDatumLocation(ref p_Regionpolygon, m_DeviceLocationParameter.m_L_DeviceLocationRoi, m_DeviceLocationParameter.m_L_TemplateRoi, ref mat_DeviceLocationRegion, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput, ref nCornerIndex);
-            m_DeviceLocationParameter.m_nBlackCornerIndexTemplateImage = nCornerIndex;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Magnus_WPF_1.Source.Application
         public Track[] m_Tracks;
         public int m_nActiveTrack;
         public Application applications = new Application();
-        public static CommBarCodeReader commHIKRobot ;
+        public static BarCodeReaderInterface m_BarcodeReader ;
         public TeachParametersUC teachParameter = new TeachParametersUC();
         public MappingSetingUC mappingParameter = new MappingSetingUC();
         public static bool m_bIsTeaching;
@@ -59,7 +59,7 @@ namespace Magnus_WPF_1.Source.Application
             ContructorDocComponent();
 
 
-            //commHIKRobot = new CommHiwinRobot();
+            m_BarcodeReader = new BarCodeReaderInterface();
 
             LoadRecipe();
             m_hiWinRobotInterface = new HiWinRobotInterface();
@@ -95,9 +95,9 @@ namespace Magnus_WPF_1.Source.Application
 
                 m_Tracks[nTrack].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
                 m_Tracks[nTrack].m_InspectionCore.LoadTeachImageToInspectionCore(nTrack);
-                #endregion
-                m_Tracks[nTrack].m_InspectionCore.AutoTeach();
-            }    
+                m_Tracks[nTrack].AutoTeach(ref m_Tracks[nTrack]);
+            }
+            #endregion
 
         }
         #endregion

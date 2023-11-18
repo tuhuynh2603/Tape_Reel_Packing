@@ -1,17 +1,21 @@
 ﻿using Microsoft.Win32;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using LicenseContext = OfficeOpenXml.LicenseContext;
 
 namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 {
     public class HiWinRobotInterface 
     {
+        public const int NUMBER_AXIS  = 4;
 
         public Thread m_hikThread;
         public bool m_bIsStop = false;
@@ -34,6 +38,14 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             public double m_Rx { get; set; }
             public double m_Ry { get; set; }
             public double m_Rz { get; set; }
+
+            public double m_Joint1{ get; set; }
+            public double m_Joint2{ get; set; }
+            public double m_Joint3{ get; set; }
+            public double m_Joint4 { get; set; }
+            public double m_Joint5 { get; set; }
+            public double m_Joint6 { get; set; }
+
             public int m_Base { get; set; }
             public int m_Tool { get; set; }
             public int m_AccRatio { get; set; }
@@ -41,20 +53,182 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             public double m_LinearSpeed { get; set; }
             public int m_Override { get; set; }
 
-            public SequencePointData(int pointIdex, double[] d_value, int AccRatio, int PTPSpeed, double LinearSpeed, int Override, string PointComment = "")
+            public SequencePointData(int pointIdex = 0, double[] d_XYZvalue = null, double[] d_Jointvalue = null, int AccRatio = 0, int PTPSpeed = 0, double LinearSpeed = 0, int Override = 0, string PointComment = "")
             {
+                if (d_XYZvalue == null)
+                    return;
                 m_PointIndex = pointIdex;
                 m_PointComment = PointComment;
-                m_X = d_value[0];
-                m_Y = d_value[1];
-                m_Z = d_value[2];
-                m_Rx = d_value[3];
-                m_Ry = d_value[4];
-                m_Rz = d_value[5];
+                m_X =  d_XYZvalue[0];
+                m_Y =  d_XYZvalue[1];
+                m_Z =  d_XYZvalue[2];
+                m_Rx = d_XYZvalue[3];
+                m_Ry = d_XYZvalue[4];
+                m_Rz = d_XYZvalue[5];
+
+                m_Joint1 = d_Jointvalue[0];
+                m_Joint2 = d_Jointvalue[1];
+                m_Joint3 = d_Jointvalue[2];
+                m_Joint4 = d_Jointvalue[3];
+                m_Joint5 = d_Jointvalue[4];
+                m_Joint6 = d_Jointvalue[5];
+
                 m_AccRatio = AccRatio;
                 m_PTPSpeed = PTPSpeed;
                 m_LinearSpeed = LinearSpeed;
                 m_Override = Override;
+            }
+            public void GetXYZPoint(ref double[] dpos)
+            {
+                dpos[0] = m_X ;
+                dpos[1] = m_Y ;
+                dpos[2] = m_Z ;
+                dpos[3] = m_Rx;
+                dpos[4] = m_Ry;
+                dpos[5] = m_Rz;
+            }
+
+            public void SetXYZPoint(double[] dpos)
+            {
+               m_X  = dpos[0];
+               m_Y  = dpos[1];
+               m_Z  = dpos[2];
+               m_Rx = dpos[3];
+               m_Ry = dpos[4];
+               m_Rz = dpos[5];
+            }
+
+            public void GetJointPoint(ref double[] npos)
+            {
+                npos[0] = m_Joint1;
+                npos[1] = m_Joint2;
+                npos[2] = m_Joint3;
+                npos[3] = m_Joint4;
+                npos[4] = m_Joint5;
+                npos[5] = m_Joint6;
+            }
+
+            public void SetJointPoint(double[] npos)
+            {
+               m_Joint1 = npos[0];
+               m_Joint2 = npos[1];
+               m_Joint3 = npos[2];
+               m_Joint4 = npos[3];
+               m_Joint5 = npos[4];
+               m_Joint6 = npos[5];
+            }
+
+
+            public static void SaveRobotPointsToExcel(List<SequencePointData> data)
+            {
+                string strRecipePath = Path.Combine(Application.Application.pathRecipe, Application.Application.currentRecipe);
+                string fullpath = Path.Combine(strRecipePath, "Robot Points" + ".cfg");
+                FileInfo file = new FileInfo(fullpath);
+
+                    using (ExcelPackage package = new ExcelPackage(file))
+                {
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Sheet_RobotPoints");
+
+                    // Header
+                    int ncol = 1;
+                    worksheet.Cells[1, ncol++].Value = "PointIndex";
+                    worksheet.Cells[1, ncol++].Value = "PointComment";
+                    worksheet.Cells[1, ncol++].Value = "X";
+                    worksheet.Cells[1, ncol++].Value = "Y";
+                    worksheet.Cells[1, ncol++].Value = "Z";
+                    worksheet.Cells[1, ncol++].Value = "Rx";
+                    worksheet.Cells[1, ncol++].Value = "Ry";
+                    worksheet.Cells[1, ncol++].Value = "Rz";
+                    worksheet.Cells[1, ncol++].Value = "Joint1";
+                    worksheet.Cells[1, ncol++].Value = "Joint2";
+                    worksheet.Cells[1, ncol++].Value = "Joint3";
+                    worksheet.Cells[1, ncol++].Value = "Joint4";
+                    worksheet.Cells[1, ncol++].Value = "Joint5";
+                    worksheet.Cells[1, ncol++].Value = "Joint6";
+                    worksheet.Cells[1, ncol++].Value = "Base";
+                    worksheet.Cells[1, ncol++].Value = "Tool";
+                    worksheet.Cells[1, ncol++].Value = "AccRatio";
+                    worksheet.Cells[1, ncol++].Value = "PTPSpeed";
+                    worksheet.Cells[1, ncol++].Value = "LinearSpeed";
+                    worksheet.Cells[1, ncol++].Value = "Override";
+
+                    // Data
+                    int row = 2;
+                    foreach (var item in data)
+                    {
+                        ncol = 1;
+                        worksheet.Cells[row, ncol++].Value =item.m_PointIndex;
+                        worksheet.Cells[row, ncol++].Value =item.m_PointComment;
+                        worksheet.Cells[row, ncol++].Value =item.m_X;
+                        worksheet.Cells[row, ncol++].Value =item.m_Y;
+                        worksheet.Cells[row, ncol++].Value =item.m_Z;
+                        worksheet.Cells[row, ncol++].Value =item.m_Rx;
+                        worksheet.Cells[row, ncol++].Value =item.m_Ry;
+                        worksheet.Cells[row, ncol++].Value =item.m_Rz;
+                        worksheet.Cells[row, ncol++].Value =item.m_Joint1;
+                        worksheet.Cells[row, ncol++].Value =item.m_Joint2;
+                        worksheet.Cells[row, ncol++].Value =item.m_Joint3;
+                        worksheet.Cells[row, ncol++].Value =item.m_Joint4;
+                        worksheet.Cells[row, ncol++].Value =item.m_Joint5;
+                        worksheet.Cells[row, ncol++].Value =item.m_Joint6;
+                        worksheet.Cells[row, ncol++].Value =item.m_Base;
+                        worksheet.Cells[row, ncol++].Value =item.m_Tool;
+                        worksheet.Cells[row, ncol++].Value =item.m_AccRatio;
+                        worksheet.Cells[row, ncol++].Value =item.m_PTPSpeed;
+                        worksheet.Cells[row, ncol++].Value =item.m_LinearSpeed;
+                        worksheet.Cells[row, ncol++].Value =item.m_Override;
+                        row++;
+                    }
+                    package.Save();
+                }
+            }
+
+            public static void ReadRobotPointsFromExcel(ref List<SequencePointData> result)
+            {
+                string strRecipePath = Path.Combine(Application.Application.pathRecipe, Application.Application.currentRecipe);
+                string fullpath = Path.Combine(strRecipePath, "Robot Points" + ".cfg");
+
+                result = new List<SequencePointData>();
+
+                FileInfo file = new FileInfo(fullpath);
+                if (!file.Exists)
+                    file.Create();
+
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Use NonCommercial license if applicable
+                using (ExcelPackage package = new ExcelPackage(file))
+                {
+                    if (package.Workbook.Worksheets.Count == 0)
+                        return;
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                    int rowCount = worksheet.Dimension.Rows;
+
+                    for (int row = 2; row <= rowCount; row++)
+                    {
+                        SequencePointData item = new SequencePointData();
+                        int ncol = 1;
+                        item.m_PointIndex = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
+                        item.m_PointComment = worksheet.Cells[row, ncol++].Value.ToString();
+                        item.m_X = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
+                        item.m_Y = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
+                        item.m_Z = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
+                        item.m_Rx = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
+                        item.m_Ry = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
+                        item.m_Rz = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
+                        item.m_Joint1  = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
+                        item.m_Joint2  = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
+                        item.m_Joint3  = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
+                        item.m_Joint4  = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
+                        item.m_Joint5  = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
+                        item.m_Joint6 = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
+                        item.m_Base = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
+                        item.m_Tool = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
+                        item.m_AccRatio = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
+                        item.m_PTPSpeed = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
+                        item.m_LinearSpeed = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
+                        item.m_Override = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
+                        result.Add(item);
+                    }
+                }
             }
         }
 
@@ -227,19 +401,19 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 m_ListPositionData.Add(new positionData() { m_field = "X", m_value = d_value[0], m_unit = "mm" });
                 m_ListPositionData.Add(new positionData() { m_field = "Y", m_value = d_value[1], m_unit = "mm" });
                 m_ListPositionData.Add(new positionData() { m_field = "Z", m_value = d_value[2], m_unit = "mm" });
-                m_ListPositionData.Add(new positionData() { m_field = "A", m_value = d_value[3], m_unit = "mm" });
-                m_ListPositionData.Add(new positionData() { m_field = "B", m_value = d_value[4], m_unit = "mm" });
-                m_ListPositionData.Add(new positionData() { m_field = "C", m_value = d_value[5], m_unit = "mm" });
+                m_ListPositionData.Add(new positionData() { m_field = "Rx", m_value = d_value[3], m_unit = "deg" });
+                m_ListPositionData.Add(new positionData() { m_field = "Ry", m_value = d_value[4], m_unit = "deg" });
+                m_ListPositionData.Add(new positionData() { m_field = "Rz", m_value = d_value[5], m_unit = "deg" });
 
 
-                int[] n_value = new int[6];
-                HWinRobot.get_encoder_count(device_id, n_value);
-                m_ListPositionData.Add(new positionData() { m_field = "Motor1", m_value = n_value[0], m_unit = "degree" });
-                m_ListPositionData.Add(new positionData() { m_field = "Motor2", m_value = n_value[1], m_unit = "degree" });
-                m_ListPositionData.Add(new positionData() { m_field = "Motor3", m_value = n_value[2], m_unit = "degree" });
-                m_ListPositionData.Add(new positionData() { m_field = "Motor4", m_value = n_value[3], m_unit = "degree" });
-                m_ListPositionData.Add(new positionData() { m_field = "Motor5", m_value = n_value[4], m_unit = "degree" });
-                m_ListPositionData.Add(new positionData() { m_field = "Motor6", m_value = n_value[5], m_unit = "degree" });
+                double[] d_Jointvalue = new double[6];
+                HWinRobot.get_current_joint(device_id, d_Jointvalue);
+                m_ListPositionData.Add(new positionData() { m_field = "Motor1", m_value = d_Jointvalue[0], m_unit = "deg" });
+                m_ListPositionData.Add(new positionData() { m_field = "Motor2", m_value = d_Jointvalue[1], m_unit = "deg" });
+                m_ListPositionData.Add(new positionData() { m_field = "Motor3", m_value = d_Jointvalue[2], m_unit = "deg" });
+                m_ListPositionData.Add(new positionData() { m_field = "Motor4", m_value = d_Jointvalue[3], m_unit = "deg" });
+                m_ListPositionData.Add(new positionData() { m_field = "Motor5", m_value = d_Jointvalue[4], m_unit = "deg" });
+                m_ListPositionData.Add(new positionData() { m_field = "Motor6", m_value = d_Jointvalue[5], m_unit = "deg" });
 
                 m_ListInputData.Clear();
 
@@ -259,8 +433,6 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
                 double[] d_value = new double[6];
                 HWinRobot.get_current_position(device_id, d_value);
-                int[] n_value = new int[6];
-                HWinRobot.get_encoder_count(device_id, n_value);
 
                 for (int n = 0; n < 6; n++)
                     if (m_ListPositionData[n].m_value != d_value[n])
@@ -274,16 +446,21 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 m_ListPositionData[5].m_value = d_value[5];
 
 
+
+                double[] d_Jointvalue = new double[6];
+                HWinRobot.get_current_joint(device_id, d_Jointvalue);
+
                 for (int n = 0; n < 6; n++)
-                    if (m_ListPositionData[n + 6].m_value != n_value[n])
+                    if (m_ListPositionData[n + 6].m_value != d_Jointvalue[n])
                         bEnableUpddate[0] = true;
 
-                m_ListPositionData[6].m_value = n_value[0];
-                m_ListPositionData[7].m_value = n_value[1];
-                m_ListPositionData[8].m_value = n_value[2];
-                m_ListPositionData[9].m_value = n_value[3];
-                m_ListPositionData[10].m_value = n_value[4];
-                m_ListPositionData[11].m_value = n_value[5];
+                m_ListPositionData[6].m_value =  d_Jointvalue[0];
+                m_ListPositionData[7].m_value =  d_Jointvalue[1];
+                m_ListPositionData[8].m_value =  d_Jointvalue[2];
+                m_ListPositionData[9].m_value =  d_Jointvalue[3];
+                m_ListPositionData[10].m_value = d_Jointvalue[4];
+                m_ListPositionData[11].m_value = d_Jointvalue[5];
+
                 for (int nIO = 0; nIO < 16; nIO++)
                 {
                     int nvalue = HWinRobot.get_digital_input(device_id, nIO + 1);
@@ -297,7 +474,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 {
 
                     int nvalue = HWinRobot.get_digital_output(device_id, nIO + 1);
-                    if ((int)m_ListInputData[nIO].m_value != nvalue)
+                    if ((int)m_ListOutputData[nIO].m_value != nvalue)
                         bEnableUpddate[2] = true;
 
                     m_ListOutputData[nIO].m_value = nvalue;
@@ -741,13 +918,76 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             HWinRobot.enable_cart_soft_limit(device_id, false);
         }
 
-        public static SequencePointData AddSequencePointInfo(int device_id, int nIndex = 0, string strComment = "")
+        public static void SetOnOffSoftLimit(int device_id, bool bEnable)
+        {
+            HWinRobot.enable_joint_soft_limit(device_id, bEnable);
+            HWinRobot.enable_cart_soft_limit(device_id, bEnable);
+        }
+        public enum JOG_TYPE
+        {
+            JOG_XYZ,
+            JOG_JOINT
+        }
+
+        public static void GetSoftLimit (int device_id, int nMode, ref bool re_bool, ref double[] low_limit, ref double[] high_limit)
+        {
+            if (nMode == (int)JOG_TYPE.JOG_XYZ)
+                HWinRobot.get_cart_soft_limit_config(device_id, ref re_bool, low_limit, high_limit);
+            else if (nMode == (int)JOG_TYPE.JOG_JOINT)
+                HWinRobot.get_joint_soft_limit_config(device_id, ref re_bool, low_limit, high_limit);
+        }
+        public static void SetSoftLimit(int device_id, double[] low_limit, double[] high_limit, int nMode)
+        {
+            if (nMode == (int)JOG_TYPE.JOG_XYZ)
+                HWinRobot.set_cart_soft_limit(device_id, low_limit, high_limit);
+            else if(nMode == (int)JOG_TYPE.JOG_JOINT)
+                HWinRobot.set_joint_soft_limit(device_id, low_limit, high_limit);
+        }
+
+        public static bool SendTaskToRobotController(int device_id, string taskPath, string taskName)
+        {
+
+            if(taskName.Split('.').Length <=1)
+                taskName = taskName + ".hrb";
+
+
+            if (!Directory.Exists(taskPath))           
+            {
+                Directory.CreateDirectory(taskPath);
+            }
+            if (File.Exists(taskPath + taskName))
+            {
+                HWinRobot.send_file(device_id, taskPath + taskName, taskName);
+                LogMessage.LogMessage.WriteToDebugViewer(1, "Send file to Robot Successfull");
+                return false;
+            }
+            else
+                LogMessage.LogMessage.WriteToDebugViewer(1, "File is not exist!");
+
+            return true;
+        }
+
+        public static bool StartTask(int device_id, string taskName)
+        {
+
+            if (taskName.Split('.').Length <= 1)
+                taskName = taskName + ".hrb";
+            HWinRobot.task_start(device_id, taskName);
+
+            return true;
+        }
+
+        public static bool EndTask(int device_id)
+        {
+            HWinRobot.task_abort(device_id);
+            return true;
+        }
+
+        public static SequencePointData AddSequencePointInfo(int device_id, double[] d_XYZvalue, double[] d_Jointvalue, int nIndex = 0, string strComment = "")
         {
             //m_List_sequencePointData.Add(sequenceData);
 
-            double[] d_value = new double[6];
-            HWinRobot.get_current_position(device_id, d_value);
-            return new SequencePointData(nIndex, d_value, 
+            return new SequencePointData(nIndex, d_XYZvalue, d_Jointvalue,
                                                                     HWinRobot.get_acc_dec_ratio(device_id), 
                                                                     HWinRobot.get_ptp_speed(device_id), 
                                                                     HWinRobot.get_lin_speed(device_id), 
@@ -765,7 +1005,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         }
 
 
-        public void HomeMove()
+        public static void HomeMove()
         {
             HWinRobot.jog_stop(m_DeviceID);
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(m_DeviceID);

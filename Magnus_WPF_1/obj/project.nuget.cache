@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "hKnrQCTgauybbaxHNU3o5WoWY654FHA6qaMX4khNS39spEbCfBfFzI2RGJ0M+2DsCN7iL8qtGKgi+UUWu40eyQ==",
+  "dgSpecHash": "1FE9iW5NPTeNNy1Ffw4BKfp38Dwu03OnlL4ulboFOb1HspGg9SOpbpe+OrKMmwlHYq6RSSAr+zG4HDFEGFkmPQ==",
   "success": true,
   "projectFilePath": "C:\\Wisely\\C#\\Tape_Reel_Packing\\Magnus_WPF_1\\Magnus_WPF_1.csproj",
   "expectedPackageFiles": [
@@ -15,9 +15,11 @@
     "C:\\Users\\huynh\\.nuget\\packages\\itextsharp\\5.5.13.3\\itextsharp.5.5.13.3.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\materialdesigncolors\\1.2.0\\materialdesigncolors.1.2.0.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\materialdesignthemes\\2.6.0\\materialdesignthemes.2.6.0.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\mathnet.numerics\\5.0.0\\mathnet.numerics.5.0.0.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\microsoft.io.recyclablememorystream\\1.4.1\\microsoft.io.recyclablememorystream.1.4.1.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\system.componentmodel.annotations\\5.0.0\\system.componentmodel.annotations.5.0.0.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\system.numerics.vectors\\4.5.0\\system.numerics.vectors.4.5.0.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\system.valuetuple\\4.4.0\\system.valuetuple.4.4.0.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\xceed.wpf.avalondock.themes.vs2013\\2.9.0.1\\xceed.wpf.avalondock.themes.vs2013.2.9.0.1.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\zedgraph\\5.1.7\\zedgraph.5.1.7.nupkg.sha512"
   ],

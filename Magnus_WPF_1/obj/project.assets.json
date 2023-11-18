@@ -181,6 +181,18 @@
           "lib/net45/MaterialDesignThemes.Wpf.dll": {}
         }
       },
+      "MathNet.Numerics/5.0.0": {
+        "type": "package",
+        "dependencies": {
+          "System.ValueTuple": "4.4.0"
+        },
+        "compile": {
+          "lib/net461/MathNet.Numerics.dll": {}
+        },
+        "runtime": {
+          "lib/net461/MathNet.Numerics.dll": {}
+        }
+      },
       "Microsoft.IO.RecyclableMemoryStream/1.4.1": {
         "type": "package",
         "compile": {
@@ -214,6 +226,18 @@
         },
         "runtime": {
           "lib/net46/System.Numerics.Vectors.dll": {}
+        }
+      },
+      "System.ValueTuple/4.4.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net47/System.ValueTuple.dll": {}
+        },
+        "runtime": {
+          "lib/net47/System.ValueTuple.dll": {}
         }
       },
       "Xceed.Wpf.AvalonDock.Themes.VS2013/2.9.0.1": {
@@ -459,6 +483,18 @@
           "lib/net45/MaterialDesignThemes.Wpf.dll": {}
         }
       },
+      "MathNet.Numerics/5.0.0": {
+        "type": "package",
+        "dependencies": {
+          "System.ValueTuple": "4.4.0"
+        },
+        "compile": {
+          "lib/net461/MathNet.Numerics.dll": {}
+        },
+        "runtime": {
+          "lib/net461/MathNet.Numerics.dll": {}
+        }
+      },
       "Microsoft.IO.RecyclableMemoryStream/1.4.1": {
         "type": "package",
         "compile": {
@@ -492,6 +528,18 @@
         },
         "runtime": {
           "lib/net46/System.Numerics.Vectors.dll": {}
+        }
+      },
+      "System.ValueTuple/4.4.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net47/System.ValueTuple.dll": {}
+        },
+        "runtime": {
+          "lib/net47/System.ValueTuple.dll": {}
         }
       },
       "Xceed.Wpf.AvalonDock.Themes.VS2013/2.9.0.1": {
@@ -737,6 +785,18 @@
           "lib/net45/MaterialDesignThemes.Wpf.dll": {}
         }
       },
+      "MathNet.Numerics/5.0.0": {
+        "type": "package",
+        "dependencies": {
+          "System.ValueTuple": "4.4.0"
+        },
+        "compile": {
+          "lib/net461/MathNet.Numerics.dll": {}
+        },
+        "runtime": {
+          "lib/net461/MathNet.Numerics.dll": {}
+        }
+      },
       "Microsoft.IO.RecyclableMemoryStream/1.4.1": {
         "type": "package",
         "compile": {
@@ -770,6 +830,18 @@
         },
         "runtime": {
           "lib/net46/System.Numerics.Vectors.dll": {}
+        }
+      },
+      "System.ValueTuple/4.4.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net47/System.ValueTuple.dll": {}
+        },
+        "runtime": {
+          "lib/net47/System.ValueTuple.dll": {}
         }
       },
       "Xceed.Wpf.AvalonDock.Themes.VS2013/2.9.0.1": {
@@ -1015,6 +1087,18 @@
           "lib/net45/MaterialDesignThemes.Wpf.dll": {}
         }
       },
+      "MathNet.Numerics/5.0.0": {
+        "type": "package",
+        "dependencies": {
+          "System.ValueTuple": "4.4.0"
+        },
+        "compile": {
+          "lib/net461/MathNet.Numerics.dll": {}
+        },
+        "runtime": {
+          "lib/net461/MathNet.Numerics.dll": {}
+        }
+      },
       "Microsoft.IO.RecyclableMemoryStream/1.4.1": {
         "type": "package",
         "compile": {
@@ -1048,6 +1132,18 @@
         },
         "runtime": {
           "lib/net46/System.Numerics.Vectors.dll": {}
+        }
+      },
+      "System.ValueTuple/4.4.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net47/System.ValueTuple.dll": {}
+        },
+        "runtime": {
+          "lib/net47/System.ValueTuple.dll": {}
         }
       },
       "Xceed.Wpf.AvalonDock.Themes.VS2013/2.9.0.1": {
@@ -1791,6 +1887,28 @@
         "src/net45/ValidationAssist.cs"
       ]
     },
+    "MathNet.Numerics/5.0.0": {
+      "sha512": "pg1W2VwaEQMAiTpGK840hZgzavnqjlCMTVSbtVCXVyT+7AX4mc1o89SPv4TBlAjhgCOo9c1Y+jZ5m3ti2YgGgA==",
+      "type": "package",
+      "path": "mathnet.numerics/5.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "icon.png",
+        "lib/net461/MathNet.Numerics.dll",
+        "lib/net461/MathNet.Numerics.xml",
+        "lib/net48/MathNet.Numerics.dll",
+        "lib/net48/MathNet.Numerics.xml",
+        "lib/net5.0/MathNet.Numerics.dll",
+        "lib/net5.0/MathNet.Numerics.xml",
+        "lib/net6.0/MathNet.Numerics.dll",
+        "lib/net6.0/MathNet.Numerics.xml",
+        "lib/netstandard2.0/MathNet.Numerics.dll",
+        "lib/netstandard2.0/MathNet.Numerics.xml",
+        "mathnet.numerics.5.0.0.nupkg.sha512",
+        "mathnet.numerics.nuspec"
+      ]
+    },
     "Microsoft.IO.RecyclableMemoryStream/1.4.1": {
       "sha512": "6A0fyZkxoUUj1dpXzLAWwI89YmKZ+ZSp1DCg+gN6llcXJwfYo1IIQZoCkuo6T7vUxw/w1CSk/Pl04NQ4fno+DQ==",
       "type": "package",
@@ -1953,6 +2071,51 @@
         "version.txt"
       ]
     },
+    "System.ValueTuple/4.4.0": {
+      "sha512": "BahUww/+mdP4ARCAh2RQhQTg13wYLVrBb9SYVgW8ZlrwjraGCXHGjo0oIiUfZ34LUZkMMR+RAzR7dEY4S1HeQQ==",
+      "type": "package",
+      "path": "system.valuetuple/4.4.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net461/System.ValueTuple.dll",
+        "lib/net461/System.ValueTuple.xml",
+        "lib/net47/System.ValueTuple.dll",
+        "lib/net47/System.ValueTuple.xml",
+        "lib/netcoreapp2.0/_._",
+        "lib/netstandard1.0/System.ValueTuple.dll",
+        "lib/netstandard1.0/System.ValueTuple.xml",
+        "lib/netstandard2.0/_._",
+        "lib/portable-net40+sl4+win8+wp8/System.ValueTuple.dll",
+        "lib/portable-net40+sl4+win8+wp8/System.ValueTuple.xml",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net461/System.ValueTuple.dll",
+        "ref/net461/System.ValueTuple.xml",
+        "ref/net47/System.ValueTuple.dll",
+        "ref/net47/System.ValueTuple.xml",
+        "ref/netcoreapp2.0/_._",
+        "ref/netstandard2.0/_._",
+        "ref/portable-net40+sl4+win8+wp8/System.ValueTuple.dll",
+        "ref/portable-net40+sl4+win8+wp8/System.ValueTuple.xml",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._",
+        "system.valuetuple.4.4.0.nupkg.sha512",
+        "system.valuetuple.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
+      ]
+    },
     "Xceed.Wpf.AvalonDock.Themes.VS2013/2.9.0.1": {
       "sha512": "jCJ6yUuAJtQDzIXfoBG1A6P7vqMMvVh/zRuT5/2e2nH6xYVX9WZ0IW3vY2bb7hExyUrh+QDd+NotpGqCgS7K+w==",
       "type": "package",
@@ -2002,6 +2165,7 @@
       "Extended.Wpf.Toolkit >= 3.8.2",
       "MaterialDesignColors >= 1.2.0",
       "MaterialDesignThemes >= 2.6.0",
+      "MathNet.Numerics >= 5.0.0",
       "System.Numerics.Vectors >= 4.5.0",
       "Xceed.Wpf.AvalonDock.Themes.VS2013 >= 2.9.0.1",
       "iTextSharp >= 5.5.13.3"
@@ -2067,6 +2231,10 @@
           "MaterialDesignThemes": {
             "target": "Package",
             "version": "[2.6.0, )"
+          },
+          "MathNet.Numerics": {
+            "target": "Package",
+            "version": "[5.0.0, )"
           },
           "System.Numerics.Vectors": {
             "target": "Package",

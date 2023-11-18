@@ -67,7 +67,7 @@ namespace Magnus_WPF_1.Source.Application
             //m_cap.SetCaptureProperty(CapProp.Focus, 65); // set the focus to the specified value
 
             int dpi = 96;
-            m_imageViews[0] = new ImageView( m_Width, m_Height, dpi, indexTrack, 1);
+            m_imageViews[0] = new ImageView(m_Width, m_Height, dpi, indexTrack, 1);
             m_imageViews[0].bufferImage = new byte[m_Width * m_Height * 3];
             m_imageViews[0]._imageWidth = m_Width;
             m_imageViews[0]._imageHeight = m_Height;
@@ -93,7 +93,7 @@ namespace Magnus_WPF_1.Source.Application
             try
             {
                 Array.Clear(m_imageViews[0].bufferImage, 0, m_imageViews[0].bufferImage.Length);
-                
+
                 m_cap.SetCaptureProperty(CapProp.Autofocus, 0);
                 //m_cap.SetCaptureProperty(CapProp.Focus, InspectionCore.DeviceLocationParameter.m_nStepTemplate);
                 m_cap.Retrieve(m_frame);
@@ -214,7 +214,7 @@ namespace Magnus_WPF_1.Source.Application
                 nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
                 return 0;
             }
-            hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);         
+            hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);
             m_imageViews[0].UpdateSourceImageMono();
             // m_imageViews[0].UpdateNewImageColor(m_imageViews[0].bufferImage, nWidth, nHeight, 96);
             nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
@@ -245,7 +245,266 @@ namespace Magnus_WPF_1.Source.Application
         //}
 
 
-        public int Inspect(ref Track m_track)
+        #region Calculate XYZ Shift and Transform Matrix between robot and camera
+
+        public class MagnusMatrix
+        {
+            private float[,] data;
+
+            public MagnusMatrix(int rows, int cols)
+            {
+                data = new float[rows, cols];
+            }
+
+            public float this[int i, int j]
+            {
+                get { return data[i, j]; }
+                set { data[i, j] = value; }
+            }
+
+            public int Rows => data.GetLength(0);
+            public int Cols => data.GetLength(1);
+
+
+
+            static float[] GaussElimination(MagnusMatrix A, float[] B)
+            {
+                int n = B.Length;
+                float[] x = new float[n];
+
+                // Implement Gaussian Elimination here...
+
+                return x;
+            }
+
+            public static float[,] CalculateTransformMatrix(PointF pC1, PointF pC2, PointF pR1, PointF pR2)
+            {
+                float x1c = pC1.X;
+                float y1c = pC1.Y;
+                float x2c = pC2.X;
+                float y2c = pC2.Y;
+                float x1r = pR1.X;
+                float y1r = pR1.Y;
+                float x2r = pR2.X;
+                float y2r = pR2.Y;
+
+                MagnusMatrix A = new MagnusMatrix(6, 6);
+                A[0, 0] = x1c; A[0, 1] = y1c; A[0, 2] = 1; A[1, 3] = x1c; A[1, 4] = y1c; A[1, 5] = 1;
+                A[2, 0] = x2c; A[2, 1] = y2c; A[3, 3] = x2c; A[3, 4] = y2c;
+
+                float[] B = { x1r, x2r, y1r, y2r, 0, 0 };
+
+                float[] x = GaussElimination(A, B);
+
+                MagnusMatrix transformMatrix = new MagnusMatrix(3, 3);
+                transformMatrix[0, 0] = x[0]; transformMatrix[0, 1] = x[1]; transformMatrix[0, 2] = x[2];
+                transformMatrix[1, 0] = x[3]; transformMatrix[1, 1] = x[4]; transformMatrix[1, 2] = x[5];
+                transformMatrix[2, 0] = 0; transformMatrix[2, 1] = 0; transformMatrix[2, 2] = 1;
+                return transformMatrix.data;
+            }
+            public static Vector3 TransformCameraToRobot(float[,] transformMatrix, float xCamera, float yCamera)
+            {
+                // Create homogeneous vector for the camera point
+                Vector3 vectorCamera = new Vector3(xCamera, yCamera, 1);
+
+                // Multiply the transformation matrix with the camera vector
+                Vector3 vectorRobotHomogeneous = MultiplyMatrixVector(transformMatrix, vectorCamera);
+
+                // Normalize the result to obtain Cartesian coordinates
+                Vector3 vectorRobotCartesian = vectorRobotHomogeneous / vectorRobotHomogeneous.Z;
+
+                return vectorRobotCartesian;
+            }
+
+            static Vector3 MultiplyMatrixVector(float[,] matrix, Vector3 vector)
+            {
+                float x = matrix[0, 0] * vector.X + matrix[0, 1] * vector.Y + matrix[0, 2] * vector.Z;
+                float y = matrix[1, 0] * vector.X + matrix[1, 1] * vector.Y + matrix[1, 2] * vector.Z;
+                float z = matrix[2, 0] * vector.X + matrix[2, 1] * vector.Y + matrix[2, 2] * vector.Z;
+
+                return new Vector3(x, y, z);
+            }
+
+            public static double CalculateShiftXYAngle(PointF pCenter1, PointF pCorner1, PointF pCenter2, PointF pCorner2, out double dShiftX, out double dShiftY)
+            {
+                double dX1 = pCorner1.X - pCenter1.X;
+                double dY1 = pCorner1.Y - pCenter1.Y;
+                double dX2 = pCorner2.X - pCenter2.X;
+                double dY2 = pCorner2.Y - pCenter2.Y;
+                dShiftX = pCenter1.X - pCenter2.X;
+                dShiftY = pCenter1.Y - pCenter2.Y;
+                return AngleBetweenVectors(dX1, dY1, dX2, dY2) * RotationDirection(dX1, dY1, dX2, dY2);
+            }
+
+            public static double AngleWithXAxis(double xa, double ya)
+            {
+                // Calculate the angle in radians
+                double thetaRad = Math.Atan2(ya, xa);
+
+                // Convert radians to degrees
+                double thetaDeg = Math.Round((180 / Math.PI) * thetaRad, 2);
+
+                return thetaDeg;
+            }
+            public static double AngleBetweenVectors(double xa, double ya, double xb, double yb)
+            {
+                // Calculate the dot product
+                double dotProduct = xa * xb + ya * yb;
+
+                // Calculate the magnitudes of the vectors
+                double magnitudeA = Math.Sqrt(xa * xa + ya * ya);
+                double magnitudeB = Math.Sqrt(xb * xb + yb * yb);
+
+                // Calculate the angle in radians
+                double thetaRad = Math.Acos(dotProduct / (magnitudeA * magnitudeB));
+
+                // Convert radians to degrees
+                double thetaDeg = Math.Round((180 / Math.PI) * thetaRad, 2);
+
+                return thetaDeg;
+            }
+            public static int RotationDirection(double xa, double ya, double xb, double yb)
+            {
+                // Calculate the cross product
+                double crossProduct = xa * yb - xb * ya;
+
+                // Determine the rotation direction
+                if (crossProduct > 0)
+                {
+                    return -1;
+                }
+                else if (crossProduct < 0)
+                {
+                    return 1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+
+
+
+
+        #endregion
+
+        public void DrawInspectionResult(ref int nResult, ref PointF pCenter, ref PointF pCorner)
+        {
+            Stopwatch timeIns = new Stopwatch();
+
+            timeIns.Restart();
+
+            SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
+            foreach (ArrayOverLay overlay in m_ArrayOverLay)
+            {
+                SolidColorBrush c = new SolidColorBrush(overlay._color);
+                m_imageViews[0].DrawRegionOverlay(overlay.mat_Region, c);
+
+            }
+
+
+
+            double dX1 = pCorner.X - pCenter.X;
+            double dY1 = pCorner.Y - pCenter.Y;
+            double dAngle = MagnusMatrix.AngleWithXAxis(dX1, dY1);
+            double dShiftX, dShiftY, dDeltaAngle;
+            dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(pCenter, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint, out dShiftX, out dShiftY);
+
+            //int Anglesign = RotationDirection(dX1, dY1, dX2, dY2);
+
+            color = new SolidColorBrush(Colors.Yellow);
+            m_imageViews[0].DrawStringOverlay("(X, Y, Angle) = (" + pCenter.X.ToString() + ", " + pCenter.Y.ToString() + ", " + ((int)dAngle).ToString() + ")", (int)pCenter.X + 10, (int)pCenter.Y, color, 20);
+
+            if (nResult == -99)
+            {
+                color = new SolidColorBrush(Colors.Red);
+                m_imageViews[0].DrawString("Device not found! ", 10, 10, color, 31);
+            }
+            else
+            {
+                if (nResult == -1)
+                {
+                    color = new SolidColorBrush(Colors.Red);
+                    m_imageViews[0].DrawString("Not Good", 10, 10, color, 31);
+                    //m_imageViews[0].DrawString("Score: " + ((int)dScoreOutput).ToString(), 10, 35, color, 31);
+
+                }
+                else
+                {
+                    color = new SolidColorBrush(Colors.Green);
+                    m_imageViews[0].DrawString(/*m_cap.GetCaptureProperty(CapProp.Focus).ToString() */ "Good", 10, 10, color, 31);
+                    color = new SolidColorBrush(Colors.Yellow);
+                    m_imageViews[0].DrawString("Delta: = (" + dShiftX.ToString() + ", " + dShiftY.ToString() + ", " + dDeltaAngle.ToString() + ")", 10, 40, color, 18);
+
+                }
+
+            }
+
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Draw Overlay time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
+
+            });
+
+            LogMessage.WriteToDebugViewer(1, "Draw Overlay time: " + timeIns.ElapsedMilliseconds.ToString());
+        }
+
+        public int AutoTeach(ref Track m_track, bool bEnableDisplay = false)
+        {
+
+            {
+                //Track _track = m_track;
+
+                if (MainWindow.mainWindow.m_bEnableDebug)
+                    m_StepDebugInfors.Clear();
+
+                m_ArrayOverLay.Clear();
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    m_imageViews[0].ClearOverlay();
+                    m_imageViews[0].ClearText();
+                });
+                int nResult;
+                PointF pCenter = new PointF();
+                PointF pCorner = new PointF();
+
+                nResult = m_InspectionCore.SimpleInspection(ref m_InspectionCore.m_TeachImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, ref m_StepDebugInfors, false);
+                //Draw Result
+                if (nResult == 0)
+                {
+                    m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint = pCenter;
+                    m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint = pCorner;
+                    m_InspectionCore.m_DeviceLocationResult.m_dAngleOxDevice = MagnusMatrix.AngleWithXAxis(pCorner.X - pCenter.X, pCorner.Y - pCenter.Y);
+                }
+
+
+
+                if (bEnableDisplay)
+                {
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        DrawInspectionResult(ref nResult, ref pCenter, ref pCorner);
+                    });
+                }
+                return nResult;
+            }
+        }
+
+        public int DebugFunction(ref Track m_track, out PointF pCenterOut, out PointF pCornerOut)
+        {
+            Inspect(ref m_track, out pCenterOut, out pCornerOut);
+            double dShiftX, dShiftY, dDeltaAngle;
+            dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(pCenterOut, pCornerOut, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint, out dShiftX, out dShiftY);
+
+            //Todo need to later after adding the calib function to calculate the transform matrix
+            //float[,] maxTransform = MagnusMatrix.CalculateTransformMatrix(pCam1, pCam2, pRobot1, pRobot2);
+            //Vector3 robotPoint = MagnusMatrix.TransformCameraToRobot(maxTransform, pCenter.X, pCenter.Y);
+            // MoveToPickPosition(robotPoint, dDeltaAngle);
+
+            return 0;
+        }
+        public int Inspect(ref Track m_track, out PointF pCenterOut, out PointF pCornerOut)
         {
             //Track _track = m_track;
 
@@ -258,80 +517,21 @@ namespace Magnus_WPF_1.Source.Application
                 m_imageViews[0].ClearOverlay();
                 m_imageViews[0].ClearText();
             });
-            //Master.list_arrayOverlay[m_nTrackID].Clear();
             int nResult;
-            Point pCenter = new Point();
-            double nAngleOutput = 0;
-            //List<ArrayOverLay> list_overlayRegion = new List<ArrayOverLay>();
-            nResult = m_InspectionCore.SimpleInspection(ref m_ArrayOverLay, ref pCenter, ref nAngleOutput, ref m_StepDebugInfors, MainWindow.mainWindow.m_bEnableDebug);
+            //double nAngleOutput = 0;
+            PointF pCenter = new PointF(0, 0);
+            PointF pCorner = new PointF(0,0);
+            nResult = m_InspectionCore.SimpleInspection(ref m_InspectionCore.m_SourceImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, ref m_StepDebugInfors, MainWindow.mainWindow.m_bEnableDebug);
 
-            // calculate robot pick point X,Y,Angle
+            pCenterOut = pCenter;
+            pCornerOut = pCorner;
 
-            Stopwatch timeIns = new Stopwatch();
-            timeIns.Start();
-            // Send result to Robot
-            string strResult = $"{nResult}_{pCenter.X *1.11}_{pCenter.Y *1.11}_{nAngleOutput}";
-            //Master.commHIKRobot.CreateAndSendMessageToHIKRobot(SignalFromVision.Vision_Go_Pick, strResult);
-            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("send message from vision to robot time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
-
-            });
             //Draw Result
-            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                timeIns.Restart();
-                //m_imageViews[0].ClearOverlay();
-                //m_imageViews[0].ClearText();
-                SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
-                //m_imageViews[0].DrawPolygonOverlay(ref polygon, color, 1);
-                foreach (ArrayOverLay overlay in m_ArrayOverLay)
-                {
-                    SolidColorBrush c = new SolidColorBrush(overlay._color);
-                    m_imageViews[0].DrawRegionOverlay(overlay.mat_Region, c);
-
-                }
-
-                //m_imageViews[0].DrawCrossPointOverlay(ref pCenter);
-                color = new SolidColorBrush(Colors.Yellow);
-                m_imageViews[0].DrawStringOverlay("(X, Y, Angle) = (" + pCenter.X.ToString() + ", " + pCenter.Y.ToString() + ", " + ((int)nAngleOutput).ToString() + ")", pCenter.X + 10, pCenter.Y, color, 20);
-
-                //m_imageViews[0].DrawRegionOverlay(ref mat_output);
-
-                if (nResult == -99)
-                {
-                    color = new SolidColorBrush(Colors.Red);
-                    m_imageViews[0].DrawString("Device not found! ", 10, 10, color, 31);
-                }
-                else
-                {
-                    if (nResult == -1)
-                    {
-                        color = new SolidColorBrush(Colors.Red);
-                        m_imageViews[0].DrawString("Not Good", 10, 10, color, 31);
-                        //m_imageViews[0].DrawString("Score: " + ((int)dScoreOutput).ToString(), 10, 35, color, 31);
-
-                    }
-                    else
-                    {
-                        color = new SolidColorBrush(Colors.Green);
-                        m_imageViews[0].DrawString(/*m_cap.GetCaptureProperty(CapProp.Focus).ToString() */ "Good", 10, 10, color, 31);
-                        //m_imageViews[0].DrawString("Score: " + ((int)dScoreOutput).ToString(), 10, 35, color, 31);
-
-                    }
-
-                }
-
+            if(true)
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Draw Overlay time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
-
+                    DrawInspectionResult(ref nResult, ref pCenter, ref pCorner);
                 });
-
-                LogMessage.WriteToDebugViewer(1, "Draw Overlay time: " + timeIns.ElapsedMilliseconds.ToString());
-
-            });
-
 
             return nResult;
         }
@@ -376,7 +576,17 @@ namespace Magnus_WPF_1.Source.Application
 
                     Stopwatch timeIns = new Stopwatch();
                     timeIns.Start();
-                    m_nResult[m_CurrentSequenceDeviceID] = Inspect(ref mainWindow.master.m_Tracks[m_nTrackID]);
+                    PointF pCenter, pCorner;
+                    m_nResult[m_CurrentSequenceDeviceID] = Inspect(ref mainWindow.master.m_Tracks[m_nTrackID], out pCenter, out pCorner);
+
+                    double dShiftX, dShiftY, dDeltaAngle;
+                    dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(pCenter, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint, out dShiftX, out dShiftY);
+
+                    //Todo need to later after adding the calib function to calculate the transform matrix
+                    //float[,] maxTransform = MagnusMatrix.CalculateTransformMatrix(pCam1, pCam2, pRobot1, pRobot2);
+                    //Vector3 robotPoint = MagnusMatrix.TransformCameraToRobot(maxTransform, pCenter.X, pCenter.Y);
+                    // MoveToPickPosition(robotPoint, dDeltaAngle);
+
                     ////
                     //Master.InspectEvent[m_nTrackID].Reset();
                     Master.InspectDoneEvent[m_nTrackID].Set();

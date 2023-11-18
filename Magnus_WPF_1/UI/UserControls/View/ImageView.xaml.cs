@@ -1136,19 +1136,20 @@ namespace Magnus_WPF_1.UI.UserControls.View
                     Rectangles L_TemplateRoi_Temp = GetRectangle();
                     controlWin.Visibility = Visibility.Collapsed;
 
-                    List<System.Drawing.Point> p_Regionpolygon = new List<System.Drawing.Point>();
-                    Mat mat_DeviceLocationRegion = new Mat();
-                    double nAngleOutput = 0.0;
-                    double dScoreOutput = 0.0;
-                    int L_CornerIndex_Temp = 0;
-                    System.Drawing.Rectangle rectMatchingPosition = new System.Drawing.Rectangle();
-                    MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.AutoTeachDatumLocation(ref p_Regionpolygon, L_DeviceLocationRoi_Temp, L_TemplateRoi_Temp, ref mat_DeviceLocationRegion, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput, ref L_CornerIndex_Temp);
-                    Source.Application.Application.categoriesTeachParam.L_TemplateRoi = L_TemplateRoi_Temp;
-                    Source.Application.Application.categoriesTeachParam.L_CornerIndex = L_CornerIndex_Temp;
+                    //List<System.Drawing.Point> p_Regionpolygon = new List<System.Drawing.Point>();
+                    //Mat mat_DeviceLocationRegion = new Mat();
+                    //double nAngleOutput = 0.0;
+                    //double dScoreOutput = 0.0;
+                    //int L_CornerIndex_Temp = 0;
+                    //System.Drawing.Rectangle rectMatchingPosition = new System.Drawing.Rectangle();
+                    //MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.AutoTeachDatumLocation(ref p_Regionpolygon, L_DeviceLocationRoi_Temp, L_TemplateRoi_Temp, ref mat_DeviceLocationRegion, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput, ref L_CornerIndex_Temp);
+                    //Source.Application.Application.categoriesTeachParam.L_TemplateRoi = L_TemplateRoi_Temp;
+                    //Source.Application.Application.categoriesTeachParam.L_CornerIndex = L_CornerIndex_Temp;
 
-                    SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
-                    DrawPolygonOverlay(ref p_Regionpolygon, color, 1);
-                    DrawRegionOverlay(mat_DeviceLocationRegion, color);
+                    MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].AutoTeach(ref MainWindow.mainWindow.master.m_Tracks[nTeachTrackID], true);
+                    //SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
+                    //DrawPolygonOverlay(ref p_Regionpolygon, color, 1);
+                    //DrawRegionOverlay(mat_DeviceLocationRegion, color);
 
                     UpdateTextOverlay((nCurrentStep + 1).ToString()/* + "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "  Device Found", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
                     UpdateRegionOverlay();

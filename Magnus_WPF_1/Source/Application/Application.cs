@@ -151,13 +151,21 @@ namespace Magnus_WPF_1.Source.Application
         public static void WriteCamSetting(int nTrack)
         {
                 #region USB Camera
-                string pathCam = Path.Combine(pathRecipe, currentRecipe, "camera_Track" + (nTrack + 1).ToString() +".cam");
-                IniFile ini = new IniFile(pathCam);
+                string pathCam = Path.Combine(pathRecipe, currentRecipe);
+                string fullpathCam = Path.Combine(pathCam, "camera_Track" + (nTrack + 1).ToString() +".cam");
+                IniFile ini = new IniFile(fullpathCam);
                 ini.WriteValue("Camera Setting", "gain", cameraSettingParam.gain);
                 ini.WriteValue("Camera Setting", "exposure time", cameraSettingParam.exposureTime);
                 ini.WriteValue("Camera Setting", "software trigger", cameraSettingParam.softwareTrigger);
                 ini.WriteValue("Camera Setting", "FrameRate", cameraSettingParam.frameRate);
-                #endregion
+            #endregion
+            if (!Directory.Exists(pathCam))
+            {
+                Directory.CreateDirectory(pathCam);
+                WriteCamSetting(nTrack);
+            }
+
+
         }
 
         public static void LoadTeachParamFromFileToDict(ref int nTrack)
@@ -203,8 +211,7 @@ namespace Magnus_WPF_1.Source.Application
             WriteLine("LOCATION", "Device Location Roi", ini, ConvertRectanglesToString(categoriesTeachParam.L_DeviceLocationRoi));
             WriteLine("LOCATION", "Threshold Type", ini, categoriesTeachParam.L_ThresholdType.ToString());
             WriteLine("LOCATION", "Object Color", ini, categoriesTeachParam.L_ObjectColor.ToString());
-
-            
+          
             WriteLine("LOCATION", "lower threshold", ini, categoriesTeachParam.L_lowerThreshold.ToString());
             WriteLine("LOCATION", "upper threshold", ini, categoriesTeachParam.L_upperThreshold.ToString());
             WriteLine("LOCATION", "lower threshold Inner Chip", ini, categoriesTeachParam.L_lowerThresholdInnerChip.ToString());

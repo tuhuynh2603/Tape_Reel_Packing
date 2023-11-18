@@ -5,6 +5,7 @@ using System.Windows.Media;
 
 namespace Magnus_WPF_1.Source.Define
 {
+
     public enum TEACHSTEP : int
     {
         TEACH_LOADIMAGE = -1,

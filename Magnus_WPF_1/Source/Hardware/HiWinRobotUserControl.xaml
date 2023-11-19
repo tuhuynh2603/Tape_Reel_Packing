@@ -406,7 +406,7 @@
                              Text="{Binding Path=Value, ElementName=m_nNumberPointValue, 
                                 Mode=TwoWay ,UpdateSourceTrigger=PropertyChanged}"></TextBox>
                 </Grid>-->
-                <Button Content=" Do Calibration" Grid.Row="0"></Button>
+                <Button x:Name="button_CameraRobotCalibration" Content=" Do Calibration" Click="button_CameraRobotCalibration_Click" Grid.Row="0"></Button>
                 <Button x:Name="button_Import_Task" Content="Import Task" Click="button_Import_Task_Click" Grid.Row="2"></Button>
                 <Button x:Name="button_Start_Task" Content="Start Task" Click="button_Start_Task_Click" Grid.Row="3"></Button>
                 <Button x:Name="button_Abort_Task" Content="Abort Task" Click="button_Abort_Task_Click" Grid.Row="4"></Button>

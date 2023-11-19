@@ -1289,12 +1289,24 @@ namespace Magnus_WPF_1
 
         private void btn_BarCodeReader_Setting_Checked(object sender, RoutedEventArgs e)
         {
+                //master.m_BarcodeReader.sendCommandToAllReaders("LON");
+
+                //defectInfor.lvDefect.View = gridView;
+                DialogDefectWidth = defectInfor.Width;
+
+                grd_Defect.Children.Clear();
+                grd_Defect.Children.Add(master.m_BarcodeReader.m_BarcodeReader);
+                //defectInfor.SvDefect.CanContentScroll = true;
+                //grd_Defect.VerticalAlignment = VerticalAlignment.Top;
+                //grd_Defect.HorizontalAlignment = HorizontalAlignment.Left;
+                grd_Defect_Settings.Visibility = Visibility.Visible;
 
         }
 
         private void btn_BarCodeReader_Setting_Unchecked(object sender, RoutedEventArgs e)
         {
-
+            grd_Defect_Settings.Visibility = Visibility.Collapsed;
+            grd_Defect.Children.Clear();
         }
     }
 }

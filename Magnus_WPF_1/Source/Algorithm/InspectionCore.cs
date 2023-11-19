@@ -234,7 +234,7 @@ namespace Magnus_WPF_1.Source.Algorithm
 
         }
 
-        public /*static*/ int SimpleInspection(ref ImageTarget InspectImage, ref List<ArrayOverLay> list_arrayOverlay, ref PointF pCenter, ref PointF pCorner, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug = false)
+        public /*static*/ int Inspect(ref ImageTarget InspectImage, ref List<ArrayOverLay> list_arrayOverlay, ref PointF pCenter, ref PointF pCorner, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug = false)
         {
             int nError;
             Stopwatch timeIns = new Stopwatch();

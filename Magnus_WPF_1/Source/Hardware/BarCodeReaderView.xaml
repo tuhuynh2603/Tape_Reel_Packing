@@ -3,45 +3,50 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Magnus_WPF_1.Source.Hardware"
+             xmlns:local="clr-namespace:Magnus_WPF_1.Source.Hardware" xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms" xmlns:sdk="clr-namespace:Keyence.AutoID.SDK;assembly=Keyence.AutoID.SDK"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="700"
              >
-    <Window Height="Auto">
+    <Grid Background="LightGray">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0">
+            <Label x:Name="label_FullReaderString" Content="Reader IP"></Label>
+            <ComboBox></ComboBox>
+            <Button x:Name="Connect" Content="Connect" Click="Connect_Click"></Button>
+        </StackPanel>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <!--<RowDefinition></RowDefinition>-->
+            </Grid.RowDefinitions>
+            <ComboBox x:Name="combo_commandSendToBarCode" Grid.Row="0" SelectionChanged="combo_commandSendToBarCode_SelectionChanged"></ComboBox>
 
-        <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"></RowDefinition>
-                    <RowDefinition Height="1*"></RowDefinition>
-                    <RowDefinition Height="1*"></RowDefinition>
-                </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0">
-                    <Label Content="Reader IP"></Label>
-                    <ComboBox></ComboBox>
-                <Button x:Name="Connect" Click="Connect_Click"></Button>
-                </StackPanel>
-                <Grid Grid.Row="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Label Grid.Row="0" Content="Command"></Label>
-                    <ComboBox Grid.Row="1"></ComboBox>
-                    <ListView Grid.Row="2"></ListView>
-                </Grid>
+            <Label Grid.Row="1" Content="data received"></Label>
+            <!--<ListView Grid.Row="2"></ListView>-->
+        </Grid>
 
-                <Grid Grid.Row="2">
-                    <Grid.RowDefinitions>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Label Grid.Row="0" Content="Config"></Label>
-                    <Button  Grid.Row="1" Content="Receive Files"></Button>
-                    <Button  Grid.Row="2" Content="Send Files"></Button>
-                </Grid>
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <Label x:Name="Label_FTP_Path" Grid.Row="0" Content="FileName"></Label>
+            <Label x:Name="LabelContent" Grid.Row="1" Content="FileName"></Label>
+            <Label x:Name="lbNewJpgFileName" Grid.Row="2" Content="JpedFileName"></Label>
+            <Button x:Name="ReceivedBarCodeFile"  Grid.Row="3" Content="Receive Files" Click="ReceivedBarCodeFile_Click"></Button>
+            <Button x:Name="SendBarCodeFile"  Grid.Row="4" Content="Send Files" Click="SendBarCodeFile_Click"></Button>
+            <Button x:Name="ReceivedFTPLastImage" Grid.Row="5" Content="Get FTP Image" Click="ReceivedFTPLastImage_Click"></Button>
+        </Grid>
 
-            </Grid>
-    </Window>
+    </Grid>
+
 </UserControl>

@@ -26,6 +26,7 @@ using Rectangle = System.Drawing.Rectangle;
 
 namespace Magnus_WPF_1.Source.Application
 {
+    using Magnus_WPF_1.Source.Hardware.SDKHrobot;
     using Magnus_WPF_1.Source.LogMessage;
     using System.Numerics;
     public class Track
@@ -266,64 +267,80 @@ namespace Magnus_WPF_1.Source.Application
             public int Cols => data.GetLength(1);
 
 
-
-            static float[] GaussElimination(MagnusMatrix A, float[] B)
+            static PointF[] AddHomogeneousCoordinate(PointF[] points)
             {
-                int n = B.Length;
-                float[] x = new float[n];
-
-                // Implement Gaussian Elimination here...
-
-                return x;
+                PointF[] homogeneousPoints = new PointF[points.Length];
+                for (int i = 0; i < points.Length; i++)
+                {
+                    homogeneousPoints[i] = new PointF(points[i].X, points[i].Y);
+                }
+                return homogeneousPoints;
             }
 
-            public static float[,] CalculateTransformMatrix(PointF pC1, PointF pC2, PointF pR1, PointF pR2)
+            public static Mat CalculateTransformMatrix(PointF[] srcPnt, PointF[] dstPnt)
             {
-                float x1c = pC1.X;
-                float y1c = pC1.Y;
-                float x2c = pC2.X;
-                float y2c = pC2.Y;
-                float x1r = pR1.X;
-                float y1r = pR1.Y;
-                float x2r = pR2.X;
-                float y2r = pR2.Y;
+                //float x1c = pC1.X;
+                //float y1c = pC1.Y;
+                //float x2c = pC2.X;
+                //float y2c = pC2.Y;
+                //float x1r = pR1.X;
+                //float y1r = pR1.Y;
+                //float x2r = pR2.X;
+                //float y2r = pR2.Y;
 
-                MagnusMatrix A = new MagnusMatrix(6, 6);
-                A[0, 0] = x1c; A[0, 1] = y1c; A[0, 2] = 1; A[1, 3] = x1c; A[1, 4] = y1c; A[1, 5] = 1;
-                A[2, 0] = x2c; A[2, 1] = y2c; A[3, 3] = x2c; A[3, 4] = y2c;
+                //MagnusMatrix A = new MagnusMatrix(6, 6);
+                //A[0, 0] = x1c; A[0, 1] = y1c; A[0, 2] = 1; A[1, 3] = x1c; A[1, 4] = y1c; A[1, 5] = 1;
+                //A[2, 0] = x2c; A[2, 1] = y2c; A[3, 3] = x2c; A[3, 4] = y2c;
 
-                float[] B = { x1r, x2r, y1r, y2r, 0, 0 };
+                //float[] B = { x1r, x2r, y1r, y2r, 0, 0 };
 
-                float[] x = GaussElimination(A, B);
+                //float[] x = GaussElimination(A, B);
+                //PointF[] srcPnt = new PointF[3];
+                //srcPnt[0] = pC1;
+                //srcPnt[1] = pC2;
+                //srcPnt[2] = pC3;
+                PointF[] srcPointsHomogeneous = AddHomogeneousCoordinate(srcPnt);
 
-                MagnusMatrix transformMatrix = new MagnusMatrix(3, 3);
-                transformMatrix[0, 0] = x[0]; transformMatrix[0, 1] = x[1]; transformMatrix[0, 2] = x[2];
-                transformMatrix[1, 0] = x[3]; transformMatrix[1, 1] = x[4]; transformMatrix[1, 2] = x[5];
-                transformMatrix[2, 0] = 0; transformMatrix[2, 1] = 0; transformMatrix[2, 2] = 1;
-                return transformMatrix.data;
-            }
-            public static Vector3 TransformCameraToRobot(float[,] transformMatrix, float xCamera, float yCamera)
-            {
-                // Create homogeneous vector for the camera point
-                Vector3 vectorCamera = new Vector3(xCamera, yCamera, 1);
-
-                // Multiply the transformation matrix with the camera vector
-                Vector3 vectorRobotHomogeneous = MultiplyMatrixVector(transformMatrix, vectorCamera);
-
-                // Normalize the result to obtain Cartesian coordinates
-                Vector3 vectorRobotCartesian = vectorRobotHomogeneous / vectorRobotHomogeneous.Z;
-
-                return vectorRobotCartesian;
+                //PointF[] dstPnt = new PointF[3];
+                //dstPnt[0] = pR1;
+                //dstPnt[1] = pR2;
+                //srcPnt[2] = pC3;
+                PointF[] dstPointsHomogeneous = AddHomogeneousCoordinate(dstPnt);
+                Mat mat = new Mat(3, 3, DepthType.Cv32F, 1);
+                mat.SetTo(new MCvScalar(10.5f));
+                mat = CvInvoke.GetAffineTransform(srcPointsHomogeneous, dstPointsHomogeneous);
+                return mat;
             }
 
-            static Vector3 MultiplyMatrixVector(float[,] matrix, Vector3 vector)
+            public static PointF ApplyTransformation(Mat transformMatrix, PointF point)
             {
-                float x = matrix[0, 0] * vector.X + matrix[0, 1] * vector.Y + matrix[0, 2] * vector.Z;
-                float y = matrix[1, 0] * vector.X + matrix[1, 1] * vector.Y + matrix[1, 2] * vector.Z;
-                float z = matrix[2, 0] * vector.X + matrix[2, 1] * vector.Y + matrix[2, 2] * vector.Z;
+                //System.Array transf = transformMatrix.GetData();
+                //object a = transf.GetValue(0, 0);
 
-                return new Vector3(x, y, z);
+                //float value = (float)transf.GetValue(0, 0);
+                //Matrix<float> transf = new Matrix<float>(3, 3);
+                //transformMatrix.CopyTo(transf);
+                float x = GetMatValue(transformMatrix, 0, 0) * point.X + GetMatValue(transformMatrix,0, 1) * point.Y + GetMatValue(transformMatrix, 0, 2);
+                float y = GetMatValue(transformMatrix, 1, 0) * point.X + GetMatValue(transformMatrix,1, 1) * point.Y + GetMatValue(transformMatrix, 1, 2);
+
+                return new PointF(x, y);
             }
+
+            static float GetMatValue(Mat mat, int row, int col)
+            {
+                // Ensure the indices are within bounds
+                if (row < 0 || row >= mat.Rows || col < 0 || col >= mat.Cols)
+                {
+                    throw new ArgumentOutOfRangeException("Invalid row or column indices");
+                }
+
+                // Access the value at the specified row and column
+                double dva = mat.GetValue(row, col);
+                float value = (float)dva;
+
+                return value;
+            }
+
 
             public static double CalculateShiftXYAngle(PointF pCenter1, PointF pCorner1, PointF pCenter2, PointF pCorner2, out double dShiftX, out double dShiftY)
             {
@@ -335,7 +352,6 @@ namespace Magnus_WPF_1.Source.Application
                 dShiftY = pCenter1.Y - pCenter2.Y;
                 return AngleBetweenVectors(dX1, dY1, dX2, dY2) * RotationDirection(dX1, dY1, dX2, dY2);
             }
-
             public static double AngleWithXAxis(double xa, double ya)
             {
                 // Calculate the angle in radians
@@ -411,6 +427,18 @@ namespace Magnus_WPF_1.Source.Application
             double dShiftX, dShiftY, dDeltaAngle;
             dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(pCenter, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint, out dShiftX, out dShiftY);
 
+            PointF robotPoint = MagnusMatrix.ApplyTransformation(MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.m_MatCameraRobotTransform, pCenter);
+            LogMessage.WriteToDebugViewer(1, "Move to Robot (X Y) = " + robotPoint.X.ToString() + ", " + robotPoint.Y.ToString());
+
+            double[] dValue = new double[6];
+            Hardware.SDKHrobot.HWinRobot.get_current_position(HiWinRobotInterface.m_DeviceID, dValue);
+            dValue[0] = robotPoint.X;
+            dValue[1] = robotPoint.Y;
+            dValue[5] = dDeltaAngle;
+            HWinRobot.jog_stop(HiWinRobotInterface.m_DeviceID);
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveToPosition(HiWinRobotInterface.m_DeviceID, 0, dValue);
+
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.MoveToReadyPosition(HiWinRobotInterface.m_DeviceID);
             //int Anglesign = RotationDirection(dX1, dY1, dX2, dY2);
 
             color = new SolidColorBrush(Colors.Yellow);
@@ -469,7 +497,7 @@ namespace Magnus_WPF_1.Source.Application
                 PointF pCenter = new PointF();
                 PointF pCorner = new PointF();
 
-                nResult = m_InspectionCore.SimpleInspection(ref m_InspectionCore.m_TeachImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, ref m_StepDebugInfors, false);
+                nResult = m_InspectionCore.Inspect(ref m_InspectionCore.m_TeachImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, ref m_StepDebugInfors, false);
                 //Draw Result
                 if (nResult == 0)
                 {
@@ -498,12 +526,17 @@ namespace Magnus_WPF_1.Source.Application
             dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(pCenterOut, pCornerOut, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint, out dShiftX, out dShiftY);
 
             //Todo need to later after adding the calib function to calculate the transform matrix
-            //float[,] maxTransform = MagnusMatrix.CalculateTransformMatrix(pCam1, pCam2, pRobot1, pRobot2);
-            //Vector3 robotPoint = MagnusMatrix.TransformCameraToRobot(maxTransform, pCenter.X, pCenter.Y);
-            // MoveToPickPosition(robotPoint, dDeltaAngle);
+            PointF robotPoint = MagnusMatrix.ApplyTransformation(MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.m_MatCameraRobotTransform, pCenterOut);
 
+            double[] dValue = new double[6];
+            Hardware.SDKHrobot.HWinRobot.get_current_position(HiWinRobotInterface.m_DeviceID, dValue);
+            dValue[0] = robotPoint.X;
+            dValue[1] = robotPoint.Y;
+            dValue[5] = dDeltaAngle;
+            HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, 0, dValue);
             return 0;
         }
+
         public int Inspect(ref Track m_track, out PointF pCenterOut, out PointF pCornerOut)
         {
             //Track _track = m_track;
@@ -521,13 +554,12 @@ namespace Magnus_WPF_1.Source.Application
             //double nAngleOutput = 0;
             PointF pCenter = new PointF(0, 0);
             PointF pCorner = new PointF(0,0);
-            nResult = m_InspectionCore.SimpleInspection(ref m_InspectionCore.m_SourceImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, ref m_StepDebugInfors, MainWindow.mainWindow.m_bEnableDebug);
+            nResult = m_InspectionCore.Inspect(ref m_InspectionCore.m_SourceImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, ref m_StepDebugInfors, MainWindow.mainWindow.m_bEnableDebug);
 
             pCenterOut = pCenter;
             pCornerOut = pCorner;
-
             //Draw Result
-            if(true)
+            if (true)
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
                     DrawInspectionResult(ref nResult, ref pCenter, ref pCorner);

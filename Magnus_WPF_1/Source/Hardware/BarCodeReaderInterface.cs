@@ -7,27 +7,29 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-
+using Keyence.AutoID.SDK;
 using Magnus_WPF_1.Source.Application;
 using System.Diagnostics;
-
 namespace Magnus_WPF_1.Source.Hardware
 {
+    using Magnus_WPF_1.Source.LogMessage;
+    //using System.Windows.Forms;
 
-	using Magnus_WPF_1.Source.LogMessage;
-
-	public class BarCodeReaderInterface
+    public class BarCodeReaderInterface
     {
 		public CommInterface commBarCodeSequence;
+
+		private ReaderSearcher m_searcher = new ReaderSearcher();
+		private Dictionary<string, ReaderAccessor> m_resisterdReaders = new Dictionary<string, ReaderAccessor>();
+		List<NicSearchResult> m_nicList = new List<NicSearchResult>();
+		private string m_strKey = "";
+
+
 		string barCodeipAddress;
-		public int portBarcodeReader = 11000;
-		public int portLotInfo = 11001;
-		public static int ncntWord;
-		public static int ncntDword;
 		const int BUFLEN = 255;
 		public int[] nReceiveMessage;
-		public int[] nReceiveMessageBkUp;
 		private MainWindow main;
+		public BarCodeReaderView m_BarcodeReader;
 
 		Thread m_Thread;
 
@@ -39,19 +41,108 @@ namespace Magnus_WPF_1.Source.Hardware
 
 			string defaults = "127.0.0.1";
 			barCodeipAddress = GetCommInfo("Barcode Comm::IpAddress", defaults);
-			defaults = portBarcodeReader.ToString();
-			portBarcodeReader = int.Parse(GetCommInfo("Comm::PortNumber[0]", defaults));
-			defaults = portLotInfo.ToString();
-			portLotInfo = int.Parse(GetCommInfo("Comm::PortNumber[1]", defaults));
-			LogMessage.WriteToDebugViewer(1, "Init  CommInterface");
-			commBarCodeSequence = new CommInterface(barCodeipAddress, portBarcodeReader);
+
+			m_nicList = m_searcher.ListUpNic();
+			if (m_nicList != null)
+			{
+				for (int i = 0; i < m_nicList.Count; i++)
+				{
+					if (m_nicList[i].NicIpAddr == barCodeipAddress)
+					{
+						m_searcher.SelectedNicSearchResult = m_nicList[i];
+						m_searcher.Start((res) => {
+							System.Windows.Application.Current.Dispatcher.BeginInvoke(new delegateSearchResult(appendSearchResult), res);
+						});
+					}
+						//string key = getKeyFromSearchResult();
+					//nicComboBox.Items.Add(m_nicList[i].NicName + "/" + m_nicList[i].NicIpAddr + "/" + m_nicList[i].NicIpv4Mask);
+				}
+			}
 
 			nReceiveMessage = new int[BUFLEN];
-			nReceiveMessageBkUp = new int[BUFLEN];
 			LoadInforPortNumber();
-			InitThread();
+			m_BarcodeReader = new BarCodeReaderView();
+			//InitThread();
 
 		}
+
+		public void appendSearchResult(ReaderSearchResult res)
+        {
+			if (res.IpAddress == "")
+			{
+				//searchUIControl(false);
+				return;
+			}
+			m_strKey = getKeyFromSearchResult(res);
+		}
+
+		private delegate void delegateSearchResult(ReaderSearchResult res);
+		public string getKeyFromSearchResult(ReaderSearchResult res)
+        {
+			return res.IpAddress + "/" + res.ReaderModel + "/" + res.ReaderName;
+		}
+
+		private ReaderSearchResult getSearchResultFromKey(string key)
+		{
+			String[] readerInfo = key.Split('/');
+			if (readerInfo.Length == 3)
+			{
+				return new ReaderSearchResult(readerInfo[1], readerInfo[2], readerInfo[0]);
+			}
+			return new ReaderSearchResult();
+		}
+
+		private bool resisterReaders(string key)
+		{
+			if (m_resisterdReaders.ContainsKey(key)) return false;
+
+			ReaderSearchResult result = getSearchResultFromKey(key);
+			m_resisterdReaders.Add(key, new ReaderAccessor(result.IpAddress));
+
+
+			return true;
+		}
+		private bool removeReaders(string key)
+		{
+			if (m_resisterdReaders.ContainsKey(key))
+			{
+				m_resisterdReaders[key].Dispose();
+				m_resisterdReaders.Remove(key);
+				return true;
+			}
+			return false;
+		}
+
+		public void sendCommandToAllReaders(string strCmd)
+		{
+			resisterReaders(m_strKey);
+
+			//LiveviewForm liveviewForm = new LiveviewForm();
+
+			//liveviewForm.EndReceive();
+
+			//liveviewForm.IpAddress = barCodeipAddress;
+
+			//liveviewForm.BeginReceive();
+
+
+
+			string cmd = strCmd;
+			foreach (ReaderAccessor reader in m_resisterdReaders.Values)
+			{
+				reader.Connect();
+				string resp = reader.ExecCommand(cmd);
+				string str= resp.Replace("\r","");
+				LogMessage.WriteToDebugViewer(2, "Message responsed from Barcode: " + str);
+				//commandResponseText.AppendText("[" + reader.IpAddress + "][" + DateTime.Now + "]" + resp + "\r\n");
+
+				//liveviewForm.DownloadRecentImage(Application.Application.pathImageSave + "BarcodeImage\\image.bmp");
+				reader.Disconnect();
+			}
+			//if (!commandTxt.Items.Contains(commandTxt.Text)) commandTxt.Items.Add(commandTxt.Text);
+		}
+
+
 
 		void LoadInforPortNumber()
 		{
@@ -69,28 +160,23 @@ namespace Magnus_WPF_1.Source.Hardware
         void BarcodeReaderThread()
 		{
 			byte[] recvBuf = new byte[255];
-			//byte[] recvBufTemp = new byte[255];
-			//nReceiveMessage = Enumerable.Repeat(-1, BUFLEN).ToArray();
-			//nReceiveMessageBkUp = Enumerable.Repeat(-1, BUFLEN).ToArray();
 			bool lastate = true;
 			int nReceivedBufferLength;
 			while (true)
 			{
 				// To do Register socket				
-				commBarCodeSequence.Connect();
+				//commBarCodeSequence.Connect();
 				if (commBarCodeSequence.isConnected)
 				{
-					//DebugMessage.WriteToDebugViewer(8, string.Format("Connected Port " + portSequence.ToString()));
-					UpdateStateBarCodeReader(portBarcodeReader, true);
-					lastate = commBarCodeSequence.isConnected;
+                    UpdateStateBarCodeReader( true);
+                    lastate = commBarCodeSequence.isConnected;
 				}
 				else
 				{
 					if (true)
 					{
-						//DebugMessage.WriteToDebugViewer(8, string.Format("Can Not Connected Port " + portSequence.ToString()));
-						UpdateStateBarCodeReader(portBarcodeReader, false);
-						lastate = false;
+                        UpdateStateBarCodeReader( false);
+                        lastate = false;
 						continue;
 					}
 				}
@@ -248,23 +334,21 @@ namespace Magnus_WPF_1.Source.Hardware
 
 		public delegate void UpdateStateSentConnection(bool isConnect);
 		public static UpdateStateSentConnection UpdateSentConnection;
-		private void UpdateStateBarCodeReader(int portNumber, bool isConneted)
+		private void UpdateStateBarCodeReader( bool isConneted)
         {
-			if (portNumber == portBarcodeReader)
+
+			System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
 			{
-				System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+				if (isConneted)
 				{
-					if (isConneted)
-					{
-						main.color_barcodeReaderStatus = "Lime";
-					}
-					else
-					{
-						main.color_barcodeReaderStatus = "Red";
-					}
-					UpdateReceiveConnection?.Invoke(isConneted);
-				});
-			}
+					main.color_barcodeReaderStatus = "Lime";
+				}
+				else
+				{
+					main.color_barcodeReaderStatus = "Red";
+				}
+				UpdateReceiveConnection?.Invoke(isConneted);
+			});
 
 		}
 

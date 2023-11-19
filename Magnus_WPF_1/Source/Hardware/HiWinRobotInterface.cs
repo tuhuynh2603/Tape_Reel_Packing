@@ -127,8 +127,19 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
                     using (ExcelPackage package = new ExcelPackage(file))
                 {
-                    ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Sheet_RobotPoints");
 
+                    bool bCreated = false;
+                    for (int n = 0; n < package.Workbook.Worksheets.Count; n++)
+                        if (package.Workbook.Worksheets[n].Name == "Sheet_RobotPoints")
+                        {
+                            bCreated = true;
+                            break;
+                        }
+
+                    if (!bCreated)
+                        package.Workbook.Worksheets.Add("Sheet_RobotPoints");
+
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
                     // Header
                     int ncol = 1;
                     worksheet.Cells[1, ncol++].Value = "PointIndex";
@@ -485,9 +496,10 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
+                if (MainWindow.mainWindow == null)
+                    return; 
                 if (MainWindow.mainWindow.master == null)
                     return;
-
                 if (bEnableUpddate[0] || m_hiWinRobotUserControl.dataGrid_robot_Position.ItemsSource == null)
                 {
                     m_hiWinRobotUserControl.dataGrid_robot_Position.ItemsSource = null;
@@ -828,11 +840,12 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             return wait_for_stop_motion(ndeviceid);
         }
 
-
         public bool wait_for_stop_motion(int device_id)
         {
-            while (HWinRobot.get_motion_state(device_id) != 1)
+            while (HWinRobot.get_motion_state(device_id) != 1 )
             {
+                if (HWinRobot.get_connection_level(device_id) != 1)
+                    return false;
                 if (m_bIsStop)
                 {
                     
@@ -1011,6 +1024,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(m_DeviceID);
             HWinRobot.jog_home(m_DeviceID);
         }
+
         //public static void EventFun(UInt16 cmd, UInt16 rlt, ref UInt16 Msg, int len)
         //{
         //    Console.WriteLine("Command: " + cmd + " Resault: " + rlt);

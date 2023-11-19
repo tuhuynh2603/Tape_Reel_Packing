@@ -166,3 +166,10 @@ C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\AnyCPU\Debug\sv\ZedGraph.resourc
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\AnyCPU\Debug\tr\ZedGraph.resources.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\AnyCPU\Debug\zh-cn\ZedGraph.resources.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\AnyCPU\Debug\zh-tw\ZedGraph.resources.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\AnyCPU\Debug\Communication.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\AnyCPU\Debug\Keyence.AutoID.SDK.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\AnyCPU\Debug\VncClientControlCommon.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\AnyCPU\Debug\VncClientControlCommonLib.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\Debug\Source\Hardware\BarCodeReaderView.g.cs
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\Debug\Source\Hardware\BarCodeReaderView.baml
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\Debug\Magnus_WPF_1.Source.Hardware.UserControl1.resources

@@ -94,3 +94,11 @@ C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\sv\ZedGraph.resources.
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\tr\ZedGraph.resources.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\zh-cn\ZedGraph.resources.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\zh-tw\ZedGraph.resources.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\MathNet.Numerics.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\System.ValueTuple.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Communication.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Keyence.AutoID.SDK.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\VncClientControlCommon.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\VncClientControlCommonLib.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Source\Hardware\BarCodeReaderView.g.cs
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Source\Hardware\BarCodeReaderView.baml

@@ -1203,10 +1203,8 @@ namespace Magnus_WPF_1
             if (master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource.Width < 0)
                 return;
 
-            System.Drawing.PointF pCenter;
-            System.Drawing.PointF pCorner;
             master.m_Tracks[activeImageDock.trackID].m_InspectionCore.LoadImageToInspection(master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource);
-            master.m_Tracks[activeImageDock.trackID].DebugFunction(ref master.m_Tracks[activeImageDock.trackID], out pCenter, out pCorner);
+            master.m_Tracks[activeImageDock.trackID].DebugFunction(ref master.m_Tracks[activeImageDock.trackID]);
 
             UpdateDebugInfor();
             return;

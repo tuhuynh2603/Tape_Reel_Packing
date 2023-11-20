@@ -342,14 +342,12 @@ namespace Magnus_WPF_1.Source.Application
             }
 
 
-            public static double CalculateShiftXYAngle(PointF pCenter1, PointF pCorner1, PointF pCenter2, PointF pCorner2, out double dShiftX, out double dShiftY)
+            public static double CalculateShiftXYAngle(PointF pCenter1, PointF pCorner1, PointF pCenter2, PointF pCorner2 )
             {
                 double dX1 = pCorner1.X - pCenter1.X;
                 double dY1 = pCorner1.Y - pCenter1.Y;
                 double dX2 = pCorner2.X - pCenter2.X;
                 double dY2 = pCorner2.Y - pCenter2.Y;
-                dShiftX = pCenter1.X - pCenter2.X;
-                dShiftY = pCenter1.Y - pCenter2.Y;
                 return AngleBetweenVectors(dX1, dY1, dX2, dY2) * RotationDirection(dX1, dY1, dX2, dY2);
             }
             public static double AngleWithXAxis(double xa, double ya)
@@ -405,7 +403,7 @@ namespace Magnus_WPF_1.Source.Application
 
         #endregion
 
-        public void DrawInspectionResult(ref int nResult, ref PointF pCenter, ref PointF pCorner)
+        public void DrawInspectionResult(ref int nResult, ref PointF pCenter, ref double dAngle)
         {
             Stopwatch timeIns = new Stopwatch();
 
@@ -418,28 +416,6 @@ namespace Magnus_WPF_1.Source.Application
                 m_imageViews[0].DrawRegionOverlay(overlay.mat_Region, c);
 
             }
-
-
-
-            double dX1 = pCorner.X - pCenter.X;
-            double dY1 = pCorner.Y - pCenter.Y;
-            double dAngle = MagnusMatrix.AngleWithXAxis(dX1, dY1);
-            double dShiftX, dShiftY, dDeltaAngle;
-            dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(pCenter, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint, out dShiftX, out dShiftY);
-
-            PointF robotPoint = MagnusMatrix.ApplyTransformation(MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.m_MatCameraRobotTransform, pCenter);
-            LogMessage.WriteToDebugViewer(1, "Move to Robot (X Y) = " + robotPoint.X.ToString() + ", " + robotPoint.Y.ToString());
-
-            double[] dValue = new double[6];
-            Hardware.SDKHrobot.HWinRobot.get_current_position(HiWinRobotInterface.m_DeviceID, dValue);
-            dValue[0] = robotPoint.X;
-            dValue[1] = robotPoint.Y;
-            dValue[5] = dDeltaAngle;
-            HWinRobot.jog_stop(HiWinRobotInterface.m_DeviceID);
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveToPosition(HiWinRobotInterface.m_DeviceID, 0, dValue);
-
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.MoveToReadyPosition(HiWinRobotInterface.m_DeviceID);
-            //int Anglesign = RotationDirection(dX1, dY1, dX2, dY2);
 
             color = new SolidColorBrush(Colors.Yellow);
             m_imageViews[0].DrawStringOverlay("(X, Y, Angle) = (" + pCenter.X.ToString() + ", " + pCenter.Y.ToString() + ", " + ((int)dAngle).ToString() + ")", (int)pCenter.X + 10, (int)pCenter.Y, color, 20);
@@ -463,7 +439,7 @@ namespace Magnus_WPF_1.Source.Application
                     color = new SolidColorBrush(Colors.Green);
                     m_imageViews[0].DrawString(/*m_cap.GetCaptureProperty(CapProp.Focus).ToString() */ "Good", 10, 10, color, 31);
                     color = new SolidColorBrush(Colors.Yellow);
-                    m_imageViews[0].DrawString("Delta: = (" + dShiftX.ToString() + ", " + dShiftY.ToString() + ", " + dDeltaAngle.ToString() + ")", 10, 40, color, 18);
+                    //m_imageViews[0].DrawString("Delta: = (" + dShiftX.ToString() + ", " + dShiftY.ToString() + ", " + dDeltaAngle.ToString() + ")", 10, 40, color, 18);
 
                 }
 
@@ -503,38 +479,42 @@ namespace Magnus_WPF_1.Source.Application
                 {
                     m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint = pCenter;
                     m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint = pCorner;
-                    m_InspectionCore.m_DeviceLocationResult.m_dAngleOxDevice = MagnusMatrix.AngleWithXAxis(pCorner.X - pCenter.X, pCorner.Y - pCenter.Y);
+                    //m_InspectionCore.m_DeviceLocationResult.m_dAngleOxDevice = MagnusMatrix.AngleWithXAxis(pCorner.X - pCenter.X, pCorner.Y - pCenter.Y);
                 }
 
 
 
                 if (bEnableDisplay)
                 {
+                    double dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(pCenter, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint);
+
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        DrawInspectionResult(ref nResult, ref pCenter, ref pCorner);
+                        DrawInspectionResult(ref nResult, ref pCenter, ref dDeltaAngle);
                     });
                 }
                 return nResult;
             }
         }
 
-        public int DebugFunction(ref Track m_track, out PointF pCenterOut, out PointF pCornerOut)
+        public int DebugFunction(ref Track m_track)
         {
-            Inspect(ref m_track, out pCenterOut, out pCornerOut);
-            double dShiftX, dShiftY, dDeltaAngle;
-            dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(pCenterOut, pCornerOut, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint, out dShiftX, out dShiftY);
+            PointF pCenter = new PointF();
+            PointF pCorner = new PointF();
 
+
+            int nResult = Inspect(ref m_track, out pCenter, out pCorner);
+            double dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(pCenter, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint);
             //Todo need to later after adding the calib function to calculate the transform matrix
-            PointF robotPoint = MagnusMatrix.ApplyTransformation(MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.m_MatCameraRobotTransform, pCenterOut);
+            PointF robotPoint = MagnusMatrix.ApplyTransformation(MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.m_MatCameraRobotTransform, pCenter);
+            //Draw Result
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                DrawInspectionResult(ref nResult, ref pCenter, ref dDeltaAngle);
+            });
 
-            double[] dValue = new double[6];
-            Hardware.SDKHrobot.HWinRobot.get_current_position(HiWinRobotInterface.m_DeviceID, dValue);
-            dValue[0] = robotPoint.X;
-            dValue[1] = robotPoint.Y;
-            dValue[5] = dDeltaAngle;
-            HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, 0, dValue);
-            return 0;
+
+            return nResult;
         }
 
         public int Inspect(ref Track m_track, out PointF pCenterOut, out PointF pCornerOut)
@@ -558,13 +538,6 @@ namespace Magnus_WPF_1.Source.Application
 
             pCenterOut = pCenter;
             pCornerOut = pCorner;
-            //Draw Result
-            if (true)
-                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                {
-                    DrawInspectionResult(ref nResult, ref pCenter, ref pCorner);
-                });
-
             return nResult;
         }
 
@@ -610,14 +583,14 @@ namespace Magnus_WPF_1.Source.Application
                     timeIns.Start();
                     PointF pCenter, pCorner;
                     m_nResult[m_CurrentSequenceDeviceID] = Inspect(ref mainWindow.master.m_Tracks[m_nTrackID], out pCenter, out pCorner);
+                    m_Center_Vision = pCenter;
+                    m_dDeltaAngleInspection = MagnusMatrix.CalculateShiftXYAngle(m_Center_Vision, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint);
 
-                    double dShiftX, dShiftY, dDeltaAngle;
-                    dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(pCenter, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint, out dShiftX, out dShiftY);
+                    //MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveToPosition(HiWinRobotInterface.m_DeviceID, 0, dValue);
 
-                    //Todo need to later after adding the calib function to calculate the transform matrix
-                    //float[,] maxTransform = MagnusMatrix.CalculateTransformMatrix(pCam1, pCam2, pRobot1, pRobot2);
-                    //Vector3 robotPoint = MagnusMatrix.TransformCameraToRobot(maxTransform, pCenter.X, pCenter.Y);
-                    // MoveToPickPosition(robotPoint, dDeltaAngle);
+                    //MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.MoveToReadyPosition(HiWinRobotInterface.m_DeviceID);
+                    //int Anglesign = RotationDirection(dX1, dY1, dX2, dY2);
+
 
                     ////
                     //Master.InspectEvent[m_nTrackID].Reset();
@@ -667,6 +640,8 @@ namespace Magnus_WPF_1.Source.Application
         public int m_CurrentSequenceDeviceID = -1;
         public int m_nCurrentClickMappingID = -1;
         public string m_strCurrentLot;
+        public PointF m_Center_Vision = new PointF();
+        public double m_dDeltaAngleInspection = 0.0;
 
         public void InspectOffline(string strFolderPath)
         {
@@ -846,7 +821,49 @@ namespace Magnus_WPF_1.Source.Application
                 // Send result to Robot
                 //string strResult = m_nResult[m_CurrentSequenceDeviceID].ToString(); 
                 //Master.commHIKRobot.CreateAndSendMessageToHIKRobot(SignalFromVision.Vision_Go_Pick, strResult);
+                PointF robotPoint = MagnusMatrix.ApplyTransformation(MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.m_MatCameraRobotTransform, m_Center_Vision);
+                // Move to Pre Pick position
+                if(MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
+                    return;
+                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, m_dDeltaAngleInspection) !=0)
+                    return;
 
+                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
+                    return;
+
+                // Turn on vaccum
+                HWinRobot.set_digital_output(HiWinRobotInterface.m_DeviceID, (int)HiWinRobotInterface.OUTPUT_IOROBOT.ROBOT_AIR_ONOFF, true);
+
+                while (HWinRobot.get_digital_input(HiWinRobotInterface.m_DeviceID, (int)HiWinRobotInterface.INPUT_IOROBOT.AIR_PRESSURESTATUS) == 0)
+                {
+                    if (!MainWindow.mainWindow.bEnableRunSequence)
+                    {
+                        //m_cap.Stop();
+                        //m_cap.ImageGrabbed -= Online_ImageGrabbed;
+                        return;
+                    }
+                }
+
+                // Move to Pick position (move Down Z motor)
+                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PICK_POSITION(robotPoint, m_dDeltaAngleInspection);
+                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
+                    return;
+
+                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, m_dDeltaAngleInspection);
+                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
+                    return;
+
+                // Move to  Pre Pick position again (move Up Z motor)
+                HWinRobot.get_digital_input(HiWinRobotInterface.m_DeviceID, (int)HiWinRobotInterface.INPUT_IOROBOT.AIR_PRESSURESTATUS);
+                while (HWinRobot.get_digital_input(HiWinRobotInterface.m_DeviceID, (int)HiWinRobotInterface.INPUT_IOROBOT.PLC_READY) == 0)
+                {
+                    if (!MainWindow.mainWindow.bEnableRunSequence)
+                    {
+                        //m_cap.Stop();
+                        //m_cap.ImageGrabbed -= Online_ImageGrabbed;
+                        return;
+                    }
+                }
 
                 Master.InspectDoneEvent[m_nTrackID].Reset();
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate

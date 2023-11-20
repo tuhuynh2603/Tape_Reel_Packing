@@ -16,7 +16,12 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
     public class HiWinRobotInterface 
     {
         public const int NUMBER_AXIS  = 4;
-
+        public enum ROBOT_OPERATION_MODE
+        {
+            MODE_MANUAL = 0,
+            MODE_AUTO = 1,
+            MODE_NUMBER
+        }
         public Thread m_hikThread;
         public bool m_bIsStop = false;
         public bool m_bMustConnectAgain = true;
@@ -27,9 +32,44 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             public double m_value { get; set; }
             public string m_unit { get; set; }
         }
+        public enum INPUT_IOROBOT
+        {
+            PLC_READY = 1,
+            CHIPDETECT_SENSOR = 2,
+            AIR_PRESSURESTATUS = 3,
+            INPUT_3,
+            INPUT_4
+        }
+
+        public enum OUTPUT_IOROBOT
+        {
+            ROBOT_READY = 1,
+            ROBOT_PLACE_DONE = 2,
+            ROBOT_CONVEYER_ONOFF = 3,
+            ROBOT_ARLAMP = 4,
+            ROBOT_RESET = 5,
+            ROBOT_AIR_ONOFF = 3,
+            ROBOT_HEART_BEAT = 6,
+        }
+
 
         public class SequencePointData
         {
+            public const string HOME_POSITION = "Home Position";
+            public const string READY_POSITION = "Ready Position";
+            public const string PRE_PICK_POSITION = "Pre Pick Position";
+            public const string PICK_POSITION = "Pick Position";
+            public const string PRE_PASS_PLACE_POSITION = "Pre Pass Place Position";
+            public const string PASS_PLACE_POSITION = "Pass Place Position";
+            public const string PRE_FAILED_PLACE_POSITION = "Pre Failed Place Position";
+            public const string PLACE_FAILED_POSITION = "Failed Place Position";
+            public const string CALIB_ROBOT_POSITION_1 = "Calib Robot Point 1";
+            public const string CALIB_ROBOT_POSITION_2 = "Calib Robot Point 2";
+            public const string CALIB_ROBOT_POSITION_3 = "Calib Robot Point 3";
+            public const string CALIB_Vision_POSITION_1 = "Calib Vision Point 1";
+            public const string CALIB_Vision_POSITION_2 = "Calib Vision Point 2";
+            public const string CALIB_Vision_POSITION_3 = "Calib Vision Point 3";
+
             public int m_PointIndex { get; set; }
             public string m_PointComment { get; set; }
             public double m_X { get; set; }
@@ -199,8 +239,6 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 string strRecipePath = Path.Combine(Application.Application.pathRecipe, Application.Application.currentRecipe);
                 string fullpath = Path.Combine(strRecipePath, "Robot Points" + ".cfg");
 
-                result = new List<SequencePointData>();
-
                 FileInfo file = new FileInfo(fullpath);
                 if (!file.Exists)
                     file.Create();
@@ -237,7 +275,15 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                         item.m_PTPSpeed = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
                         item.m_LinearSpeed = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
                         item.m_Override = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
-                        result.Add(item);
+
+                        int nIndexTemp = HiWinRobotUserControl.CheckPointExistOnList(ref result, item.m_PointComment);
+                        if(nIndexTemp >=0)
+                        {
+                            result[nIndexTemp] = item;
+                        }
+                        else
+                            result.Add(item);
+
                     }
                 }
             }
@@ -326,9 +372,10 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 LogMessage.LogMessage.WriteToDebugViewer(1, "level:" + level);
 
                 HWinRobot.set_connection_level(m_DeviceID, 1);
-                level = HWinRobot.get_connection_level(m_DeviceID);
-                LogMessage.LogMessage.WriteToDebugViewer(1, "level:" + level);
-
+                HWinRobot.set_operation_mode(m_DeviceID, (int)ROBOT_OPERATION_MODE.MODE_AUTO);
+                int nmode = HWinRobot.get_operation_mode(m_DeviceID);
+                string strMode = nmode == (int)ROBOT_OPERATION_MODE.MODE_AUTO ? "AUTO" : "MANUAL";
+                LogMessage.LogMessage.WriteToDebugViewer(1, "operation mode:" + strMode);
                 //Disconnect(device_id);
                 //HWinRobot.set_connection_level(device_id, 1);
                 //level = HWinRobot.get_connection_level(device_id);
@@ -831,20 +878,75 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             }
         }
 
-
-
-        public bool MoveToPosition(int ndeviceid, int nmode, double[] p)
+        #region Pick Place Movement
+        public int MoveTo_PRE_PICK_POSITION(System.Drawing.PointF robotPoint, double dDeltaAngle, bool bSetSpeed = false, int nmode = 0)
         {
 
-            HWinRobot.ptp_pos(ndeviceid, nmode, p);
-            return wait_for_stop_motion(ndeviceid);
+            double[] dValue = new double[6];
+            SequencePointData pData = m_hiWinRobotUserControl.GetPointData(SequencePointData.PRE_PICK_POSITION);
+            pData.GetXYZPoint(ref dValue);
+            if (bSetSpeed)
+            {
+                HWinRobot.set_acc_dec_ratio(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_AccRatio));
+                HWinRobot.set_ptp_speed(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_PTPSpeed));
+                HWinRobot.set_lin_speed(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_LinearSpeed));
+                HWinRobot.set_override_ratio(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_Override));
+            }
+
+            dValue[0] = robotPoint.X;
+            dValue[1] = robotPoint.Y;
+            dValue[5] = dDeltaAngle + dValue[5];
+            //wait_for_stop_motion(ndeviceid);
+            LogMessage.LogMessage.WriteToDebugViewer(2, $"Move to {SequencePointData.PRE_PICK_POSITION} (X Y Z Angle) = " + dValue[0].ToString() + ", " + dValue[1].ToString() + ", " + dValue[2].ToString() + ", " + dValue[5].ToString());
+            return HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, nmode, dValue);
+
+            //return wait_for_stop_motion(ndeviceid);
         }
 
-        public bool wait_for_stop_motion(int device_id)
+        public int MoveTo_PICK_POSITION(System.Drawing.PointF robotPoint, double dDeltaAngle, bool bSetSpeed = false, int nmode = 0)
         {
-            while (HWinRobot.get_motion_state(device_id) != 1 )
+
+            double[] dValue = new double[6];
+            SequencePointData pData = m_hiWinRobotUserControl.GetPointData(SequencePointData.PICK_POSITION);
+            pData.GetXYZPoint(ref dValue);
+            if (bSetSpeed)
             {
-                if (HWinRobot.get_connection_level(device_id) != 1)
+                HWinRobot.set_acc_dec_ratio(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_AccRatio));
+                HWinRobot.set_ptp_speed(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_PTPSpeed));
+                HWinRobot.set_lin_speed(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_LinearSpeed));
+                HWinRobot.set_override_ratio(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_Override));
+            }
+            dValue[0] = robotPoint.X;
+            dValue[1] = robotPoint.Y;
+            dValue[5] = dDeltaAngle + dValue[5];
+            LogMessage.LogMessage.WriteToDebugViewer(2, $"Move to {SequencePointData.PICK_POSITION} (X Y Z Angle) = " + dValue[0].ToString() + ", " + dValue[1].ToString() + ", " + dValue[2].ToString() + ", " + dValue[5].ToString());
+            return HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, nmode, dValue);
+        }
+
+        public int MoveTo_STATIC_POSITION(string strPosition, bool bSetSpeed = false, int nmode = 0)
+        {
+
+            double[] dValue = new double[6];
+            SequencePointData pData = m_hiWinRobotUserControl.GetPointData(strPosition);
+            pData.GetXYZPoint(ref dValue);
+            if (bSetSpeed)
+            {
+                HWinRobot.set_acc_dec_ratio(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_AccRatio));
+                HWinRobot.set_ptp_speed(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_PTPSpeed));
+                HWinRobot.set_lin_speed(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_LinearSpeed));
+                HWinRobot.set_override_ratio(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_Override));
+            }
+            LogMessage.LogMessage.WriteToDebugViewer(2, $"Move to {strPosition} (X Y Z Angle) = " + dValue[0].ToString() + ", " + dValue[1].ToString() + ", " + dValue[2].ToString() + ", " + dValue[5].ToString());
+            return HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, nmode, dValue);
+        }
+
+        #endregion
+
+        public bool wait_for_stop_motion()
+        {
+            while (HWinRobot.get_motion_state(HiWinRobotInterface.m_DeviceID) != 1 )
+            {
+                if (HWinRobot.get_connection_level(HiWinRobotInterface.m_DeviceID) != 1)
                     return false;
                 if (m_bIsStop)
                 {
@@ -862,74 +964,6 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             return true;
         }
 
-        public static void SoftLimitExample(int device_id)
-        {
-            double[] joint_low_limit = { -20, -20, -35, -20, 0, 0 };
-            double[] joint_high_limit = { 20, 20, 0, 0, 0, 0 };
-            double[] cart_low_limit = { -100, 300, -100, 0, 0, 0 };
-            double[] cart_high_limit = { 100, 450, -25, 0, 0, 0 };
-            double[] cart_home = { 0, 400, 0, 0, -90, 0 };
-            double[] joint_home = { 0, 0, 0, 0, -90, 0 };
-            double[] now_pos = { 0, 0, 0, 0, 0, 0 };
-            bool re_bool = false;
-            HWinRobot.get_current_position(device_id, now_pos);
-
-            // run joint softlimit
-            HWinRobot.set_override_ratio(device_id, 100);
-            HWinRobot.set_joint_soft_limit(device_id, joint_low_limit, joint_high_limit);
-            HWinRobot.enable_joint_soft_limit(device_id, true);
-            HWinRobot.enable_cart_soft_limit(device_id, false);
-            HWinRobot.get_joint_soft_limit_config(device_id, ref re_bool, joint_low_limit, joint_high_limit);
-            Console.WriteLine("Enable Joint SoftLimit: " + re_bool);
-            HWinRobot.jog_home(device_id);
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(device_id);
-            Thread.Sleep(1000);
-            for (int i = 0; i < 4; i++)
-            {
-                HWinRobot.jog(device_id, 1, i, -1);
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(device_id);
-                Console.WriteLine("On the limits of SoftLimit");
-            }
-            for (int i = 0; i < 4; i++)
-            {
-                HWinRobot.jog(device_id, 1, i, 1);
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(device_id);
-                Console.WriteLine("On the limits of SoftLimit");
-            }
-            HWinRobot.enable_joint_soft_limit(device_id, false);
-
-            // run cartesian softlimit
-            HWinRobot.ptp_axis(device_id, 0, joint_home);
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(device_id);
-            HWinRobot.set_cart_soft_limit(device_id, cart_low_limit, cart_high_limit);
-            HWinRobot.enable_cart_soft_limit(device_id, true);
-            HWinRobot.get_cart_soft_limit_config(device_id, ref re_bool, cart_low_limit, cart_high_limit);
-            Console.WriteLine("Enable Cart SoftLimit: " + re_bool);
-            HWinRobot.lin_pos(device_id, 0, 0, cart_home);
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(device_id);
-            for (int i = 0; i < 3; i++)
-            {
-                HWinRobot.jog(device_id, 0, i, -1);
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(device_id);
-                Console.WriteLine("On the limits of SoftLimit");
-                Console.WriteLine("");
-                HWinRobot.clear_alarm(device_id);
-                Thread.Sleep(2000);
-            }
-            for (int i = 0; i < 3; i++)
-            {
-                HWinRobot.jog(device_id, 0, i, 1);
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(device_id);
-                Console.WriteLine("On the limits of SoftLimit");
-                Console.WriteLine("");
-                HWinRobot.clear_alarm(device_id);
-                Thread.Sleep(2000);
-            }
-            Console.WriteLine("End of motion");
-
-            HWinRobot.enable_joint_soft_limit(device_id, false);
-            HWinRobot.enable_cart_soft_limit(device_id, false);
-        }
 
         public static void SetOnOffSoftLimit(int device_id, bool bEnable)
         {
@@ -1021,7 +1055,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         public static void HomeMove()
         {
             HWinRobot.jog_stop(m_DeviceID);
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(m_DeviceID);
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
             HWinRobot.jog_home(m_DeviceID);
         }
 

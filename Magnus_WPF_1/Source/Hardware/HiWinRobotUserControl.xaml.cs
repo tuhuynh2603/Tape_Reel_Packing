@@ -40,9 +40,9 @@ namespace Magnus_WPF_1.Source.Hardware
             combo_MoveTypes.Items.Add("Relative");
             combo_MoveTypes.SelectedIndex = 1;
 
-            int bServoOnOff = HWinRobot.get_motor_state(HiWinRobotInterface.m_DeviceID);
+            int bServoOnOff = HWinRobot.get_motor_state(HiWinRobotInterface.m_RobotConnectID);
             toggle_ServoOnOff.IsChecked = bServoOnOff == 0 ? false : true;
-            if (HWinRobot.get_operation_mode(HiWinRobotInterface.m_DeviceID) == 0)
+            if (HWinRobot.get_operation_mode(HiWinRobotInterface.m_RobotConnectID) == 0)
             {
                 check_Manual.IsChecked = true;
                 check_Auto.IsChecked = false;
@@ -78,7 +78,7 @@ namespace Magnus_WPF_1.Source.Hardware
             m_List_sequencePointData.Add(new SequencePointData() { m_PointComment = SequencePointData.PRE_PASS_PLACE_POSITION });
             m_List_sequencePointData.Add(new SequencePointData() { m_PointComment = SequencePointData.PASS_PLACE_POSITION });
             m_List_sequencePointData.Add(new SequencePointData() { m_PointComment = SequencePointData.PRE_FAILED_PLACE_POSITION });
-            m_List_sequencePointData.Add(new SequencePointData() { m_PointComment = SequencePointData.PLACE_FAILED_POSITION });
+            m_List_sequencePointData.Add(new SequencePointData() { m_PointComment = SequencePointData.FAILED_PLACE_POSITION });
 
 
             m_List_sequencePointData.Add(new SequencePointData() { m_PointComment = SequencePointData.CALIB_ROBOT_POSITION_1 });
@@ -191,7 +191,7 @@ namespace Magnus_WPF_1.Source.Hardware
             slider_AccRatioPercentShow.Text = Math.Round(dvalue).ToString();
 
             Int16 val = Convert.ToInt16(slider_AccRatioPercentShow.Text);
-            HWinRobot.set_acc_dec_ratio(HiWinRobotInterface.m_DeviceID, val);
+            HWinRobot.set_acc_dec_ratio(HiWinRobotInterface.m_RobotConnectID, val);
         }
 
         private void slider_PTPSpeedPercent_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -212,7 +212,7 @@ namespace Magnus_WPF_1.Source.Hardware
             bool error = Double.TryParse(slider_PTPSpeedPercentShow.Text, out dvalue);
             slider_PTPSpeedPercentShow.Text = Math.Round(dvalue).ToString();
             Int16 val = Convert.ToInt16(slider_PTPSpeedPercentShow.Text);
-            HWinRobot.set_ptp_speed(HiWinRobotInterface.m_DeviceID, val);
+            HWinRobot.set_ptp_speed(HiWinRobotInterface.m_RobotConnectID, val);
         }
 
         private void slider_LinearSpeed_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -233,7 +233,7 @@ namespace Magnus_WPF_1.Source.Hardware
             bool error = Double.TryParse(slider_LinearSpeedShow.Text, out dvalue);
             slider_LinearSpeedShow.Text = Math.Round(dvalue).ToString();
             Int16 val = Convert.ToInt16(slider_LinearSpeedShow.Text);
-            HWinRobot.set_lin_speed(HiWinRobotInterface.m_DeviceID, val);
+            HWinRobot.set_lin_speed(HiWinRobotInterface.m_RobotConnectID, val);
         }
 
         private void slider_OverridePercent_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -254,25 +254,25 @@ namespace Magnus_WPF_1.Source.Hardware
             bool error = Double.TryParse(slider_OverridePercentShow.Text, out dvalue);
             slider_OverridePercentShow.Text = Math.Round(dvalue).ToString();
             Int16 val = Convert.ToInt16(slider_OverridePercentShow.Text);
-            HWinRobot.set_override_ratio(HiWinRobotInterface.m_DeviceID, val);
+            HWinRobot.set_override_ratio(HiWinRobotInterface.m_RobotConnectID, val);
         }
 
         private void toggle_ServoOnOff_Click(object sender, RoutedEventArgs e)
         {
-            HWinRobot.jog_stop(HiWinRobotInterface.m_DeviceID);
+            HWinRobot.jog_stop(HiWinRobotInterface.m_RobotConnectID);
             LogMessage.LogMessage.WriteToDebugViewer(2, "Stop Move");
 
-            int bServoOnOff = HWinRobot.get_motor_state(HiWinRobotInterface.m_DeviceID);
+            int bServoOnOff = HWinRobot.get_motor_state(HiWinRobotInterface.m_RobotConnectID);
             if (bServoOnOff == 0)
             {
-                HWinRobot.set_motor_state(HiWinRobotInterface.m_DeviceID, 1);
+                HWinRobot.set_motor_state(HiWinRobotInterface.m_RobotConnectID, 1);
                 toggle_ServoOnOff.Background = new SolidColorBrush(Colors.Green);
                 toggle_ServoOnOff.Content = "Servo ON";
 
             }
             else
             {
-                HWinRobot.set_motor_state(HiWinRobotInterface.m_DeviceID, 0);
+                HWinRobot.set_motor_state(HiWinRobotInterface.m_RobotConnectID, 0);
                 toggle_ServoOnOff.Background = new SolidColorBrush(Colors.Gray);
                 toggle_ServoOnOff.Content = "Servo OFF";
 
@@ -282,10 +282,10 @@ namespace Magnus_WPF_1.Source.Hardware
 
         public void SetMotorSpeed()
         {
-            HWinRobot.set_acc_dec_ratio(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(m_nAccRatioPercentValue));
-            HWinRobot.set_ptp_speed(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(m_PTPSpeedPercentValue));
-            HWinRobot.set_lin_speed(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(m_nLinearSpeedValue));
-            HWinRobot.set_override_ratio(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(m_nOverridePercent));
+            HWinRobot.set_acc_dec_ratio(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(m_nAccRatioPercentValue));
+            HWinRobot.set_ptp_speed(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(m_PTPSpeedPercentValue));
+            HWinRobot.set_lin_speed(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(m_nLinearSpeedValue));
+            HWinRobot.set_override_ratio(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(m_nOverridePercent));
         }
 
         public List<SequencePointData> m_List_sequencePointData = new List<SequencePointData>();
@@ -294,11 +294,11 @@ namespace Magnus_WPF_1.Source.Hardware
         {
             SetMotorSpeed();
             double[] d_XYZvalue = new double[6];
-            HWinRobot.get_current_position(HiWinRobotInterface.m_DeviceID, d_XYZvalue);
+            HWinRobot.get_current_position(HiWinRobotInterface.m_RobotConnectID, d_XYZvalue);
             double[] d_Jointvalue = new double[6];
-            HWinRobot.get_current_joint(HiWinRobotInterface.m_DeviceID, d_Jointvalue);
+            HWinRobot.get_current_joint(HiWinRobotInterface.m_RobotConnectID, d_Jointvalue);
 
-            m_List_sequencePointData.Add(HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_DeviceID, d_XYZvalue, d_Jointvalue, m_List_sequencePointData.Count, ""));
+            m_List_sequencePointData.Add(HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, d_XYZvalue, d_Jointvalue, m_List_sequencePointData.Count, ""));
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
                 if (MainWindow.mainWindow.master == null)
@@ -338,11 +338,11 @@ namespace Magnus_WPF_1.Source.Hardware
             SetMotorSpeed();
 
             double[] d_XYZvalue = new double[6];
-            HWinRobot.get_current_position(HiWinRobotInterface.m_DeviceID, d_XYZvalue);
+            HWinRobot.get_current_position(HiWinRobotInterface.m_RobotConnectID, d_XYZvalue);
             double[] d_Jointvalue = new double[6];
-            HWinRobot.get_current_joint(HiWinRobotInterface.m_DeviceID, d_Jointvalue);
+            HWinRobot.get_current_joint(HiWinRobotInterface.m_RobotConnectID, d_Jointvalue);
 
-            m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex] = HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_DeviceID, d_XYZvalue, d_Jointvalue,  m_List_sequencePointData.Count, m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex].m_PointComment);
+            m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex] = HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, d_XYZvalue, d_Jointvalue,  m_List_sequencePointData.Count, m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex].m_PointComment);
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
                 if (MainWindow.mainWindow.master == null)
@@ -436,7 +436,7 @@ namespace Magnus_WPF_1.Source.Hardware
                 {
                     double[] dpos = new double[6];
                     m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex].GetXYZPoint(ref dpos);
-                    m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, 0, dpos)));
+                    m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => HWinRobot.ptp_pos(HiWinRobotInterface.m_RobotConnectID, 0, dpos)));
                     m_Thread.Start();
                 }
 
@@ -444,7 +444,7 @@ namespace Magnus_WPF_1.Source.Hardware
                 {
                     double[] dpos = new double[6];
                     m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex].GetJointPoint(ref dpos);
-                    m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => HWinRobot.ptp_axis(HiWinRobotInterface.m_DeviceID, 0, dpos)));
+                    m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => HWinRobot.ptp_axis(HiWinRobotInterface.m_RobotConnectID, 0, dpos)));
                     m_Thread.Start();
                 }
 
@@ -453,7 +453,7 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void button_Stop_Moving_Click(object sender, RoutedEventArgs e)
         {
-            HWinRobot.jog_stop(HiWinRobotInterface.m_DeviceID);
+            HWinRobot.jog_stop(HiWinRobotInterface.m_RobotConnectID);
             LogMessage.LogMessage.WriteToDebugViewer(2, "Stop Move Clicked");
         }
 
@@ -519,7 +519,7 @@ namespace Magnus_WPF_1.Source.Hardware
         {
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                if (HWinRobot.get_motion_state(HiWinRobotInterface.m_DeviceID) != 1)
+                if (HWinRobot.get_motion_state(HiWinRobotInterface.m_RobotConnectID) != 1)
                     return;
 
                 //MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(HiWinRobotInterface.m_DeviceID);
@@ -528,9 +528,9 @@ namespace Magnus_WPF_1.Source.Hardware
                     if (combo_JogType.SelectedIndex == (int)JOG_TYPE.JOG_XYZ)
                     {
                         double[] dValue = new double[6];
-                        HWinRobot.get_current_position(HiWinRobotInterface.m_DeviceID, dValue);
+                        HWinRobot.get_current_position(HiWinRobotInterface.m_RobotConnectID, dValue);
                         dValue[nMotorID] = (Double)(m_nStepRelativeValue / 1000.0);
-                        HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, 0, dValue);
+                        HWinRobot.ptp_pos(HiWinRobotInterface.m_RobotConnectID, 0, dValue);
                     }
                     else
                     {
@@ -539,9 +539,9 @@ namespace Magnus_WPF_1.Source.Hardware
                             nMotorID = HiWinRobotInterface.NUMBER_AXIS - 1;
 
                         double[] dValue = new double[6];
-                        HWinRobot.get_current_joint(HiWinRobotInterface.m_DeviceID, dValue);
+                        HWinRobot.get_current_joint(HiWinRobotInterface.m_RobotConnectID, dValue);
                         dValue[nMotorID] = (Double)(m_nStepRelativeValue / 1000.0);
-                        HWinRobot.ptp_axis(HiWinRobotInterface.m_DeviceID, 0, dValue);
+                        HWinRobot.ptp_axis(HiWinRobotInterface.m_RobotConnectID, 0, dValue);
                     }
                 }
                 else
@@ -552,7 +552,7 @@ namespace Magnus_WPF_1.Source.Hardware
                     {
                         double[] dValue = { 0, 0, 0, 0, 0, 0 };
                         dValue[nMotorID] = (Double)(Math.Abs(m_nStepRelativeValue) / 1000.0) * ndirection;
-                        HWinRobot.ptp_rel_pos(HiWinRobotInterface.m_DeviceID, 0, dValue);
+                        HWinRobot.ptp_rel_pos(HiWinRobotInterface.m_RobotConnectID, 0, dValue);
                     }
                     else
                     {
@@ -561,7 +561,7 @@ namespace Magnus_WPF_1.Source.Hardware
                             nMotorID = HiWinRobotInterface.NUMBER_AXIS - 1;
                         double[] dValue = { 0, 0, 0, 0, 0, 0 };
                         dValue[nMotorID] = (Double)(Math.Abs(m_nStepRelativeValue) / 1000.0) * ndirection;
-                        HWinRobot.ptp_rel_axis(HiWinRobotInterface.m_DeviceID, 0, dValue);
+                        HWinRobot.ptp_rel_axis(HiWinRobotInterface.m_RobotConnectID, 0, dValue);
                     }
                 }
                 //dValue[nMotorID] += (Double)(Math.Abs(m_nStepRelativeValue) / 1000.0) * ndirection;
@@ -615,7 +615,7 @@ namespace Magnus_WPF_1.Source.Hardware
                     m_List_sequencePointData[nIndex].GetXYZPoint(ref dPos);
                     dPos[0] = pRobotPos.X;
                     dPos[1] = pRobotPos.Y;
-                    return HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, 0, dPos);
+                    return HWinRobot.ptp_pos(HiWinRobotInterface.m_RobotConnectID, 0, dPos);
                 }
             }
             //HiWinRobotInterface.HomeMove();
@@ -634,7 +634,7 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void button_ResetAlarm_Click(object sender, RoutedEventArgs e)
         {
-            HWinRobot.clear_alarm(HiWinRobotInterface.m_DeviceID);
+            HWinRobot.clear_alarm(HiWinRobotInterface.m_RobotConnectID);
             label_Alarm.Content = "";
 
         }
@@ -655,7 +655,7 @@ namespace Magnus_WPF_1.Source.Hardware
         {
             //SetMotorSpeed();
             double[] dHomePos = new double[6];
-            HWinRobot.get_home_point(m_DeviceID, dHomePos);
+            HWinRobot.get_home_point(m_RobotConnectID, dHomePos);
 
             double[] dXYZPos = new double[6];
             int nHomePointIndex = -1;
@@ -667,10 +667,10 @@ namespace Magnus_WPF_1.Source.Hardware
             if (nHomePointIndex >= 0)
             {
                 m_List_sequencePointData[nHomePointIndex].GetXYZPoint(ref dXYZPos);
-                m_List_sequencePointData[nHomePointIndex] = HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_DeviceID, dXYZPos, dHomePos, m_List_sequencePointData.Count, "Home Position");
+                m_List_sequencePointData[nHomePointIndex] = HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, dXYZPos, dHomePos, m_List_sequencePointData.Count, "Home Position");
             }
             else
-                m_List_sequencePointData.Add(HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_DeviceID, dXYZPos, dHomePos, m_List_sequencePointData.Count, "Home Position"));
+                m_List_sequencePointData.Add(HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, dXYZPos, dHomePos, m_List_sequencePointData.Count, "Home Position"));
 
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
@@ -711,7 +711,7 @@ namespace Magnus_WPF_1.Source.Hardware
                 else
                     m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex].m_PointComment = "Home Position";
 
-                HWinRobot.set_home_point(HiWinRobotInterface.m_DeviceID, dJointPos);
+                HWinRobot.set_home_point(HiWinRobotInterface.m_RobotConnectID, dJointPos);
                 //HiWinRobotInterface.SetHome(m_DeviceID, dPos, combo_JogType.SelectedIndex);
 
             }
@@ -735,11 +735,11 @@ namespace Magnus_WPF_1.Source.Hardware
             double[] dlowSoftLimit = new double[6];
             double[] dhighSoftLimit = new double[6];
             bool b_rel = false;
-            HiWinRobotInterface.GetSoftLimit(HiWinRobotInterface.m_DeviceID, (int)JOG_TYPE.JOG_XYZ, ref b_rel, ref dlowSoftLimit, ref dhighSoftLimit);
+            HiWinRobotInterface.GetSoftLimit(HiWinRobotInterface.m_RobotConnectID, (int)JOG_TYPE.JOG_XYZ, ref b_rel, ref dlowSoftLimit, ref dhighSoftLimit);
 
             double[] dlowJointSoftLimit = new double[6];
             double[] dhighJointSoftLimit = new double[6];
-            HiWinRobotInterface.GetSoftLimit(HiWinRobotInterface.m_DeviceID, (int)JOG_TYPE.JOG_JOINT, ref b_rel, ref dlowJointSoftLimit, ref dhighJointSoftLimit);
+            HiWinRobotInterface.GetSoftLimit(HiWinRobotInterface.m_RobotConnectID, (int)JOG_TYPE.JOG_JOINT, ref b_rel, ref dlowJointSoftLimit, ref dhighJointSoftLimit);
 
             int nLowIndex = -1;
             int nHighIndex = -1;
@@ -752,14 +752,14 @@ namespace Magnus_WPF_1.Source.Hardware
                     nHighIndex = nIndex;
             }
             if (nLowIndex >= 0)
-                m_List_sequencePointData[nLowIndex] = HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_DeviceID, dlowSoftLimit, dlowJointSoftLimit, nLowIndex + 1, "Lower Soft Limit");
+                m_List_sequencePointData[nLowIndex] = HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, dlowSoftLimit, dlowJointSoftLimit, nLowIndex + 1, "Lower Soft Limit");
             else
-                m_List_sequencePointData.Add(HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_DeviceID, dlowSoftLimit, dlowJointSoftLimit, m_List_sequencePointData.Count, "Lower Soft Limit"));
+                m_List_sequencePointData.Add(HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, dlowSoftLimit, dlowJointSoftLimit, m_List_sequencePointData.Count, "Lower Soft Limit"));
 
             if (nHighIndex >= 0)
-                m_List_sequencePointData[nHighIndex] = HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_DeviceID, dhighSoftLimit, dlowJointSoftLimit, nHighIndex + 1, "Higher Soft Limit");
+                m_List_sequencePointData[nHighIndex] = HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, dhighSoftLimit, dlowJointSoftLimit, nHighIndex + 1, "Higher Soft Limit");
             else
-                m_List_sequencePointData.Add(HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_DeviceID, dhighSoftLimit, dhighJointSoftLimit, m_List_sequencePointData.Count, "Higher Soft Limit"));
+                m_List_sequencePointData.Add(HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, dhighSoftLimit, dhighJointSoftLimit, m_List_sequencePointData.Count, "Higher Soft Limit"));
 
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
@@ -784,7 +784,7 @@ namespace Magnus_WPF_1.Source.Hardware
                 double[] dLowPos = new double[6];
                 double[] dHighPos = new double[6];
                 bool bRe = false;
-                HiWinRobotInterface.GetSoftLimit(m_DeviceID, combo_JogType.SelectedIndex, ref bRe, ref dLowPos, ref dHighPos);
+                HiWinRobotInterface.GetSoftLimit(m_RobotConnectID, combo_JogType.SelectedIndex, ref bRe, ref dLowPos, ref dHighPos);
 
                 if (combo_JogType.SelectedIndex == (int)JOG_TYPE.JOG_JOINT)
                 {
@@ -814,9 +814,9 @@ namespace Magnus_WPF_1.Source.Hardware
 
 
                 if (nLimit == 0)
-                    HiWinRobotInterface.SetSoftLimit(m_DeviceID, dPos, dHighPos, combo_JogType.SelectedIndex);
+                    HiWinRobotInterface.SetSoftLimit(m_RobotConnectID, dPos, dHighPos, combo_JogType.SelectedIndex);
                 else
-                    HiWinRobotInterface.SetSoftLimit(m_DeviceID, dLowPos, dPos, combo_JogType.SelectedIndex);
+                    HiWinRobotInterface.SetSoftLimit(m_RobotConnectID, dLowPos, dPos, combo_JogType.SelectedIndex);
             }
 
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
@@ -857,7 +857,8 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void check_Manual_Checked(object sender, RoutedEventArgs e)
         {
-            HWinRobot.set_operation_mode(HiWinRobotInterface.m_DeviceID, (int)ROBOT_OPERATION_MODE.MODE_MANUAL);
+            if (HiWinRobotInterface.m_RobotConnectID >= 0)
+                HWinRobot.set_operation_mode(HiWinRobotInterface.m_RobotConnectID, (int)ROBOT_OPERATION_MODE.MODE_MANUAL);
             //HWinRobot.disconnect(HiWinRobotInterface.m_DeviceID);
             //if(MainWindow.mainWindow.master !=null)
             //    MainWindow.mainWindow.master.m_hiWinRobotInterface.ReconnectToHIKRobot();
@@ -865,7 +866,8 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void check_Auto_Checked(object sender, RoutedEventArgs e)
         {
-            HWinRobot.set_operation_mode(HiWinRobotInterface.m_DeviceID, (int)ROBOT_OPERATION_MODE.MODE_AUTO);
+            if(HiWinRobotInterface.m_RobotConnectID >=0)
+                HWinRobot.set_operation_mode(HiWinRobotInterface.m_RobotConnectID, (int)ROBOT_OPERATION_MODE.MODE_AUTO);
             //HWinRobot.disconnect(HiWinRobotInterface.m_DeviceID);
             //if (MainWindow.mainWindow.master != null)
             //    MainWindow.mainWindow.master.m_hiWinRobotInterface.ReconnectToHIKRobot();
@@ -873,15 +875,15 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void dataGrid_robot_Output_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (HWinRobot.get_connection_level(HiWinRobotInterface.m_DeviceID) == 0)
+            if (HWinRobot.get_connection_level(HiWinRobotInterface.m_RobotConnectID) == 0)
                 return;
 
             if (dataGrid_robot_Output.SelectedIndex < 0)
                 return;
 
-            int nvalue = HWinRobot.get_digital_output(HiWinRobotInterface.m_DeviceID, dataGrid_robot_Output.SelectedIndex + 1);
+            int nvalue = HWinRobot.get_digital_output(HiWinRobotInterface.m_RobotConnectID, dataGrid_robot_Output.SelectedIndex + 1);
             bool bIOStatus = nvalue == 1 ? true : false;
-            HWinRobot.set_digital_output(HiWinRobotInterface.m_DeviceID, dataGrid_robot_Output.SelectedIndex + 1, !bIOStatus);
+            HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, dataGrid_robot_Output.SelectedIndex + 1, !bIOStatus);
         }
 
         public System.Drawing.PointF[] m_CalibPoints = new System.Drawing.PointF[3];

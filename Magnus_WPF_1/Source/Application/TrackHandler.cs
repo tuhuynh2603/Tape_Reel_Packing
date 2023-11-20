@@ -541,7 +541,7 @@ namespace Magnus_WPF_1.Source.Application
             return nResult;
         }
 
-        private void InspectionOnlineThread()
+        private void InspectThread()
         {
             Master.InspectEvent[m_nTrackID].Reset();
             while (MainWindow.mainWindow != null)
@@ -585,17 +585,7 @@ namespace Magnus_WPF_1.Source.Application
                     m_nResult[m_CurrentSequenceDeviceID] = Inspect(ref mainWindow.master.m_Tracks[m_nTrackID], out pCenter, out pCorner);
                     m_Center_Vision = pCenter;
                     m_dDeltaAngleInspection = MagnusMatrix.CalculateShiftXYAngle(m_Center_Vision, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint);
-
-                    //MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveToPosition(HiWinRobotInterface.m_DeviceID, 0, dValue);
-
-                    //MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.MoveToReadyPosition(HiWinRobotInterface.m_DeviceID);
-                    //int Anglesign = RotationDirection(dX1, dY1, dX2, dY2);
-
-
-                    ////
-                    //Master.InspectEvent[m_nTrackID].Reset();
                     Master.InspectDoneEvent[m_nTrackID].Set();
-
 
                     timeIns.Stop();
                     Thread.Sleep(5);
@@ -604,6 +594,8 @@ namespace Magnus_WPF_1.Source.Application
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
                         //MainWindow.mainWindow.UpdateDebugInfor();
+                        double dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(pCenter, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint);
+                        DrawInspectionResult(ref m_nResult[m_CurrentSequenceDeviceID], ref pCenter, ref dDeltaAngle);
 
                         m_imageViews[0].tbl_InspectTime.Text = timeIns.ElapsedMilliseconds.ToString();
 
@@ -642,16 +634,94 @@ namespace Magnus_WPF_1.Source.Application
         public string m_strCurrentLot;
         public PointF m_Center_Vision = new PointF();
         public double m_dDeltaAngleInspection = 0.0;
+        public int m_nVisionReady = 0;
+        //public void InspectOfflineThread(string strFolderPath)
+        //{
 
-        public void InspectOffline(string strFolderPath)
+        //    //if (mainWindow.bEnableOfflineInspection)
+        //    //        return;
+
+        //    if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.bEnableRunSequence)
+        //        return;
+
+        //    CheckInspectionOnlineThread();
+
+        //    //MainWindow.mainWindow.bEnableOfflineInspection = true;
+
+        //    DirectoryInfo folder = new DirectoryInfo(strFolderPath);
+
+        //    // Get a list of items (files and directories) inside the folder
+        //    FileSystemInfo[] items = folder.GetFileSystemInfos();
+
+        //    // Loop through the items and print their names
+
+        //    while (MainWindow.mainWindow.bEnableOfflineInspection && !mainWindow.bEnableRunSequence)
+        //    {
+        //        try
+        //        {
+        //            while (!Master.m_hardwareTriggerSnapEvent[m_nTrackID].WaitOne(10))
+        //            {
+        //                if (MainWindow.mainWindow == null)
+        //                    return;
+
+        //                if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.bEnableRunSequence)
+        //                    return;
+
+        //            }
+        //            bool bDeviceIDFound = false;
+        //            foreach (FileSystemInfo item in items)
+        //            {
+        //                string strDeviceID = item.Name.Split('.')[0];
+        //                strDeviceID = strDeviceID.Split('_')[1];
+        //                int nDeviceID = Int32.Parse(strDeviceID);
+        //                if (nDeviceID < 0 || nDeviceID >= m_nResult.Length)
+        //                    nDeviceID = 0;
+        //                if (m_nCurrentClickMappingID != nDeviceID - 1)
+        //                    continue;
+        //                bDeviceIDFound = true;
+        //                Array.Clear(m_imageViews[0].bufferImage, 0, m_imageViews[0].bufferImage.Length);
+        //                // Mono Image
+        //                m_imageViews[0].UpdateNewImageMono(item.FullName);
+        //                break;
+        //            }
+        //            if (bDeviceIDFound == false)
+        //                continue;
+
+        //            Master.InspectEvent[m_nTrackID].Set();
+        //            //m_nResult[m_nCurrentClickMappingID] = Inspect();
+        //            Master.InspectDoneEvent[m_nTrackID].Reset();
+        //            while (!Master.InspectDoneEvent[m_nTrackID].WaitOne(10))
+        //            {
+        //                if (MainWindow.mainWindow == null)
+        //                    return;
+
+        //                if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.bEnableRunSequence)
+        //                    return;
+        //            }
+        //            Master.InspectDoneEvent[m_nTrackID].Reset();
+        //            Master.VisionReadyEvent[m_nTrackID].Set();
+
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            LogMessage.WriteToDebugViewer(1, "PROCESS ERROR. Inspection Offline : " + e.ToString());
+        //        }
+        //    }
+        //}
+
+
+        public void InspectOfflineThread(string strFolderPath)
         {
 
             //if (mainWindow.bEnableOfflineInspection)
             //        return;
 
+            if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.bEnableRunSequence)
+                return;
+
             CheckInspectionOnlineThread();
 
-            MainWindow.mainWindow.bEnableOfflineInspection = true;
+            //MainWindow.mainWindow.bEnableOfflineInspection = true;
 
             DirectoryInfo folder = new DirectoryInfo(strFolderPath);
 
@@ -660,7 +730,7 @@ namespace Magnus_WPF_1.Source.Application
 
             // Loop through the items and print their names
 
-            while (MainWindow.mainWindow.bEnableOfflineInspection && !mainWindow.bEnableRunSequence)
+            foreach (FileSystemInfo item in items)
             {
                 try
                 {
@@ -674,30 +744,23 @@ namespace Magnus_WPF_1.Source.Application
 
                     }
                     bool bDeviceIDFound = false;
-                    foreach (FileSystemInfo item in items)
-                    {
+
                         string strDeviceID = item.Name.Split('.')[0];
                         strDeviceID = strDeviceID.Split('_')[1];
                         int nDeviceID = Int32.Parse(strDeviceID);
                         if (nDeviceID < 0 || nDeviceID >= m_nResult.Length)
                             nDeviceID = 0;
-                        if (m_nCurrentClickMappingID != nDeviceID - 1)
-                            continue;
-                        bDeviceIDFound = true;
+                    //if (m_nCurrentClickMappingID != nDeviceID - 1)
+                    //    continue;
+                    m_CurrentSequenceDeviceID = nDeviceID;
+                    bDeviceIDFound = true;
                         Array.Clear(m_imageViews[0].bufferImage, 0, m_imageViews[0].bufferImage.Length);
                         // Mono Image
                         m_imageViews[0].UpdateNewImageMono(item.FullName);
-                        break;
-                    }
+
+
                     if (bDeviceIDFound == false)
                         continue;
-                    //Color Image
-                    //Mat img_temp = new Mat();
-                    //img_temp = CvInvoke.Imread(item.FullName, ImreadModes.Color);
-                    //Array.Clear(m_imageViews[0].bufferImage, 0, m_imageViews[0].bufferImage.Length);
-                    //Image<Bgr, byte> imgg = img_temp.ToImage<Bgr, byte>();
-                    //m_imageViews[0].bufferImage = BitmapToByteArray(imgg.ToBitmap());
-                    //m_imageViews[0].UpdateNewImageColor(m_imageViews[0].bufferImage, imgg.ToBitmap().Width, imgg.ToBitmap().Height, 96);
 
                     Master.InspectEvent[m_nTrackID].Set();
                     //m_nResult[m_nCurrentClickMappingID] = Inspect();
@@ -710,8 +773,9 @@ namespace Magnus_WPF_1.Source.Application
                         if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.bEnableRunSequence)
                             return;
                     }
-                    Master.InspectDoneEvent[m_nTrackID].Reset();
 
+                    Master.InspectDoneEvent[m_nTrackID].Reset();
+                    Master.VisionReadyEvent[m_nTrackID].Set();
 
                 }
                 catch (Exception e)
@@ -721,7 +785,8 @@ namespace Magnus_WPF_1.Source.Application
             }
         }
 
-        public void FullSequenceThread()
+
+        public void InspectOnlineThread()
         {
 
             CheckInspectionOnlineThread();
@@ -817,58 +882,10 @@ namespace Magnus_WPF_1.Source.Application
                         return;
                     }
                 }
-
-                // Send result to Robot
-                //string strResult = m_nResult[m_CurrentSequenceDeviceID].ToString(); 
-                //Master.commHIKRobot.CreateAndSendMessageToHIKRobot(SignalFromVision.Vision_Go_Pick, strResult);
-                PointF robotPoint = MagnusMatrix.ApplyTransformation(MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.m_MatCameraRobotTransform, m_Center_Vision);
-                // Move to Pre Pick position
-                if(MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
-                    return;
-                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, m_dDeltaAngleInspection) !=0)
-                    return;
-
-                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
-                    return;
-
-                // Turn on vaccum
-                HWinRobot.set_digital_output(HiWinRobotInterface.m_DeviceID, (int)HiWinRobotInterface.OUTPUT_IOROBOT.ROBOT_AIR_ONOFF, true);
-
-                while (HWinRobot.get_digital_input(HiWinRobotInterface.m_DeviceID, (int)HiWinRobotInterface.INPUT_IOROBOT.AIR_PRESSURESTATUS) == 0)
-                {
-                    if (!MainWindow.mainWindow.bEnableRunSequence)
-                    {
-                        //m_cap.Stop();
-                        //m_cap.ImageGrabbed -= Online_ImageGrabbed;
-                        return;
-                    }
-                }
-
-                // Move to Pick position (move Down Z motor)
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PICK_POSITION(robotPoint, m_dDeltaAngleInspection);
-                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
-                    return;
-
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, m_dDeltaAngleInspection);
-                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
-                    return;
-
-                // Move to  Pre Pick position again (move Up Z motor)
-                HWinRobot.get_digital_input(HiWinRobotInterface.m_DeviceID, (int)HiWinRobotInterface.INPUT_IOROBOT.AIR_PRESSURESTATUS);
-                while (HWinRobot.get_digital_input(HiWinRobotInterface.m_DeviceID, (int)HiWinRobotInterface.INPUT_IOROBOT.PLC_READY) == 0)
-                {
-                    if (!MainWindow.mainWindow.bEnableRunSequence)
-                    {
-                        //m_cap.Stop();
-                        //m_cap.ImageGrabbed -= Online_ImageGrabbed;
-                        return;
-                    }
-                }
-
                 Master.InspectDoneEvent[m_nTrackID].Reset();
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Full sequence time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Inspection sequence time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
 
                 });
                 timeIns.Restart();
@@ -919,7 +936,7 @@ namespace Magnus_WPF_1.Source.Application
             {
                 Master.InspectDoneEvent[m_nTrackID].Reset();
                 Master.InspectEvent[m_nTrackID].Reset();
-                threadInspectOnline = new System.Threading.Thread(new System.Threading.ThreadStart(() => InspectionOnlineThread()));
+                threadInspectOnline = new System.Threading.Thread(new System.Threading.ThreadStart(() => InspectThread()));
                 threadInspectOnline.Name = m_nTrackID.ToString();
                 threadInspectOnline.SetApartmentState(ApartmentState.STA);
                 threadInspectOnline.IsBackground = true;
@@ -930,7 +947,7 @@ namespace Magnus_WPF_1.Source.Application
             {
                 Master.InspectDoneEvent[m_nTrackID].Reset();
                 Master.InspectEvent[m_nTrackID].Reset();
-                threadInspectOnline = new System.Threading.Thread(new System.Threading.ThreadStart(() => InspectionOnlineThread()));
+                threadInspectOnline = new System.Threading.Thread(new System.Threading.ThreadStart(() => InspectThread()));
                 threadInspectOnline.Name = m_nTrackID.ToString();
                 threadInspectOnline.SetApartmentState(ApartmentState.STA);
                 threadInspectOnline.IsBackground = true;

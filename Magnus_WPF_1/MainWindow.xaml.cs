@@ -302,7 +302,12 @@ namespace Magnus_WPF_1
         {
 
             bEnableOfflineInspection = (bool)inspect_offline_btn.IsChecked;
-            master.RunOfflineSequenceThread(activeImageDock.trackID);
+            for (int n = 0; n < Application.m_nTrack; n++)
+            {
+                master.RunOfflineSequenceThread(n);
+            }
+            master.RobotSequenceThread();
+
         }
 
         private void btn_inspect_offline_UnChecked(object sender, RoutedEventArgs e)
@@ -320,19 +325,22 @@ namespace Magnus_WPF_1
         {
             btn_run_sequence.IsChecked = true;
             bEnableRunSequence = (bool)btn_run_sequence.IsChecked;
-
             inspect_offline_btn.IsEnabled = false;
-            if (nTrack == (int)TRACK_TYPE.TRACK_ALL)
+            for (int n = 0; n < Application.m_nTrack; n++)
             {
-                for (int n = 0; n < Application.m_nTrack; n++)
-                {
-                    master.RunSequenceThread(n);
-                }
+                master.RunOnlineSequenceThread(n);
             }
-            else
-                master.RunSequenceThread(nTrack);
+            //if (nTrack == (int)TRACK_TYPE.TRACK_ALL)
+            //{
+            //    for (int n = 0; n < Application.m_nTrack; n++)
+            //    {
+            //        master.RunOnlineSequenceThread(n);
+            //    }
+            //}
+            //else
+            //    master.RunOnlineSequenceThread(nTrack);
 
-
+            master.RobotSequenceThread();
             //Master.commHIKRobot.CreateAndSendMessageToHIKRobot(SignalFromVision.Vision_Ready);
         }
         public void Stop_Sequence(int nTrack = (int)TRACK_TYPE.TRACK_ALL)

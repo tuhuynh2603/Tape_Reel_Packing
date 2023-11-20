@@ -37,8 +37,9 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             PLC_READY = 1,
             CHIPDETECT_SENSOR = 2,
             AIR_PRESSURESTATUS = 3,
-            INPUT_3,
-            INPUT_4
+            EMERGENCY_STATUS = 4,
+            QUICK_STOP_STATUS = 5,
+            RESET_STATUS = 6
         }
 
         public enum OUTPUT_IOROBOT
@@ -62,7 +63,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             public const string PRE_PASS_PLACE_POSITION = "Pre Pass Place Position";
             public const string PASS_PLACE_POSITION = "Pass Place Position";
             public const string PRE_FAILED_PLACE_POSITION = "Pre Failed Place Position";
-            public const string PLACE_FAILED_POSITION = "Failed Place Position";
+            public const string FAILED_PLACE_POSITION = "Failed Place Position";
             public const string CALIB_ROBOT_POSITION_1 = "Calib Robot Point 1";
             public const string CALIB_ROBOT_POSITION_2 = "Calib Robot Point 2";
             public const string CALIB_ROBOT_POSITION_3 = "Calib Robot Point 3";
@@ -317,7 +318,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             InitRobotParameter();
             ConnectoHIKRobot(m_strRobotIPAddress);
             m_hiWinRobotUserControl = new HiWinRobotUserControl(m_strRobotIPAddress);
-            InitDataGridview(m_DeviceID, true);
+            InitDataGridview(m_RobotConnectID, true);
             m_hikThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => Thread_function()));
             m_hikThread.Start();
             //dispatcherTimer.Tick += dispatcherTimer_Tick;
@@ -328,11 +329,11 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         {
 
             m_strRobotIPAddress = strAddress;
-            m_DeviceID = -1;
+            m_RobotConnectID = -1;
             try
             {
-                HWinRobot.disconnect(m_DeviceID);
-                m_DeviceID = HWinRobot.open_connection(strAddress, 1, callback);
+                HWinRobot.disconnect(m_RobotConnectID);
+                m_RobotConnectID = HWinRobot.open_connection(strAddress, 1, callback);
             }
             catch (Exception e)
             {
@@ -340,9 +341,9 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
             };
 
-            if (m_DeviceID >= 0)
+            if (m_RobotConnectID >= 0)
             {
-                HWinRobot.clear_alarm(m_DeviceID);
+                HWinRobot.clear_alarm(m_RobotConnectID);
 
                 int client_L = -1, client_s = -1, client_rev = -1;
                 int server_L = -1, server_s = -1, server_rev = -1;
@@ -352,7 +353,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 LogMessage.LogMessage.WriteToDebugViewer(1, "HRSDK Release Ver:" + v);
 
                 HWinRobot.get_hrsdk_sdkver(ref client_L, ref client_s, ref client_rev);
-                HWinRobot.get_hrss_sdkver(m_DeviceID, ref server_L, ref server_s, ref server_rev);
+                HWinRobot.get_hrss_sdkver(m_RobotConnectID, ref server_L, ref server_s, ref server_rev);
                 // if HRSSMode != 3 it mean we cannot control robot by software
                 // Mode 2: Auto
                 // Mode 3: External control
@@ -368,12 +369,12 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                     LogMessage.LogMessage.WriteToDebugViewer(1, "Some APIs not support.");
                 }
 
-                int level = HWinRobot.get_connection_level(m_DeviceID);
+                int level = HWinRobot.get_connection_level(m_RobotConnectID);
                 LogMessage.LogMessage.WriteToDebugViewer(1, "level:" + level);
 
-                HWinRobot.set_connection_level(m_DeviceID, 1);
-                HWinRobot.set_operation_mode(m_DeviceID, (int)ROBOT_OPERATION_MODE.MODE_AUTO);
-                int nmode = HWinRobot.get_operation_mode(m_DeviceID);
+                HWinRobot.set_connection_level(m_RobotConnectID, 1);
+                HWinRobot.set_operation_mode(m_RobotConnectID, (int)ROBOT_OPERATION_MODE.MODE_AUTO);
+                int nmode = HWinRobot.get_operation_mode(m_RobotConnectID);
                 string strMode = nmode == (int)ROBOT_OPERATION_MODE.MODE_AUTO ? "AUTO" : "MANUAL";
                 LogMessage.LogMessage.WriteToDebugViewer(1, "operation mode:" + strMode);
                 //Disconnect(device_id);
@@ -396,8 +397,8 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             //dispatcherTimer.Stop();
             try
             {
-                HWinRobot.disconnect(m_DeviceID);               
-                m_DeviceID = HWinRobot.open_connection(m_strRobotIPAddress, 1, callback);
+                HWinRobot.disconnect(m_RobotConnectID);               
+                m_RobotConnectID = HWinRobot.open_connection(m_strRobotIPAddress, 1, callback);
 
             }
             catch (Exception e)
@@ -406,17 +407,17 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
             };
 
-            if (m_DeviceID >= 0)
+            if (m_RobotConnectID >= 0)
             {
 
-                HWinRobot.clear_alarm(m_DeviceID);
-                int nHRSS = HWinRobot.get_hrss_mode(m_DeviceID);
+                HWinRobot.clear_alarm(m_RobotConnectID);
+                int nHRSS = HWinRobot.get_hrss_mode(m_RobotConnectID);
                 //LogMessage.LogMessage.WriteToDebugViewer(1, "HRSS mode " + nHRSS.ToString());
 
                 if (nHRSS != 3)
                 {
-                    HWinRobot.disconnect(m_DeviceID);
-                    m_DeviceID = -1;
+                    HWinRobot.disconnect(m_RobotConnectID);
+                    m_RobotConnectID = -1;
                     LogMessage.LogMessage.WriteToDebugViewer(1, "connect failed.");
                     return;
                 }
@@ -424,11 +425,11 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 LogMessage.LogMessage.WriteToDebugViewer(1, "connect successful.");
                 StringBuilder v = new StringBuilder(100);
                 HWinRobot.get_hrsdk_version(v);
-                HWinRobot.set_connection_level(m_DeviceID, 1);
-                int level = HWinRobot.get_connection_level(m_DeviceID);
+                HWinRobot.set_connection_level(m_RobotConnectID, 1);
+                int level = HWinRobot.get_connection_level(m_RobotConnectID);
 
                 // Turn on Motor to allow Moving
-                HWinRobot.set_motor_state(m_DeviceID, 1);
+                HWinRobot.set_motor_state(m_RobotConnectID, 1);
                 //dispatcherTimer.Start();
 
             }
@@ -444,7 +445,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         public List<positionData> m_ListVelocityData = new List<positionData>();
         public List<positionData> m_ListInputData = new List<positionData>();
         public List<positionData> m_ListOutputData = new List<positionData>();
-        public static int m_DeviceID = -1;
+        public static int m_RobotConnectID = -1;
         public void InitDataGridview(int device_id, bool breset = false)
         {
             bool[] bEnableUpddate = { false, false, false };
@@ -806,7 +807,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 //Connect button
                 if (m_hiWinRobotUserControl.b_button_RobotConnect == true)
                 {
-                    if (m_DeviceID < 0)
+                    if (m_RobotConnectID < 0)
                     {
                         ReconnectToHIKRobot();
                         Thread.Sleep(1000);
@@ -814,31 +815,31 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                     }
                     else if (MainWindow.isRobotControllerOpen)
                     {
-                        InitDataGridview(m_DeviceID);
+                        InitDataGridview(m_RobotConnectID);
 
                     }
 
                     // Change mode during using software
-                    if (HWinRobot.get_hrss_mode(m_DeviceID) != 3 && m_DeviceID >= 0)
+                    if (HWinRobot.get_hrss_mode(m_RobotConnectID) != 3 && m_RobotConnectID >= 0)
                     {
-                        HWinRobot.disconnect(m_DeviceID);
-                        m_DeviceID = -1;
+                        HWinRobot.disconnect(m_RobotConnectID);
+                        m_RobotConnectID = -1;
 
                     }
                 }
                 //Disconnect button
                 else
                 {
-                    if (m_DeviceID >= 0)
+                    if (m_RobotConnectID >= 0)
                     {
-                        HWinRobot.disconnect(m_DeviceID);
-                        m_DeviceID = -1;
+                        HWinRobot.disconnect(m_RobotConnectID);
+                        m_RobotConnectID = -1;
                     }
                             
                 }
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
-                    if (m_DeviceID >= 0)
+                    if (m_RobotConnectID >= 0)
                     {
                         m_hiWinRobotUserControl.button_RobotConnect.Content = "Connected";
                         m_hiWinRobotUserControl.button_RobotConnect.Background = new SolidColorBrush(Colors.Green);
@@ -862,20 +863,8 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
                 Thread.Sleep(100);
             }
-            HWinRobot.disconnect(m_DeviceID);
+            HWinRobot.disconnect(m_RobotConnectID);
             return;
-        }
-
-        private void dispatcherTimer_Tick(object sender, EventArgs e)
-        {
-        }
-
-        public void Disconnect(int device_id)
-        {
-            if (device_id >= 0)
-            {
-                HWinRobot.disconnect(device_id);
-            }
         }
 
         #region Pick Place Movement
@@ -887,10 +876,10 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             pData.GetXYZPoint(ref dValue);
             if (bSetSpeed)
             {
-                HWinRobot.set_acc_dec_ratio(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_AccRatio));
-                HWinRobot.set_ptp_speed(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_PTPSpeed));
-                HWinRobot.set_lin_speed(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_LinearSpeed));
-                HWinRobot.set_override_ratio(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_Override));
+                HWinRobot.set_acc_dec_ratio(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(pData.m_AccRatio));
+                HWinRobot.set_ptp_speed(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(pData.m_PTPSpeed));
+                HWinRobot.set_lin_speed(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(pData.m_LinearSpeed));
+                HWinRobot.set_override_ratio(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(pData.m_Override));
             }
 
             dValue[0] = robotPoint.X;
@@ -898,7 +887,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             dValue[5] = dDeltaAngle + dValue[5];
             //wait_for_stop_motion(ndeviceid);
             LogMessage.LogMessage.WriteToDebugViewer(2, $"Move to {SequencePointData.PRE_PICK_POSITION} (X Y Z Angle) = " + dValue[0].ToString() + ", " + dValue[1].ToString() + ", " + dValue[2].ToString() + ", " + dValue[5].ToString());
-            return HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, nmode, dValue);
+            return HWinRobot.ptp_pos(HiWinRobotInterface.m_RobotConnectID, nmode, dValue);
 
             //return wait_for_stop_motion(ndeviceid);
         }
@@ -911,16 +900,16 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             pData.GetXYZPoint(ref dValue);
             if (bSetSpeed)
             {
-                HWinRobot.set_acc_dec_ratio(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_AccRatio));
-                HWinRobot.set_ptp_speed(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_PTPSpeed));
-                HWinRobot.set_lin_speed(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_LinearSpeed));
-                HWinRobot.set_override_ratio(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_Override));
+                HWinRobot.set_acc_dec_ratio(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(pData.m_AccRatio));
+                HWinRobot.set_ptp_speed(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(pData.m_PTPSpeed));
+                HWinRobot.set_lin_speed(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(pData.m_LinearSpeed));
+                HWinRobot.set_override_ratio(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(pData.m_Override));
             }
             dValue[0] = robotPoint.X;
             dValue[1] = robotPoint.Y;
             dValue[5] = dDeltaAngle + dValue[5];
             LogMessage.LogMessage.WriteToDebugViewer(2, $"Move to {SequencePointData.PICK_POSITION} (X Y Z Angle) = " + dValue[0].ToString() + ", " + dValue[1].ToString() + ", " + dValue[2].ToString() + ", " + dValue[5].ToString());
-            return HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, nmode, dValue);
+            return HWinRobot.ptp_pos(HiWinRobotInterface.m_RobotConnectID, nmode, dValue);
         }
 
         public int MoveTo_STATIC_POSITION(string strPosition, bool bSetSpeed = false, int nmode = 0)
@@ -931,23 +920,24 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             pData.GetXYZPoint(ref dValue);
             if (bSetSpeed)
             {
-                HWinRobot.set_acc_dec_ratio(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_AccRatio));
-                HWinRobot.set_ptp_speed(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_PTPSpeed));
-                HWinRobot.set_lin_speed(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_LinearSpeed));
-                HWinRobot.set_override_ratio(HiWinRobotInterface.m_DeviceID, Convert.ToInt16(pData.m_Override));
+                HWinRobot.set_acc_dec_ratio(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(pData.m_AccRatio));
+                HWinRobot.set_ptp_speed(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(pData.m_PTPSpeed));
+                HWinRobot.set_lin_speed(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(pData.m_LinearSpeed));
+                HWinRobot.set_override_ratio(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(pData.m_Override));
             }
             LogMessage.LogMessage.WriteToDebugViewer(2, $"Move to {strPosition} (X Y Z Angle) = " + dValue[0].ToString() + ", " + dValue[1].ToString() + ", " + dValue[2].ToString() + ", " + dValue[5].ToString());
-            return HWinRobot.ptp_pos(HiWinRobotInterface.m_DeviceID, nmode, dValue);
+            return HWinRobot.ptp_pos(HiWinRobotInterface.m_RobotConnectID, nmode, dValue);
         }
 
         #endregion
 
         public bool wait_for_stop_motion()
         {
-            while (HWinRobot.get_motion_state(HiWinRobotInterface.m_DeviceID) != 1 )
+            while (HWinRobot.get_motion_state(HiWinRobotInterface.m_RobotConnectID) != 1 )
             {
-                if (HWinRobot.get_connection_level(HiWinRobotInterface.m_DeviceID) != 1)
-                    return false;
+                //robot connection changed => return false
+                if (HWinRobot.get_connection_level(HiWinRobotInterface.m_RobotConnectID) <0)
+                    return true;
                 if (m_bIsStop)
                 {
                     
@@ -956,12 +946,12 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                         m_bIsStop = false;
                     }
 
-                    return false;
+                    return true;
 
                 }
                 Thread.Sleep(30);
             }
-            return true;
+            return false;
         }
 
 
@@ -1048,15 +1038,15 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             {
                 m_bIsStop = true;
             }
-            HWinRobot.jog_stop(HiWinRobotInterface.m_DeviceID);
+            HWinRobot.jog_stop(HiWinRobotInterface.m_RobotConnectID);
         }
 
 
         public static void HomeMove()
         {
-            HWinRobot.jog_stop(m_DeviceID);
+            HWinRobot.jog_stop(m_RobotConnectID);
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
-            HWinRobot.jog_home(m_DeviceID);
+            HWinRobot.jog_home(m_RobotConnectID);
         }
 
         //public static void EventFun(UInt16 cmd, UInt16 rlt, ref UInt16 Msg, int len)

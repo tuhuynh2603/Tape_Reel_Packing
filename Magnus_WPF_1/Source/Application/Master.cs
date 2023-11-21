@@ -344,7 +344,7 @@ namespace Magnus_WPF_1.Source.Application
                 timeIns.Restart();
 
 
-                while (!Master.VisionReadyEvent[0].WaitOne(10))
+                while (!Master.VisionReadyEvent[0].WaitOne(1))
                 {
                     if (MainWindow.mainWindow == null)
                         return;
@@ -392,41 +392,17 @@ namespace Magnus_WPF_1.Source.Application
                     return;
 
 
-                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
-                    return;
-                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.READY_POSITION) != 0)
-                    return;
+                //if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
+                //    return;
+                //if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.READY_POSITION) != 0)
+                //    return;
 
-                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
-                    return;
-
-                Master.VisionReadyEvent[0].Reset();
-                m_hardwareTriggerSnapEvent[0].Set();
+                //if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
+                //    return;
 
                 ///////////////// Barcode Sequence
 
                 int nResult = m_Tracks[0].m_nResult[m_Tracks[0].m_CurrentSequenceDeviceID];
-
-
-                if (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_READY) == 0)
-                {
-                    if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
-                    {
-                        return;
-                    }
-                }
-
-                while (!Master.VisionReadyEvent[1].WaitOne(10))
-                {
-                    if (MainWindow.mainWindow == null)
-                        return;
-
-                    if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
-                    {
-                        return;
-                    }
-                }
-
 
                 if (MoveToPassFailedPosition(nResult) < 0)
                     return;
@@ -434,11 +410,15 @@ namespace Magnus_WPF_1.Source.Application
 
                 if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
                     return;
-                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.READY_POSITION) != 0)
+
+                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, m_Tracks[0].m_dDeltaAngleInspection) != 0)
                     return;
 
-                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
-                    return;
+                //if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.READY_POSITION) != 0)
+                //    return;
+
+                //if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
+                //    return;
 
                 Master.VisionReadyEvent[1].Reset();
                 m_hardwareTriggerSnapEvent[1].Set();
@@ -459,10 +439,36 @@ namespace Magnus_WPF_1.Source.Application
             string strPrePosition = nResult == 0?SequencePointData.PRE_PASS_PLACE_POSITION : SequencePointData.PRE_FAILED_PLACE_POSITION;
             string strPosition = nResult == 0 ? SequencePointData.PASS_PLACE_POSITION : SequencePointData.FAILED_PLACE_POSITION;
 
+
             MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(strPrePosition);
+
+
+
+            if (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_READY) == 0)
+            {
+                if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
+                {
+                    return -1;
+                }
+            }
+
+            while (!Master.VisionReadyEvent[1].WaitOne(1))
+            {
+                if (MainWindow.mainWindow == null)
+                    return -1;
+
+                if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
+                {
+                    return -1;
+                }
+            }
 
             if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
                 return -1;
+
+            Master.VisionReadyEvent[0].Reset();
+            m_hardwareTriggerSnapEvent[0].Set();
+
 
             MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(strPosition);
 

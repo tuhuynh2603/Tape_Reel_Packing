@@ -643,6 +643,11 @@ namespace Magnus_WPF_1.Source.Hardware
         private void button_RobotConnect_Checked(object sender, RoutedEventArgs e)
         {
             b_button_RobotConnect = (bool)button_RobotConnect.IsChecked;
+            if (MainWindow.mainWindow.master == null)
+                return;
+
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.m_strRobotIPAddress = GetCommInfo("Robot Comm::IpAddress", MainWindow.mainWindow.master.m_hiWinRobotInterface.m_strRobotIPAddress);
+            txtRobotIPAddress = MainWindow.mainWindow.master.m_hiWinRobotInterface.m_strRobotIPAddress;
         }
 
         private void button_RobotConnect_Unchecked(object sender, RoutedEventArgs e)

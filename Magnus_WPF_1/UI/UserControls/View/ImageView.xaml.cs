@@ -1,4 +1,5 @@
 ﻿using Emgu.CV;
+using Emgu.CV.Structure;
 using Emgu.CV.WPF;
 using Magnus_WPF_1.Source.Algorithm;
 using Magnus_WPF_1.Source.Application;
@@ -230,10 +231,16 @@ namespace Magnus_WPF_1.UI.UserControls.View
         {
             try
             {
-                int iw = 0;
-                int ih = 0;
-                int stride = 0;
-                bufferImage = ReadBufferFromFile(pathImage, ref iw, ref ih, ref stride);
+                //int iw = 0;
+                //int ih = 0;
+                //int stride = 0;
+                //bufferImage = ReadBufferFromFile(pathImage, ref iw, ref ih, ref stride);
+
+                CvImage matTemp = CvInvoke.Imread(pathImage, Emgu.CV.CvEnum.ImreadModes.Grayscale);
+
+                bufferImage = ConvertMonoMatToByteArray(matTemp);
+
+                //UpdateUIImageMono(bufferImage);
                 UpdateSourceImageMono();
                 return true;
             }
@@ -244,6 +251,41 @@ namespace Magnus_WPF_1.UI.UserControls.View
                 return false;
             }
         }
+
+        static byte[] ConvertMonoMatToByteArray(Mat matMono)
+        {
+            // Convert mono Mat to Image<Gray, byte>
+            Image<Gray, byte> imageMono = matMono.ToImage<Gray, byte>();
+
+            // Convert Image<Gray, byte> to byte array
+            byte[] byteArrayMono = ImageToByteArray(imageMono);
+
+            return byteArrayMono;
+        }
+
+        static byte[] ImageToByteArray(Image<Gray, byte> imageMono)
+        {
+            // Convert Image<Gray, byte> to Bitmap
+            System.Drawing.Bitmap bitmapMono = imageMono.ToBitmap();
+
+            // Lock the bits of the bitmap
+            System.Drawing.Imaging.BitmapData bmpData = bitmapMono.LockBits(new System.Drawing.Rectangle(0, 0, bitmapMono.Width, bitmapMono.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmapMono.PixelFormat);
+
+            // Calculate the number of bytes required to store the bitmap
+            int byteCount = Math.Abs(bmpData.Stride) * bitmapMono.Height;
+
+            // Create a byte array to hold the bitmap data
+            byte[] byteArrayMono = new byte[byteCount];
+
+            // Copy the locked bytes from memory to the byte array
+            Marshal.Copy(bmpData.Scan0, byteArrayMono, 0, byteCount);
+
+            // Unlock the bits of the bitmap
+            bitmapMono.UnlockBits(bmpData);
+
+            return byteArrayMono;
+        }
+
         public void UpdateSourceImageMono(bool isOnline = false)
         {
             // //DebugMessage.WriteToDebugViewer(1, $"_imageWidth of track: {_imageWidth}");
@@ -771,9 +813,14 @@ namespace Magnus_WPF_1.UI.UserControls.View
             int diX = (int)(a.X / scaleX) >= _imageWidth ? _imageWidth - 1 : (int)(a.X / scaleX);
             int diY = (int)(a.Y / scaleY) >= _imageHeight ? _imageHeight - 1 : (int)(a.Y / scaleY);
             int index = diY * (stride) + diX;
+
+            System.Drawing.PointF robotPoint = new System.Drawing.PointF(0, 0);
+            if (MainWindow.mainWindow.master != null)
+                robotPoint = Track.MagnusMatrix.ApplyTransformation(MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.m_MatCameraRobotTransform,  new System.Drawing.PointF(diX , diY));
+
             byte red = bufferImage[index < 0 ? 0 : index > size - 1 ? 0 : index];   // index overside
             ((MainWindow)(System.Windows.Application.Current.MainWindow)).UpdateGrayValue(trackID,
-                                                                            "[" + diX.ToString() + ", " + diY.ToString() + "]",
+                                                                            "[" + diX.ToString() + ", " + diY.ToString() + "]" + " Robot[" + robotPoint.X.ToString() + ", " + robotPoint.Y.ToString() + "]" ,
                                                                             "[" + red.ToString() + "]");
             //}
         }
@@ -1143,7 +1190,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
                     //int L_CornerIndex_Temp = 0;
                     //System.Drawing.Rectangle rectMatchingPosition = new System.Drawing.Rectangle();
                     //MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.AutoTeachDatumLocation(ref p_Regionpolygon, L_DeviceLocationRoi_Temp, L_TemplateRoi_Temp, ref mat_DeviceLocationRegion, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput, ref L_CornerIndex_Temp);
-                    //Source.Application.Application.categoriesTeachParam.L_TemplateRoi = L_TemplateRoi_Temp;
+                    Source.Application.Application.categoriesTeachParam.L_TemplateRoi = L_TemplateRoi_Temp;
                     //Source.Application.Application.categoriesTeachParam.L_CornerIndex = L_CornerIndex_Temp;
 
                     MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].AutoTeach(ref MainWindow.mainWindow.master.m_Tracks[nTeachTrackID], true);

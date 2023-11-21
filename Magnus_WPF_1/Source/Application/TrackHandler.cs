@@ -420,17 +420,17 @@ namespace Magnus_WPF_1.Source.Application
             color = new SolidColorBrush(Colors.Yellow);
             m_imageViews[0].DrawStringOverlay("(X, Y, Angle) = (" + pCenter.X.ToString() + ", " + pCenter.Y.ToString() + ", " + ((int)dAngle).ToString() + ")", (int)pCenter.X + 10, (int)pCenter.Y, color, 20);
 
-            if (nResult == -99)
+            if (nResult == -(int)ERROR_CODE.NO_PATTERN_FOUND)
             {
                 color = new SolidColorBrush(Colors.Red);
                 m_imageViews[0].DrawString("Device not found! ", 10, 10, color, 31);
             }
             else
             {
-                if (nResult == -1)
+                if (nResult == -(int)ERROR_CODE.OPPOSITE_CHIP)
                 {
                     color = new SolidColorBrush(Colors.Red);
-                    m_imageViews[0].DrawString("Not Good", 10, 10, color, 31);
+                    m_imageViews[0].DrawString("Black Chip Found", 10, 10, color, 31);
                     //m_imageViews[0].DrawString("Score: " + ((int)dScoreOutput).ToString(), 10, 35, color, 31);
 
                 }
@@ -470,8 +470,8 @@ namespace Magnus_WPF_1.Source.Application
                     m_imageViews[0].ClearText();
                 });
                 int nResult;
-                PointF pCenter = new PointF();
-                PointF pCorner = new PointF();
+                PointF pCenter = new PointF(0,0);
+                PointF pCorner = new PointF(0,0);
 
                 nResult = m_InspectionCore.Inspect(ref m_InspectionCore.m_TeachImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, ref m_StepDebugInfors, false);
                 //Draw Result
@@ -532,7 +532,7 @@ namespace Magnus_WPF_1.Source.Application
             });
             int nResult;
             //double nAngleOutput = 0;
-            PointF pCenter = new PointF(0, 0);
+            PointF pCenter = new PointF(0,0);
             PointF pCorner = new PointF(0,0);
             nResult = m_InspectionCore.Inspect(ref m_InspectionCore.m_SourceImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, ref m_StepDebugInfors, MainWindow.mainWindow.m_bEnableDebug);
 
@@ -729,11 +729,13 @@ namespace Magnus_WPF_1.Source.Application
             FileSystemInfo[] items = folder.GetFileSystemInfos();
 
             // Loop through the items and print their names
-
+            Stopwatch timeIns = new Stopwatch();
+            timeIns.Start();
             foreach (FileSystemInfo item in items)
             {
                 try
                 {
+
                     while (!Master.m_hardwareTriggerSnapEvent[m_nTrackID].WaitOne(10))
                     {
                         if (MainWindow.mainWindow == null)
@@ -743,11 +745,13 @@ namespace Magnus_WPF_1.Source.Application
                             return;
 
                     }
+                    timeIns.Restart();
+
                     bool bDeviceIDFound = false;
 
                         string strDeviceID = item.Name.Split('.')[0];
                         strDeviceID = strDeviceID.Split('_')[1];
-                        int nDeviceID = Int32.Parse(strDeviceID);
+                        int nDeviceID = Int32.Parse(strDeviceID) -1;
                         if (nDeviceID < 0 || nDeviceID >= m_nResult.Length)
                             nDeviceID = 0;
                     //if (m_nCurrentClickMappingID != nDeviceID - 1)
@@ -762,6 +766,9 @@ namespace Magnus_WPF_1.Source.Application
                     if (bDeviceIDFound == false)
                         continue;
 
+                    LogMessage.WriteToDebugViewer(5, "UpdateNewImageMono Inspection Offline : " + timeIns.ElapsedMilliseconds.ToString());
+                    timeIns.Restart();
+
                     Master.InspectEvent[m_nTrackID].Set();
                     //m_nResult[m_nCurrentClickMappingID] = Inspect();
                     Master.InspectDoneEvent[m_nTrackID].Reset();
@@ -773,14 +780,15 @@ namespace Magnus_WPF_1.Source.Application
                         if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.bEnableRunSequence)
                             return;
                     }
-
+                    LogMessage.WriteToDebugViewer(5, "Inspection Offline : " + timeIns.ElapsedMilliseconds.ToString());
+                    timeIns.Restart();
                     Master.InspectDoneEvent[m_nTrackID].Reset();
                     Master.VisionReadyEvent[m_nTrackID].Set();
 
                 }
                 catch (Exception e)
                 {
-                    LogMessage.WriteToDebugViewer(1, "PROCESS ERROR. Inspection Offline : " + e.ToString());
+                    LogMessage.WriteToDebugViewer(5, "PROCESS ERROR. Inspection Offline : " + e.ToString());
                 }
             }
         }

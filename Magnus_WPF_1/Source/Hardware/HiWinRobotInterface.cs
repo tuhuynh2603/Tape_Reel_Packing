@@ -295,11 +295,6 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         public System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
 
 
-        public void InitRobotParameter()
-        {
-            m_strRobotIPAddress = GetCommInfo("Robot Comm::IpAddress", m_strRobotIPAddress);
-        }
-
         public static string GetCommInfo(string key, string defaults)
         {
             RegistryKey registerPreferences = Registry.CurrentUser.CreateSubKey(Application.Application.pathRegistry + "\\Comm", true);
@@ -315,7 +310,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
         public HiWinRobotInterface()
         {
-            InitRobotParameter();
+            m_strRobotIPAddress = GetCommInfo("Robot Comm::IpAddress", m_strRobotIPAddress);
             ConnectoHIKRobot(m_strRobotIPAddress);
             m_hiWinRobotUserControl = new HiWinRobotUserControl(m_strRobotIPAddress);
             InitDataGridview(m_RobotConnectID, true);
@@ -393,7 +388,6 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
         public void ReconnectToHIKRobot()
         {
-            InitRobotParameter();
             //dispatcherTimer.Stop();
             try
             {
@@ -621,30 +615,30 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                         ////        MainWindow.mainWindow.master.m_hiWinRobotInterface.m_bMustConnectAgain = true;
                         ////    }
                         ////}
-                        LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] HRSS Mode: " + info[0]);
-                        if (info[0] == "3")
-                        {
-                            LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Operation Mode: " + info[1]);
-                            LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Override Ratio: " + info[2]);
-                            LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Motor State: " + info[3]);
-                            LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Exe File Name: " + info[4]);
-                            LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Function Output: " + info[5]);
-                            if (info[6] != "0")
-                                LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Alarm Count: " + info[6]);
-                            LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Keep Alive: " + info[7]);
-                            if (info[8] == "2")
-                                LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Motion Status: " + info[8]);
+                        //LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] HRSS Mode: " + info[0]);
+                        //if (info[0] == "3")
+                        //{
+                        //    LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Operation Mode: " + info[1]);
+                        //    LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Override Ratio: " + info[2]);
+                        //    LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Motor State: " + info[3]);
+                        //    LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Exe File Name: " + info[4]);
+                        //    LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Function Output: " + info[5]);
+                        //    if (info[6] != "0")
+                        //        LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Alarm Count: " + info[6]);
+                        //    LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Keep Alive: " + info[7]);
+                        //    if (info[8] == "2")
+                        //        LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Motion Status: " + info[8]);
 
-                            LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] payload: " + info[9]);
-                            LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Speed: " + info[10]); // safe: 0   normal: 1
-                            if (info[14] != "")
-                            {
-                                //LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Move Done!. Position: " + info[11]);
-                                LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Move Done! Coor: {0}, {1}, {2}, {3}, {4}, {5} ", info[14], info[15], info[16], info[17], info[18], info[19]));
-                                LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Joint: {0}, {1}, {2}, {3}, {4}, {5} ", info[20], info[21], info[22], info[23], info[24], info[25]));
-                            }
-                            LogMessage.LogMessage.WriteToDebugViewer(1, "");
-                        }
+                        //    LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] payload: " + info[9]);
+                        //    LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Speed: " + info[10]); // safe: 0   normal: 1
+                        //    if (info[14] != "")
+                        //    {
+                        //        //LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Move Done!. Position: " + info[11]);
+                        //        LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Move Done! Coor: {0}, {1}, {2}, {3}, {4}, {5} ", info[14], info[15], info[16], info[17], info[18], info[19]));
+                        //        LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Joint: {0}, {1}, {2}, {3}, {4}, {5} ", info[20], info[21], info[22], info[23], info[24], info[25]));
+                        //    }
+                        //    LogMessage.LogMessage.WriteToDebugViewer(1, "");
+                        //}
                         break;
                     case 4703:
                          LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Timer {0}: {1} ", Int32.Parse(info[0]) + 1, info[1]));
@@ -837,6 +831,10 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                     }
                             
                 }
+
+                if (System.Windows.Application.Current == null)
+                    return;
+
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
                     if (m_RobotConnectID >= 0)
@@ -917,7 +915,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
             double[] dValue = new double[6];
             SequencePointData pData = m_hiWinRobotUserControl.GetPointData(strPosition);
-            pData.GetXYZPoint(ref dValue);
+            pData.GetJointPoint(ref dValue);
             if (bSetSpeed)
             {
                 HWinRobot.set_acc_dec_ratio(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(pData.m_AccRatio));
@@ -926,7 +924,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 HWinRobot.set_override_ratio(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(pData.m_Override));
             }
             LogMessage.LogMessage.WriteToDebugViewer(2, $"Move to {strPosition} (X Y Z Angle) = " + dValue[0].ToString() + ", " + dValue[1].ToString() + ", " + dValue[2].ToString() + ", " + dValue[5].ToString());
-            return HWinRobot.ptp_pos(HiWinRobotInterface.m_RobotConnectID, nmode, dValue);
+            return HWinRobot.ptp_axis(HiWinRobotInterface.m_RobotConnectID, nmode, dValue);
         }
 
         #endregion
@@ -949,7 +947,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                     return true;
 
                 }
-                Thread.Sleep(30);
+                Thread.Sleep(5);
             }
             return false;
         }

@@ -372,6 +372,15 @@
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\bug-play-custom.png" />
+    <Resource Include="Resources\camera-iris-custom.png" />
+    <Resource Include="Resources\qrcode-scan-custom.png" />
+    <Resource Include="Resources\robot-industrial-custom.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\chevron-triple-down-custom.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(ProjectDir)..\BarcodeReaderSDK\$(PlatformName)\" "$(TargetDir)" /S /C /Y</PreBuildEvent>

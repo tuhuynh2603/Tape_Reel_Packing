@@ -32,7 +32,7 @@ namespace Magnus_WPF_1
         public static MainWindow mainWindow;
         public OutputLogView outputLogView;
         public DefectInfor defectInfor = new DefectInfor();
-        public static string[] titles = new string[] { "Top View ", "Flap Side 1 ", "Flap Side 2 " };
+        public static string[] titles = new string[] { "Top Camera", "Barcode Reader", "Flap Side 2 " };
 
         private int screenWidth = 2000;// System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width;
         private int screenHeight = 2000;// System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height;
@@ -302,11 +302,13 @@ namespace Magnus_WPF_1
         {
 
             bEnableOfflineInspection = (bool)inspect_offline_btn.IsChecked;
-            for (int n = 0; n < Application.m_nTrack; n++)
-            {
-                master.RunOfflineSequenceThread(n);
-            }
-            master.RobotSequenceThread();
+            //for (int n = 0; n < Application.m_nTrack; n++)
+            //{
+            //    master.RunOfflineSequenceThread(n);
+            //}
+            master.RunOfflineSequenceThread(activeImageDock.trackID);
+            
+            //master.RobotSequenceThread();
 
         }
 
@@ -398,16 +400,9 @@ namespace Magnus_WPF_1
             int nID = Check_mapping_Cursor_ID(m_CanvasMovePoint, true);
             master.m_Tracks[activeImageDock.trackID].m_nCurrentClickMappingID = nID;
 
-            //if (m_bEnableDebug) {
-            //    InspectionCore.LoadImageToInspection(master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource);
-            //    master.m_Tracks[activeImageDock.trackID].Inspect();
-            //    UpdateDebugInfor();
-            //        return;
-            //}
-
             master.m_Tracks[activeImageDock.trackID].CheckInspectionOnlineThread();
             if (bEnableRunSequence || bEnableOfflineInspection)
-                Master.m_hardwareTriggerSnapEvent[activeImageDock.trackID].Set();
+                Master.m_OfflineTriggerSnapEvent[activeImageDock.trackID].Set();
             else
                 Master.InspectEvent[activeImageDock.trackID].Set();
         }

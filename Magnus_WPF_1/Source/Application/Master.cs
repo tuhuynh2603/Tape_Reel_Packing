@@ -33,6 +33,8 @@ namespace Magnus_WPF_1.Source.Application
         public static ManualResetEvent[] InspectEvent;
         public static ManualResetEvent[] InspectDoneEvent;
         public static AutoResetEvent[] m_hardwareTriggerSnapEvent;
+        public static AutoResetEvent[] m_OfflineTriggerSnapEvent;
+
         public static ManualResetEvent[] VisionReadyEvent;
 
         // public AutoDeleteImagesDlg m_AutoDeleteImagesDlg = new AutoDeleteImagesDlg();
@@ -50,7 +52,6 @@ namespace Magnus_WPF_1.Source.Application
         public Thread[] m_SaveInspectImageThread;
         public static List<ArrayOverLay>[] list_arrayOverlay;
         public static Queue<ImageSaveData> m_SaveInspectImageQueue = new Queue<ImageSaveData>(); // create a queue to hold messages
-        public BitmapSource btmSource;
         public HiWinRobotInterface m_hiWinRobotInterface;
 
         #region Contructor Master
@@ -114,6 +115,7 @@ namespace Magnus_WPF_1.Source.Application
             m_Tracks = new Track[Application.m_nTrack];
             InspectEvent = new ManualResetEvent[Application.m_nTrack];
             InspectDoneEvent = new ManualResetEvent[Application.m_nTrack];
+            m_OfflineTriggerSnapEvent = new AutoResetEvent[Application.m_nTrack];
             VisionReadyEvent = new ManualResetEvent[Application.m_nTrack];
             m_hardwareTriggerSnapEvent = new AutoResetEvent[Application.m_nTrack];
             m_SaveInspectImageThread = new Thread[Application.m_nTrack];
@@ -128,6 +130,8 @@ namespace Magnus_WPF_1.Source.Application
                 InspectEvent[index_track] = new ManualResetEvent(false);
                 InspectDoneEvent[index_track] = new ManualResetEvent(false);
                 m_hardwareTriggerSnapEvent[index_track] = new AutoResetEvent(false);
+                m_OfflineTriggerSnapEvent[index_track] = new AutoResetEvent(false);
+
                 VisionReadyEvent[index_track] = new ManualResetEvent(false);
 
                 if (m_SaveInspectImageThread[index_track] == null)
@@ -199,7 +203,7 @@ namespace Magnus_WPF_1.Source.Application
             {
                 if (File.Exists(strImageFilePath))
                     File.Delete(strImageFilePath);
-                BitmapSource _bitmapImage = btmSource;
+                BitmapSource _bitmapImage = m_Tracks[nTrack].m_imageViews[0]. btmSource;
                 string path_image = strImageFilePath;
                 using (FileStream stream = new FileStream(path_image, FileMode.CreateNew))
                 {
@@ -439,7 +443,7 @@ namespace Magnus_WPF_1.Source.Application
 
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Inspection sequence time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Inspection sequence time {timeIns.ElapsedMilliseconds} (ms): " );
 
                 });
                 timeIns.Restart();

@@ -25,6 +25,16 @@
             <TextBlock Grid.Row="1" Text="Run" Foreground="Yellow" TextAlignment="Center" FontSize="20"></TextBlock>
         </Grid>
 
+        <Grid x:Key="debugSequenceImage" Margin="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"></RowDefinition>
+                <RowDefinition Height="1*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Image Grid.Row="0"  Source="Resources\chevron-triple-down-custom.png"></Image>
+            <TextBlock Grid.Row="1" Text="Step Run" Foreground="Yellow" TextAlignment="Center" FontSize="20"></TextBlock>
+        </Grid>
+
+
         <!--Background button-->
         <LinearGradientBrush x:Key="BgButton" EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
             <GradientStop Color="#FFE47F27" Offset="0.439" />
@@ -208,7 +218,7 @@
                                                             Click="btn_inspect_Click"/>
                                     <RibbonToggleButton Name="debug_btn"
                                                             Label="Debug"
-                                                            LargeImageSource="Resources\book-open-custom.png"
+                                                            LargeImageSource="Resources\bug-play-custom.png"
                                                             MouseOverBackground="{StaticResource MouseOverButtonStyle}"
                                                             Foreground="GhostWhite"
                                                             CheckedBackground="{StaticResource CheckedButtonStyle}"
@@ -262,7 +272,7 @@
 
                                     <RibbonToggleButton Name="mapping_parameters_btn"
                                                             Label="Mapping Setting"
-                                                            LargeImageSource="Resources\book-open-custom.png"
+                                                            LargeImageSource="Resources\blue-chip.png"
                                                             MouseOverBackground="{StaticResource MouseOverButtonStyle}"
                                                             Foreground="GhostWhite"
                                                             CheckedBackground="{StaticResource CheckedButtonStyle}"
@@ -345,7 +355,7 @@
 
                                                 <RibbonToggleButton Name="camera_setting_btn" Grid.Column="1"
                                                         Label="Camera Setting"
-                                                        LargeImageSource="Resources\camera-custom.png" Foreground="GhostWhite"
+                                                        LargeImageSource="Resources\camera-iris-custom.png" Foreground="GhostWhite"
                                                         Checked="btn_Camera_Setting_Checked"
                                                         Unchecked="btn_Camera_Setting_Unchecked"
                                                         CheckedBackground="{StaticResource CheckedButtonStyle}"
@@ -371,7 +381,7 @@
                                             </Grid.RowDefinitions>
                                                 <RibbonToggleButton x:Name="btn_Robot_Controller" Grid.Row="1"
                                                         Label="ROBOT Controller"
-                                                        LargeImageSource="Resources/network.png"
+                                                        LargeImageSource="Resources/robot-industrial-custom.png"
                                                         Foreground="White"
                                                         IsEnabled="true"
                                                         Checked="btn_Robot_Controller_Checked"
@@ -398,7 +408,7 @@
                                             </Grid.RowDefinitions>
                                             <RibbonToggleButton x:Name="btn_BarCodeReader_Setting" Grid.Row="1"
                                                         Label="Barcode Reader Setting"
-                                                        LargeImageSource="Resources/network.png"
+                                                        LargeImageSource="Resources/qrcode-scan-custom.png"
                                                         Foreground="White"                          
                                                         IsEnabled="true"
                                                         Checked="btn_BarCodeReader_Setting_Checked"
@@ -499,6 +509,13 @@
                         Background="Transparent"
                               IsChecked="False" Checked="btn_run_sequence_Checked" Unchecked="btn_run_sequence_Unchecked">
                 </ToggleButton>
+
+                <ToggleButton x:Name="btn_Debug_sequence" Content="{StaticResource debugSequenceImage}"
+                        Margin="0,25,0,0" HorizontalAlignment ="Center"
+                        Background="Transparent"
+                              IsChecked="False" Checked="btn_run_sequence_Checked" Unchecked="btn_run_sequence_Unchecked">
+                </ToggleButton>
+                
             </StackPanel>
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top"
                         Orientation="Horizontal" Height="25">

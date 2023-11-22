@@ -244,11 +244,11 @@ namespace Magnus_WPF_1.Source.Algorithm
             nError = FindDeviceLocation_Zoom(ref InspectImage.Gray,
                                              ref list_arrayOverlay, ref pCenter, ref pCorner, ref  debugInfors, bEnableDebug);
 
-            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("FindDeviceLocation_Zoom time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
+            //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            //{
+            //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("FindDeviceLocation_Zoom time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
 
-            });
+            //});
             timeIns.Restart();
 
             return nError;
@@ -633,11 +633,11 @@ namespace Magnus_WPF_1.Source.Algorithm
             //p_Regionpolygon.Remove(pCenter);
 
             //LogMessage.WriteToDebugViewer(1, "FindNearestPoints time: " + timeIns.ElapsedMilliseconds.ToString());
-            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("FindNearestPoints. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)");
+            //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            //{
+            //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("FindNearestPoints. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)");
 
-            });
+            //});
             timeIns.Stop();
 
             return -(int)ERROR_CODE.PASS;

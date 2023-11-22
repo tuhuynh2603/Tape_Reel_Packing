@@ -240,7 +240,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
                 //bufferImage = ConvertMonoMatToByteArray(matTemp);
 
-                UpdateUIImageMono(bufferImage);
+                //UpdateUIImageMono(bufferImage);
                 UpdateSourceImageMono();
                 return true;
             }
@@ -389,6 +389,10 @@ namespace Magnus_WPF_1.UI.UserControls.View
                 //DebugMessage.WriteToDebugViewer(1, $"enableGray: {enableGray}");
             }
         }
+
+
+
+
 
         public byte[] ConvertMonoToBinary()
         {

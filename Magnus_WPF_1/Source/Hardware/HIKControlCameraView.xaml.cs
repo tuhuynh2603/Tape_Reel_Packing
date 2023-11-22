@@ -267,7 +267,7 @@ namespace Magnus_WPF_1.Source.Hardware
                 Application.Application.cameraSettingParam.gain = gain;
                 Application.Application.cameraSettingParam.exposureTime = expose;
                 Application.Application.cameraSettingParam.frameRate = frameRate;
-                Application.Application.WriteCamSetting(m_nTrack);
+                //Application.Application.WriteCamSetting(m_nTrack);
             }    
         }
 

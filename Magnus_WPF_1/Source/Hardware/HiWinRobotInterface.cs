@@ -44,13 +44,15 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
         public enum OUTPUT_IOROBOT
         {
-            ROBOT_READY = 1,
-            ROBOT_PLACE_DONE = 2,
-            ROBOT_CONVEYER_ONOFF = 3,
-            ROBOT_ARLAMP = 4,
-            ROBOT_RESET = 5,
-            ROBOT_AIR_ONOFF = 3,
-            ROBOT_HEART_BEAT = 6,
+            ROBOT_AIR_ON = 1,
+            ROBOT_AIR_OFF = 5,
+
+            ROBOT_READY = 2,
+            ROBOT_PLACE_DONE = 3,
+            ROBOT_CONVEYER_ONOFF = 4,
+            ROBOT_ARLAMP = 6,
+            ROBOT_RESET = 7,
+            ROBOT_HEART_BEAT = 8,
         }
 
 

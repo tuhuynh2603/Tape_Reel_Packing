@@ -326,10 +326,12 @@ namespace Magnus_WPF_1
             btn_run_sequence.IsChecked = true;
             bEnableRunSequence = (bool)btn_run_sequence.IsChecked;
             inspect_offline_btn.IsEnabled = false;
-            for (int n = 0; n < Application.m_nTrack; n++)
-            {
-                master.RunOnlineSequenceThread(n);
-            }
+            //for (int n = 0; n < Application.m_nTrack; n++)
+            //{
+            //    master.RunOnlineSequenceThread(n);
+            //}
+            master.RunOnlineSequenceThread(0);
+
             //if (nTrack == (int)TRACK_TYPE.TRACK_ALL)
             //{
             //    for (int n = 0; n < Application.m_nTrack; n++)

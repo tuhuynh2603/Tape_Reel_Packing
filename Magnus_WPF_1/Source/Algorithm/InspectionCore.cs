@@ -437,20 +437,20 @@ namespace Magnus_WPF_1.Source.Algorithm
             {
 
                 //CvImage region_VarThreshold = new CvImage();
-                MagnusOpenCVLib.VarThresholding(ref zoomedInImage, ref img_thresholdRegion, (int)m_DeviceLocationParameter.m_L_ObjectColor, 2 * ((int)(m_DeviceLocationParameter.m_nMinWidthDevice * m_DeviceLocationParameter.m_dScaleImageRatio/ 4)) + 3, ref region_SearchDeviceLocation, m_DeviceLocationParameter.m_L_upperThreshold);
+                MagnusOpenCVLib.VarThresholding(ref zoomedInImage, ref img_thresholdRegion, (int)m_DeviceLocationParameter.m_L_ObjectColor, 2 * ((int)(m_DeviceLocationParameter.m_nMinWidthDevice / 4)) + 3, ref region_SearchDeviceLocation, m_DeviceLocationParameter.m_L_upperThreshold);
                 PushBackDebugInfors(imgSource, img_thresholdRegion, "VarThresholding. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
                 timeIns.Restart();
             }
 
             CvImage img_MophoRegion = new CvImage();
-            MagnusOpenCVLib.ClosingCircle(ref img_thresholdRegion, ref img_MophoRegion, (int)(m_DeviceLocationParameter.m_nDilationMask * m_DeviceLocationParameter.m_dScaleImageRatio) + 1);
+            MagnusOpenCVLib.ClosingCircle(ref img_thresholdRegion, ref img_MophoRegion, (int)(m_DeviceLocationParameter.m_nDilationMask ) + 1);
             PushBackDebugInfors(imgSource, img_MophoRegion, "Outer region after ClosingCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
 
             List<Rectangle> rect_SelectRectangle = new List<Rectangle>();
             CvImage mat_selectedtRegions = new CvImage();
 
-            MagnusOpenCVLib.SelectRegion(ref img_MophoRegion, ref mat_selectedtRegions, ref rect_SelectRectangle, (int)(m_DeviceLocationParameter.m_nMinWidthDevice * m_DeviceLocationParameter.m_dScaleImageRatio), (int)(m_DeviceLocationParameter.m_nMinHeightDevice * m_DeviceLocationParameter.m_dScaleImageRatio));
+            MagnusOpenCVLib.SelectRegion(ref img_MophoRegion, ref mat_selectedtRegions, ref rect_SelectRectangle, (int)(m_DeviceLocationParameter.m_nMinWidthDevice), (int)(m_DeviceLocationParameter.m_nMinHeightDevice));
             PushBackDebugInfors(imgSource, mat_selectedtRegions, "Outer region after SelectRegion with Width and Height. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
 
@@ -488,7 +488,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             timeIns.Restart();
             
             CvImage mat_InnerChipOpeningRegion = new CvImage();
-            MagnusOpenCVLib.OpeningCircle(ref mat_InnerChipFillUpRegion, ref mat_InnerChipOpeningRegion, (int)(m_DeviceLocationParameter.m_nOpeningMask * m_DeviceLocationParameter.m_dScaleImageRatio) + 1 );
+            MagnusOpenCVLib.OpeningCircle(ref mat_InnerChipFillUpRegion, ref mat_InnerChipOpeningRegion, (int)(m_DeviceLocationParameter.m_nOpeningMask) + 1 );
             PushBackDebugInfors(imgSource, mat_InnerChipOpeningRegion, "Inner Chip Region after Opening. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
 
@@ -538,7 +538,7 @@ namespace Magnus_WPF_1.Source.Algorithm
                 timeIns.Restart();
 
                 CvImage mat_InnerChipOpeningRegion_black = new CvImage();
-                MagnusOpenCVLib.OpeningCircle(ref mat_InnerChipFillUpRegion, ref mat_InnerChipOpeningRegion_black, (int)(m_DeviceLocationParameter.m_nOpeningMask * m_DeviceLocationParameter.m_dScaleImageRatio) + 1);
+                MagnusOpenCVLib.OpeningCircle(ref mat_InnerChipFillUpRegion, ref mat_InnerChipOpeningRegion_black, (int)(m_DeviceLocationParameter.m_nOpeningMask) + 1);
                 PushBackDebugInfors(imgSource, mat_InnerChipOpeningRegion_black, "Check Opposite chip: black region after Opening. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
                 timeIns.Restart();
 
@@ -554,8 +554,8 @@ namespace Magnus_WPF_1.Source.Algorithm
                 CvContourArray contours = new CvContourArray();
                 MagnusOpenCVLib.GenContourRegion(ref mat_BiggestInnerChipRegion_black, ref contours, RetrType.External);
                 rotateRect_Device = CvInvoke.MinAreaRect(contours[0]);
-                if(rotateRect_Device.Size.Width < (int)(m_DeviceLocationParameter.m_nMinWidthDevice * m_DeviceLocationParameter.m_dScaleImageRatio)
-                    || rotateRect_Device.Size.Height < (int)(m_DeviceLocationParameter.m_nMinHeightDevice * m_DeviceLocationParameter.m_dScaleImageRatio))
+                if(rotateRect_Device.Size.Width < (int)(m_DeviceLocationParameter.m_nMinWidthDevice)
+                    || rotateRect_Device.Size.Height < (int)(m_DeviceLocationParameter.m_nMinHeightDevice))
                     return -(int)ERROR_CODE.NO_PATTERN_FOUND;
 
                 pCenter = new Point((int)(rotateRect_Device.Center.X / m_DeviceLocationParameter.m_dScaleImageRatio), (int)(rotateRect_Device.Center.Y / m_DeviceLocationParameter.m_dScaleImageRatio));

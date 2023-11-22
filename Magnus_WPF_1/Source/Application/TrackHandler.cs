@@ -801,7 +801,7 @@ namespace Magnus_WPF_1.Source.Application
 
             int nWidth = 0, nHeight = 0;
             //Todo If Reset lot ID, need to create new lot ID and reset current Device ID to 0
-            m_CurrentSequenceDeviceID = -1;
+            m_CurrentSequenceDeviceID = 0;
             m_strCurrentLot = string.Format("TrayID_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
             if (!hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
                 hIKControlCameraView.InitializeCamera(m_strSeriCamera);
@@ -891,6 +891,8 @@ namespace Magnus_WPF_1.Source.Application
                     }
                 }
                 Master.InspectDoneEvent[m_nTrackID].Reset();
+                Master.VisionReadyEvent[m_nTrackID].Set();
+
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
                     ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Inspection sequence time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);

@@ -23,7 +23,7 @@ namespace Magnus_WPF_1.Source.Hardware
 		private Dictionary<string, ReaderAccessor> m_resisterdReaders = new Dictionary<string, ReaderAccessor>();
 		List<NicSearchResult> m_nicList = new List<NicSearchResult>();
 		private string m_strKey = "";
-
+		public LiveviewForm vvv = new LiveviewForm();
 
 		string barCodeipAddress;
 		const int BUFLEN = 255;
@@ -35,9 +35,11 @@ namespace Magnus_WPF_1.Source.Hardware
 
 		public BarCodeReaderInterface()
         {
+			LogMessage.WriteToDebugViewer(2, "1");
 
 			if (main == null)
 				main = MainWindow.mainWindow;
+			LogMessage.WriteToDebugViewer(2, "2");
 
 			string defaults = "127.0.0.1";
 			barCodeipAddress = GetCommInfo("Barcode Comm::IpAddress", defaults);
@@ -58,6 +60,7 @@ namespace Magnus_WPF_1.Source.Hardware
 					//nicComboBox.Items.Add(m_nicList[i].NicName + "/" + m_nicList[i].NicIpAddr + "/" + m_nicList[i].NicIpv4Mask);
 				}
 			}
+			LogMessage.WriteToDebugViewer(2, "3");
 
 			nReceiveMessage = new int[BUFLEN];
 			LoadInforPortNumber();
@@ -142,13 +145,10 @@ namespace Magnus_WPF_1.Source.Hardware
 			//if (!commandTxt.Items.Contains(commandTxt.Text)) commandTxt.Items.Add(commandTxt.Text);
 		}
 
-
-
 		void LoadInforPortNumber()
 		{
 			MainWindow.mainWindow.label_Barcode_Status.Content = barCodeipAddress;
 		}
-
 
 		private void InitThread()
         {
@@ -156,7 +156,6 @@ namespace Magnus_WPF_1.Source.Hardware
 			m_Thread.IsBackground = true;
 			m_Thread.Start();
 		}
-
         void BarcodeReaderThread()
 		{
 			byte[] recvBuf = new byte[255];
@@ -213,7 +212,6 @@ namespace Magnus_WPF_1.Source.Hardware
 				Thread.Sleep(10);
 			}
 		}
-
 
 		public int m_nDecodeMessage = 0;
 		public void DecodeMessageReceivedFromBarcode(ref string strMessage)
@@ -327,7 +325,6 @@ namespace Magnus_WPF_1.Source.Hardware
 			commBarCodeSequence.WriteData(data);
 
 		}
-
 
 		public delegate void UpdateStateReceiveConnection(bool isConnect);
 		public static UpdateStateReceiveConnection UpdateReceiveConnection;

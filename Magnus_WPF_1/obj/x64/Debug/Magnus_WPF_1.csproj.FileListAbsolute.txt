@@ -26,7 +26,6 @@ C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\MaterialDesignColors.p
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\MaterialDesignThemes.Wpf.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\MaterialDesignThemes.Wpf.pdb
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Xceed.Wpf.AvalonDock.Themes.VS2013.dll
-C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Magnus_WPF_1.csproj.AssemblyReference.cache
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\MainWindow.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\MappingSetingUC.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Source\Hardware\HIKControlCameraView.g.cs
@@ -102,3 +101,4 @@ C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\VncClientControlCommon
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\VncClientControlCommonLib.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Source\Hardware\BarCodeReaderView.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Source\Hardware\BarCodeReaderView.baml
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Magnus_WPF_1.csproj.AssemblyReference.cache

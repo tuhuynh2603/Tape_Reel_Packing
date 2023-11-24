@@ -29,13 +29,17 @@ namespace Magnus_WPF_1.Source.Hardware
         private const string MESSAGE_JPEG_NO_EXIST = "< CANNOT find any image file in the historical data. >";
         public BarCodeReaderView()
         {
+            LogMessage.LogMessage.WriteToDebugViewer(2, "4");
+
             InitializeComponent();
+            LogMessage.LogMessage.WriteToDebugViewer(2, "5");
+
             combo_commandSendToBarCode.Items.Add("LON");
             combo_commandSendToBarCode.Items.Add("LOFF");
 
         }
 
-        bool bOnOff = false;
+        //bool bOnOff = false;
         FileSystemWatcher watcher = null;
         private string m_ftpPath = String.Empty;
 
@@ -62,7 +66,7 @@ namespace Magnus_WPF_1.Source.Hardware
         {
             System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             folderBrowserDialog1.Description = "Select FTP path";
-            folderBrowserDialog1.SelectedPath = @"C:\Users\Public\Documents\KEYENCE\SR-H7W\SRManagementTool\AppSetting\LiveTmp\0001FCDA0F7C\live";
+            folderBrowserDialog1.SelectedPath = @"C:\Users\Public\Documents\KEYENCE\SR-H7W\SRManagementTool\ftp";
             //System.Windows.Forms.DialogResult result = folderBrowserDialog.ShowDialog();
 
             System.Windows.Forms.DialogResult dr = folderBrowserDialog1.ShowDialog();

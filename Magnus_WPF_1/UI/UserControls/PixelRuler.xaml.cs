@@ -26,8 +26,8 @@ namespace Magnus_WPF_1.UI.UserControls
 	public partial class PixelRuler : UserControl
 	{
 
-		private bool isDragging = false;
-		private Point mouseOffset;
+		//private bool isDragging = false;
+		//private Point mouseOffset;
 
 
 		public PixelRuler()
@@ -117,7 +117,7 @@ namespace Magnus_WPF_1.UI.UserControls
 		public void MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			int trackID = MainWindow.activeImageDock.trackID;
-			int docID = 0;
+			//int docID = 0;
 			var dock = sender as Grid;
 			if (dock != currentDock)
 			{

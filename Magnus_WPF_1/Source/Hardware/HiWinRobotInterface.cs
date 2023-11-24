@@ -332,7 +332,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 HWinRobot.disconnect(m_RobotConnectID);
                 m_RobotConnectID = HWinRobot.open_connection(strAddress, 1, callback);
             }
-            catch (Exception e)
+            catch
             {
                 LogMessage.LogMessage.WriteToDebugViewer(1, "connect failed.");
 
@@ -397,7 +397,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 m_RobotConnectID = HWinRobot.open_connection(m_strRobotIPAddress, 1, callback);
 
             }
-            catch (Exception e)
+            catch
             {
                 LogMessage.LogMessage.WriteToDebugViewer(1, "connect failed.");
 

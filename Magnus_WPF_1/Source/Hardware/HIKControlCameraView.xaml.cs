@@ -24,6 +24,7 @@ namespace Magnus_WPF_1.Source.Hardware
         {
             InitializeComponent();
             //this.Closing += Window_Closing;
+
             DeviceListAcq();
             InitializeCamera(strCameraID);
             m_strCameraSerial = strCameraID;

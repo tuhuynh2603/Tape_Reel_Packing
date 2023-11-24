@@ -63,6 +63,8 @@ namespace Magnus_WPF_1.Source.Application
             Application.CheckRegistry();
             Application.LoadRegistry();
             ContructorDocComponent();
+            LogMessage.LogMessage.WriteToDebugViewer(2, "BarCodeReaderInterface");
+
             m_BarcodeReader = new BarCodeReaderInterface();
 
             LoadRecipe();
@@ -378,7 +380,7 @@ namespace Magnus_WPF_1.Source.Application
                 // Move to Pre Pick position
                 if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
                     return;
-                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, m_Tracks[0].m_dDeltaAngleInspection) != 0)
+                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection) != 0)
                     return;
 
                 if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
@@ -388,7 +390,7 @@ namespace Magnus_WPF_1.Source.Application
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, true);
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
                 // Move to Pick position (move Down Z motor)
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PICK_POSITION(robotPoint, m_Tracks[0].m_dDeltaAngleInspection);
+                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection);
                 if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
                     return;
 
@@ -405,7 +407,7 @@ namespace Magnus_WPF_1.Source.Application
 
                 // From now, if Air PressureStatus signal is 0, we consider it as the chip has been through, so we arlamp it 
                 // Move to  Pre  position again (move Up Z motor)
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, m_Tracks[0].m_dDeltaAngleInspection);
+                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection);
                 if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
                     return;
 

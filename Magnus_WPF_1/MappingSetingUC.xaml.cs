@@ -152,7 +152,7 @@ namespace Magnus_WPF_1
                     }
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }

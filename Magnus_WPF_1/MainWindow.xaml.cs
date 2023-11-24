@@ -1227,7 +1227,7 @@ namespace Magnus_WPF_1
 
 
         GridView gridView = new GridView();
-        private string _color_portReceive;
+        //private string _color_portReceive;
 
         public void UpdateDebugInfor()
         {

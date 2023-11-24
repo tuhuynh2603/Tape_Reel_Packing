@@ -32,7 +32,7 @@ namespace Magnus_WPF_1.UI.UserControls
 		{
 			DataColumn column;
 
-			DataRow row;
+			//DataRow row;
 			column = new DataColumn();
 			column.ColumnName = "username";
 			column.DataType = typeof(string);
@@ -221,8 +221,8 @@ namespace Magnus_WPF_1.UI.UserControls
 		private void Login_Click(object sender, System.Windows.RoutedEventArgs e)
 		{
 		}
-		private System.Windows.Threading.DispatcherTimer dispatcherTimer;
-		private int time = 0;
+		//private System.Windows.Threading.DispatcherTimer dispatcherTimer;
+		//private int time = 0;
 		//private void KeepHeartBeat()
 		//{
 		//	dispatcherTimer = new System.Windows.Threading.DispatcherTimer();

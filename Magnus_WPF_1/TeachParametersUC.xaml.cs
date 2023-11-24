@@ -176,7 +176,7 @@ namespace Magnus_WPF_1
                     }
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 pgr_PropertyGrid_Teach.Update();
                 return false;

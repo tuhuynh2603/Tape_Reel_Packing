@@ -124,7 +124,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
         }
         public void SetBackgroundDoc(int trackID)
         {
-            byte[] bufer;
+            //byte[] bufer;
             switch (trackID)
             {
                 case 0:
@@ -434,7 +434,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
                             }
                         }
                     }
-                    catch (Exception ex)
+                    catch
                     {
                         //DebugMessage.WriteToDebugViewer(0, string.Format("Update Color Image: {0}", ex.ToString()));
                     }
@@ -766,7 +766,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
         }
 
         #region Update RGB Value and Gray Value
-        private bool positionInImage = false;
+        //private bool positionInImage = false;
         private void GetCoordinateInImage(object sender, System.Windows.Input.MouseEventArgs e)
         {
             System.Windows.Point a = e.GetPosition(image);

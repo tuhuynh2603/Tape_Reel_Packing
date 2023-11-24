@@ -477,8 +477,8 @@ namespace Magnus_WPF_1.Source.Application
                 int nResult;
                 PointF pCenter = new PointF(0,0);
                 PointF pCorner = new PointF(0,0);
-
-                nResult = m_InspectionCore.Inspect(ref m_InspectionCore.m_TeachImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, ref m_StepDebugInfors, false);
+                m_InspectionCore.LoadImageToInspection(m_imageViews[0].btmSource);
+                nResult = m_InspectionCore.Inspect(ref m_InspectionCore.m_SourceImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, ref m_StepDebugInfors, false);
                 //Draw Result
                 if (nResult == 0)
                 {

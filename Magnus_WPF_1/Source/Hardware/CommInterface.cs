@@ -31,7 +31,7 @@ namespace Magnus_WPF_1.Source.Hardware
                 isConnected = true;
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 isConnected = false;
                 stream = null;

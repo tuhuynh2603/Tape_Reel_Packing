@@ -945,7 +945,7 @@ namespace Magnus_WPF_1.Source.Algorithm
         // the lines p1 --> p2 and p3 --> p4.
         public static void LineIntersection(PointF pt1, PointF pt2, PointF pt3, PointF pt4, ref Point intersection)
         {
-            bool lines_intersect;
+            //bool lines_intersect;
             bool segments_intersect;
             PointF close_p1;
             PointF close_p2;
@@ -965,14 +965,14 @@ namespace Magnus_WPF_1.Source.Algorithm
             if (float.IsInfinity(t1))
             {
                 // The lines are parallel (or close enough to it).
-                lines_intersect = false;
+                //lines_intersect = false;
                 segments_intersect = false;
                 intersection = new Point(int.MaxValue, int.MaxValue);
                 close_p1 = new PointF(float.NaN, float.NaN);
                 close_p2 = new PointF(float.NaN, float.NaN);
                 return;
             }
-            lines_intersect = true;
+            //lines_intersect = true;
 
             float t2 =
                 ((pt3.X - pt1.X) * dy12 + (pt1.Y - pt3.Y) * dx12)
@@ -1025,8 +1025,8 @@ namespace Magnus_WPF_1.Source.Algorithm
 
             CvInvoke.BitwiseOr(line, region, regionUnion);
             int area = 0;
-            double[] minValues, maxValues;
-            Point[] minLoc, maxLoc;
+            //double[] minValues, maxValues;
+            //Point[] minLoc, maxLoc;
             isPass = false;
 
             //  20211021

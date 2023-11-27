@@ -718,8 +718,10 @@ namespace Magnus_WPF_1.Source.Algorithm
         {
             CvImage lowerThreshMat = new CvImage();
             CvImage upperThreshMat = new CvImage();
-            CvInvoke.Threshold(imgGray, lowerThreshMat, minThreshold, 255, Emgu.CV.CvEnum.ThresholdType.Binary);
-            CvInvoke.Threshold(imgGray, upperThreshMat, maxThreshold, 255, Emgu.CV.CvEnum.ThresholdType.BinaryInv);
+            Mat result = new Mat();
+            //CvInvoke.Add(imgGray, new UMat(imgGray.Size, DepthType.Cv8U, 1), result, null);
+            CvInvoke.Threshold(imgGray, lowerThreshMat, (double)minThreshold-1, 255, Emgu.CV.CvEnum.ThresholdType.Binary);
+            CvInvoke.Threshold(imgGray, upperThreshMat, (double)maxThreshold, 255, Emgu.CV.CvEnum.ThresholdType.BinaryInv);
             CvInvoke.BitwiseAnd(lowerThreshMat, upperThreshMat, imgThreshold);
             return true;
         }

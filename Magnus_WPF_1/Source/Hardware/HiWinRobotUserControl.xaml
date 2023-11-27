@@ -63,7 +63,7 @@
                     <ToggleButton x:Name="button_RobotConnect"  
                                   Checked="button_RobotConnect_Checked" 
                                   Unchecked="button_RobotConnect_Unchecked" 
-                                  IsChecked="True" Grid.Column="2" 
+                                  Grid.Column="2" 
                                   Content="N/A" Width="Auto"  
                                   VerticalContentAlignment="Center"></ToggleButton>
                 </Grid>

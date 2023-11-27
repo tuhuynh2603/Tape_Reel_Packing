@@ -5,8 +5,8 @@ using Emgu.CV.WPF;
 using Magnus_WPF_1.Source.Algorithm;
 using Magnus_WPF_1.Source.Define;
 using Magnus_WPF_1.Source.Hardware;
-using Magnus_WPF_1.UI.UserControls.View;
 using Magnus_WPF_1.UI.UserControls;
+using Magnus_WPF_1.UI.UserControls.View;
 using MvCamCtrl.NET;
 using System;
 using System.Collections.Generic;
@@ -20,21 +20,17 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-
-using Point = System.Drawing.Point;
 using Rectangle = System.Drawing.Rectangle;
 
 namespace Magnus_WPF_1.Source.Application
 {
-    using Magnus_WPF_1.Source.Hardware.SDKHrobot;
     using Magnus_WPF_1.Source.LogMessage;
-    using System.Numerics;
     public class Track
     {
         private MainWindow mainWindow;
         public InspectionCore m_InspectionCore;
-        public static int m_Width = 3840;
-        public static int m_Height = 2748;
+        public int m_Width = 3840;
+        public int m_Height = 2748;
         public ImageView[] m_imageViews;
         public int[] m_nResult;
         public int m_nTrackID;
@@ -46,7 +42,7 @@ namespace Magnus_WPF_1.Source.Application
 
         public List<DefectInfor.DebugInfors> m_StepDebugInfors;
         public List<ArrayOverLay> m_ArrayOverLay;
-        public Track(int indexTrack, int numdoc, string serieCam, MainWindow app)
+        public Track(int indexTrack, int numdoc, string serieCam, MainWindow app, int width = 3840, int height = 2748)
         {
             m_StepDebugInfors = new List<DefectInfor.DebugInfors>();
             m_ArrayOverLay = new List<ArrayOverLay>();
@@ -54,7 +50,8 @@ namespace Magnus_WPF_1.Source.Application
             mainWindow = app;
             m_imageViews = new ImageView[numdoc];
             m_nResult = new int[10000];
-
+            m_Width = width;
+            m_Height = height;
 
             Application.LoadCamSetting(indexTrack);
             if (serieCam != "none"  && serieCam != "")
@@ -477,8 +474,7 @@ namespace Magnus_WPF_1.Source.Application
                 int nResult;
                 PointF pCenter = new PointF(0,0);
                 PointF pCorner = new PointF(0,0);
-                m_InspectionCore.LoadImageToInspection(m_imageViews[0].btmSource);
-                nResult = m_InspectionCore.Inspect(ref m_InspectionCore.m_SourceImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, ref m_StepDebugInfors, false);
+                nResult = m_InspectionCore.Inspect(ref m_InspectionCore.m_TeachImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, ref m_StepDebugInfors, false);
                 //Draw Result
                 if (nResult == 0)
                 {
@@ -583,25 +579,19 @@ namespace Magnus_WPF_1.Source.Application
 
                     });
 
-
                     Stopwatch timeIns = new Stopwatch();
                     timeIns.Start();
                     PointF pCenter, pCorner;
                     m_nResult[m_CurrentSequenceDeviceID] = Inspect(ref mainWindow.master.m_Tracks[m_nTrackID], out pCenter, out pCorner);
                     m_Center_Vision = pCenter;
                     double dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(m_Center_Vision, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint);
-
                     m_dDeltaAngleInspection = dDeltaAngle;
                     Master.InspectDoneEvent[m_nTrackID].Set();
-
                     timeIns.Stop();
-                    Thread.Sleep(5);
                     LogMessage.WriteToDebugViewer(1, "Total inspection time: " + timeIns.ElapsedMilliseconds.ToString());
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        //MainWindow.mainWindow.UpdateDebugInfor();
-                        //double dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(pCenter, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint);
                         DrawInspectionResult(ref m_nResult[m_CurrentSequenceDeviceID], ref pCenter, ref dDeltaAngle);
 
                         m_imageViews[0].tbl_InspectTime.Text = timeIns.ElapsedMilliseconds.ToString();
@@ -627,8 +617,6 @@ namespace Magnus_WPF_1.Source.Application
                 catch (Exception e)
                 {
                     LogMessage.WriteToDebugViewer(1, "PROCESS ERROR: " + e.ToString());
-                    //Master.InspectDoneEvent[m_nTrackID].Set();
-
                 }
             }
 
@@ -645,15 +633,10 @@ namespace Magnus_WPF_1.Source.Application
         public void InspectOfflineThread(string strFolderPath)
         {
 
-            //if (mainWindow.bEnableOfflineInspection)
-            //        return;
-
             if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.bEnableRunSequence)
                 return;
 
             CheckInspectionOnlineThread();
-
-            //MainWindow.mainWindow.bEnableOfflineInspection = true;
 
             DirectoryInfo folder = new DirectoryInfo(strFolderPath);
 
@@ -805,19 +788,22 @@ namespace Magnus_WPF_1.Source.Application
         {
 
             CheckInspectionOnlineThread();
-
             int nWidth = 0, nHeight = 0;
             //Todo If Reset lot ID, need to create new lot ID and reset current Device ID to 0
             m_CurrentSequenceDeviceID = 0;
             m_strCurrentLot = string.Format("TrayID_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
-            if (!hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
-                hIKControlCameraView.InitializeCamera(m_strSeriCamera);
 
-            int nRet = hIKControlCameraView.m_MyCamera.MV_CC_StartGrabbing_NET();
-            if (MyCamera.MV_OK != nRet)
+            if (m_nTrackID == 0)
             {
-                hIKControlCameraView.m_bGrabbing = false;
-                return ;
+                if (!hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
+                    hIKControlCameraView.InitializeCamera(m_strSeriCamera);
+
+                int nRet = hIKControlCameraView.m_MyCamera.MV_CC_StartGrabbing_NET();
+                if (MyCamera.MV_OK != nRet)
+                {
+                    hIKControlCameraView.m_bGrabbing = false;
+                    return;
+                }
             }
 
             //m_cap.ImageGrabbed += Online_ImageGrabbed;
@@ -837,33 +823,38 @@ namespace Magnus_WPF_1.Source.Application
 
                     if (!MainWindow.mainWindow.bEnableRunSequence)
                     {
-                        nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
                         return;
                     }
 
                 }
                 timeIns.Restart();
-                //double dScale = 3;
-                //nError = FindDeviceLocation_Zoom(ref m_SourceImage.Gray,
-                //                                 ref list_arrayOverlay, ref pCenter, ref nAngleOutput, ref debugInfors, bEnableDebug);
 
-                //Snap camera
-                nRet = hIKControlCameraView.m_MyCamera.MV_CC_SetCommandValue_NET("TriggerSoftware");
-                if (MyCamera.MV_OK != nRet)
+                if (m_nTrackID == 0)
                 {
-                    nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
-                    return;
+                    //Snap camera
+                    int nRet = hIKControlCameraView.m_MyCamera.MV_CC_SetCommandValue_NET("TriggerSoftware");
+                    if (MyCamera.MV_OK != nRet)
+                    {
+                        nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+                        return;
+                    }
+
+                    hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);
+                    if (MyCamera.MV_OK != nRet)
+                    {
+                        nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+                        return;
+                    }
+                    m_imageViews[0].UpdateSourceImageMono();
+
+                }
+                else
+                {  
+                    //Scan Barcode
+                    MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage();
                 }
 
-                hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);
-                if (MyCamera.MV_OK != nRet)
-                {
-                    hIKControlCameraView.m_bGrabbing = false;
-                    nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
-                    return;
-                }
 
-                m_imageViews[0].UpdateSourceImageMono();
                 // Update Current Device ID
                 m_CurrentSequenceDeviceID++;
                 if (m_CurrentSequenceDeviceID >= Source.Application.Application.categoriesMappingParam.M_NumberDeviceX * Source.Application.Application.categoriesMappingParam.M_NumberDeviceY)
@@ -883,7 +874,6 @@ namespace Magnus_WPF_1.Source.Application
                 // Do Inspection
                 Master.InspectDoneEvent[m_nTrackID].Reset();
                 Master.InspectEvent[m_nTrackID].Set();
-                //bool b = false;
                 while (!Master.InspectDoneEvent[m_nTrackID].WaitOne(10))
                 {
                     if (MainWindow.mainWindow == null)
@@ -891,9 +881,6 @@ namespace Magnus_WPF_1.Source.Application
 
                     if (!MainWindow.mainWindow.bEnableRunSequence)
                     {
-                        //m_cap.Stop();
-                        //m_cap.ImageGrabbed -= Online_ImageGrabbed;
-                        nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
                         return;
                     }
                 }
@@ -908,8 +895,6 @@ namespace Magnus_WPF_1.Source.Application
                 timeIns.Restart();
 
             }
-            nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
-
         }
 
         private void SaveBtmSource(BitmapSource btm, string path)

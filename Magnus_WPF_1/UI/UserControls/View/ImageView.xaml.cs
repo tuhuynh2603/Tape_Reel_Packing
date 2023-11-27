@@ -239,14 +239,13 @@ namespace Magnus_WPF_1.UI.UserControls.View
                 //CvImage matTemp = CvInvoke.Imread(pathImage, Emgu.CV.CvEnum.ImreadModes.Grayscale);
 
                 //bufferImage = ConvertMonoMatToByteArray(matTemp);
-
                 //UpdateUIImageMono(bufferImage);
                 UpdateSourceImageMono();
                 return true;
             }
             catch (Exception)
             {
-                MessageBox.Show("Wrong Image File", "Load Image", MessageBoxButton.OK, MessageBoxImage.Information);
+                //MessageBox.Show("Wrong Image File", "Load Image", MessageBoxButton.OK, MessageBoxImage.Information);
                 SetBackgroundDoc(trackID);
                 return false;
             }
@@ -584,7 +583,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
             for (int n = 0; n < array_edges.Count(); n++)
             {
-                EDDrawingOverlay.DrawLine(GridOverlay, array_edges[n].P1, array_edges[n].P2, color);
+                EDDrawingOverlay.DrawLine(trackID, GridOverlay, array_edges[n].P1, array_edges[n].P2, color);
             }
             //    else
             //    {
@@ -614,7 +613,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
         {
             try
             {
-                EDDrawingOverlay.DrawPolygon(GridOverlay, polygon_Input, color, nLineWidth);
+                EDDrawingOverlay.DrawPolygon(trackID,GridOverlay, polygon_Input, color, nLineWidth);
             }
             catch { }
 
@@ -624,7 +623,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
         {
             try
             {
-                EDDrawingOverlay.DrawString(GridOverlay, text, X, Y, brushColor, fontsize);
+                EDDrawingOverlay.DrawString(trackID,GridOverlay, text, X, Y, brushColor, fontsize);
             }
             catch { }
         }
@@ -974,7 +973,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
                 UpdateNewImageMono(strImagePath);
                 GridOverlay.Children.Clear();
                 UpdateTextOverlay("", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
-                MainWindow.mainWindow.UpdateTitleDoc(0, string.Format("Name Image: {0}", " teachImage.bmp"), true);
+                MainWindow.mainWindow.UpdateTitleDoc(0, "teachImage.bmp", true);
             }
         }
 
@@ -1079,11 +1078,16 @@ namespace Magnus_WPF_1.UI.UserControls.View
             Master.m_bIsTeaching = true;
             Master.m_NextStepTeachEvent.Reset();
             Source.Application.Application.LoadTeachParamFromFileToDict(ref nTeachTrackID);
+            //MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
+
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
+
                 resultTeach.Children.Clear();
                 ClearOverlay();
                 loadTeachImageToUI(nTeachTrackID);
+                MainWindow.mainWindow.master.teachParameter.UpdateTeachParamFromDictToUI(Source.Application.Application.dictTeachParam);
+
             });
 
             // now only teach device location so only TP_roiNo
@@ -1196,7 +1200,8 @@ namespace Magnus_WPF_1.UI.UserControls.View
                     //MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.AutoTeachDatumLocation(ref p_Regionpolygon, L_DeviceLocationRoi_Temp, L_TemplateRoi_Temp, ref mat_DeviceLocationRegion, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput, ref L_CornerIndex_Temp);
                     Source.Application.Application.categoriesTeachParam.L_TemplateRoi = L_TemplateRoi_Temp;
                     //Source.Application.Application.categoriesTeachParam.L_CornerIndex = L_CornerIndex_Temp;
-
+                    MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
+                    MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.LoadTeachImageToInspectionCore(nTeachTrackID);
                     MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].AutoTeach(ref MainWindow.mainWindow.master.m_Tracks[nTeachTrackID], true);
                     //SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
                     //DrawPolygonOverlay(ref p_Regionpolygon, color, 1);
@@ -1321,9 +1326,8 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
         private void getChosenDoc(object sender, MouseButtonEventArgs e)
         {
-            //MainWindow.activeImageDock = sender as ImageView;
-            MainWindow.activeImageDock = this;
-
+            MainWindow.activeImageDock = sender as ImageView;
+            //MainWindow.activeImageDock = this;
             if (MainWindow.activeImageDock.enableGray == 0)
                 MainWindow.mainWindow.btn_Binarize.IsChecked = false;
             else

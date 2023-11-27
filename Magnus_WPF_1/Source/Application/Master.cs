@@ -1,5 +1,4 @@
 ﻿using Emgu.CV;
-using Magnus_WPF_1.Source.Algorithm;
 using Magnus_WPF_1.Source.Define;
 using Magnus_WPF_1.Source.Hardware.SDKHrobot;
 using System;
@@ -13,8 +12,8 @@ namespace Magnus_WPF_1.Source.Application
 {
     using Magnus_WPF_1.Source.Hardware;
     using System.Diagnostics;
-    using static Magnus_WPF_1.Source.Application.Track;
     using static HiWinRobotInterface;
+    using static Magnus_WPF_1.Source.Application.Track;
     public class Master
     {
         //private int width, height, dpi;
@@ -125,7 +124,9 @@ namespace Magnus_WPF_1.Source.Application
             thread_StreamCamera = new Thread[Application.m_nTrack];
             list_arrayOverlay = new List<ArrayOverLay>[Application.m_nTrack];
             //string[] nSeriCam = { "02C89933333", "none" };
-            
+
+
+
             for (int index_track = 0; index_track < Application.m_nTrack; index_track++)
             {
                 //for(int index_doc = 0; index_doc < Application.m_nDoc; index_doc++)
@@ -145,7 +146,7 @@ namespace Magnus_WPF_1.Source.Application
 
                 list_arrayOverlay[index_track] = new List<ArrayOverLay>();
 
-                m_Tracks[index_track] = new Track(index_track, 1, Application.m_strCameraSerial[index_track], mainWindow);
+                m_Tracks[index_track] = new Track(index_track, 1, Application.m_strCameraSerial[index_track], mainWindow, Application.m_Width[index_track], Application.m_Height[index_track]);
 
             }
         }
@@ -193,8 +194,8 @@ namespace Magnus_WPF_1.Source.Application
                 // Mono Image
                 m_Tracks[nTrack].m_imageViews[0].UpdateNewImageMono(strImageFilePath);
                 m_Tracks[nTrack].m_imageViews[0].GridOverlay.Children.Clear();
-                m_Tracks[nTrack].m_imageViews[0].UpdateTextOverlay("", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
-                mainWindow.UpdateTitleDoc(0, string.Format("Name Image: {0}", " teachImage.bmp"), true);
+                //m_Tracks[nTrack].m_imageViews[0].UpdateTextOverlay("", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+                //mainWindow.UpdateTitleDoc(0, "teachImage.bmp", true);
             }
         }
 
@@ -284,8 +285,6 @@ namespace Magnus_WPF_1.Source.Application
         }
         internal void RunOnlineSequenceThread(int nTrack)
         {
-            mainWindow.ResetMappingResult(nTrack);
-            mainWindow.ResetStatisticResult(nTrack);
 
             InspectDoneEvent[nTrack].Reset();
             InspectEvent[nTrack].Reset();
@@ -320,39 +319,46 @@ namespace Magnus_WPF_1.Source.Application
             }
         }
 
+        void ResetSequence()
+        {
+            Master.VisionReadyEvent[0].Reset();
+            Master.VisionReadyEvent[1].Reset();
+
+            HWinRobot.jog_stop(HiWinRobotInterface.m_RobotConnectID);
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.PRE_FAILED_PLACE_POSITION);
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+            HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
+            HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, true);
+            Thread.Sleep(500);
+            HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
+            HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
+            Thread.Sleep(500);
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.READY_POSITION);
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();     
+        }
+
         void func_RobotSequence()
         {
             // Reset All motor
 
             // Home Move // init OutPut
-            HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
-            HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
-            if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
-                return;
-            if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.READY_POSITION) != 0)
-                return;
-
-            if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
-                return;
-
-            Master.VisionReadyEvent[0].Reset();
-            Master.VisionReadyEvent[1].Set();
-
-            m_hardwareTriggerSnapEvent[0].Set();
+            ResetSequence();
             //
+            m_hardwareTriggerSnapEvent[0].Set();
             Stopwatch timeIns = new Stopwatch();
+            Stopwatch timeIns_fullSequence = new Stopwatch();
+            timeIns_fullSequence.Start();
             timeIns.Start();
-
-
             while (MainWindow.mainWindow.bEnableRunSequence || MainWindow.mainWindow.bEnableOfflineInspection)
             {
-
-
                 if (MainWindow.mainWindow == null)
                     return;
 
-
-                
+                int nStep = 1;
+                LogMessage.LogMessage.WriteToDebugViewer(9, "Begin Sequence");
+                // Step 1: wait for station 1 inspection
+                timeIns.Restart();
                 while (!Master.VisionReadyEvent[0].WaitOne(1))
                 {
                     if (MainWindow.mainWindow == null)
@@ -367,153 +373,112 @@ namespace Magnus_WPF_1.Source.Application
                 int nResult = m_Tracks[0].m_nResult[m_Tracks[0].m_CurrentSequenceDeviceID];
                 if (nResult == -(int)ERROR_CODE.NO_PATTERN_FOUND)
                 {
+                    LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nStep++} : Station 1 inspection No Device Found ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
                     Master.VisionReadyEvent[0].Reset();
                     m_hardwareTriggerSnapEvent[0].Set();
                     HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
                     HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
                     continue;
                 }
-                // Send result to Robot
-                //string strResult = m_nResult[m_CurrentSequenceDeviceID].ToString(); 
-                //Master.commHIKRobot.CreateAndSendMessageToHIKRobot(SignalFromVision.Vision_Go_Pick, strResult);
+
+                LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nStep++} : Station 1 inspection  ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
+
+                // Step 2: Transform point from camera position to robot position
                 System.Drawing.PointF robotPoint = MagnusMatrix.ApplyTransformation(MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.m_MatCameraRobotTransform, m_Tracks[0].m_Center_Vision);
-                // Move to Pre Pick position
-                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
-                    return;
+                LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nStep++} : Transform point from camera position to robot position ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
+
+                //Step 3: Move to Pre Pick position
                 if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection) != 0)
                     return;
-
-                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
+                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion() != 0)
                     return;
 
-                // Turn on vaccum
+                LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nStep++} : Move to Pre Pick position ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
+
+
+                //Step 4: Turn on vaccum
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, true);
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
+                LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nStep++} : Turn on vaccum ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
+
                 // Move to Pick position (move Down Z motor)
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection);
-                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
+                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection) != 0)
+                    return;
+                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion() != 0)
+                    return;
+                LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nStep++} : Move to Pick position (move Down Z motor) ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
+
+                //Step 5: Move to  Pre pick  position again (move Up Z motor)
+                // From now, if Air PressureStatus signal is 0, we consider it as the chip has been through, so we arlamp it
+
+                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection);
+
+                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion() != 0)
                     return;
 
-                //after 
-                if (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.AIR_PRESSURESTATUS) == 0)
+                while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.AIR_PRESSURESTATUS) == 0)
                 {
                     if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
                     {
-                        //m_cap.Stop();
-                        //m_cap.ImageGrabbed -= Online_ImageGrabbed;
                         return;
                     }
                 }
 
-                // From now, if Air PressureStatus signal is 0, we consider it as the chip has been through, so we arlamp it 
-                // Move to  Pre  position again (move Up Z motor)
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection);
-                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
+                LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nStep++} : Move to  Pre pick  position again ({timeIns.ElapsedMilliseconds} ms)");
+
+                //Step 6: Move To Pass fail position
+                string strPrePosition = nResult == 0 ? SequencePointData.PRE_PASS_PLACE_POSITION : SequencePointData.PRE_FAILED_PLACE_POSITION;
+                string strPosition = nResult == 0 ? SequencePointData.PASS_PLACE_POSITION : SequencePointData.FAILED_PLACE_POSITION;
+                LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nStep++} : Move To Pass fail position ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
+
+                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(strPrePosition);
+
+                // Sleep 200ms to make sure the robot outside of camera region
+                //Step 7: Trigger camera  1 
+                Thread.Sleep(200);
+                Master.VisionReadyEvent[0].Reset();
+                m_hardwareTriggerSnapEvent[0].Set();
+                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion() != 0)
                     return;
+                LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nStep++} : Trigger camera  1  ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
 
+                //Step 8: Wait For PLC Ready
+                while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_READY) == 0)
+                {
+                    if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
+                    {
+                        return;
+                    }
+                }
+                LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nStep++} : Wait For PLC Ready ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
 
-                //if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
-                //    return;
-                //if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.READY_POSITION) != 0)
-                //    return;
+                /////////////////Step 9: put device to the tray (turn off vaccum)
+                HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
+                HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, true);
+                Thread.Sleep(50);
+                LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nStep++} : Put device to the tray ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
 
-                //if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
-                //    return;
+                // Step 10: set trigger barcode
+                m_hardwareTriggerSnapEvent[1].Set();
+                LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nStep++} : Trigger Barcode ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
 
-                ///////////////// Barcode Sequence
-                if (MoveToPassFailedPosition(nResult) < 0)
-                    return;
-
-
-                //if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
-                //    return;
-
-                //if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, m_Tracks[0].m_dDeltaAngleInspection) != 0)
-                //    return;
-
+                // Step 11: Move to ready position and turn off vaccum
                 if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.READY_POSITION) != 0)
                     return;
-
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
-                //if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
-                //    return;
-
-                //Master.VisionReadyEvent[1].Reset();
-                //m_hardwareTriggerSnapEvent[1].Set();
-
+                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion() != 0)
+                    return;
+                LogMessage.LogMessage.WriteToDebugViewer(9, $"End sequence. Total time: ({timeIns_fullSequence.ElapsedMilliseconds} ms)");
 
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Inspection sequence time {timeIns.ElapsedMilliseconds} (ms): " );
-
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Full sequence. Total time {timeIns_fullSequence.ElapsedMilliseconds} (ms): " );
                 });
-                timeIns.Restart();
+                timeIns_fullSequence.Restart();
 
             }
         }
-
-        public int MoveToPassFailedPosition(int nResult)
-        {
-            string strPrePosition = nResult == 0?SequencePointData.PRE_PASS_PLACE_POSITION : SequencePointData.PRE_FAILED_PLACE_POSITION;
-            string strPosition = nResult == 0 ? SequencePointData.PASS_PLACE_POSITION : SequencePointData.FAILED_PLACE_POSITION;
-
-            // Move To Pre Place
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(strPrePosition);
-
-            // Wait For PLC and Barcode Ready
-            //if (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_READY) == 0)
-            //{
-            //    if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
-            //    {
-            //        return -1;
-            //    }
-            //}
-
-            //while (!Master.VisionReadyEvent[1].WaitOne(1))
-            //{
-            //    if (MainWindow.mainWindow == null)
-            //        return -1;
-
-            //    if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
-            //    {
-            //        return -1;
-            //    }
-            //}
-
-
-
-            if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
-                return -1;
-
-            //later need to check Conveyor ready signal
-            Master.VisionReadyEvent[0].Reset();
-            m_hardwareTriggerSnapEvent[0].Set();
-
-            //MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(strPosition);
-            //if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
-            //    return -1;
-
-            HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
-            HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, true);
-            Thread.Sleep(50);
-            // After testing, need replace if = while
-            //if (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.AIR_PRESSURESTATUS) == 0)
-            //{
-            //    if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
-            //    {
-            //        return -1;
-            //    }
-            //}
-            // Sleep 50ms 
-
-            //MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(strPrePosition);
-            //if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion())
-            //    return -1;
-
-            return 0;
-        }
-
 
         internal void RunSaveInspectImageThread(int nTrack)
         {
@@ -595,8 +560,6 @@ namespace Magnus_WPF_1.Source.Application
             //defectInfor.lvDefect.View = gridView;
             if (bIschecked)
             {
-                m_hiWinRobotInterface.dispatcherTimer.Start();
-
                 MainWindow.mainWindow.grd_Defect.Height = m_hiWinRobotInterface.m_hiWinRobotUserControl.Height;
                 MainWindow.mainWindow.grd_Defect.Width = m_hiWinRobotInterface.m_hiWinRobotUserControl.Width;
 
@@ -609,8 +572,6 @@ namespace Magnus_WPF_1.Source.Application
             }
             else
             {
-                m_hiWinRobotInterface.dispatcherTimer.Stop();
-
                 MainWindow.mainWindow.grd_Defect.Children.Clear();
                 MainWindow.mainWindow.grd_Defect_Settings.Visibility = System.Windows.Visibility.Collapsed;
             }

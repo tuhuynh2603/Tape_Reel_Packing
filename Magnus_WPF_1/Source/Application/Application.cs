@@ -25,6 +25,9 @@ namespace Magnus_WPF_1.Source.Application
         public static string pathRegistry;
         public static string pathImageSave;
         public static List<string> m_strCameraSerial;
+        public static int[] m_Width = { 3840, 680 };
+        public static int[] m_Height = { 2748, 512 };
+
         public static void CheckRegistry()
         {
             pathRegistry = "Software\\HD Vision\\SemiConductor_1";

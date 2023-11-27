@@ -41,10 +41,10 @@ namespace Magnus_WPF_1
         public LayoutDocumentPaneGroup oldPanelGroup = new LayoutDocumentPaneGroup();
 
         private LayoutDocumentPaneGroup bigPanelGroup = new LayoutDocumentPaneGroup();
-        private LayoutDocumentPane bigTagPanel = new LayoutDocumentPane();
+        private LayoutDocumentPane imageZoomViewPane = new LayoutDocumentPane();
         private LayoutDocument bigDoc = new LayoutDocument();
 
-        private LayoutDocumentPaneGroup[] imagesViewPaneGroup;
+        private LayoutDocumentPaneGroup imagesViewPaneGroup;
         private LayoutDocumentPane[] imagesViewPane;
         private LayoutDocument[] imagesViewDoc;
 
@@ -328,11 +328,13 @@ namespace Magnus_WPF_1
             btn_run_sequence.IsChecked = true;
             bEnableRunSequence = (bool)btn_run_sequence.IsChecked;
             inspect_offline_btn.IsEnabled = false;
-            //for (int n = 0; n < Application.m_nTrack; n++)
-            //{
-            //    master.RunOnlineSequenceThread(n);
-            //}
-            master.RunOnlineSequenceThread(0);
+            ResetMappingResult(nTrack);
+            ResetStatisticResult(nTrack);
+            for (int n = 0; n < Application.m_nTrack; n++)
+            {
+                master.RunOnlineSequenceThread(n);
+            }
+            //master.RunOnlineSequenceThread(0);
 
             //if (nTrack == (int)TRACK_TYPE.TRACK_ALL)
             //{
@@ -421,11 +423,11 @@ namespace Magnus_WPF_1
 
         public void InitBigDocPanel()
         {
-            bigPanelGroup.Children.Add(bigTagPanel);
-            bigTagPanel.DockWidth = new System.Windows.GridLength(screenWidth / 1.5);
-            bigTagPanel.DockHeight = new System.Windows.GridLength(screenHeight / 1);
-            bigTagPanel.DockMinHeight = screenHeight / 1;
-            bigTagPanel.DockMinWidth = screenWidth / 2;
+            bigPanelGroup.Children.Add(imageZoomViewPane);
+            imageZoomViewPane.DockWidth = new System.Windows.GridLength(screenWidth / 1.5);
+            imageZoomViewPane.DockHeight = new System.Windows.GridLength(screenHeight / 1);
+            imageZoomViewPane.DockMinHeight = screenHeight / 1;
+            imageZoomViewPane.DockMinWidth = screenWidth / 2;
             //bigPanelGroup.Children.Add(new LayoutDocumentPane(new LayoutDocument()
             //{
             //    Content = outputLogView,
@@ -435,7 +437,7 @@ namespace Magnus_WPF_1
             //    Title = "Output Log"
             //}));
 
-            bigTagPanel.Children.Add(bigDoc);
+            imageZoomViewPane.Children.Add(bigDoc);
             bigDoc.Title = "Zoom Doc Panel";
             bigDoc.CanClose = false;
             bigDoc.CanFloat = false;
@@ -459,7 +461,7 @@ namespace Magnus_WPF_1
 
             m_layoutPanel = new LayoutPanel();
             mainPanelGroup = new LayoutDocumentPaneGroup();
-            // mainPanelGroup.Orientation = Orientation.Horizontal;
+            mainPanelGroup.Orientation = Orientation.Horizontal;
             outPutLogPaneGroup = new LayoutAnchorablePaneGroup();
             outPutLogPaneGroup.Orientation = Orientation.Vertical;
 
@@ -469,29 +471,20 @@ namespace Magnus_WPF_1
             total_doc = num_Doc * numTrack;// Application.Application.total_doc;
 
             #region Image Layout
-            imagesViewPaneGroup = new LayoutDocumentPaneGroup[total_doc];
-            imagesViewPane = new LayoutDocumentPane[total_doc];
-            imagesViewDoc = new LayoutDocument[total_doc];
+            imagesViewPaneGroup = new LayoutDocumentPaneGroup();
+            imagesViewPaneGroup.Orientation = Orientation.Horizontal;
+            mainPanelGroup.Children.Add(imagesViewPaneGroup);
 
-            for (int i = 0; i < total_doc; i++)
-            {
-                imagesViewPaneGroup[i] = new LayoutDocumentPaneGroup();
-                //imagesViewPaneGroup[i].Orientation = Orientation.Horizontal;
-                mainPanelGroup.Children.Add(imagesViewPaneGroup[i]);
-            }
+            imagesViewPane = new LayoutDocumentPane[numTrack];
+            imagesViewDoc = new LayoutDocument[total_doc];
 
             for (int track_index = 0; track_index < numTrack; track_index++)
             {
+                imagesViewPane[track_index] = new LayoutDocumentPane();
+                imagesViewPane[track_index].CanRepositionItems = false;
+                imagesViewPaneGroup.Children.Add(imagesViewPane[track_index]);
                 for (int doc_index = 0; doc_index < num_Doc; doc_index++)
                 {
-                    imagesViewPane[track_index * num_Doc + doc_index] = new LayoutDocumentPane();
-                    imagesViewPane[track_index * num_Doc + doc_index].CanRepositionItems = false;
-                    //if (track_index == 0)
-                    //    imagesViewPaneGroup[0].Children.Add(imagesViewPane[track_index * num_Doc + doc_index]);
-
-                    //else
-                    imagesViewPaneGroup[track_index].Children.Add(imagesViewPane[track_index * num_Doc + doc_index]);
-
                     imagesViewDoc[track_index * num_Doc + doc_index] = new LayoutDocument
                     {
                         Title = titles[track_index * num_Doc + doc_index],
@@ -501,7 +494,7 @@ namespace Magnus_WPF_1
                         CanClose = false,
                         //CanMove = false,
                     };
-                    imagesViewPane[track_index * num_Doc + doc_index].Children.Add(imagesViewDoc[track_index * num_Doc + doc_index]);
+                    imagesViewPane[track_index].Children.Add(imagesViewDoc[track_index * num_Doc + doc_index]);
                 }
             }
             #endregion
@@ -513,6 +506,7 @@ namespace Magnus_WPF_1
             outPutLogViewDoc.Title = "Output Log View";
             outPutLogViewDoc.Content = outputLogView;
             outPutLogViewDoc.ContentId = "";
+
             outPutLogViewDoc.CanClose = false;
             outPutLogViewDoc.CanHide = false;
             outPutLogViewDoc.AutoHideMinWidth = screenWidth / 1;
@@ -535,6 +529,7 @@ namespace Magnus_WPF_1
             m_layout.Children.Add(outPutLogPaneGroup);
             m_layoutPanel.Orientation = Orientation.Horizontal;
             m_layoutPanel.Children.Add(m_layout);
+            //m_layoutPanel.Children.Add(statisticPaneGroup);
 
             layoutHPSF = new LayoutRoot();
             layoutHPSF.RootPanel = m_layoutPanel;
@@ -587,11 +582,9 @@ namespace Magnus_WPF_1
             if (!isOneSpecificDocState)
             {
                 oldPanelGroup = mainPanelGroup;
-                bigTagPanel.ReplaceChild(bigDoc, imagesViewDoc[trackID]);
+                imageZoomViewPane.ReplaceChild(bigDoc, imagesViewDoc[trackID]);
                 imagesViewDoc[trackID].CanClose = false;
                 imagesViewDoc[trackID].CanFloat = false;
-                //imagesViewDoc[trackID].CanMove = false;
-
                 m_layoutPanel.ReplaceChildAt(0, bigPanelGroup);
             }
             else
@@ -599,8 +592,7 @@ namespace Magnus_WPF_1
                 mainPanelGroup = oldPanelGroup;
                 imagesViewDoc[trackID].CanClose = false;
                 imagesViewDoc[trackID].CanFloat = false;
-                //imagesViewDoc[trackID].CanMove = false;
-                bigTagPanel.ReplaceChild(imagesViewDoc[trackID], bigDoc);
+                imageZoomViewPane.ReplaceChild(imagesViewDoc[trackID], bigDoc);
                 imagesViewPane[trackID].Children.Add(imagesViewDoc[trackID]);
                 m_layoutPanel.ReplaceChildAt(0, m_layout);
             }
@@ -777,6 +769,7 @@ namespace Magnus_WPF_1
             master.teachParameter.Width = 300;
             master.teachParameter.Height = 600;
             //master.m_Tracks[0].m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autofocus, 1);
+            master.teachParameter.track_ComboBox.SelectedIndex = activeImageDock.trackID;
             master.teachParameter.ReloadParameterUI(activeImageDock.trackID);
             grd_PopupDialog.Children.Add(master.teachParameter);
             //grd_PopupDialog.Children.Add(master.m_Tracks[]);
@@ -976,21 +969,11 @@ namespace Magnus_WPF_1
 
         private void Window_Closed(object sender, EventArgs e)
         {
+            master.m_hiWinRobotInterface.m_hikThread.Interrupt();
+            master.m_hiWinRobotInterface.m_hikThread.Abort();
             master.DeleteMaster();
             mainWindow = null;
             master = null;
-            //mainPanelGroup = null;
-            //oldPanelGroup = null;
-            //bigPanelGroup = null;
-            //bigTagPanel = null;
-            //bigDoc = null;
-            //imagesViewPaneGroup = null;
-            //imagesViewPane = null;
-            //imagesViewDoc = null;
-            //teachViewDoc = null;
-            //activeImageDock = null;
-            //layoutRoot = null;
-            //_layoutHPSF = null;
 
         }
 

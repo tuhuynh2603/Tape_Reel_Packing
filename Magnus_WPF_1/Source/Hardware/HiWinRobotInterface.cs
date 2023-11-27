@@ -294,8 +294,6 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
         public HiWinRobotUserControl m_hiWinRobotUserControl;
         public string m_strRobotIPAddress = "";
-        public System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-
 
         public static string GetCommInfo(string key, string defaults)
         {
@@ -399,7 +397,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             }
             catch
             {
-                LogMessage.LogMessage.WriteToDebugViewer(1, "connect failed.");
+                //LogMessage.LogMessage.WriteToDebugViewer(1, "connect failed.");
 
             };
 
@@ -886,7 +884,13 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             dValue[1] = robotPoint.Y;
             dValue[5] = dDeltaAngle + dValue[5];
             //wait_for_stop_motion(ndeviceid);
+            if (CheckSoftLimit(HiWinRobotInterface.m_RobotConnectID, nmode, dValue) != 0)
+            {
+                LogMessage.LogMessage.WriteToDebugViewer(3, "Soft Limit Error at Position (X,Y,Z,Angle):  " + dValue[0].ToString() + ", " + dValue[1].ToString() + ", " + dValue[2].ToString() + ", " + dValue[5].ToString());
+                return -1;
+            }
             LogMessage.LogMessage.WriteToDebugViewer(2, $"Move to {SequencePointData.PRE_PICK_POSITION} (X Y Z Angle) = " + dValue[0].ToString() + ", " + dValue[1].ToString() + ", " + dValue[2].ToString() + ", " + dValue[5].ToString());
+
             return HWinRobot.ptp_pos(HiWinRobotInterface.m_RobotConnectID, nmode, dValue);
 
             //return wait_for_stop_motion(ndeviceid);
@@ -908,8 +912,14 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             dValue[0] = robotPoint.X;
             dValue[1] = robotPoint.Y;
             dValue[5] = dDeltaAngle + dValue[5];
+            if (CheckSoftLimit(HiWinRobotInterface.m_RobotConnectID, nmode, dValue) != 0)
+            {
+                LogMessage.LogMessage.WriteToDebugViewer(3, "Soft Limit Error at Position (X,Y,Z,Angle):  " + dValue[0].ToString() + ", " + dValue[1].ToString() + ", " + dValue[2].ToString() + ", " + dValue[5].ToString());
+                return -1;
+            }
             LogMessage.LogMessage.WriteToDebugViewer(2, $"Move to {SequencePointData.PICK_POSITION} (X Y Z Angle) = " + dValue[0].ToString() + ", " + dValue[1].ToString() + ", " + dValue[2].ToString() + ", " + dValue[5].ToString());
             return HWinRobot.ptp_pos(HiWinRobotInterface.m_RobotConnectID, nmode, dValue);
+
         }
 
         public int MoveTo_STATIC_POSITION(string strPosition, bool bSetSpeed = false, int nmode = 0)
@@ -931,13 +941,13 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
         #endregion
 
-        public bool wait_for_stop_motion()
+        public int wait_for_stop_motion()
         {
             while (HWinRobot.get_motion_state(HiWinRobotInterface.m_RobotConnectID) != 1 )
             {
                 //robot connection changed => return false
                 if (HWinRobot.get_connection_level(HiWinRobotInterface.m_RobotConnectID) <0)
-                    return true;
+                    return -1;
                 if (m_bIsStop)
                 {
                     
@@ -946,12 +956,12 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                         m_bIsStop = false;
                     }
 
-                    return true;
+                    return -1;
 
                 }
                 Thread.Sleep(5);
             }
-            return false;
+            return 0;
         }
 
 
@@ -964,6 +974,21 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         {
             JOG_XYZ,
             JOG_JOINT
+        }
+
+        public static int CheckSoftLimit(int nDevice_id, int nMode, double[] dMovingPoint)
+        {
+            bool re_bool = false;
+            double[] low_limit = new double[6];
+            double[] high_limit = new double[6];
+            HWinRobot.get_cart_soft_limit_config(nDevice_id, ref re_bool, low_limit, high_limit);
+
+            if (dMovingPoint[0] < low_limit[0] || dMovingPoint[0] > high_limit[0] ||
+                dMovingPoint[1] < low_limit[1] || dMovingPoint[1] > high_limit[1] ||
+                dMovingPoint[2] < low_limit[2] || dMovingPoint[2] > high_limit[2])
+                return -1;
+
+            return 0;
         }
 
         public static void GetSoftLimit (int device_id, int nMode, ref bool re_bool, ref double[] low_limit, ref double[] high_limit)
@@ -1053,11 +1078,6 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         //{
         //    Console.WriteLine("Command: " + cmd + " Resault: " + rlt);
         //}
-
-
-
-
-
 
     }
 }

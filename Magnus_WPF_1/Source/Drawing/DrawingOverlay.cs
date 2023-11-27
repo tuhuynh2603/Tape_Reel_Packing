@@ -19,7 +19,7 @@ namespace Magnus_WPF_1.Source.DrawingOverlay
         //Main Drawing Functions
         #region Main Drawing Functions
         //Draw Line
-        public static bool DrawLine(Canvas GridOverlay, System.Drawing.Point p1, System.Drawing.Point p2, System.Windows.Media.Brush color, double thickness = 2)
+        public static bool DrawLine(int nTrack, Canvas GridOverlay, System.Drawing.Point p1, System.Drawing.Point p2, System.Windows.Media.Brush color, double thickness = 2)
         {
             Line line = new Line();
             line.Stroke = color;
@@ -29,8 +29,8 @@ namespace Magnus_WPF_1.Source.DrawingOverlay
 
             GridOverlay.Dispatcher.Invoke(delegate
             {
-                scaleWidth = GridOverlay.Width / Track.m_Width;
-                scaleHeight = GridOverlay.Height / Track.m_Height;
+                scaleWidth = GridOverlay.Width / Application.Application.m_Width[nTrack];
+                scaleHeight = GridOverlay.Height / Application.Application.m_Height[nTrack];
             });
 
             line.X1 = p1.X * scaleWidth;
@@ -45,7 +45,7 @@ namespace Magnus_WPF_1.Source.DrawingOverlay
             });
             return true;
         }
-        public static bool DrawLineFlap(Canvas GridOverlay, System.Drawing.Point p1, System.Drawing.Point p2, System.Windows.Media.Brush color, double thickness = 2)
+        public static bool DrawLineFlap(int nTrack, Canvas GridOverlay, System.Drawing.Point p1, System.Drawing.Point p2, System.Windows.Media.Brush color, double thickness = 2)
         {
             Line line = new Line();
             line.Stroke = color;
@@ -55,8 +55,8 @@ namespace Magnus_WPF_1.Source.DrawingOverlay
 
             GridOverlay.Dispatcher.Invoke(delegate
             {
-                scaleWidth = GridOverlay.Width / Track.m_Width;
-                scaleHeight = GridOverlay.Height / Track.m_Height;
+                scaleWidth = GridOverlay.Width / Application.Application.m_Width[nTrack];
+                scaleHeight = GridOverlay.Height / Application.Application.m_Height[nTrack];
             });
 
             line.X1 = p1.X * scaleWidth;
@@ -123,7 +123,7 @@ namespace Magnus_WPF_1.Source.DrawingOverlay
         }
 
         // Draw Polygon
-        public static bool DrawPolygon(Canvas GridOverlay, List<System.Drawing.Point> pointList, System.Windows.Media.Brush color, double thickness)
+        public static bool DrawPolygon(int nTrack, Canvas GridOverlay, List<System.Drawing.Point> pointList, System.Windows.Media.Brush color, double thickness)
         {
             Polygon polygon = new Polygon();
             polygon.Stroke = color;
@@ -132,8 +132,8 @@ namespace Magnus_WPF_1.Source.DrawingOverlay
             double scaleHeight = 0;
             GridOverlay.Dispatcher.Invoke(delegate
             {
-                scaleWidth = GridOverlay.Width / Track.m_Width;
-                scaleHeight = GridOverlay.Height / Track.m_Height;
+                scaleWidth = GridOverlay.Width / Application.Application.m_Width[nTrack];
+                scaleHeight = GridOverlay.Height / Application.Application.m_Height[nTrack];
             });
 
             foreach (System.Drawing.Point point in pointList)
@@ -150,7 +150,7 @@ namespace Magnus_WPF_1.Source.DrawingOverlay
         }
 
         // Draw Rectangle
-        public static bool DrawRectangle(Canvas GridOverlay, System.Windows.Point leftTop, System.Windows.Point rightBottom, System.Windows.Media.Brush color, double thickness)
+        public static bool DrawRectangle(int nTrack, Canvas GridOverlay, System.Windows.Point leftTop, System.Windows.Point rightBottom, System.Windows.Media.Brush color, double thickness)
         {
             System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
             rect.Stroke = color;
@@ -159,8 +159,8 @@ namespace Magnus_WPF_1.Source.DrawingOverlay
             double scaleHeight = 0;
             GridOverlay.Dispatcher.Invoke(delegate
             {
-                scaleWidth = GridOverlay.Width / Track.m_Width;
-                scaleHeight = GridOverlay.Height / Track.m_Height;
+                scaleWidth = GridOverlay.Width / Application.Application.m_Width[nTrack];
+                scaleHeight = GridOverlay.Height / Application.Application.m_Height[nTrack];
             });
             Canvas.SetLeft(rect, leftTop.X * scaleWidth);
             Canvas.SetTop(rect, leftTop.Y * scaleHeight);
@@ -173,7 +173,7 @@ namespace Magnus_WPF_1.Source.DrawingOverlay
             return true;
         }
 
-        public static bool DrawRectangle(Canvas GridOverlay, System.Drawing.Rectangle rect, int Method, System.Windows.Media.Brush color, double thickness)
+        public static bool DrawRectangle(int nTrack, Canvas GridOverlay, System.Drawing.Rectangle rect, int Method, System.Windows.Media.Brush color, double thickness)
         {
             double scaleWidth = 0;
             double scaleHeight = 0;
@@ -183,13 +183,13 @@ namespace Magnus_WPF_1.Source.DrawingOverlay
                 //Method (otherwise): SideFlap
                 if (Method == 0)
                 {
-                    scaleWidth = GridOverlay.Width / Track.m_Width;
-                    scaleHeight = GridOverlay.Height / Track.m_Height;
+                    scaleWidth = GridOverlay.Width / Application.Application.m_Width[nTrack];
+                    scaleHeight = GridOverlay.Height / Application.Application.m_Height[nTrack];
                 }
                 else
                 {
-                    scaleWidth = GridOverlay.Width / Track.m_Width;
-                    scaleHeight = GridOverlay.Height / Track.m_Height;
+                    scaleWidth = GridOverlay.Width / Application.Application.m_Width[nTrack];
+                    scaleHeight = GridOverlay.Height / Application.Application.m_Height[nTrack];
                 }
 
             });
@@ -228,14 +228,14 @@ namespace Magnus_WPF_1.Source.DrawingOverlay
 
 
         // Draw Cross
-        public static bool DrawCross(Canvas GridOverlay, System.Drawing.PointF pointCross, int Angle, double Length, System.Windows.Media.Brush color, double Thickness)
+        public static bool DrawCross(int nTrack, Canvas GridOverlay, System.Drawing.PointF pointCross, int Angle, double Length, System.Windows.Media.Brush color, double Thickness)
         {
             double scaleWidth = 0;
             double scaleHeight = 0;
             GridOverlay.Dispatcher.Invoke(delegate
             {
-                scaleWidth = GridOverlay.Width / Track.m_Width;
-                scaleHeight = GridOverlay.Height / Track.m_Height;
+                scaleWidth = GridOverlay.Width / Application.Application.m_Width[nTrack];
+                scaleHeight = GridOverlay.Height / Application.Application.m_Height[nTrack];
             });
             Line line1 = new Line();
             line1.Stroke = color;
@@ -262,15 +262,15 @@ namespace Magnus_WPF_1.Source.DrawingOverlay
         }
 
 
-        public static bool DrawString(Canvas GridOverlay, string text, int X, int Y, SolidColorBrush brushColor, int fontsize = 21)
+        public static bool DrawString(int nTrack, Canvas GridOverlay, string text, int X, int Y, SolidColorBrush brushColor, int fontsize = 21)
         {
 
             double scaleWidth = 0;
             double scaleHeight = 0;
             GridOverlay.Dispatcher.Invoke(delegate
             {
-                scaleWidth = GridOverlay.Width / Track.m_Width;
-                scaleHeight = GridOverlay.Height / Track.m_Height;
+                scaleWidth = GridOverlay.Width / Application.Application.m_Width[nTrack];
+                scaleHeight = GridOverlay.Height / Application.Application.m_Height[nTrack];
             });
 
             Results result = new Results(text, brushColor, fontsize);

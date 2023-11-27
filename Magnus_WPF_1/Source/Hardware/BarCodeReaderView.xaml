@@ -23,7 +23,7 @@
                 <RowDefinition></RowDefinition>
                 <!--<RowDefinition></RowDefinition>-->
             </Grid.RowDefinitions>
-            <ComboBox x:Name="combo_commandSendToBarCode" Grid.Row="0" SelectionChanged="combo_commandSendToBarCode_SelectionChanged"></ComboBox>
+            <ComboBox x:Name="combo_commandSendToBarCode" Grid.Row="0" SelectionChanged="combo_commandSendToBarCode_SelectionChanged" ></ComboBox>
 
             <Label Grid.Row="1" Content="data received"></Label>
             <!--<ListView Grid.Row="2"></ListView>-->

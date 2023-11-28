@@ -21,7 +21,7 @@
             </ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border Name="HighlightBorder"
+                    <Border Name="HighlightBorder" Width="Auto"
                                 Margin="0"
                                 Padding="5"
                                 BorderThickness="0"
@@ -30,13 +30,13 @@
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="1*" />
-                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="1*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Name="nameStatistic"
                                             Grid.Column="0"
                                             FontSize="16"
                                             FontFamily="Microsoft New Tai Lue"
-                                            HorizontalAlignment="Stretch"
+                                            HorizontalAlignment="Left"
                                             Text="{Binding nameSummary,Mode=TwoWay}"
                                             TextWrapping="Wrap"
                                             Foreground="{Binding color}">

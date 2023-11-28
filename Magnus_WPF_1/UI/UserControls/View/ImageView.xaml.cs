@@ -195,6 +195,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
             // Lock the bitmap's bits.  
             System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height);
+
             System.Drawing.Imaging.BitmapData bmpData =
                 bmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly,
                 bmp.PixelFormat);
@@ -205,6 +206,8 @@ namespace Magnus_WPF_1.UI.UserControls.View
             stride = iwI * channels;
             ihI = bmp.Height;
             byte[] bufferCamera = new byte[stride * ihI];
+            if (bmp.Width != _imageWidth || bmp.Height != _imageHeight)
+                return bufferCamera;
             int x = bmpData.Stride - bmpData.Width * channels;
             if (x != 0)
             {

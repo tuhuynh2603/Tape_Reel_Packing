@@ -214,41 +214,5 @@ namespace Magnus_WPF_1.UI.UserControls
 			((MainWindow)System.Windows.Application.Current.MainWindow).btn_Pixel_Ruler.IsChecked = false;
 		}
 
-
-		//private void PixelRuler_MouseDown(object sender, MouseButtonEventArgs e)
-		//{
-		//	if (e.LeftButton == MouseButtonState.Pressed)
-		//	{
-		//		isDragging = true;
-		//		mouseOffset = e.GetPosition(this);
-		//		CaptureMouse();
-		//	}
-		//}
-
-		//private void PixelRuler_MouseMove(object sender, MouseEventArgs e)
-		//{
-		//	if (isDragging)
-		//	{
-		//		Point newLocation = e.GetPosition(Parent as UIElement);
-		//		newLocation.X -= mouseOffset.X;
-		//		newLocation.Y -= mouseOffset.Y;
-		//		LogMessage.WriteToDebugViewer(0, "X " + newLocation.X.ToString() + "Y " + newLocation.Y.ToString());
-				
-		//		MainWindow.mainWindow.tt_PixelRulers.X = newLocation.X;
-		//		MainWindow.mainWindow.tt_PixelRulers.Y = newLocation.Y;
-		//	}
-		//}
-
-		//private void PixelRuler_MouseUp(object sender, MouseButtonEventArgs e)
-		//{
-		//	if (isDragging)
-		//	{
-		//		//MainWindow.mainWindow.popupRuler.AllowDrop = false;
-		//		isDragging = false;
-		//		ReleaseMouseCapture();
-		//	}
-		//}
-
-
 	}
 }

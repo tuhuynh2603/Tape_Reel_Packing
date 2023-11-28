@@ -50,6 +50,9 @@ namespace Magnus_WPF_1.Source.Application
             mainWindow = app;
             m_imageViews = new ImageView[numdoc];
             m_nResult = new int[10000];
+            for(int n = 0; n < m_nResult.Length; n++)
+                m_nResult.SetValue((int)ERROR_CODE.NUM_DEFECTS, n);
+
             m_Width = width;
             m_Height = height;
 
@@ -669,6 +672,8 @@ namespace Magnus_WPF_1.Source.Application
                         if (m_nCurrentClickMappingID != nDeviceID - 1)
                             continue;
                         bDeviceIDFound = true;
+                        if (m_imageViews[0].bufferImage == null)
+                            continue;
                         Array.Clear(m_imageViews[0].bufferImage, 0, m_imageViews[0].bufferImage.Length);
                         // Mono Image
                         m_imageViews[0].UpdateNewImageMono(item.FullName);

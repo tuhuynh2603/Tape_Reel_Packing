@@ -211,19 +211,28 @@ namespace Magnus_WPF_1
             //[Browsable(false)]
             [Category("MAPPING")]
             [DisplayName("Number Device X")]
-            [Range(1, 20)]
-            [DefaultValue(5)]
+            [Range(5, 10)]
+            [DefaultValue(10)]
             [Description("")]
             [PropertyOrder(0)]
             public int M_NumberDeviceX { get; set; }
             //[Browsable(false)]
             [Category("MAPPING")]
             [DisplayName("Number Device Y")]
-            [Range(1, 20)]
-            [DefaultValue(5)]
+            [Range(5, 10)]
+            [DefaultValue(10)]
             [Description("")]
             [PropertyOrder(1)]
             public int M_NumberDeviceY { get; set; }
+
+            //[Browsable(false)]
+            [Category("MAPPING")]
+            [DisplayName("Number Device Per Lot")]
+            [Range(1, 10000)]
+            [DefaultValue(1000)]
+            [Description("")]
+            [PropertyOrder(2)]
+            public int M_NumberDevicePerLot { get; set; }
             #endregion
 
         }

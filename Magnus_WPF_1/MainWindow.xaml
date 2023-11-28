@@ -34,6 +34,15 @@
             <TextBlock Grid.Row="1" Text="Step Run" Foreground="Yellow" TextAlignment="Center" FontSize="20"></TextBlock>
         </Grid>
 
+        <Grid x:Key="debugSequenceNextStepImage" Margin="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"></RowDefinition>
+                <RowDefinition Height="1*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Image Grid.Row="0"  Source="Resources\step-forward-custom.png"></Image>
+            <TextBlock Grid.Row="1" Text="Next" Foreground="Yellow" TextAlignment="Center" FontSize="20"></TextBlock>
+        </Grid>
+
 
         <!--Background button-->
         <LinearGradientBrush x:Key="BgButton" EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
@@ -513,9 +522,15 @@
                 <ToggleButton x:Name="btn_Debug_sequence" Content="{StaticResource debugSequenceImage}"
                         Margin="0,25,0,0" HorizontalAlignment ="Center"
                         Background="Transparent"
-                              IsChecked="False" Checked="btn_run_sequence_Checked" Unchecked="btn_run_sequence_Unchecked">
+                              IsChecked="False" Checked="btn_Debug_sequence_Checked" Unchecked="btn_Debug_sequence_Unchecked">
                 </ToggleButton>
-                
+
+                <Button x:Name="btn_Debug_sequence_NextStep" Content="{StaticResource debugSequenceNextStepImage}"
+                        Margin="0,25,0,0" HorizontalAlignment ="Center"
+                        Background="Transparent"
+                              Click ="btn_Debug_sequence_NextStep_Click">
+                </Button>
+
             </StackPanel>
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top"
                         Orientation="Horizontal" Height="25">
@@ -796,44 +811,53 @@
             </Grid>
 
             <Grid Grid.Column="1" Margin="0 0 0 0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="2.1*"></RowDefinition>
-                    <RowDefinition Height="1*"></RowDefinition>
-                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2.1*"></RowDefinition>
+                        <RowDefinition Height="1*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                        <Grid Grid.Row="0"  >
+                            <GroupBox Margin="10" Header="Mapping Result" Foreground="WhiteSmoke" FontSize="20">
+                                <Border  Height="auto" BorderBrush="WhiteSmoke" CornerRadius="3" BorderThickness="3"  Background="Transparent" Opacity="0.8" Margin="9,9,9,1">
 
-                <Grid Grid.Row="0">
-                    <GroupBox Margin="10" Header="Mapping Result" Foreground="WhiteSmoke" FontSize="20">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="10*"></RowDefinition>
+                                        <RowDefinition Height="1*"></RowDefinition>
+                                        <RowDefinition Height="1*"></RowDefinition>
 
-                        <!--<Border  Height="auto"
-                            BorderBrush="WhiteSmoke"
-                            CornerRadius="3" BorderThickness="3" 
-                            Background="Transparent" Opacity="0.8" 
-                            Margin="9,20,9,1">-->
-                        <Canvas Margin="10" x:Name="canvas_Mapping" MouseMove="canvas_Mapping_MouseMove" HorizontalAlignment="Left" MouseLeftButtonDown="canvas_Mapping_MouseLeftButtonDown" MouseLeave="canvas_Mapping_MouseLeave">
-                            <Border x:Name="border_boundingbox_focus"></Border>
-                            <Border x:Name="border_boundingbox_clicked"></Border>
-                            <!--<Label x:Name="lb_canvas_MappingID"
-                                   Width="30" Height="30" Background="AliceBlue" Foreground="Black" FontSize="10" MouseLeave="Fl_MouseLeave" MouseEnter="Fl_MouseEnter"></Label>-->
-                        </Canvas>
-                        <!--</Border>-->
-                    </GroupBox>
+                                    </Grid.RowDefinitions>
+                                    <Canvas Grid.Row="0" Margin="10" x:Name="canvas_Mapping"  Width ="Auto"  MouseMove="canvas_Mapping_MouseMove" HorizontalAlignment="Left" MouseLeftButtonDown="canvas_Mapping_MouseLeftButtonDown" MouseLeave="canvas_Mapping_MouseLeave">
+                                        <Border x:Name="border_boundingbox_focus"></Border>
+                                        <Border x:Name="border_boundingbox_clicked"></Border>
+                                    </Canvas>
+                                    <Canvas Grid.Row="1" x:Name="canvas_Mapping_NextPage" Width ="Auto"  MouseMove="canvas_Mapping_NextPage_MouseMove"  HorizontalAlignment="Left" MouseLeftButtonDown="canvas_Mapping_NextPage_MouseLeftButtonDown"  MouseLeave="canvas_Mapping_NextPage_MouseLeave">
+                                        <Border x:Name="border_boundingbox_NextPage_focus"></Border>
+                                        <Border x:Name="border_boundingbox_NextPage_clicked"></Border>
+                                    </Canvas>
+                                </Grid>
+                            </Border>
+                            </GroupBox>
+                        </Grid>
 
-                </Grid>
-                <Grid Grid.Row="1">
+                    <Grid Grid.Row="1">
 
-                    <Border Height="Auto"
-                        CornerRadius="8" BorderThickness="3" 
-                        Background="Transparent" Opacity="0.8" 
-                        Margin="0.2,0,0.4,0.2">
-                        <DockPanel  LastChildFill="True">
-                            <DockPanel LastChildFill="True" DockPanel.Dock="Top">
-                                <view:StatisticView x:Name="statisticView"
-                                        DockPanel.Dock="Top"></view:StatisticView>
+                        <Border Height="Auto"
+                                                    CornerRadius="8" BorderThickness="3" 
+                                                    Background="Transparent" Opacity="0.8" 
+                                                    Margin="0.2,0,0.4,0.2">
+                            <DockPanel  LastChildFill="True">
+                                <DockPanel LastChildFill="True" DockPanel.Dock="Top">
+                                    <view:StatisticView x:Name="statisticView"
+                                                DockPanel.Dock="Top">
+                                        
+                                    </view:StatisticView>
+                                </DockPanel>
                             </DockPanel>
-                        </DockPanel>
-                    </Border>
-                </Grid>
+                        </Border>
+                    </Grid>
             </Grid>
+        </Grid>
 
             <!--Mapping-->
 

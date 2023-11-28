@@ -39,7 +39,9 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             AIR_PRESSURESTATUS = 3,
             EMERGENCY_STATUS = 4,
             QUICK_STOP_STATUS = 5,
-            RESET_STATUS = 6
+            RESET_STATUS = 6,
+            IN_CONVEYER_ONOFF = 7
+
         }
 
         public enum OUTPUT_IOROBOT

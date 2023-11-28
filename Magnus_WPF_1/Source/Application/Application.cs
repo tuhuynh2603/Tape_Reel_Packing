@@ -253,6 +253,8 @@ namespace Magnus_WPF_1.Source.Application
 
             ReadLine("MAPPING", "Number Device X", ini, ref dictMappingParam);
             ReadLine("MAPPING", "Number Device Y", ini, ref dictMappingParam);
+            ReadLine("MAPPING", "Number Device Per Lot", ini, ref dictMappingParam);
+
         }
 
         public void WriteMappingParam()
@@ -261,6 +263,7 @@ namespace Magnus_WPF_1.Source.Application
             IniFile ini = new IniFile(pathFile);
             WriteLine("MAPPING", "Number Device X", ini, categoriesMappingParam.M_NumberDeviceX.ToString());
             WriteLine("MAPPING", "Number Device Y", ini, categoriesMappingParam.M_NumberDeviceY.ToString());
+            WriteLine("MAPPING", "Number Device Per Lot", ini, categoriesMappingParam.M_NumberDevicePerLot.ToString());        
         }
 
         string ConvertRectanglesToString(Rectangles rectangles)

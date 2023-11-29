@@ -586,47 +586,6 @@ namespace Magnus_WPF_1.Source.Algorithm
             pCorner.X = pCorner.X / (float)m_DeviceLocationParameter.m_dScaleImageRatio;
             pCorner.Y = pCorner.Y / (float)m_DeviceLocationParameter.m_dScaleImageRatio;
 
-
-            //double dOx_Angle = AngleWithXAxis(pCornerPoint.X - rotateRect_Device.Center.X, pCornerPoint.Y - rotateRect_Device.Center.Y);
-
-            //double AngleWithXAxis(double xa, double ya)
-            //{
-            //    // Calculate the angle in radians
-            //    double thetaRad = Math.Atan2(ya, xa);
-
-            //    // Convert radians to degrees
-            //    double thetaDeg = Math.Round((180 / Math.PI) * thetaRad, 2);
-
-            //    return thetaDeg;
-            //}
-
-            //double AngleBetweenVectors(double xa, double ya, double xb, double yb)
-            //{
-            //    // Calculate the dot product
-            //    double dotProduct = xa * xb + ya * yb;
-
-            //    // Calculate the magnitudes of the vectors
-            //    double magnitudeA = Math.Sqrt(xa * xa + ya * ya);
-            //    double magnitudeB = Math.Sqrt(xb * xb + yb * yb);
-
-            //    // Calculate the angle in radians
-            //    double thetaRad = Math.Acos(dotProduct / (magnitudeA * magnitudeB));
-
-            //    // Convert radians to degrees
-            //    double thetaDeg = Math.Round((180 / Math.PI) * thetaRad, 2);
-
-            //    return thetaDeg;
-            //}
-
-
-
-            //nAngleOutput = dOx_Angle;// rotateRect_Device.Angle + (m_DeviceLocationParameter.m_nBlackCornerIndexTemplateImage - nminIndex) * 90;
-            //if (nAngleOutput <= -180)
-            //    nAngleOutput = 360 - nAngleOutput;
-
-            //if (nAngleOutput >= 180)
-            //    nAngleOutput = nAngleOutput - 360;
-
             timeIns.Restart();
             CvImage mat_point = new CvImage();
             mat_point = CvImage.Zeros(zoomedInImage.Height, zoomedInImage.Width, DepthType.Cv8U, 1);
@@ -640,25 +599,9 @@ namespace Magnus_WPF_1.Source.Algorithm
             timeIns.Restart();
             AddRegionOverlay(ref list_arrayOverlay, mat_point, Colors.Yellow);
 
-
-
-
-            //p_Regionpolygon = RotatePolygon(pPolygon, -nAngleOutput, pCenter.X, pCenter.Y);
-            //p_Regionpolygon.Remove(pCenter);
-
-            //LogMessage.WriteToDebugViewer(1, "FindNearestPoints time: " + timeIns.ElapsedMilliseconds.ToString());
-            //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-            //{
-            //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("FindNearestPoints. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)");
-
-            //});
             timeIns.Stop();
 
             return -(int)ERROR_CODE.PASS;
-            //if (false)
-            //    return 0;
-            //else
-            //    return -1;
 
         }
 
@@ -889,6 +832,39 @@ namespace Magnus_WPF_1.Source.Algorithm
             return points[nminIndex];
         }
 
+
+        public void LabelMarking_Inspection(CvImage imgSourceInput, RotatedRect rotateRect_Device, ref int nResultOutput)
+        {
+
+        }
+        public int Calibration_Get3Points(CvImage imgSourceInput, out PointF[] points)
+        {
+            points = new PointF[4];
+            CvImage thresholdImage = new CvImage();
+            MagnusOpenCVLib.Threshold2(ref imgSourceInput, ref thresholdImage, 0, 128);
+            CvImage OpeningImage = new CvImage();
+
+            MagnusOpenCVLib.OpeningCircle(ref thresholdImage, ref OpeningImage, 5);
+            CvImage BiggestRegion = new CvImage();
+
+            MagnusOpenCVLib.SelectBiggestRegion(ref OpeningImage, ref BiggestRegion);
+            CvPointArray point_regions = new CvPointArray();
+
+            CvInvoke.FindNonZero(BiggestRegion, point_regions);
+            if (point_regions.Size == 0)
+                return -1;
+
+            CvContourArray contours = new CvContourArray();
+            MagnusOpenCVLib.GenContourRegion(ref BiggestRegion, ref contours, RetrType.External);
+            RotatedRect rotateRect_Device = CvInvoke.MinAreaRect(contours[0]);
+            if (rotateRect_Device.Size.Width < (int)(m_DeviceLocationParameter.m_nMinWidthDevice)
+                || rotateRect_Device.Size.Height < (int)(m_DeviceLocationParameter.m_nMinHeightDevice))
+                return -(int)ERROR_CODE.NO_PATTERN_FOUND;
+
+            points = rotateRect_Device.GetVertices();
+
+            return 0;
+        }
         //public static int FindNearestPoints(CvImage imgSourceInput, ref CvImage deviceLocationThresholdRegion, System.Drawing.Rectangle rectMatchingPosition, List<Point> polygonInput, float fAngleInput)
         //{
 

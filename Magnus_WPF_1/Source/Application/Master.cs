@@ -320,7 +320,7 @@ namespace Magnus_WPF_1.Source.Application
             }
         }
 
-        int ResetSequence(bool bEnableStepMode = true)
+        public int ResetSequence(bool bEnableStepMode = true)
         {
             Master.VisionReadyEvent[0].Reset();
             Master.VisionReadyEvent[1].Reset();

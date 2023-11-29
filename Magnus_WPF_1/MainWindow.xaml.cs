@@ -1478,13 +1478,13 @@ namespace Magnus_WPF_1
         private void btn_Debug_sequence_Checked(object sender, RoutedEventArgs e)
         {
             m_bEnableDebugSequence = (bool)btn_Debug_sequence.IsChecked;
-            btn_Debug_sequence_NextStep.IsEnabled = true;
+            //btn_Debug_sequence_NextStep.IsEnabled = true;
         }
 
         private void btn_Debug_sequence_Unchecked(object sender, RoutedEventArgs e)
         {
             m_bEnableDebugSequence = (bool)btn_Debug_sequence.IsChecked;
-            btn_Debug_sequence_NextStep.IsEnabled = false;
+            //btn_Debug_sequence_NextStep.IsEnabled = false;
         }
 
         private void btn_Debug_sequence_NextStep_Click(object sender, RoutedEventArgs e)

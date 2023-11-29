@@ -563,7 +563,11 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
                 if(HiWinRobotUserControl.m_strAlarmMessage.Length >0)
                 {
-                    m_hiWinRobotUserControl.label_Alarm.Content = HiWinRobotUserControl.m_strAlarmMessage;
+                    lock (m_hiWinRobotUserControl.label_Alarm)
+                    {
+                        m_hiWinRobotUserControl.label_Alarm.Content = HiWinRobotUserControl.m_strAlarmMessage;
+
+                    }
                 }    
             });
 

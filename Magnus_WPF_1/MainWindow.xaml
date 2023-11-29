@@ -392,10 +392,9 @@
                                                         Label="ROBOT Controller"
                                                         LargeImageSource="Resources/robot-industrial-custom.png"
                                                         Foreground="White"
-                                                        IsEnabled="true"
                                                         Checked="btn_Robot_Controller_Checked"
                                                         Unchecked="btn_Robot_Controller_Unchecked"
-                                                        IsChecked="False"
+                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
                                                         MouseOverBackground="{StaticResource BgButton}" 
                                                         Width="Auto"/>
 
@@ -423,6 +422,7 @@
                                                         Checked="btn_BarCodeReader_Setting_Checked"
                                                         Unchecked="btn_BarCodeReader_Setting_Unchecked"
                                                         IsChecked="False"
+                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
                                                         MouseOverBackground="{StaticResource BgButton}" 
                                                         Width="Auto">
                                                 
@@ -513,10 +513,12 @@
 
                 </dragablz:TabablzControl>
 
-                <ToggleButton x:Name="btn_run_sequence" Content="{StaticResource runSequenceImage}"
+                <ToggleButton x:Name="btn_run_sequence" 
+                        Content="{StaticResource runSequenceImage}"
+                         
                         Margin="0,25,0,0" HorizontalAlignment ="Center"
                         Background="Transparent"
-                              IsChecked="False" Checked="btn_run_sequence_Checked" Unchecked="btn_run_sequence_Unchecked">
+                        IsChecked="False" Checked="btn_run_sequence_Checked" Unchecked="btn_run_sequence_Unchecked">
                 </ToggleButton>
 
                 <ToggleButton x:Name="btn_Debug_sequence" Content="{StaticResource debugSequenceImage}"
@@ -528,8 +530,10 @@
                 <Button x:Name="btn_Debug_sequence_NextStep" Content="{StaticResource debugSequenceNextStepImage}"
                         Margin="0,25,0,0" HorizontalAlignment ="Center"
                         Background="Transparent"
-                              Click ="btn_Debug_sequence_NextStep_Click">
+                        Click ="btn_Debug_sequence_NextStep_Click">
                 </Button>
+                
+                
 
             </StackPanel>
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top"

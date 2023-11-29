@@ -204,7 +204,7 @@ namespace Magnus_WPF_1.Source.Application
             if (MyCamera.MV_OK != nRet)
             {
                 hIKControlCameraView.m_bGrabbing = false;
-                return 0;
+                return -1;
             }
 
             int nWidth = 0, nHeight = 0;
@@ -213,7 +213,7 @@ namespace Magnus_WPF_1.Source.Application
             {
                 //OutputDe("Trigger Software Fail!", nRet);
                 nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
-                return 0;
+                return -1;
             }
             hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);
             m_imageViews[0].UpdateSourceImageMono();
@@ -222,7 +222,7 @@ namespace Magnus_WPF_1.Source.Application
             if (MyCamera.MV_OK != nRet)
             {
                 hIKControlCameraView.m_bGrabbing = false;
-                return 0;
+                return -1;
             }
             return 0;
 
@@ -501,6 +501,10 @@ namespace Magnus_WPF_1.Source.Application
             }
         }
 
+        public int CalibrationGet3Points(out PointF[] points)
+        {
+            return m_InspectionCore.Calibration_Get3Points(m_InspectionCore.m_SourceImage.Gray, out points);
+        }
         public int DebugFunction(ref Track m_track)
         {
             PointF pCenter = new PointF();

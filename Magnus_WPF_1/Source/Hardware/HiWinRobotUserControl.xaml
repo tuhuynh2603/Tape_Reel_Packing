@@ -8,14 +8,18 @@
              d:DesignHeight="550" d:DesignWidth="700">
     <Grid Background="AliceBlue">
         <Grid.RowDefinitions>
-            <RowDefinition Height="100"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
             <RowDefinition Height="3.4*"></RowDefinition>
             <RowDefinition Height="2*"></RowDefinition>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Width="Auto">
-            <Label Content="Robot Control" Background="DimGray" Foreground="Black"></Label>
-            <Border BorderThickness="0,1,0,1" BorderBrush="Black" Width="Auto">
+        <Grid Grid.Row="0" Width="Auto">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"></RowDefinition>
+                <RowDefinition Height="5*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" Content="Robot Control" Background="DimGray" Foreground="Black"></Label>
+            <Border Grid.Row="1" Height="Auto" BorderThickness="0,1,0,1" BorderBrush="Black" Width="Auto">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="3*"></ColumnDefinition>
@@ -28,13 +32,13 @@
                             <ColumnDefinition></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <Grid Grid.Column="0">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="1*"></RowDefinition>
-                                <RowDefinition Height="50"></RowDefinition>
-                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50"></ColumnDefinition>
+                                <ColumnDefinition Width="1*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
 
-                            <Label Grid.Row="0" Content="Status" BorderThickness="1" BorderBrush="Black" VerticalAlignment="Stretch" Background="WhiteSmoke" HorizontalContentAlignment="Center"></Label>
-                            <Label x:Name="label_Alarm" Grid.Row="1" BorderThickness="1" BorderBrush="Black"   Background="Wheat"></Label>
+                            <Label Grid.Column="0" Content="Status" BorderThickness="1" BorderBrush="Black" VerticalContentAlignment="Center" Background="WhiteSmoke" HorizontalContentAlignment="Center"></Label>
+                            <Label x:Name="label_Alarm" Grid.Column="1" BorderThickness="1" BorderBrush="Black"   Background="Wheat"></Label>
                         </Grid>
 
                         <Button Grid.Column="1" Content="Reset Alarm" Click="button_ResetAlarm_Click"></Button>
@@ -42,8 +46,8 @@
                     </Grid>
                     <Grid Grid.Column="1">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="25"></RowDefinition>
-                            <RowDefinition Height="25"></RowDefinition>
+                            <RowDefinition Height="1*"></RowDefinition>
+                            <RowDefinition Height="1*"></RowDefinition>
                         </Grid.RowDefinitions>
                         <Border Grid.Row="0" BorderThickness="1,0,1,1" BorderBrush="Gray">
                             <Grid>
@@ -53,11 +57,16 @@
                             </Grid>
                         </Border>
                         <Border Grid.Row="1" BorderThickness="1" BorderBrush="Gray" >
-                            <StackPanel Orientation ="Horizontal" >
-                                <Label Content="Model: "></Label>
-                                <RadioButton Name="check_Manual" Checked="check_Manual_Checked" Content="Manual" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"></RadioButton>
-                                <RadioButton Name="check_Auto" Checked="check_Auto_Checked" Margin="10,0,0,0" Content="Auto" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"></RadioButton>
-                            </StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                                    <ColumnDefinition Width="2*"></ColumnDefinition>
+                                    <ColumnDefinition Width="2*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label       Grid.Column="0" Content="Model: " HorizontalContentAlignment="Right"></Label>
+                                <RadioButton Grid.Column="1" Name="check_Manual" Checked="check_Manual_Checked" Content="Manual" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"></RadioButton>
+                                <RadioButton Grid.Column="2" Name="check_Auto" Checked="check_Auto_Checked" Margin="10,0,0,0" Content="Auto" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"></RadioButton>
+                            </Grid>
                         </Border>
                     </Grid>
                     <ToggleButton x:Name="button_RobotConnect"  
@@ -70,7 +79,7 @@
 
             </Border>
 
-        </StackPanel>
+        </Grid>
         <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="2">
 
             <Grid>
@@ -406,7 +415,7 @@
                              Text="{Binding Path=Value, ElementName=m_nNumberPointValue, 
                                 Mode=TwoWay ,UpdateSourceTrigger=PropertyChanged}"></TextBox>
                 </Grid>-->
-                <Button x:Name="button_CameraRobotCalibration" Content=" Do Calibration" Click="button_CameraRobotCalibration_Click" Grid.Row="0"></Button>
+                <Button x:Name="button_CameraRobotCalibration" Content=" Do Calibration" Click="button_CameraRobotCalibration_Click" Grid.Row="0" Height="28" VerticalAlignment="Bottom"/>
                 <Button x:Name="button_Import_Task" Content="Import Task" Click="button_Import_Task_Click" Grid.Row="2"></Button>
                 <Button x:Name="button_Start_Task" Content="Start Task" Click="button_Start_Task_Click" Grid.Row="3"></Button>
                 <Button x:Name="button_Abort_Task" Content="Abort Task" Click="button_Abort_Task_Click" Grid.Row="4"></Button>

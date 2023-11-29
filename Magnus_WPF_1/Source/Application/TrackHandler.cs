@@ -501,9 +501,32 @@ namespace Magnus_WPF_1.Source.Application
             }
         }
 
+
+        public List<ArrayOverLay> m_CalibArrayOverLay = new List<ArrayOverLay>();
         public int CalibrationGet3Points(out PointF[] points)
         {
-            return m_InspectionCore.Calibration_Get3Points(m_InspectionCore.m_SourceImage.Gray, out points);
+            m_CalibArrayOverLay.Clear();
+            int nResult =  m_InspectionCore.Calibration_Get3Points(m_InspectionCore.m_SourceImage.Gray, out points, ref m_CalibArrayOverLay);
+            PointF[] pointsOverlay = points;
+
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                m_imageViews[0].ClearOverlay();
+                foreach (ArrayOverLay overlay in m_CalibArrayOverLay)
+                {
+                    SolidColorBrush c = new SolidColorBrush(overlay._color);
+                    m_imageViews[0].DrawRegionOverlay(overlay.mat_Region, c);
+                }
+
+                SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
+                for (int n = 0; n < pointsOverlay.Length; n++)
+                {
+                    m_imageViews[0].DrawStringOverlay((n+1).ToString(), (int)pointsOverlay[n].X, (int)pointsOverlay[n].Y, color);
+                }
+            });
+
+
+            return nResult;
         }
         public int DebugFunction(ref Track m_track)
         {

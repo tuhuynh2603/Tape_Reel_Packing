@@ -38,7 +38,7 @@
                             </Grid.ColumnDefinitions>
 
                             <Label Grid.Column="0" Content="Status" BorderThickness="1" BorderBrush="Black" VerticalContentAlignment="Center" Background="WhiteSmoke" HorizontalContentAlignment="Center"></Label>
-                            <Label x:Name="label_Alarm" Grid.Column="1" BorderThickness="1" BorderBrush="Black"   Background="Wheat"></Label>
+                            <TextBlock x:Name="label_Alarm" Grid.Column="1" Background="Wheat" TextWrapping="WrapWithOverflow"></TextBlock>
                         </Grid>
 
                         <Button Grid.Column="1" Content="Reset Alarm" Click="button_ResetAlarm_Click"></Button>
@@ -416,6 +416,7 @@
                                 Mode=TwoWay ,UpdateSourceTrigger=PropertyChanged}"></TextBox>
                 </Grid>-->
                 <Button x:Name="button_CameraRobotCalibration" Content=" Do Calibration" Click="button_CameraRobotCalibration_Click" Grid.Row="0" Height="28" VerticalAlignment="Bottom"/>
+                <Button x:Name="button_Next_Calibration" Content="Next" Click="button_Next_Calibration_Click"  Grid.Row="1"></Button>
                 <Button x:Name="button_Import_Task" Content="Import Task" Click="button_Import_Task_Click" Grid.Row="2"></Button>
                 <Button x:Name="button_Start_Task" Content="Start Task" Click="button_Start_Task_Click" Grid.Row="3"></Button>
                 <Button x:Name="button_Abort_Task" Content="Abort Task" Click="button_Abort_Task_Click" Grid.Row="4"></Button>

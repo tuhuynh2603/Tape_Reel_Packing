@@ -837,14 +837,15 @@ namespace Magnus_WPF_1.Source.Algorithm
         {
 
         }
-        public int Calibration_Get3Points(CvImage imgSourceInput, out PointF[] points)
+        public int Calibration_Get3Points(CvImage imgSourceInput, out PointF[] points, ref List<ArrayOverLay> list_arrayOverlay)
         {
             points = new PointF[4];
             CvImage thresholdImage = new CvImage();
-            MagnusOpenCVLib.Threshold2(ref imgSourceInput, ref thresholdImage, 0, 128);
+            MagnusOpenCVLib.Threshold2(ref imgSourceInput, ref thresholdImage, m_DeviceLocationParameter.m_L_lowerThreshold, m_DeviceLocationParameter.m_L_upperThreshold);
+
             CvImage OpeningImage = new CvImage();
 
-            MagnusOpenCVLib.OpeningCircle(ref thresholdImage, ref OpeningImage, 5);
+            MagnusOpenCVLib.OpeningCircle(ref thresholdImage, ref OpeningImage, 1);
             CvImage BiggestRegion = new CvImage();
 
             MagnusOpenCVLib.SelectBiggestRegion(ref OpeningImage, ref BiggestRegion);
@@ -857,12 +858,23 @@ namespace Magnus_WPF_1.Source.Algorithm
             CvContourArray contours = new CvContourArray();
             MagnusOpenCVLib.GenContourRegion(ref BiggestRegion, ref contours, RetrType.External);
             RotatedRect rotateRect_Device = CvInvoke.MinAreaRect(contours[0]);
-            if (rotateRect_Device.Size.Width < (int)(m_DeviceLocationParameter.m_nMinWidthDevice)
-                || rotateRect_Device.Size.Height < (int)(m_DeviceLocationParameter.m_nMinHeightDevice))
-                return -(int)ERROR_CODE.NO_PATTERN_FOUND;
+            //if (rotateRect_Device.Size.Width < (int)(m_DeviceLocationParameter.m_nMinWidthDevice)
+            //    || rotateRect_Device.Size.Height < (int)(m_DeviceLocationParameter.m_nMinHeightDevice))
+            //    return -(int)ERROR_CODE.NO_PATTERN_FOUND;
 
             points = rotateRect_Device.GetVertices();
 
+
+
+            CvImage rec_region2 = new CvImage();
+            rec_region2 = CvImage.Zeros(imgSourceInput.Height, imgSourceInput.Width, DepthType.Cv8U, 1);
+
+            MagnusOpenCVLib.GenRectangle2(rec_region2, rotateRect_Device, new MCvScalar(255), 1);
+            CvImage rec_regionFillup = new CvImage();
+
+            MagnusOpenCVLib.FillUp(ref rec_region2, ref  rec_regionFillup);
+
+            AddRegionOverlay(ref list_arrayOverlay, rec_regionFillup, Colors.YellowGreen);
             return 0;
         }
         //public static int FindNearestPoints(CvImage imgSourceInput, ref CvImage deviceLocationThresholdRegion, System.Drawing.Rectangle rectMatchingPosition, List<Point> polygonInput, float fAngleInput)

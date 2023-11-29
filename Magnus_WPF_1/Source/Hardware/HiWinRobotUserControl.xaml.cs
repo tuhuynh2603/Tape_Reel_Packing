@@ -635,7 +635,7 @@ namespace Magnus_WPF_1.Source.Hardware
         private void button_ResetAlarm_Click(object sender, RoutedEventArgs e)
         {
             HWinRobot.clear_alarm(HiWinRobotInterface.m_RobotConnectID);
-            label_Alarm.Content = "";
+            label_Alarm.Text = "";
 
         }
 
@@ -899,15 +899,14 @@ namespace Magnus_WPF_1.Source.Hardware
 
         public int WaitForNextStepCalibrationEvent(string strDebugMessage = "")
         {
-            if (!MainWindow.mainWindow.m_bEnableDebugSequence)
-                return 0;
+
 
             lock (label_Alarm)
             {
 
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
-                    label_Alarm.Content = strDebugMessage;
+                    label_Alarm.Text = strDebugMessage;
                 });
             }
 
@@ -919,24 +918,31 @@ namespace Magnus_WPF_1.Source.Hardware
             return 0;
         }
 
-        Thread m_CalibrationThread;
+
+        
         public static AutoResetEvent m_NextStepCalibration = new AutoResetEvent(false);
+        private void button_Next_Calibration_Click(object sender, RoutedEventArgs e)
+        {
+            m_NextStepCalibration.Set();
+        }
+
+
+        Thread m_CalibrationThread;
         private void button_CameraRobotCalibration_Click(object sender, RoutedEventArgs e)
         {
-            if (m_CalibrationThread.IsAlive)
+            if (m_CalibrationThread == null)
+                m_CalibrationThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => CalibrationSequence()));
+            else if (!m_CalibrationThread.IsAlive)
+                m_CalibrationThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => CalibrationSequence()));
+            else
                 return;
 
-            label_Alarm.Content = "Start Calibration";
-
+            label_Alarm.Text = "Start Calibration";
             m_NextStepCalibration.Reset();
-            m_bCalibrationStatus = true;
-            m_CalibrationThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => CalibrationSequence()));
             m_CalibrationThread.Start();
         }
-        bool m_bCalibrationStatus = false;
 
         public void CalibrationSequence()
-
         {
             //int nAlarmCount = 0;
             //HWinRobot.get_alarm_log_count(HiWinRobotInterface.m_RobotConnectID, ref nAlarmCount);
@@ -954,33 +960,33 @@ namespace Magnus_WPF_1.Source.Hardware
             if (MainWindow.mainWindow.master.m_Tracks[0].SingleSnap_HIKCamera() < 0)
             {
                 MessageBox.Show("Please Check camera connetion again! Stop calibration","", MessageBoxButton.OK);
-                return;
+                //return;
             }
 
             System.Drawing.PointF[] points;
             MainWindow.mainWindow.master.m_Tracks[0].CalibrationGet3Points(out points);
-            if (WaitForNextStepCalibrationEvent("Calibration Done. Please press Next to move the robot to 1st Point.") < 0)
+            if (WaitForNextStepCalibrationEvent("Done. Please press Next to move the robot to 1st Point.") < 0)
                 return;
 
             MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_1);
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
 
-            if (WaitForNextStepCalibrationEvent("Calibration Done. Please press Next to save and move the robot to 2nd Point.") < 0)
+            if (WaitForNextStepCalibrationEvent(" Done. Please press Next to save and move the robot to 2nd Point.") < 0)
                 return;
 
             MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_2);
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
 
-            if (WaitForNextStepCalibrationEvent("Calibration Done. Please press Next to save and move the robot to 3rd Point.") < 0)
+            if (WaitForNextStepCalibrationEvent(" Done. Please press Next to save and move the robot to 3rd Point.") < 0)
                 return;
 
             MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_3);
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
 
-            if (WaitForNextStepCalibrationEvent("Calibration Done. Please press Next to save the 3rd Point.") < 0)
+            if (WaitForNextStepCalibrationEvent(" Done. Please press Next to save the 3rd Point.") < 0)
                 return;
 
-            if (MessageBox.Show("Would you like to save the calibration results ?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
+            if (MessageBox.Show("Would you like to save the calibration result ?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
                 return;
 
             Docalibration();
@@ -988,8 +994,8 @@ namespace Magnus_WPF_1.Source.Hardware
             if (WaitForNextStepCalibrationEvent("Calibration Done. Please press Next complete the sequence.") < 0)
                 return;
 
-            m_bCalibrationStatus = false;
         }
+
         public void Docalibration()
         {
 

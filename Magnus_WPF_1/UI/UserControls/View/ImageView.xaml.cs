@@ -856,6 +856,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             {
                 GridOverlay.Dispatcher.Invoke(() =>
                 {
+                    string namee = uIElement[i].GetType().Name;
                     if (uIElement[i].GetType().Name == "Polygon")
                     {
                         Polygon polygon = new Polygon();
@@ -894,6 +895,19 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
                         GridOverlay.Children.Add(line);
                     }
+                    else if (uIElement[i].GetType().Name == "TextBlock")
+                    {
+                        double X = Canvas.GetLeft(uIElement[i]);
+                        double Y = Canvas.GetTop(uIElement[i]);
+                        Canvas.SetLeft(uIElement[i], X * (newScaleX / oldScaleX));
+                        Canvas.SetTop(uIElement[i],  Y * (newScaleX / oldScaleX));
+                        GridOverlay.Dispatcher.Invoke(delegate
+                        {
+                            GridOverlay.Children.Add(uIElement[i]);
+                        });
+                    }
+                    
+
                 });
             }
             if (isSetupGrid)

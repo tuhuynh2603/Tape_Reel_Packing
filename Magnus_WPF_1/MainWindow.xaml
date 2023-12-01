@@ -15,7 +15,6 @@
 
 
     <Window.Resources>
-
         <Grid x:Key="runSequenceImage" Margin="3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="3*"></RowDefinition>
@@ -129,50 +128,28 @@
             </Setter>
         </Style>
 
-        <!--<Style x:Key="ToggleButtonStyle1" TargetType="{x:Type ToggleButton}">
-            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
-            <Setter Property="Background" Value="{x:Null}"/>
-            <Setter Property="IsChecked" Value="False"></Setter>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ToggleButton}">
-                        <Border x:Name="border"
-                                BorderBrush="AliceBlue" 
-                                CornerRadius="3"
-                                BorderThickness="1" 
-                                SnapsToDevicePixels="true">
-                            <ContentPresenter x:Name="contentPresenter" 
-                                              Focusable="False" 
-                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                              Margin="{TemplateBinding Padding}" 
-                                              RecognizesAccessKey="True" 
-                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter Property="Background" TargetName="border" Value="{StaticResource MouseOverButtonStyle}"/>
-                                <Setter Property="BorderThickness" TargetName="border" Value="0"/>
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="true">
-                                <Setter Property="Background" TargetName="border" Value="{StaticResource CheckedButtonStyle}"/>
-                                <Setter Property="BorderThickness" TargetName="border" Value="0"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="false">
-                                <Setter Property="Background" TargetName="border" 
-                                        Value="{StaticResource Button.Disabled.Background}"/>
-                                <Setter Property="BorderBrush" TargetName="border" 
-                                        Value="{StaticResource Button.Disabled.Border}"/>
-                                <Setter Property="TextElement.Foreground"
-                                        TargetName="contentPresenter"
-                                        Value="{StaticResource Button.Disabled.Foreground}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>-->
+        <RoutedUICommand x:Key="Routed_btn_inspect_Click"/>
+        <RoutedUICommand x:Key="Routed_Btn_load_teach_image_Click"/>
+        <RoutedUICommand x:Key="Routed_btn_Binarize_Click"/>
+        <RoutedUICommand x:Key="Routed_btn_Pixel_Ruler_Click"/>
+
     </Window.Resources>
+
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource Routed_btn_inspect_Click}" Executed="btn_inspect_Click"/>
+        <CommandBinding Command="{StaticResource Routed_Btn_load_teach_image_Click}" Executed="Btn_load_teach_image_Click"/>
+        <CommandBinding Command="{StaticResource Routed_btn_Binarize_Click}" Executed="btn_Binarize_Click"/>
+        <CommandBinding Command="{StaticResource Routed_btn_Pixel_Ruler_Click}" Executed="btn_Pixel_Ruler_Click"/>
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding  Key="i" Command="{StaticResource Routed_btn_inspect_Click}"></KeyBinding>
+        <KeyBinding  Key="l" Command="{StaticResource Routed_Btn_load_teach_image_Click}"></KeyBinding>
+        <KeyBinding  Key="b" Command="{StaticResource Routed_btn_Binarize_Click}"></KeyBinding>
+        <KeyBinding  Key="p" Command="{StaticResource Routed_btn_Pixel_Ruler_Click}"></KeyBinding>
+        
+    </Window.InputBindings>
+
 
     <Grid Background="#FF322F2E">
         <!--Title-->
@@ -223,7 +200,7 @@
                                                             MouseOverBackground="{StaticResource MouseOverButtonStyle}"
                                                             Foreground="GhostWhite"
                                                             PreviewMouseDown="PreviewMouseDownInspectionBtn"
-                                                            Width="auto" 
+                                                            Width="auto"
                                                             Click="btn_inspect_Click"/>
                                     <RibbonToggleButton Name="debug_btn"
                                                             Label="Debug"
@@ -244,13 +221,22 @@
                                                             Width="auto" 
                                                             Checked="btn_inspect_offline_Checked"
                                                             Unchecked="btn_inspect_offline_UnChecked"/>
-
+                                    <RibbonButton Name="btn_load_image_File"
+                                                            Label="Load Image File"
+                                                            LargeImageSource="Resources\file-upload-custom.png" Foreground="GhostWhite"
+                                                            MouseOverBackground="{StaticResource MouseOverButtonStyle}"
+                                                            Width="auto" Click="btn_load_image_File_Click"/>
+                                    <RibbonButton Name="btn_save_current_image"
+                                                            Label="Save Current Image"
+                                                            LargeImageSource="Resources\download-box-custom.png" Foreground="GhostWhite"
+                                                            MouseOverBackground="{StaticResource MouseOverButtonStyle}"
+                                                            Width="auto" Click="btn_save_current_image_Click"/>
 
                                     <RibbonButton Name="load_teach_image_btn"
                                                             Label="Load Teach Image"
                                                             LargeImageSource="Resources\file-upload-custom.png" Foreground="GhostWhite"
                                                             MouseOverBackground="{StaticResource MouseOverButtonStyle}"
-                                                            Width="auto" Click="btn_load_teach_image_Click"/>
+                                                            Width="auto" Click="Btn_load_teach_image_Click"/>
 
                                     <RibbonButton Name="btn_save_teach_image"
                                                             Label="Save Teach Image"
@@ -473,8 +459,7 @@
                                           MouseLeave="Binarize_MouseLeave"
                                           MouseEnter="Binarize_MouseEnter"
                                           Width="68" 
-                                          Checked="btn_Binarize_Checked" 
-                                          Unchecked="btn_Binarize_Unchecked"/>
+                                          Click="btn_Binarize_Click"/>
                             </RibbonGroup>
                             <!--Tool-->
                             <RibbonGroup Name="rgb_Tool_Group"  BorderThickness="5" BorderBrush="AntiqueWhite" >
@@ -492,8 +477,7 @@
                                                 Label="Pixel Ruler"
                                                 LargeImageSource="Resources\run-custom.png"
                                                 Foreground="GhostWhite" 
-                                                Checked="btn_Pixel_Ruler_Checked"       
-                                                Unchecked="btn_Pixel_Ruler_Unchecked"
+                                                Click="btn_Pixel_Ruler_Click"
                                                 FontSize="13"
                                                 MouseOverBackground="{StaticResource BgButton}"
                                                 CheckedBackground="{StaticResource BgButton}"
@@ -783,7 +767,7 @@
 
         </Grid>
         
-        <Grid x:Name="Layout" Margin="0 130 0 0" 
+        <Grid x:Name="Layout1" Margin="0 130 0 0" 
               
             HorizontalAlignment="Stretch" Background="Black">
 

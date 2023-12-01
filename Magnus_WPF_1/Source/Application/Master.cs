@@ -200,6 +200,69 @@ namespace Magnus_WPF_1.Source.Application
             }
         }
 
+        public void loadImageFromFileToUI(int nTrack, string strFileName)
+        {
+
+            if (!File.Exists(strFileName))
+                return;
+            else
+            {
+                string[] nameImageArray = strFileName.Split('\\');
+                int leght = nameImageArray.Count();
+                string _nameImage = nameImageArray[leght - 1];
+                m_Tracks[nTrack].m_imageViews[0].nameImage = _nameImage;
+
+                //Color Image
+                //BitmapImage bitmap = new BitmapImage();
+                //bitmap = LoadBitmap(strImageFilePath);
+                //m_Tracks[nTrack].m_imageViews[0].UpdateNewImage(bitmap);
+                // Mono Image
+                m_Tracks[nTrack].m_imageViews[0].UpdateNewImageMono(strFileName);
+                m_Tracks[nTrack].m_InspectionCore.LoadImageToInspection(m_Tracks[nTrack].m_imageViews[0].btmSource);
+
+                m_Tracks[nTrack].m_imageViews[0].GridOverlay.Children.Clear();
+                //m_Tracks[nTrack].m_imageViews[0].UpdateTextOverlay("", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+                //mainWindow.UpdateTitleDoc(0, "teachImage.bmp", true);
+            }
+        }
+
+
+        public void SaveUIImage(int nTrack)
+        {
+            string strDateTime = string.Format("({0}.{1}.{2}_{3}.{4}.{5})", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+            string strPath = System.IO.Path.Combine(Source.Application.Application.pathImageSave, "UI Image");
+            if (!Directory.Exists(strPath))
+                Directory.CreateDirectory(strPath);
+            strPath = System.IO.Path.Combine(strPath, $"Track {nTrack + 1}");
+
+            if (!Directory.Exists(strPath))
+                Directory.CreateDirectory(strPath);
+
+            string strImageFilePath = System.IO.Path.Combine(strPath, $"{strDateTime}.bmp");
+            try
+            {
+
+                m_Tracks[nTrack].m_InspectionCore.LoadImageToInspection(m_Tracks[nTrack].m_imageViews[0].btmSource);
+                m_Tracks[nTrack].m_InspectionCore.SaveCurrentSourceImage(strImageFilePath, 0);
+
+                m_Tracks[nTrack].m_InspectionCore.SaveCurrentSourceImage(strImageFilePath, 1);
+                /*BitmapSource _bitmapImage = m_Tracks[nTrack].m_imageViews[0].btmSource;
+                string path_image = strImageFilePath;
+                using (FileStream stream = new FileStream(path_image, FileMode.CreateNew))
+                {
+                    BitmapEncoder encoder = new BmpBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create((BitmapSource)_bitmapImage));
+                    encoder.Save(stream);
+                    _bitmapImage.Freeze();
+                    stream.Dispose();
+                    stream.Close();
+                }*/
+            }
+            catch (Exception)
+            {
+            }
+        }
+
         public void SaveUITeachImage(int nTrack)
         {
             string strImageFilePath = System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_Track" + (nTrack + 1).ToString() + ".bmp");

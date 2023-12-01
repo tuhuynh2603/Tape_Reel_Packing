@@ -459,7 +459,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
                         }
                     }
-                    catch (Exception ex)
+                    catch
                     {
                         //DebugMessage.WriteToDebugViewer(0, string.Format("Update Color Image: {0}", ex.ToString()));
                     }

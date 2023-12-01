@@ -40,7 +40,7 @@ namespace Magnus_WPF_1.Source.Hardware
         }
 
         //bool bOnOff = false;
-        FileSystemWatcher watcher = null;
+        //FileSystemWatcher watcher = null;
         public string m_ftpPath = @"C:\Wisely\Barcode Reader\FTP";
 
 

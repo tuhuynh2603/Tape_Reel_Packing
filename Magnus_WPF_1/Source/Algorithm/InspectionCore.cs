@@ -268,6 +268,22 @@ namespace Magnus_WPF_1.Source.Algorithm
             //CvInvoke.WaitKey();
         }
 
+        public void SaveCurrentSourceImage(string strFullFileName, int nType = 0)
+        {
+            if(nType == 0)
+            {
+                CvInvoke.Imwrite(strFullFileName, m_SourceImage.Gray);
+            }
+            else
+            {
+                //m_SourceImage.Gray.Save(strFullFileName);
+                string strtemp = strFullFileName.Replace(".bmp", ".jpg");
+                CvInvoke.Imwrite(strtemp, m_SourceImage.Gray, new KeyValuePair<ImwriteFlags, int>(ImwriteFlags.JpegQuality, 20));
+
+
+            }
+        }
+
         //public static int FindDeviceLocation_Old(ref CvImage imgSource,
         //    ref List<Point> p_Regionpolygon, ref Point pCenter, ref Mat mat_DeviceLocationRegion, ref double nAngleOutput, ref double dScoreOutput)
         //{
@@ -598,6 +614,30 @@ namespace Magnus_WPF_1.Source.Algorithm
             PushBackDebugInfors(imgSource, mat_point, "Center Chip Region . (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
             AddRegionOverlay(ref list_arrayOverlay, mat_point, Colors.Yellow);
+
+
+            double dDeltaAngle = Track.MagnusMatrix.CalculateShiftXYAngle(pCenter, pCorner, m_DeviceLocationResult.m_dCenterDevicePoint, m_DeviceLocationResult.m_dCornerDevicePoint);
+
+            float fShiftX = pCenter.X - m_DeviceLocationResult.m_dCenterDevicePoint.X;
+            float fShiftY = pCenter.Y - m_DeviceLocationResult.m_dCenterDevicePoint.Y;
+
+            CvImage shiftImage =  MagnusOpenCVLib.RotateShiftImage(ref imgSource, pCenter, (float)dDeltaAngle, -fShiftX, -fShiftY);
+            CvImage rect_centerShift = MagnusOpenCVLib.RotateShiftImage(ref mat_point, pCenter, (float)dDeltaAngle, -fShiftX, -fShiftY);
+            PushBackDebugInfors(shiftImage, rect_centerShift, "shift Image and region. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+            CvImage imgTemp = new CvImage();
+
+            //CvInvoke.Subtract(m_TeachImage.Gray, shiftImage, imgTemp);
+            //PushBackDebugInfors(imgTemp, rect_centerShift, "Subtract teach and inspection image. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            //timeIns.Restart();
+
+            //CvInvoke.Subtract(shiftImage, m_TeachImage.Gray, imgTemp);
+            //PushBackDebugInfors(imgTemp, rect_centerShift, "Subtract teach and inspection image. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            //timeIns.Restart();
+
+            CvInvoke.AbsDiff(m_TeachImage.Gray, shiftImage, imgTemp);
+            PushBackDebugInfors(imgTemp, rect_centerShift, "Subtract teach and inspection image. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
 
             timeIns.Stop();
 

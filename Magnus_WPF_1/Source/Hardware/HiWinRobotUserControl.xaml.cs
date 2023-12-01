@@ -71,7 +71,7 @@ namespace Magnus_WPF_1.Source.Hardware
             slider_OverridePercentShow.Text = "10";
             slider_StepRelativeShow.Text = "1000";
             m_List_sequencePointData = new List<SequencePointData>();
-            m_List_sequencePointData.Add(new SequencePointData() {m_PointComment = SequencePointData.HOME_POSITION });
+            m_List_sequencePointData.Add(new SequencePointData() { m_PointComment = SequencePointData.HOME_POSITION });
             m_List_sequencePointData.Add(new SequencePointData() { m_PointComment = SequencePointData.READY_POSITION });
             m_List_sequencePointData.Add(new SequencePointData() { m_PointComment = SequencePointData.PRE_PICK_POSITION });
             m_List_sequencePointData.Add(new SequencePointData() { m_PointComment = SequencePointData.PICK_POSITION });
@@ -342,7 +342,7 @@ namespace Magnus_WPF_1.Source.Hardware
             double[] d_Jointvalue = new double[6];
             HWinRobot.get_current_joint(HiWinRobotInterface.m_RobotConnectID, d_Jointvalue);
 
-            m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex] = HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, d_XYZvalue, d_Jointvalue,  m_List_sequencePointData.Count, m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex].m_PointComment);
+            m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex] = HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, d_XYZvalue, d_Jointvalue, m_List_sequencePointData.Count, m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex].m_PointComment);
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
                 if (MainWindow.mainWindow.master == null)
@@ -362,12 +362,12 @@ namespace Magnus_WPF_1.Source.Hardware
         }
 
         int mComboSelectedItem_Backup = 0;
-        string[] m_strXYZMovingButtonLabel = { "X", "Y", "Z", "RTZ"};
-        string[] m_strJointMovingButtonLabe = { "A1", "A2", "A3", "A4"};
+        string[] m_strXYZMovingButtonLabel = { "X", "Y", "Z", "RTZ" };
+        string[] m_strJointMovingButtonLabe = { "A1", "A2", "A3", "A4" };
 
         private void combo_JogType_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(combo_JogType.SelectedIndex != mComboSelectedItem_Backup)
+            if (combo_JogType.SelectedIndex != mComboSelectedItem_Backup)
             {
                 mComboSelectedItem_Backup = combo_JogType.SelectedIndex;
                 SetMovingButtonLabel();
@@ -411,7 +411,7 @@ namespace Magnus_WPF_1.Source.Hardware
         {
 
         }
-     
+
         private void slider_StepRelativeShow_TextChanged(object sender, TextChangedEventArgs e)
         {
             double dvalue = 0.0;
@@ -428,7 +428,7 @@ namespace Magnus_WPF_1.Source.Hardware
         private void dataGrid_all_robot_Positions_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
 
-            if(dataGrid_all_robot_Positions.SelectedIndex >=0 && dataGrid_all_robot_Positions.SelectedIndex < m_List_sequencePointData.Count)
+            if (dataGrid_all_robot_Positions.SelectedIndex >= 0 && dataGrid_all_robot_Positions.SelectedIndex < m_List_sequencePointData.Count)
             {
                 //int nIndex = combo_JogType.SelectedIndex;
 
@@ -607,10 +607,8 @@ namespace Magnus_WPF_1.Source.Hardware
         {
             for (int nIndex = 0; nIndex < m_List_sequencePointData.Count; nIndex++)
             {
-                if (m_List_sequencePointData[nIndex].m_PointComment == "Pre Pick Position")
+                if (m_List_sequencePointData[nIndex].m_PointComment == SequencePointData.PRE_PICK_POSITION)
                 {
-                    //m_CalibPoints[0].X = (float)m_List_sequencePointData[nIndex].m_X;
-                    //m_CalibPoints[0].Y = (float)m_List_sequencePointData[nIndex].m_Y;
                     double[] dPos = new double[6];
                     m_List_sequencePointData[nIndex].GetXYZPoint(ref dPos);
                     dPos[0] = pRobotPos.X;
@@ -666,7 +664,7 @@ namespace Magnus_WPF_1.Source.Hardware
             int nHomePointIndex = -1;
             for (int nIndex = 0; nIndex < m_List_sequencePointData.Count; nIndex++)
             {
-                if (m_List_sequencePointData[nIndex].m_PointComment == "Home Position")
+                if (m_List_sequencePointData[nIndex].m_PointComment == SequencePointData.HOME_POSITION)
                     nHomePointIndex = nIndex;
             }
             if (nHomePointIndex >= 0)
@@ -750,7 +748,7 @@ namespace Magnus_WPF_1.Source.Hardware
             int nHighIndex = -1;
             for (int nIndex = 0; nIndex < m_List_sequencePointData.Count; nIndex++)
             {
-                if (m_List_sequencePointData[nIndex].m_PointComment == "Lower Soft Limit" )
+                if (m_List_sequencePointData[nIndex].m_PointComment == "Lower Soft Limit")
                     nLowIndex = nIndex;
 
                 if (m_List_sequencePointData[nIndex].m_PointComment == "Higher Soft Limit")
@@ -847,7 +845,7 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void button_Import_Task_Click(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
         private void button_Start_Task_Click(object sender, RoutedEventArgs e)
@@ -871,7 +869,7 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void check_Auto_Checked(object sender, RoutedEventArgs e)
         {
-            if(HiWinRobotInterface.m_RobotConnectID >=0)
+            if (HiWinRobotInterface.m_RobotConnectID >= 0)
                 HWinRobot.set_operation_mode(HiWinRobotInterface.m_RobotConnectID, (int)ROBOT_OPERATION_MODE.MODE_AUTO);
             //HWinRobot.disconnect(HiWinRobotInterface.m_DeviceID);
             //if (MainWindow.mainWindow.master != null)
@@ -891,8 +889,7 @@ namespace Magnus_WPF_1.Source.Hardware
             HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, dataGrid_robot_Output.SelectedIndex + 1, !bIOStatus);
         }
 
-        public System.Drawing.PointF[] m_CalibPoints = new System.Drawing.PointF[3];
-        public System.Drawing.PointF[] m_CalibVisionPoints = new System.Drawing.PointF[3];
+
         public Mat m_MatCameraRobotTransform = new Mat();
 
 
@@ -919,7 +916,7 @@ namespace Magnus_WPF_1.Source.Hardware
         }
 
 
-        
+
         public static AutoResetEvent m_NextStepCalibration = new AutoResetEvent(false);
         private void button_Next_Calibration_Click(object sender, RoutedEventArgs e)
         {
@@ -959,83 +956,178 @@ namespace Magnus_WPF_1.Source.Hardware
 
             if (MainWindow.mainWindow.master.m_Tracks[0].SingleSnap_HIKCamera() < 0)
             {
-                MessageBox.Show("Please Check camera connetion again! Stop calibration","", MessageBoxButton.OK);
+                MessageBox.Show("Cannot open camera 1. Please Check camera connection again! Stop calibration...", "", MessageBoxButton.OK);
                 //return;
             }
 
-            System.Drawing.PointF[] points;
-            MainWindow.mainWindow.master.m_Tracks[0].CalibrationGet3Points(out points);
+            System.Drawing.PointF[] vision_points;
+            System.Drawing.PointF[] robot_points = new System.Drawing.PointF[3];
+            MainWindow.mainWindow.master.m_Tracks[0].CalibrationGet3Points(out vision_points);
             if (WaitForNextStepCalibrationEvent("Done. Please press Next to move the robot to 1st Point.") < 0)
                 return;
 
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_1);
+            if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_1) < 0)
+            {
+                if (MessageBox.Show("Move Failed, please click OK then reset alarm and manually move the robot to position 1", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
+                {
+                    MessageBox.Show("Calibration sequence cancel...", "", MessageBoxButton.OKCancel);
+
+                    return;
+                }
+
+            }
+
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
 
             if (WaitForNextStepCalibrationEvent(" Done. Please press Next to save and move the robot to 2nd Point.") < 0)
                 return;
 
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_2);
+            int nPointIndex = 0;
+            double[] drobotPoint = new double[6];
+            //SequencePointData pData = MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.GetPointData(SequencePointData.CALIB_ROBOT_POSITION_1);
+            //pData.GetXYZPoint(ref drobotPoint);
+            HWinRobot.get_current_position(HiWinRobotInterface.m_RobotConnectID, drobotPoint);
+            robot_points[nPointIndex++] = new System.Drawing.PointF((float)drobotPoint[0], (float)drobotPoint[1]);
+
+            if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_2) < 0)
+            {
+                if (MessageBox.Show("Move Failed, please click OK then reset alarm and manually move the robot to position 2", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
+                {
+                    MessageBox.Show("Calibration sequence cancel...", "", MessageBoxButton.OKCancel);
+
+                    return;
+                }
+
+            }
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
 
             if (WaitForNextStepCalibrationEvent(" Done. Please press Next to save and move the robot to 3rd Point.") < 0)
                 return;
 
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_3);
+            HWinRobot.get_current_position(HiWinRobotInterface.m_RobotConnectID, drobotPoint);
+            robot_points[nPointIndex++] = new System.Drawing.PointF((float)drobotPoint[0], (float)drobotPoint[1]);
+
+
+            if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_3) < 0)
+            {
+                if (MessageBox.Show("Move Failed, please click OK then reset alarm and manually move the robot to position 3", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
+                {
+                    MessageBox.Show("Calibration sequence cancel...", "", MessageBoxButton.OKCancel);
+
+                    return;
+                }
+
+            }
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
 
             if (WaitForNextStepCalibrationEvent(" Done. Please press Next to save the 3rd Point.") < 0)
                 return;
 
+            HWinRobot.get_current_position(HiWinRobotInterface.m_RobotConnectID, drobotPoint);
+            robot_points[nPointIndex++] = new System.Drawing.PointF((float)drobotPoint[0], (float)drobotPoint[1]);
+
             if (MessageBox.Show("Would you like to save the calibration result ?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
                 return;
 
-            Docalibration();
+            //Docalibration();
+            Mat mat_CameraRobotTransform = Application.Track.MagnusMatrix.CalculateTransformMatrix(vision_points, robot_points);
 
             if (WaitForNextStepCalibrationEvent("Calibration Done. Please press Next complete the sequence.") < 0)
                 return;
 
         }
 
-        public void Docalibration()
+        public int SaveCalibrationData(System.Drawing.PointF[] vision_points, System.Drawing.PointF[] robot_points)
         {
-
+            if (vision_points.Length < 3 || robot_points.Length < 3)
+                return -1;
 
             for (int nIndex = 0; nIndex < m_List_sequencePointData.Count; nIndex++)
             {
-                if (m_List_sequencePointData[nIndex].m_PointComment == "Calib Robot Point 1")
+                if (m_List_sequencePointData[nIndex].m_PointComment == SequencePointData.CALIB_ROBOT_POSITION_1)
+                {
+                   m_List_sequencePointData[nIndex].m_X = robot_points[0].X ;
+                   m_List_sequencePointData[nIndex].m_Y = robot_points[0].Y ;
+                }
+                if (m_List_sequencePointData[nIndex].m_PointComment == SequencePointData.CALIB_ROBOT_POSITION_2)
+                {
+                    m_List_sequencePointData[nIndex].m_X = robot_points[1].X;
+                    m_List_sequencePointData[nIndex].m_Y = robot_points[1].Y;
+                }
+
+                if (m_List_sequencePointData[nIndex].m_PointComment == SequencePointData.CALIB_ROBOT_POSITION_3)
+                {
+                    m_List_sequencePointData[nIndex].m_X = robot_points[2].X;
+                    m_List_sequencePointData[nIndex].m_Y = robot_points[2].Y;
+                }
+
+                if (m_List_sequencePointData[nIndex].m_PointComment == SequencePointData.CALIB_Vision_POSITION_1)
+                {
+                    m_List_sequencePointData[nIndex].m_X = vision_points[0].X;
+                    m_List_sequencePointData[nIndex].m_Y = vision_points[0].Y;
+                }
+                if (m_List_sequencePointData[nIndex].m_PointComment == SequencePointData.CALIB_Vision_POSITION_2)
+                {
+                    m_List_sequencePointData[nIndex].m_X = vision_points[1].X;
+                    m_List_sequencePointData[nIndex].m_Y = vision_points[1].Y;
+                }
+
+                if (m_List_sequencePointData[nIndex].m_PointComment == SequencePointData.CALIB_Vision_POSITION_3)
+                {
+                    m_List_sequencePointData[nIndex].m_X = vision_points[2].X;
+                    m_List_sequencePointData[nIndex].m_Y = vision_points[2].Y;
+                }
+            }
+
+            m_MatCameraRobotTransform = Application.Track.MagnusMatrix.CalculateTransformMatrix(vision_points, robot_points);
+            SequencePointData.SaveRobotPointsToExcel(m_List_sequencePointData);
+
+            return 0;
+        }
+
+        public void Docalibration()
+        {
+
+            System.Drawing.PointF[] m_CalibPoints = new System.Drawing.PointF[3];
+            System.Drawing.PointF[] m_CalibVisionPoints = new System.Drawing.PointF[3];
+
+            for (int nIndex = 0; nIndex < m_List_sequencePointData.Count; nIndex++)
+            {
+                if (m_List_sequencePointData[nIndex].m_PointComment == SequencePointData.CALIB_ROBOT_POSITION_1)
                 {
                     m_CalibPoints[0].X = (float)m_List_sequencePointData[nIndex].m_X;
                     m_CalibPoints[0].Y = (float)m_List_sequencePointData[nIndex].m_Y;
                 }
-                if (m_List_sequencePointData[nIndex].m_PointComment == "Calib Robot Point 2")
+                if (m_List_sequencePointData[nIndex].m_PointComment == SequencePointData.CALIB_ROBOT_POSITION_2)
                 {
                     m_CalibPoints[1].X = (float)m_List_sequencePointData[nIndex].m_X;
                     m_CalibPoints[1].Y = (float)m_List_sequencePointData[nIndex].m_Y;
                 }
 
-                if (m_List_sequencePointData[nIndex].m_PointComment == "Calib Robot Point 3")
+                if (m_List_sequencePointData[nIndex].m_PointComment == SequencePointData.CALIB_ROBOT_POSITION_3)
                 {
                     m_CalibPoints[2].X = (float)m_List_sequencePointData[nIndex].m_X;
                     m_CalibPoints[2].Y = (float)m_List_sequencePointData[nIndex].m_Y;
                 }
 
-                if (m_List_sequencePointData[nIndex].m_PointComment == "Calib Vision Point 1")
+                if (m_List_sequencePointData[nIndex].m_PointComment == SequencePointData.CALIB_Vision_POSITION_1)
                 {
                     m_CalibVisionPoints[0].X = (float)m_List_sequencePointData[nIndex].m_X;
                     m_CalibVisionPoints[0].Y = (float)m_List_sequencePointData[nIndex].m_Y;
                 }
-                if (m_List_sequencePointData[nIndex].m_PointComment == "Calib Vision Point 2")
+                if (m_List_sequencePointData[nIndex].m_PointComment == SequencePointData.CALIB_Vision_POSITION_2)
                 {
                     m_CalibVisionPoints[1].X = (float)m_List_sequencePointData[nIndex].m_X;
                     m_CalibVisionPoints[1].Y = (float)m_List_sequencePointData[nIndex].m_Y;
                 }
 
-                if (m_List_sequencePointData[nIndex].m_PointComment == "Calib Vision Point 3")
+                if (m_List_sequencePointData[nIndex].m_PointComment == SequencePointData.CALIB_Vision_POSITION_3)
                 {
                     m_CalibVisionPoints[2].X = (float)m_List_sequencePointData[nIndex].m_X;
                     m_CalibVisionPoints[2].Y = (float)m_List_sequencePointData[nIndex].m_Y;
                 }
             }
+            
             m_MatCameraRobotTransform = Application.Track.MagnusMatrix.CalculateTransformMatrix(m_CalibVisionPoints, m_CalibPoints);
 
         }

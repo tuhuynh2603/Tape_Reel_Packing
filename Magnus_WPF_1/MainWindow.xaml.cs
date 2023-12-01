@@ -884,11 +884,49 @@ namespace Magnus_WPF_1
             master.m_Tracks[0].m_imageViews[0].tbl_Value.Text = valueRGB;
             master.m_Tracks[0].m_imageViews[0].tbl_Value_gray.Text = valueGray;
         }
+        private void btn_save_current_image_Click(object sender, RoutedEventArgs e)
+        {
+            //var result = MessageBox.Show("Do you want to save as teach image ?", "Save as Teach Image", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            //if (result == MessageBoxResult.Yes)
+            //{
+            master.SaveUIImage(activeImageDock.trackID);
+            //master.m_Tracks[0].m_imageViews[0].SaveTeachImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp"));
+            //}
 
-        private void btn_load_teach_image_Click(object sender, RoutedEventArgs e)
+        }
+
+        string m_strSelectionFolderFilePath = "";
+        private void btn_load_image_File_Click(object sender, RoutedEventArgs e)
+        {
+            if (m_strSelectionFolderFilePath == @"C:\" || m_strSelectionFolderFilePath == "")
+                m_strSelectionFolderFilePath = Path.Combine(Application.pathImageSave, "UI Image");
+            // Set the initial directory for the dialog box
+            System.Windows.Forms.OpenFileDialog FileDialog = new System.Windows.Forms.OpenFileDialog();
+
+            FileDialog.FileName = m_strSelectionFolderFilePath;
+
+            // Display the dialog box and wait for the user's response
+            System.Windows.Forms.DialogResult result = FileDialog.ShowDialog();
+
+            // If the user clicked the OK button, open the selected folder
+            if ((int)result == 1)
+            {
+                // Get the path of the selected folder
+                m_strSelectionFolderFilePath = FileDialog.FileName;
+
+                master.loadImageFromFileToUI(activeImageDock.trackID, FileDialog.FileName);
+                // Open the folder using a DirectoryInfo or other appropriate method
+                // ...
+            }
+            else
+                return;
+
+
+        }
+
+        private void Btn_load_teach_image_Click(object sender, RoutedEventArgs e)
         {
             master.loadTeachImageToUI(activeImageDock.trackID);
-
         }
 
         //public bool bEnableSingleSnapImages = true;
@@ -1186,7 +1224,7 @@ namespace Magnus_WPF_1
         public static bool isRobotControllerOpen = false;
         private void btn_Clear_Comm_Click(object sender, RoutedEventArgs e)
         {
-            //master.commLog.ClearCommLog();
+            MainWindow.mainWindow.outputLogView.ClearOutputLog();
         }
 
 
@@ -1271,9 +1309,15 @@ namespace Magnus_WPF_1
         }
 
         #region PIXEL RULER
-        private void btn_Pixel_Ruler_Checked(object sender, RoutedEventArgs e)
+        private void btn_Pixel_Ruler_Click(object sender, RoutedEventArgs e)
         {
-            popupRuler.IsOpen = true;
+            popupRuler.IsOpen = !popupRuler.IsOpen;
+            btn_Pixel_Ruler.IsChecked = popupRuler.IsOpen;
+            if (!popupRuler.IsOpen)
+            {
+                pixelRuler.Finish();
+                return;
+            }
             Grid[] tempGrid = new Grid[Source.Application.Application.m_nTrack];
             for (int index_track = 0; index_track < Source.Application.Application.m_nTrack; index_track++)
             {
@@ -1282,36 +1326,24 @@ namespace Magnus_WPF_1
 
             pixelRuler.SetUp(tempGrid, true);
         }
-
-        private void btn_Pixel_Ruler_Unchecked(object sender, RoutedEventArgs e)
-        {
-            popupRuler.IsOpen = false;
-            pixelRuler.Finish();
-        }
         #endregion
 
-        private void btn_Binarize_Checked(object sender, RoutedEventArgs e)
+        bool m_bBinarizeStatus = false;
+        private void btn_Binarize_Click(object sender, RoutedEventArgs e)
         {
             if (activeImageDock == null)
                 return;
+            m_bBinarizeStatus = !m_bBinarizeStatus;
+            btn_Binarize.IsChecked = m_bBinarizeStatus;
+            if (m_bBinarizeStatus)
+                btn_Binarize_On();
+            else btn_Binarize_Off();
+
+        }
+        private void btn_Binarize_On()
+        {
+
             int trackID = activeImageDock.trackID;
-            //if (trackID == 0)
-            //{
-            //    master.m_Tracks[trackID].imageViewSF[0].Stamp_rangeSlider_H.HigherValue = 70;
-            //    master.m_Tracks[trackID].imageViewSF[0].Stamp_rangeSlider_H.LowerValue = 0;
-            //    master.m_Tracks[trackID].imageViewSF[0].Stamp_rangeSlider_S.HigherValue = 255;
-            //    master.m_Tracks[trackID].imageViewSF[0].Stamp_rangeSlider_S.LowerValue = 0;
-            //    master.m_Tracks[trackID].imageViewSF[0].Stamp_rangeSlider_V.HigherValue = 255;
-            //    master.m_Tracks[trackID].imageViewSF[0].Stamp_rangeSlider_V.LowerValue = 0;
-            //    master.m_Tracks[trackID].imageViewSF[0].panelSlider.Visibility = Visibility.Visible;
-
-
-            //    master.m_Tracks[trackID].imageViewSF[0].enableGray = 2;
-            //    master.m_Tracks[trackID].imageViewSF[0].ShowBinaryImage();
-            //    master.m_Tracks[trackID].imageViewSF[0].ClearOverlay();
-            //    master.m_Tracks[trackID].imageViewSF[0].ClearText();
-
-            //}
             if (trackID == 0 || trackID == 1)
             {
                 master.m_Tracks[trackID].m_imageViews[0].ClearOverlay();
@@ -1321,17 +1353,10 @@ namespace Magnus_WPF_1
                 master.m_Tracks[trackID].m_imageViews[0].UpdateSourceSliderChangeValue();
             }
         }
-        public void btn_Binarize_Unchecked(object sender, RoutedEventArgs e)
+
+        public void btn_Binarize_Off()
         {
-            if (activeImageDock == null)
-                return;
             int trackID = activeImageDock.trackID;
-            //if (trackID == 0)
-            //{
-            //    master.trackSF[0].imageViewSF[0].enableGray = 0;
-            //    master.trackSF[0].imageViewSF[0].panelSlider.Visibility = Visibility.Collapsed;
-            //    master.trackSF[0].imageViewSF[0].image.Source = master.trackSF[0].imageViewSF[0].btmSource;
-            //}
             if (trackID == 0 || trackID == 1)
             {
                 master.m_Tracks[trackID].m_imageViews[0].enableGray = 0;

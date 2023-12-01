@@ -208,8 +208,23 @@ namespace Magnus_WPF_1.Source.Application
         }
         public void WriteTeachParam(int nTrack)
         {
+
             string strFileName = "TeachParameters_Track" + (nTrack + 1).ToString() + ".cfg";
             string pathFile = Path.Combine(pathRecipe, currentRecipe, strFileName);
+
+            string strDateTime = string.Format("({0}.{1}.{2}_{3}.{4}.{5})", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+            string backup_path = Path.Combine(pathRecipe, currentRecipe, "Backup_Teach Parameter");
+            if (!Directory.Exists(backup_path))
+                Directory.CreateDirectory(backup_path);
+
+            string backup_fullpath = Path.Combine(backup_path, $"TeachParameters_Track{nTrack + 1} {strDateTime}" + ".cfg");
+            FileInfo file = new FileInfo(pathFile);
+
+            if (!file.Exists)
+                file.Create();
+
+            file.CopyTo(backup_fullpath);
+
             IniFile ini = new IniFile(pathFile);
             WriteLine("LOCATION", "Device Location Roi", ini, ConvertRectanglesToString(categoriesTeachParam.L_DeviceLocationRoi));
             WriteLine("LOCATION", "Threshold Type", ini, categoriesTeachParam.L_ThresholdType.ToString());

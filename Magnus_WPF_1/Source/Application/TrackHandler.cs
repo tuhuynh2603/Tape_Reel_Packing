@@ -569,6 +569,7 @@ namespace Magnus_WPF_1.Source.Application
 
             pCenterOut = pCenter;
             pCornerOut = pCorner;
+
             return nResult;
         }
 
@@ -616,6 +617,9 @@ namespace Magnus_WPF_1.Source.Application
                     m_Center_Vision = pCenter;
                     double dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(m_Center_Vision, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint);
                     m_dDeltaAngleInspection = dDeltaAngle;
+
+
+
                     Master.InspectDoneEvent[m_nTrackID].Set();
                     timeIns.Stop();
                     LogMessage.WriteToDebugViewer(1, "Total inspection time: " + timeIns.ElapsedMilliseconds.ToString());
@@ -889,7 +893,7 @@ namespace Magnus_WPF_1.Source.Application
 
                 // Update Current Device ID
                 m_CurrentSequenceDeviceID++;
-                if (m_CurrentSequenceDeviceID >= Source.Application.Application.categoriesMappingParam.M_NumberDeviceX * Source.Application.Application.categoriesMappingParam.M_NumberDeviceY)
+                if (m_CurrentSequenceDeviceID >= Source.Application.Application.categoriesMappingParam.M_NumberDevicePerLot)
                     m_CurrentSequenceDeviceID = 0;
                 if (m_CurrentSequenceDeviceID == 0)
                 {

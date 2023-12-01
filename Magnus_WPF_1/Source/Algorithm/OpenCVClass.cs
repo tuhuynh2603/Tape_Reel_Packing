@@ -494,6 +494,26 @@ namespace Magnus_WPF_1.Source.Algorithm
             result = rotatedImage;
             return true;
         }
+        public static CvImage RotateShiftImage(ref CvImage source,PointF centerPoint, float angleRotate, float fShiftX, float fShiftY)
+        {
+            CvImage rotatedImage = new CvImage();
+            CvImage mapMatrix = new CvImage();
+            CvInvoke.GetRotationMatrix2D(centerPoint,
+                        angleRotate, 1.0, mapMatrix);
+            float fX = (float)mapMatrix.GetValue(0, 2);
+            fX += (float)fShiftX;
+
+            float fY = (float) mapMatrix.GetValue(1, 2);
+            fY  += (float)fShiftY;
+
+            mapMatrix.SetValue(0, 2, fX);
+            mapMatrix.SetValue(1, 2, fY);
+            System.Drawing.Size szTemplateSize = new System.Drawing.Size(source.Cols, source.Rows);
+            CvInvoke.WarpAffine(source, rotatedImage, mapMatrix, szTemplateSize);
+            return rotatedImage;
+        }
+
+
         // Shift Image
         public static bool ShiftImage(CvImage source, ref CvImage result, ref PointF[] srcPnt, ref PointF[] dstPnt)
         {

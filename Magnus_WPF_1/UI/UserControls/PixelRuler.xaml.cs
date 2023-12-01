@@ -55,13 +55,13 @@ namespace Magnus_WPF_1.UI.UserControls
 			if (uIElements == null) { return; }
 			for (int i = 0; i < uIElements.Length; i++)
 			{
-				this.uIElements[i].PreviewMouseLeftButtonDown += MouseLeftButtonDown;
-				this.uIElements[i].PreviewMouseMove += PreviewMouseMove;
+				this.uIElements[i].PreviewMouseLeftButtonDown += Pixe_MouseLeftButtonDown;
+				this.uIElements[i].PreviewMouseMove += Pixel_PreviewMouseMove;
 			}
 			currentDock = this.uIElements[0];
 			polyline = new Polyline();
 			polyline.StrokeThickness = 0.3;
-			polyline.Stroke = Brushes.Yellow;
+			polyline.Stroke = Brushes.Blue;
 			Panel.SetZIndex(polyline, 5);
 			valuepixX.Text = "--";
 			valuepixY.Text = "--";
@@ -78,8 +78,8 @@ namespace Magnus_WPF_1.UI.UserControls
 			if (uIElements == null) return;
 			for (int i = 0; i < uIElements.Length; i++)
 			{
-				uIElements[i].PreviewMouseLeftButtonDown -= MouseLeftButtonDown;
-				uIElements[i].PreviewMouseMove -= PreviewMouseMove;
+				uIElements[i].PreviewMouseLeftButtonDown -= Pixe_MouseLeftButtonDown;
+				uIElements[i].PreviewMouseMove -= Pixel_PreviewMouseMove;
 			}
 			if (currentDock.Children.Contains(currentGrid))
 				currentDock.Children.Remove(currentGrid);
@@ -114,7 +114,7 @@ namespace Magnus_WPF_1.UI.UserControls
 			return grid;
 		}
 		int count = 0;
-		public void MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		public void Pixe_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			int trackID = MainWindow.activeImageDock.trackID;
 			//int docID = 0;
@@ -199,7 +199,7 @@ namespace Magnus_WPF_1.UI.UserControls
 			valuedeg.Text = String.Format("{0:0.00}", dangle * 180 / Math.PI);
 			valuerad.Text = String.Format("{0:0.00}", dangle);
 		}
-		private void PreviewMouseMove(object sender, MouseEventArgs e)
+		private void Pixel_PreviewMouseMove(object sender, MouseEventArgs e)
 		{
 			if (count == 1 && polyline.Points.Count > 0)
 			{

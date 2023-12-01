@@ -168,9 +168,22 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             {
                 string strRecipePath = Path.Combine(Application.Application.pathRecipe, Application.Application.currentRecipe);
                 string fullpath = Path.Combine(strRecipePath, "Robot Points" + ".cfg");
+
+                string strDateTime = string.Format("({0}.{1}.{2}_{3}.{4}.{5})", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+                string backup_path = Path.Combine(strRecipePath, "Backup_Robot Points");
+                if (!Directory.Exists(backup_path))
+                    Directory.CreateDirectory(backup_path);
+                
+                string backup_fullpath = Path.Combine(backup_path, $"Robot Points {strDateTime}" + ".cfg");
+
                 FileInfo file = new FileInfo(fullpath);
 
-                    using (ExcelPackage package = new ExcelPackage(file))
+                if (!file.Exists)
+                    file.Create();
+
+                file.CopyTo(backup_fullpath);
+
+                using (ExcelPackage package = new ExcelPackage(file))
                 {
 
                     bool bCreated = false;
@@ -942,6 +955,11 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 HWinRobot.set_override_ratio(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(pData.m_Override));
             }
             LogMessage.LogMessage.WriteToDebugViewer(2, $"Move to {strPosition} (X Y Z Angle) = " + dValue[0].ToString() + ", " + dValue[1].ToString() + ", " + dValue[2].ToString() + ", " + dValue[5].ToString());
+            if (CheckSoftLimit(HiWinRobotInterface.m_RobotConnectID, nmode, dValue) != 0)
+            {
+                LogMessage.LogMessage.WriteToDebugViewer(3, "Soft Limit Error at Position (X,Y,Z,Angle):  " + dValue[0].ToString() + ", " + dValue[1].ToString() + ", " + dValue[2].ToString() + ", " + dValue[5].ToString());
+                return -1;
+            }
             return HWinRobot.ptp_axis(HiWinRobotInterface.m_RobotConnectID, nmode, dValue);
         }
 

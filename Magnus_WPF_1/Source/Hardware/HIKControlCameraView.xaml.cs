@@ -275,7 +275,7 @@ namespace Magnus_WPF_1.Source.Hardware
         private void bnClose_Click(object sender, RoutedEventArgs e)
         {
 
-            var result = MessageBox.Show("Do you want to save camera parameters ?", "", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            var result = MessageBox.Show("Would you like to save camera parameters ?", "", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
             {
 

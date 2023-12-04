@@ -52,7 +52,7 @@ namespace Magnus_WPF_1.Source.Application
         public static List<ArrayOverLay>[] list_arrayOverlay;
         public static Queue<ImageSaveData> m_SaveInspectImageQueue = new Queue<ImageSaveData>(); // create a queue to hold messages
         public HiWinRobotInterface m_hiWinRobotInterface;
-
+        public PLCCOMM m_plcComm;
         #region Contructor Master
         public Master(MainWindow app)
         {
@@ -68,10 +68,12 @@ namespace Magnus_WPF_1.Source.Application
 
             LoadRecipe();
             m_hiWinRobotInterface = new HiWinRobotInterface();
-
+            m_plcComm = new PLCCOMM();
             m_nActiveTrack = 0;
 
         }
+
+
         public void DeleteMaster()
         {
             for (int nTrack = 0; nTrack < Application.m_nTrack; nTrack++)
@@ -445,6 +447,16 @@ namespace Magnus_WPF_1.Source.Application
             // Home Move // init OutPut
             ResetSequence();
             //
+
+            //Wait for Signal from PLC when they ready for new Lot so we can create new lot ID
+            while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_READY) == 0)
+            {
+                if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
+                {
+                    return;
+                }
+            }
+
             nError = WaitForNextStepSequenceEvent("Begin Sequence: Press Next to trigger camera 1");
             if (nError< 0) return;
 
@@ -460,18 +472,6 @@ namespace Magnus_WPF_1.Source.Application
             int nEmptyTrayHoles = 0;
             while (MainWindow.mainWindow.bEnableRunSequence || MainWindow.mainWindow.bEnableOfflineInspection)
             {
-
-                // Wait for Signal from PLC when they ready for new Lot so we can create new lot ID
-                //while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_READY) == 0)
-                //{
-                //    if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
-                //    {
-                //        return;
-                //    }
-                //}
-                // 
-
-
 
                 if (MainWindow.mainWindow == null)
                     return;

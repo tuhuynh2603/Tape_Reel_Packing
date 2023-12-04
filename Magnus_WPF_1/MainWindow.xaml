@@ -423,6 +423,31 @@
                                             </Label>
                                         </Grid>
 
+                                        <Grid Margin="0,-30,0,0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="3*"></RowDefinition>
+                                                <RowDefinition Height="5*"></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                            <RibbonToggleButton x:Name="btn_PLCCOMM_Setting" Grid.Row="1"
+                                                        Label="PLC COMM Setting"
+                                                        LargeImageSource="Resources/network.png"
+                                                        Foreground="White"                          
+                                                        IsEnabled="true"
+                                                        Checked ="btn_PLCCOMM_Setting_Checked"
+                                                        Unchecked="btn_PLCCOMM_Setting_Unchecked"
+                                                        IsChecked="False"
+                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
+                                                        MouseOverBackground="{StaticResource BgButton}" 
+                                                        Width="Auto">
+
+                                            </RibbonToggleButton>
+
+                                            <Label x:Name="label_PLCCOMM_Status"  Margin="0,0,0,5" FontSize="10" Grid.Row="0" Content="Disconnected" VerticalContentAlignment="Top" BorderThickness="3,3,3,0" BorderBrush="#FF2662B1">
+                                            </Label>
+                                        </Grid>
+
+
+
                                     </RibbonGroup>
 
                                 </Grid>

@@ -1405,9 +1405,7 @@ namespace Magnus_WPF_1
         {
 
             m_bEnableDebug = (bool)debug_btn.IsChecked;
-            //grd_Defect.Children.Clear();
             grd_Defect_Settings.Visibility = Visibility.Collapsed;
-            //defectInfor.lvDefect.ItemsSource = null;
 
         }
 
@@ -1430,9 +1428,6 @@ namespace Magnus_WPF_1
 
                 grd_Defect.Children.Clear();
                 grd_Defect.Children.Add(defectInfor);
-                //defectInfor.SvDefect.CanContentScroll = true;
-                //grd_Defect.VerticalAlignment = VerticalAlignment.Top;
-                //grd_Defect.HorizontalAlignment = HorizontalAlignment.Left;
                 grd_Defect_Settings.Visibility = Visibility.Visible;
 
         }
@@ -1485,9 +1480,6 @@ namespace Magnus_WPF_1
 
                 grd_Defect.Children.Clear();
                 grd_Defect.Children.Add(master.m_BarcodeReader.m_BarcodeReader);
-                //defectInfor.SvDefect.CanContentScroll = true;
-                //grd_Defect.VerticalAlignment = VerticalAlignment.Top;
-                //grd_Defect.HorizontalAlignment = HorizontalAlignment.Left;
                 grd_Defect_Settings.Visibility = Visibility.Visible;
 
         }
@@ -1516,6 +1508,27 @@ namespace Magnus_WPF_1
         {
             if(m_bEnableDebugSequence)
                 Master.m_NextStepSequenceEvent.Set();
+        }
+
+        int m_nPLCGridViewIndex = 0;
+        private void btn_PLCCOMM_Setting_Checked(object sender, RoutedEventArgs e)
+        {
+            //DialogDefectWidth = 300;
+            //DialogDefectHeight = 300;
+
+            m_nPLCGridViewIndex = grd_PopupDialog.Children.Count;
+            grd_PopupDialog.Children.Clear();
+            grd_PopupDialog.Children.Add(master.m_plcComm);
+            grd_PopupDialog.Visibility = Visibility.Visible;
+        }
+
+        private void btn_PLCCOMM_Setting_Unchecked(object sender, RoutedEventArgs e)
+        {
+            //grd_Defect.Children.RemoveAt(m_nPLCGridViewIndex);
+            //if(grd_Defect.Children.Count == 0)
+            grd_PopupDialog.Children.Clear();
+                //grd_Defect_Settings.Visibility = Visibility.Collapsed;
+
         }
     }
 }

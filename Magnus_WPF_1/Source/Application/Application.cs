@@ -88,6 +88,19 @@ namespace Magnus_WPF_1.Source.Application
             }
 
         }
+
+        public static string GetCommInfo(string key, string defaults)
+        {
+            RegistryKey registerPreferences = Registry.CurrentUser.CreateSubKey(pathRegistry + "\\Comm", true);
+            if ((string)registerPreferences.GetValue(key) == null)
+            {
+                registerPreferences.SetValue(key, defaults);
+                return defaults;
+            }
+            else
+                return (string)registerPreferences.GetValue(key);
+        }
+
         static void ReadLine(string section, string key, IniFile ini, ref Dictionary<string, string> dictionary)
         {
             string[] arr = section.Split(' ');

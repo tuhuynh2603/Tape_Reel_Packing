@@ -310,22 +310,10 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         public HiWinRobotUserControl m_hiWinRobotUserControl;
         public string m_strRobotIPAddress = "";
 
-        public static string GetCommInfo(string key, string defaults)
-        {
-            RegistryKey registerPreferences = Registry.CurrentUser.CreateSubKey(Application.Application.pathRegistry + "\\Comm", true);
-            if ((string)registerPreferences.GetValue(key) == null)
-            {
-                registerPreferences.SetValue(key, defaults);
-                return defaults;
-            }
-            else
-                return (string)registerPreferences.GetValue(key);
-        }
-
 
         public HiWinRobotInterface()
         {
-            m_strRobotIPAddress = GetCommInfo("Robot Comm::IpAddress", m_strRobotIPAddress);
+            m_strRobotIPAddress = Application.Application.GetCommInfo("Robot Comm::IpAddress", m_strRobotIPAddress);
             ConnectoHIKRobot(m_strRobotIPAddress);
             m_hiWinRobotUserControl = new HiWinRobotUserControl(m_strRobotIPAddress);
             InitDataGridview(m_RobotConnectID, true);

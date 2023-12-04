@@ -97,7 +97,7 @@ namespace Magnus_WPF_1.Source.Hardware
 			bIsDownload = true;
 			string str = "";
 			string str2 = "";
-			if (MainWindow.mainWindow.master.m_Tracks[1].m_strCurrentLot == "")
+			if (MainWindow.mainWindow.master.m_Tracks[1].m_strCurrentLot == "" || MainWindow.mainWindow.master.m_Tracks[1].m_strCurrentLot == null)
 				MainWindow.mainWindow.master.m_Tracks[1].m_strCurrentLot = "Dummy";
 
 			string strFolder = Path.Combine(Application.Application.pathImageSave, MainWindow.mainWindow.master.m_Tracks[1].m_strCurrentLot);

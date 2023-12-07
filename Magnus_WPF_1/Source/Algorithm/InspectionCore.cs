@@ -409,6 +409,154 @@ namespace Magnus_WPF_1.Source.Algorithm
         //        return -1;
 
         //}
+        public int FindBlackChip(ref CvImage imgSource, ref CvImage mat_RegionInspectionROI, ref PointF pCenter, ref List<ArrayOverLay> list_arrayOverlay, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug = false)
+        {
+            Stopwatch timeIns = new Stopwatch();
+
+            //if (m_TemplateImage.Gray == null)
+            //    return -99;
+            timeIns.Start();
+            int m_nLowerBlackChipThreshold = 0;
+            int m_nUpperBlackChipThreshold = 30;
+            int m_nOpeningBlackChipThreshold = 5;
+            int m_nOpeningBlackChipThreshold2 = 15;
+
+            CvImage img_thresholdRegion = new CvImage();
+            MagnusOpenCVLib.Threshold2(ref imgSource, ref img_thresholdRegion, m_nLowerBlackChipThreshold, m_nUpperBlackChipThreshold);
+            CvInvoke.BitwiseAnd(mat_RegionInspectionROI, img_thresholdRegion, img_thresholdRegion);
+            PushBackDebugInfors(imgSource, img_thresholdRegion, "Check Black Chip Region: img_thresholdRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+
+
+
+            CvImage img_OpeningRegion = new CvImage();
+            MagnusOpenCVLib.OpeningCircle(ref img_thresholdRegion, ref img_OpeningRegion, m_nOpeningBlackChipThreshold);
+            PushBackDebugInfors(imgSource, img_OpeningRegion, "Check Black Chip Region: img_OpeningRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+            CvImage img_FillUpRegion = new CvImage();
+
+            MagnusOpenCVLib.FillUp(ref img_OpeningRegion, ref img_FillUpRegion);
+            PushBackDebugInfors(imgSource, img_FillUpRegion, "Check Black Chip Region: FillUp. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+
+            CvImage img_OpeningRegion2 = new CvImage();
+            MagnusOpenCVLib.OpeningCircle(ref img_FillUpRegion, ref img_OpeningRegion2, m_nOpeningBlackChipThreshold2);
+            PushBackDebugInfors(imgSource, img_OpeningRegion2, "Check Black Chip Region: img_OpeningRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+
+
+            CvImage img_BiggestRegion = new CvImage();
+            MagnusOpenCVLib.SelectBiggestRegion(ref img_OpeningRegion2, ref img_BiggestRegion);
+            PushBackDebugInfors(imgSource, img_BiggestRegion, "Check Black Chip Region: img_BiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+            CvPointArray point_regions = new CvPointArray();
+
+            CvInvoke.FindNonZero(img_BiggestRegion, point_regions);
+            if (point_regions.Size == 0)
+                return -(int)ERROR_CODE.PASS;
+
+            CvContourArray contours2 = new CvContourArray();
+            MagnusOpenCVLib.GenContourRegion(ref img_BiggestRegion, ref contours2, RetrType.External);
+            RotatedRect rotateRect_Device = new RotatedRect();
+            rotateRect_Device = CvInvoke.MinAreaRect(contours2[0]);
+            if (rotateRect_Device.Size.Width < (int)(m_DeviceLocationParameter.m_nMinWidthDevice/2)
+                || rotateRect_Device.Size.Height < (int)(m_DeviceLocationParameter.m_nMinHeightDevice/2))
+                return -(int)ERROR_CODE.PASS;
+
+            AddRegionOverlay(ref list_arrayOverlay, img_BiggestRegion, Colors.Red);
+
+
+            CvImage distanceTransform = new CvImage();
+            CvInvoke.DistanceTransform(img_BiggestRegion, distanceTransform, null, DistType.L2, 5);
+            PushBackDebugInfors(distanceTransform, distanceTransform, "Check Black Chip Region: distanceTransform. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+
+            CvImage normalizedDistanceTransform = new CvImage();
+            CvInvoke.Normalize(distanceTransform, normalizedDistanceTransform, 0, 255, NormType.MinMax, DepthType.Cv8U);
+
+            PushBackDebugInfors(normalizedDistanceTransform, normalizedDistanceTransform, "Check Black Chip Region: Normalize. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+
+            CvImage img_thresholdTransformRegion = new CvImage();
+            MagnusOpenCVLib.Threshold2(ref normalizedDistanceTransform, ref img_thresholdTransformRegion, 250, 255);
+            PushBackDebugInfors(imgSource, img_thresholdTransformRegion, "Check Black Chip Region: img_thresholdTransformRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+
+
+
+            //CvImage img_TopLeftRegion = new CvImage();
+
+            //MagnusOpenCVLib.SelectRegionBasedPosition(ref img_thresholdTransformRegion, ref img_TopLeftRegion, (int)POSITION.TOP_RIGHT);
+            //PushBackDebugInfors(imgSource, img_TopLeftRegion, "Check Black Chip Region: img_TopLeftRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            //timeIns.Restart();
+
+            
+            //CvImage img_BiggestRegion2 = new CvImage();
+
+            //MagnusOpenCVLib.SelectBiggestRegion(ref img_thresholdTransformRegion, ref img_BiggestRegion2);
+            //PushBackDebugInfors(imgSource, img_BiggestRegion2, "Check Black Chip Region: img_BiggestRegion2. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            //timeIns.Restart();
+
+            CvInvoke.FindNonZero(img_thresholdTransformRegion, point_regions);
+            if (point_regions.Size == 0)
+                return -(int)ERROR_CODE.PASS;
+
+
+            List<Rectangle> corner = new List<Rectangle>();
+            //MagnusOpenCVLib.GetCornerFromRegion(ref img_BiggestRegion2, corner, imgSource.Size);
+
+            CvImage result = new CvImage();
+            CvContourArray contourArray = new CvContourArray();
+            CvContourArray contourArrayHull = new CvContourArray();
+            CvPointArray PointArray = new CvPointArray();
+            Rectangle rect = new Rectangle();
+
+            MagnusOpenCVLib.ExtractExternalContours(ref img_thresholdTransformRegion, ref result, ref contourArray);
+            MagnusOpenCVLib.ConvexHull(contourArray, ref contourArrayHull, ref result, imgSource.Size);
+            PushBackDebugInfors(imgSource, result, "Check Black Chip Region: ConvexHull. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+            List<PointF> listContourPoints = new List<PointF>();
+            for (int n = 0; n < contourArray.Size; n++)
+            {
+                CvPointArray PointArrayTemp = contourArrayHull[n];
+                for (int m = 0; m < PointArrayTemp.Size; m++)
+                {
+                    listContourPoints.Add(PointArrayTemp[m]);
+
+                }
+            }
+            //rect = CvInvoke.BoundingRectangle(PointArray);
+            //corner.Add(rect);
+            //CvImage region_Rect = new CvImage();
+            //region_Rect = CvImage.Zeros(imgSource.Height, imgSource.Width, DepthType.Cv8U, 1);
+            //foreach(Rectangle r in corner)
+            //{
+            //    CvInvoke.Rectangle(region_Rect, r, new MCvScalar(255), -1);
+            //}
+
+            //PushBackDebugInfors(imgSource, region_Rect, "Check Black Chip Region: region_Rect. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            //timeIns.Restart();
+
+
+            PointF pTemp = new PointF(0, 0);
+            MagnusOpenCVLib.SelectPointBased_Top_Left_Bottom_Right(ref listContourPoints, ref pTemp, (int)POSITION._RIGHT);
+
+            pCenter = new Point((int)(pTemp.X / m_DeviceLocationParameter.m_dScaleImageRatio), (int)(pTemp.Y / m_DeviceLocationParameter.m_dScaleImageRatio));
+
+            CvImage mat_point = new CvImage();
+            mat_point = CvImage.Zeros(imgSource.Height, imgSource.Width, DepthType.Cv8U, 1);
+            System.Drawing.Rectangle rect_center = new System.Drawing.Rectangle((int)(pTemp.X),
+                                                                            (int)(pTemp.Y),
+                                                                            (int)(4),
+                                                                           (int)(4));
+
+            CvInvoke.Rectangle(mat_point, rect_center, new MCvScalar(255), -1);
+            PushBackDebugInfors(imgSource, mat_point, "Center Chip Region . (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
+            AddRegionOverlay(ref list_arrayOverlay, mat_point, Colors.Yellow);
+
+            return -(int)ERROR_CODE.OPPOSITE_CHIP;
+        }
 
         public /*static*/ int FindDeviceLocation_Zoom(ref CvImage imgSource, ref List<ArrayOverLay> list_arrayOverlay, ref PointF pCenter, ref PointF pCorner, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug = false)
         {
@@ -437,11 +585,17 @@ namespace Magnus_WPF_1.Source.Algorithm
             region_SearchDeviceLocation = CvImage.Zeros(zoomedInImage.Height, zoomedInImage.Width, DepthType.Cv8U, 1);
             CvInvoke.Rectangle(region_SearchDeviceLocation, rectDeviceLocation, new MCvScalar(255), -1);
 
-            PushBackDebugInfors(zoomedInImage, region_SearchDeviceLocation, " Before EqualizeHist. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(zoomedInImage, region_SearchDeviceLocation, "Region_SearchDeviceLocationt. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
-            CvInvoke.EqualizeHist(zoomedInImage, zoomedInImage_Scale);
-            PushBackDebugInfors(zoomedInImage_Scale, region_SearchDeviceLocation, "EqualizeHist. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
-            timeIns.Restart();
+
+            // Find black Chip first
+            int nError = FindBlackChip(ref zoomedInImage, ref region_SearchDeviceLocation, ref pCenter, ref list_arrayOverlay, ref debugInfors, bEnableDebug);
+            if (nError < (int)ERROR_CODE.PASS)
+                return nError;
+
+            //CvInvoke.EqualizeHist(zoomedInImage, zoomedInImage_Scale);
+            //PushBackDebugInfors(zoomedInImage_Scale, region_SearchDeviceLocation, "EqualizeHist. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            //timeIns.Restart();
 
             //CvInvoke.WaitKey(0);
             timeIns.Restart();
@@ -553,45 +707,45 @@ namespace Magnus_WPF_1.Source.Algorithm
             }
 
 
-            // Check Opposite chip
-            if(bIsChipFound == false)
-            {
-                 CvImage img_thresholdInnerRegion_Black = new CvImage();
-                CvInvoke.BitwiseXor(region_SearchDeviceLocation, img_thresholdInnerRegion, img_thresholdInnerRegion_Black);
-                CvInvoke.BitwiseAnd(region_SearchDeviceLocation, img_thresholdInnerRegion_Black, img_thresholdInnerRegion_Black);
-                PushBackDebugInfors(imgSource, img_thresholdInnerRegion_Black, "Check Opposite chip: black region after threshold. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
-                timeIns.Restart();
+            //// Check Opposite chip
+            //if(bIsChipFound == false)
+            //{
+            //     CvImage img_thresholdInnerRegion_Black = new CvImage();
+            //    CvInvoke.BitwiseXor(region_SearchDeviceLocation, img_thresholdInnerRegion, img_thresholdInnerRegion_Black);
+            //    CvInvoke.BitwiseAnd(region_SearchDeviceLocation, img_thresholdInnerRegion_Black, img_thresholdInnerRegion_Black);
+            //    PushBackDebugInfors(imgSource, img_thresholdInnerRegion_Black, "Check Opposite chip: black region after threshold. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            //    timeIns.Restart();
 
-                CvImage mat_FillUpBlackRegion_black = new CvImage();
-                MagnusOpenCVLib.FillUp(ref img_thresholdInnerRegion_Black, ref mat_FillUpBlackRegion_black);
-                PushBackDebugInfors(imgSource, mat_FillUpBlackRegion_black, "Check Opposite chip: black region after fillup. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
-                timeIns.Restart();
+            //    CvImage mat_FillUpBlackRegion_black = new CvImage();
+            //    MagnusOpenCVLib.FillUp(ref img_thresholdInnerRegion_Black, ref mat_FillUpBlackRegion_black);
+            //    PushBackDebugInfors(imgSource, mat_FillUpBlackRegion_black, "Check Opposite chip: black region after fillup. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            //    timeIns.Restart();
 
-                CvImage mat_InnerChipOpeningRegion_black = new CvImage();
-                MagnusOpenCVLib.OpeningCircle(ref mat_FillUpBlackRegion_black, ref mat_InnerChipOpeningRegion_black, (int)(m_DeviceLocationParameter.m_nOpeningMask) + 1);
-                PushBackDebugInfors(imgSource, mat_InnerChipOpeningRegion_black, "Check Opposite chip: black region after Opening. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
-                timeIns.Restart();
+            //    CvImage mat_InnerChipOpeningRegion_black = new CvImage();
+            //    MagnusOpenCVLib.OpeningCircle(ref mat_FillUpBlackRegion_black, ref mat_InnerChipOpeningRegion_black, (int)(m_DeviceLocationParameter.m_nOpeningMask) + 1);
+            //    PushBackDebugInfors(imgSource, mat_InnerChipOpeningRegion_black, "Check Opposite chip: black region after Opening. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            //    timeIns.Restart();
 
-                CvImage mat_BiggestInnerChipRegion_black = new CvImage();
-                MagnusOpenCVLib.SelectBiggestRegion(ref mat_InnerChipOpeningRegion_black, ref mat_BiggestInnerChipRegion_black);
-                PushBackDebugInfors(imgSource, mat_BiggestInnerChipRegion_black, "Check Opposite chip: black region after select biggest region. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
-                timeIns.Restart();
+            //    CvImage mat_BiggestInnerChipRegion_black = new CvImage();
+            //    MagnusOpenCVLib.SelectBiggestRegion(ref mat_InnerChipOpeningRegion_black, ref mat_BiggestInnerChipRegion_black);
+            //    PushBackDebugInfors(imgSource, mat_BiggestInnerChipRegion_black, "Check Opposite chip: black region after select biggest region. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            //    timeIns.Restart();
 
-                CvInvoke.FindNonZero(mat_BiggestInnerChipRegion_black, point_regions);
-                if (point_regions.Size == 0)
-                    return -(int)ERROR_CODE.NO_PATTERN_FOUND;
+            //    CvInvoke.FindNonZero(mat_BiggestInnerChipRegion_black, point_regions);
+            //    if (point_regions.Size == 0)
+            //        return -(int)ERROR_CODE.NO_PATTERN_FOUND;
 
-                CvContourArray contours = new CvContourArray();
-                MagnusOpenCVLib.GenContourRegion(ref mat_BiggestInnerChipRegion_black, ref contours, RetrType.External);
-                rotateRect_Device = CvInvoke.MinAreaRect(contours[0]);
-                if(rotateRect_Device.Size.Width < (int)(m_DeviceLocationParameter.m_nMinWidthDevice)
-                    || rotateRect_Device.Size.Height < (int)(m_DeviceLocationParameter.m_nMinHeightDevice))
-                    return -(int)ERROR_CODE.NO_PATTERN_FOUND;
+            //    CvContourArray contours = new CvContourArray();
+            //    MagnusOpenCVLib.GenContourRegion(ref mat_BiggestInnerChipRegion_black, ref contours, RetrType.External);
+            //    rotateRect_Device = CvInvoke.MinAreaRect(contours[0]);
+            //    if(rotateRect_Device.Size.Width < (int)(m_DeviceLocationParameter.m_nMinWidthDevice)
+            //        || rotateRect_Device.Size.Height < (int)(m_DeviceLocationParameter.m_nMinHeightDevice))
+            //        return -(int)ERROR_CODE.NO_PATTERN_FOUND;
 
-                pCenter = new Point((int)(rotateRect_Device.Center.X / m_DeviceLocationParameter.m_dScaleImageRatio), (int)(rotateRect_Device.Center.Y / m_DeviceLocationParameter.m_dScaleImageRatio));
-                return -(int)ERROR_CODE.OPPOSITE_CHIP;
+            //    pCenter = new Point((int)(rotateRect_Device.Center.X / m_DeviceLocationParameter.m_dScaleImageRatio), (int)(rotateRect_Device.Center.Y / m_DeviceLocationParameter.m_dScaleImageRatio));
+            //    return -(int)ERROR_CODE.OPPOSITE_CHIP;
 
-            }
+            //}
 
             pCenter = new Point((int)(rotateRect_Device.Center.X / m_DeviceLocationParameter.m_dScaleImageRatio), (int)(rotateRect_Device.Center.Y / m_DeviceLocationParameter.m_dScaleImageRatio));
 

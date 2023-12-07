@@ -1394,6 +1394,8 @@ namespace Magnus_WPF_1
             if (master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource.Width < 0)
                 return;
 
+
+            defectInfor.m_TrackDebugging = activeImageDock.trackID;
             master.m_Tracks[activeImageDock.trackID].m_InspectionCore.LoadImageToInspection(master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource);
             master.m_Tracks[activeImageDock.trackID].DebugFunction(ref master.m_Tracks[activeImageDock.trackID]);
 
@@ -1473,21 +1475,26 @@ namespace Magnus_WPF_1
 
         private void btn_BarCodeReader_Setting_Checked(object sender, RoutedEventArgs e)
         {
-                //master.m_BarcodeReader.sendCommandToAllReaders("LON");
+            //master.m_BarcodeReader.sendCommandToAllReaders("LON");
 
-                //defectInfor.lvDefect.View = gridView;
-                DialogDefectWidth = defectInfor.Width;
-
-                grd_Defect.Children.Clear();
-                grd_Defect.Children.Add(master.m_BarcodeReader.m_BarcodeReader);
-                grd_Defect_Settings.Visibility = Visibility.Visible;
+            //defectInfor.lvDefect.View = gridView;
+            //DialogDefectWidth = defectInfor.Width;
+            grd_Dialog_Settings.Margin = new Thickness(0, 160, 0, 0);
+            grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Top;
+            grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Left;
+            grd_Dialog_Settings.Width = master.m_BarcodeReader.m_BarcodeReader.Width;
+            grd_Dialog_Settings.Height = master.m_BarcodeReader.m_BarcodeReader.Height;
+            grd_PopupDialog.Children.Clear();
+            grd_PopupDialog.Children.Add(master.m_BarcodeReader.m_BarcodeReader);
+            //grd_PopupDialog.Visibility = Visibility.Visible;
+            grd_PopupDialog.Visibility = Visibility.Visible;
 
         }
 
         private void btn_BarCodeReader_Setting_Unchecked(object sender, RoutedEventArgs e)
         {
-            grd_Defect_Settings.Visibility = Visibility.Collapsed;
-            grd_Defect.Children.Clear();
+            //grd_Defect_Settings.Visibility = Visibility.Collapsed;
+            grd_PopupDialog.Children.Clear();
         }
 
 
@@ -1513,8 +1520,11 @@ namespace Magnus_WPF_1
         int m_nPLCGridViewIndex = 0;
         private void btn_PLCCOMM_Setting_Checked(object sender, RoutedEventArgs e)
         {
-            //DialogDefectWidth = 300;
-            //DialogDefectHeight = 300;
+            grd_Dialog_Settings.Margin = new Thickness(0, 160, 0, 0);
+            grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Top;
+            grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Left;
+            grd_Dialog_Settings.Width = master.m_plcComm.Width;
+            grd_Dialog_Settings.Height = master.m_plcComm.Height;
 
             m_nPLCGridViewIndex = grd_PopupDialog.Children.Count;
             grd_PopupDialog.Children.Clear();

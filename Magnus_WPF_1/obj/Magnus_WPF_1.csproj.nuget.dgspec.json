@@ -66,18 +66,6 @@
               "target": "Package",
               "version": "[2.6.0, )"
             },
-            "MathNet.Numerics": {
-              "target": "Package",
-              "version": "[5.0.0, )"
-            },
-            "OPCFoundation.NetStandard.Opc.Ua": {
-              "target": "Package",
-              "version": "[1.4.372.76, )"
-            },
-            "System.Numerics.Vectors": {
-              "target": "Package",
-              "version": "[4.5.0, )"
-            },
             "Xceed.Wpf.AvalonDock.Themes.VS2013": {
               "target": "Package",
               "version": "[2.9.0.1, )"

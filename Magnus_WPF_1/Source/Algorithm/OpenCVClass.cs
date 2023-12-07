@@ -35,12 +35,12 @@ namespace Magnus_WPF_1.Source.Algorithm
             return true;
         }
 
-        public static bool GetCornerFromRegion(ref CvImage region, List<Rectangle> corner, Size imgSize)
+        public static int GetCornerFromRegion(ref CvImage region, List<Rectangle> corner, Size imgSize)
         {
             if (region.IsEmpty)
             {
                 corner.Add(new Rectangle(0, 0, 0, 0));
-                return false;
+                return -1;
             }
             CvImage result = new CvImage();
             CvContourArray contourArray = new CvContourArray();
@@ -53,7 +53,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             PointArray = contourArrayHull[0];
             rect = CvInvoke.BoundingRectangle(PointArray);
             corner.Add(rect);
-            return true;
+            return 0;
         }
 
         //Rect To Points
@@ -549,6 +549,44 @@ namespace Magnus_WPF_1.Source.Algorithm
 
             CvInvoke.Compare(connection, connectionIndexMat, compareMat, CmpType.Equal);
             selectedRegion = selectedRegion | compareMat;
+            return true;
+        }
+
+        public static bool SelectPointBased_Top_Left_Bottom_Right(ref List<PointF> source, ref PointF result, int position)
+        {
+
+            int nIndex = 0;
+            for (int i = 1; i < source.Count; i++)
+            {
+                switch (position)
+                {
+                    case (int)POSITION._LEFT:
+                        if (source[i].X <= source[nIndex].X)
+                        {
+                            nIndex = i;
+                        }
+                        break;
+                    case (int)POSITION._RIGHT:
+                        if (source[i].X >= source[nIndex].X)
+                        {
+                            nIndex = i;
+                        }
+                        break;
+                    case (int)POSITION._TOP:
+                        if (source[i].Y <= source[nIndex].Y)
+                        {
+                            nIndex = i;
+                        }
+                        break;
+                    case (int)POSITION._BOTTOM:
+                        if (source[i].Y >= source[nIndex].Y)
+                        {
+                            nIndex = i;
+                        }
+                        break;
+                }
+            }
+            result = source[nIndex];
             return true;
         }
 

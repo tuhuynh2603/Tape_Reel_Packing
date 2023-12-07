@@ -36,7 +36,12 @@ namespace Magnus_WPF_1.Source.Define
         TOP_LEFT,
         TOP_RIGHT,
         BOTTOM_RIGHT,
-        BOTTOM_LEFT
+        BOTTOM_LEFT,
+        _TOP,
+        _LEFT,
+        _BOTTOM,
+        _RIGHT
+
     };
     public enum OBJECT_COLOR : int
     {

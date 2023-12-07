@@ -22,7 +22,6 @@ namespace Magnus_WPF_1.Source.Hardware
 
 		private ReaderAccessor m_reader = new ReaderAccessor();
 		List<NicSearchResult> m_nicList = new List<NicSearchResult>();
-		private string m_strKey = "";
 		public LiveviewForm m_liveviewForm = new LiveviewForm();
 
 		string barCodeipAddress;
@@ -58,6 +57,7 @@ namespace Magnus_WPF_1.Source.Hardware
 					}
 				}
 			}
+
 			nReceiveMessage = new int[BUFLEN];
 			LoadInforPortNumber();
 			m_BarcodeReader = new BarCodeReaderView();
@@ -69,7 +69,6 @@ namespace Magnus_WPF_1.Source.Hardware
 			{
 				return;
 			}
-			m_strKey = getKeyFromSearchResult(res);
 
 			m_liveviewForm.EndReceive();
 			m_liveviewForm.IpAddress = res.IpAddress;
@@ -78,9 +77,33 @@ namespace Magnus_WPF_1.Source.Hardware
 			m_liveviewForm.BeginReceive();
 			m_liveviewForm.Update();
 			m_reader.IpAddress = res.IpAddress;
-			m_reader.Connect();
+			bool bSuccess = m_reader.Connect();
 
+			updateConnectionStatus(bSuccess);
 		}
+
+		public void updateConnectionStatus(bool bIsConnected)
+		{
+
+			System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+			{
+				if (bIsConnected)
+				{
+					m_BarcodeReader.label_ReaderIP_Address.Content = $"{m_reader.IpAddress}";
+					m_BarcodeReader.Connect.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
+					MainWindow.mainWindow.label_Barcode_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
+
+				}
+				else
+				{
+					m_BarcodeReader.label_ReaderIP_Address.Content = $"{m_reader.IpAddress}";
+					m_BarcodeReader.Connect.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Red);
+					MainWindow.mainWindow.label_Barcode_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Red);
+
+				}
+			});
+		}
+
 
 		private delegate void delegateSearchResult(ReaderSearchResult res);
 		public string getKeyFromSearchResult(ReaderSearchResult res)
@@ -88,12 +111,22 @@ namespace Magnus_WPF_1.Source.Hardware
 			return res.IpAddress + "/" + res.ReaderModel + "/" + res.ReaderName;
 		}
 
+		public void ReconnectBarCode()
+        {
+			bool bIsConnected = false;
+			if(m_reader.ExecCommand("KEYENCE") == "")
+            {
+				m_reader.Disconnect();
+				bIsConnected = m_reader.Connect();
+			}
+			updateConnectionStatus(bIsConnected);
+		}
 
 		bool bIsDownload = false;
-		public void GetBarCodeStringAndImage(string strCmd = "")
+		public string GetBarCodeStringAndImage(string strCmd = "")
 		{
 			if (bIsDownload)
-				return;
+				return "";
 			bIsDownload = true;
 			string str = "";
 			string str2 = "";
@@ -133,8 +166,7 @@ namespace Magnus_WPF_1.Source.Hardware
 			});
 
 			bIsDownload = false;
-			if (str.Length == 0)
-				return;
+				return str + "_" + str2;
 		}
 
 		void LoadInforPortNumber()

@@ -33,7 +33,13 @@ namespace Magnus_WPF_1.Source.Hardware
             //m_modbusServer.LocalIPAddress = ;
             //m_modbusServer.Port = 502;
             m_modbusClient.ConnectedChanged += M_modbusClient_ConnectedChanged;
-            m_modbusClient.Connect();
+            try {
+                m_modbusClient.Connect();
+            }
+            catch
+            {
+               
+            }
             combo_PLC_Comm_Function.Items.Add("Write Value");
             combo_PLC_Comm_Function.Items.Add("Read Value");
             m_modbusClient.ReceiveDataChanged += M_modbusClient_ReceiveDataChanged;

@@ -43,6 +43,7 @@ namespace Magnus_WPF_1.UI.UserControls
         };
 
         bool bIsSelected = false;
+        public int m_TrackDebugging = 0;
         private void lvDefect_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (bIsSelected)
@@ -67,12 +68,12 @@ namespace Magnus_WPF_1.UI.UserControls
                             Image<Gray, byte> imgg = matImage.ToImage<Gray, byte>().Clone();
                             //m_imageViews[0].bufferImage = BitmapToByteArray(imgg.ToBitmap());
                             //byte[] buffer = Track.BitmapToByteArray(imgg.ToBitmap());
-                            MainWindow.mainWindow.master.m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].ClearOverlay();
-                            MainWindow.mainWindow.master.m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].UpdateUIImageMono(Track.BitmapToByteArray(imgg.ToBitmap()));
+                            MainWindow.mainWindow.master.m_Tracks[m_TrackDebugging].m_imageViews[0].ClearOverlay();
+                            MainWindow.mainWindow.master.m_Tracks[m_TrackDebugging].m_imageViews[0].UpdateUIImageMono(Track.BitmapToByteArray(imgg.ToBitmap()));
                             //MainWindow.mainWindow.master.m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].image.Source = imgg;
                             Mat matRegion = item.mat_Region;
                             SolidColorBrush color = new SolidColorBrush(Colors.Cyan);
-                            MainWindow.mainWindow.master.m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].DrawRegionOverlay(matRegion, color);
+                            MainWindow.mainWindow.master.m_Tracks[m_TrackDebugging].m_imageViews[0].DrawRegionOverlay(matRegion, color);
                         });
                                                    
                         bIsSelected = false;

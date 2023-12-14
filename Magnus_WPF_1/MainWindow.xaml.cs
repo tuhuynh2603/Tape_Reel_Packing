@@ -808,12 +808,12 @@ namespace Magnus_WPF_1
 
             if (master.thread_StreamCamera[activeImageDock.trackID] == null)
             {
-                master.thread_StreamCamera[activeImageDock.trackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Thread()));
+                master.thread_StreamCamera[activeImageDock.trackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.func_GrabImageThread()));
                 master.thread_StreamCamera[activeImageDock.trackID].Start();
             }
             else if (!master.thread_StreamCamera[activeImageDock.trackID].IsAlive)
             {
-                master.thread_StreamCamera[activeImageDock.trackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Thread()));
+                master.thread_StreamCamera[activeImageDock.trackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.func_GrabImageThread()));
                 master.thread_StreamCamera[activeImageDock.trackID].Start();
             }
         }
@@ -1511,9 +1511,18 @@ namespace Magnus_WPF_1
             //btn_Debug_sequence_NextStep.IsEnabled = false;
         }
 
+
+        private void btn_Debug_sequence_PreviousStep_Click(object sender, RoutedEventArgs e)
+        {
+            master.m_bNextStepSequence = false;
+            if (m_bEnableDebugSequence)
+                Master.m_NextStepSequenceEvent.Set();
+        }
+
         private void btn_Debug_sequence_NextStep_Click(object sender, RoutedEventArgs e)
         {
-            if(m_bEnableDebugSequence)
+            master.m_bNextStepSequence = true;
+            if (m_bEnableDebugSequence)
                 Master.m_NextStepSequenceEvent.Set();
         }
 
@@ -1541,22 +1550,24 @@ namespace Magnus_WPF_1
 
         }
 
-        private void btn_Imidiate_Stop_Checked(object sender, RoutedEventArgs e)
+
+
+
+        private void btn_Emergency_Stop_Click(object sender, RoutedEventArgs e)
         {
-            master.m_ImidiateStatus_Simulate = (bool)btn_Imidiate_Stop.IsChecked == false ? 0: 1;
+            master.m_EmergencyStatus_Simulate = (bool)btn_Emergency_Stop.IsChecked == false ? 0 : 1;
+
         }
 
-        private void btn_Emergency_Stop_Checked(object sender, RoutedEventArgs e)
+        private void btn_Imidiate_Stop_Click(object sender, RoutedEventArgs e)
         {
-            //string path = @"/Resources/green-chip.png";
-
-            master.m_EmergencyStatus_Simulate = (bool)btn_Emergency_Stop.IsChecked == false ? 0 : 1;
-            //btn_Emergency_Stop.Content = new BitmapImage(new Uri(path, UriKind.Relative));
+            master.m_ImidiateStatus_Simulate = (bool)btn_Imidiate_Stop.IsChecked == false ? 0 : 1;
         }
 
         private void btn_Reset_Machine_Click(object sender, RoutedEventArgs e)
         {
-            master.m_ResetMachineStatus_Simulate = 1;
+            if(master.m_ResetMachineStatus_Simulate == 0)
+                master.m_ResetMachineStatus_Simulate = 1;
         }
 
         public bool m_bShowOverlay = true;

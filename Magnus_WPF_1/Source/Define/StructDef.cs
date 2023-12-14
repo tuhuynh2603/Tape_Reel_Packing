@@ -164,6 +164,8 @@ namespace Magnus_WPF_1.Source.Define
         public System.Windows.Media.Color _color { get; set; }
     };
 
+
+
     public struct Rectangles
     {
         private Point _topLeft;

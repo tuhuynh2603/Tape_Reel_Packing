@@ -259,7 +259,7 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void toggle_ServoOnOff_Click(object sender, RoutedEventArgs e)
         {
-            HWinRobot.jog_stop(HiWinRobotInterface.m_RobotConnectID);
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.StopMotor();
             LogMessage.LogMessage.WriteToDebugViewer(2, "Stop Move");
 
             int bServoOnOff = HWinRobot.get_motor_state(HiWinRobotInterface.m_RobotConnectID);
@@ -453,7 +453,7 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void button_Stop_Moving_Click(object sender, RoutedEventArgs e)
         {
-            HWinRobot.jog_stop(HiWinRobotInterface.m_RobotConnectID);
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.StopMotor();
             LogMessage.LogMessage.WriteToDebugViewer(2, "Stop Move Clicked");
         }
 

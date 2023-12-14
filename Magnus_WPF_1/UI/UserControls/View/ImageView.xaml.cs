@@ -1090,7 +1090,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
         }
 
         List<Rectangles> L_PVIArea = new List<Rectangles>();
-        public void TeachSequence(int nTeachTrackID)
+        public void func_TeachSequence(int nTeachTrackID)
         {
             Master.m_bIsTeaching = true;
             Master.m_NextStepTeachEvent.Reset();

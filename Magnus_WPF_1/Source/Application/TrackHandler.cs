@@ -679,7 +679,7 @@ namespace Magnus_WPF_1.Source.Application
         public PointF m_Center_Vision = new PointF();
         public double m_dDeltaAngleInspection = 0.0;
         public int m_nVisionReady = 0;
-        public void InspectOfflineThread(string strFolderPath)
+        public void func_InspectOfflineThread(string strFolderPath)
         {
 
             if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.bEnableRunSequence)
@@ -835,7 +835,7 @@ namespace Magnus_WPF_1.Source.Application
         //}
 
 
-        public void InspectOnlineThread()
+        public void func_InspectOnlineThread()
         {
 
             CheckInspectionOnlineThread();

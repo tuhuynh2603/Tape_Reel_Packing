@@ -52,7 +52,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             EMERGENCY_STATUS = 3,
             ROBOT_CONVEYER_ONOFF = 4,
             IMIDIATE_STATUS = 6,
-            ROBOT_ARLAMP = 7,
+            RESET_STATUS = 7,
             ROBOT_HEART_BEAT = 8,
 
         }
@@ -955,22 +955,28 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
         public int wait_for_stop_motion()
         {
+
+            //lock (this)
+            //{
+            //    m_bIsStop = false;
+            //}
+
             while (HWinRobot.get_motion_state(HiWinRobotInterface.m_RobotConnectID) != 1 )
             {
                 //robot connection changed => return false
                 if (HWinRobot.get_connection_level(HiWinRobotInterface.m_RobotConnectID) <0)
                     return -1;
-                if (m_bIsStop)
-                {
+                //if (m_bIsStop)
+                //{
                     
-                    lock (this)
-                    {
-                        m_bIsStop = false;
-                    }
+                //    lock (this)
+                //    {
+                //        m_bIsStop = false;
+                //    }
 
-                    return -1;
+                //    return -1;
 
-                }
+                //}
                 Thread.Sleep(5);
             }
             return 0;
@@ -1071,17 +1077,17 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
         public void StopMotor()
         {
-            lock (this)
-            {
-                m_bIsStop = true;
-            }
-            HWinRobot.jog_stop(HiWinRobotInterface.m_RobotConnectID);
+            //lock (this)
+            //{
+            //    m_bIsStop = true;
+            //}
+            HWinRobot.jog_stop(m_RobotConnectID);
         }
 
 
         public static void HomeMove()
         {
-            HWinRobot.jog_stop(m_RobotConnectID);
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.StopMotor();
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
             HWinRobot.jog_home(m_RobotConnectID);
         }

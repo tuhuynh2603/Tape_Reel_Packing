@@ -33,6 +33,15 @@
             <TextBlock Grid.Row="1" Text="Step Run" Foreground="Yellow" TextAlignment="Center" FontSize="20"></TextBlock>
         </Grid>
 
+        <Grid x:Key="debugSequencePreviousStepImage" Margin="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"></RowDefinition>
+                <RowDefinition Height="1*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Image Grid.Row="0"  Source="Resources\step-forward-custom.png"></Image>
+            <TextBlock Grid.Row="1" Text="Back" Foreground="Yellow" TextAlignment="Center" FontSize="20"></TextBlock>
+        </Grid>
+
         <Grid x:Key="debugSequenceNextStepImage" Margin="3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="3*"></RowDefinition>
@@ -726,6 +735,13 @@
                                           IsChecked="False" Checked="btn_Debug_sequence_Checked" Unchecked="btn_Debug_sequence_Unchecked">
                             </ToggleButton>
 
+                            <Button x:Name="btn_Debug_sequence_PreviousStep" Content="{StaticResource debugSequencePreviousStepImage}"
+                                    Margin="0,0,0,0" HorizontalAlignment ="Center"
+                                    Background="Transparent" BorderThickness="0"
+                                    Click ="btn_Debug_sequence_PreviousStep_Click">
+                            </Button>
+
+
                             <Button x:Name="btn_Debug_sequence_NextStep" Content="{StaticResource debugSequenceNextStepImage}"
                                     Margin="0,0,0,0" HorizontalAlignment ="Center"
                                     Background="Transparent" BorderThickness="0"
@@ -737,7 +753,8 @@
                          
                                     Margin="0,0,0,0" HorizontalAlignment ="Center"
                                     Background="Transparent" BorderThickness="0"
-                                    IsChecked="False" Checked="btn_Imidiate_Stop_Checked">
+                                    IsChecked="False"
+                                    Click="btn_Imidiate_Stop_Click">
                             </ToggleButton>
 
                             <ToggleButton x:Name="btn_Emergency_Stop" 
@@ -745,7 +762,8 @@
                          
                                     Margin="0,0,0,0" HorizontalAlignment ="Center"
                                     Background="Transparent" BorderThickness="0"
-                                    IsChecked="False" Checked ="btn_Emergency_Stop_Checked">
+                                    IsChecked="False"
+                                    Click="btn_Emergency_Stop_Click">
                             </ToggleButton>
                 
                             <Button x:Name="btn_Reset_Machine" 

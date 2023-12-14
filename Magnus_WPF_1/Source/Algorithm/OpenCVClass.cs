@@ -434,7 +434,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             return true;
         }
         // select region  by width height 
-        public static bool SelectRegion(ref CvImage source, ref CvImage result, ref List<Rectangle> rectArray, int minWidth, int minHeight)
+        public static bool SelectRegion(ref CvImage source, ref CvImage result, ref List<Rectangle> rectArray, int minWidth, int minHeight, int maxWidth = 9999999, int maxHeight = 999999)
         {
             CvImage labelImage = new CvImage(source.Size, DepthType.Cv32S, 1);
             CvImage stats = new CvImage();
@@ -445,7 +445,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             stats.CopyTo(statsData);
             for (int i = 1; i < nLabels; i++)
             {
-                if ((statsData[i * stats.Cols + 3]) > minHeight && (statsData[i * stats.Cols + 2]) > minWidth)
+                if ((statsData[i * stats.Cols + 3]) > minHeight && (statsData[i * stats.Cols + 3]) < maxHeight && (statsData[i * stats.Cols + 2]) > minWidth && (statsData[i * stats.Cols + 2]) < maxWidth)
                 {
 
                     var x = statsData[i * stats.Cols + 0];
@@ -552,8 +552,11 @@ namespace Magnus_WPF_1.Source.Algorithm
             return true;
         }
 
-        public static bool SelectPointBased_Top_Left_Bottom_Right(ref List<PointF> source, ref PointF result, int position)
+        public static int SelectPointBased_Top_Left_Bottom_Right(ref List<PointF> source, ref PointF result, int position)
         {
+            result = new PointF(0, 0);
+            if (source.Count < 1)
+                return -1;
 
             int nIndex = 0;
             for (int i = 1; i < source.Count; i++)
@@ -587,7 +590,7 @@ namespace Magnus_WPF_1.Source.Algorithm
                 }
             }
             result = source[nIndex];
-            return true;
+            return nIndex;
         }
 
         // Select Region Based Position
@@ -849,6 +852,47 @@ namespace Magnus_WPF_1.Source.Algorithm
             DrawContours(ref result, ref contours, source.Size, sColor, -1, -1);
             return true;
         }
+
+        public static bool FillUpSmallShapes(ref CvImage source, ref CvImage fillUpRegions, int nMinSize = 0, int nMaxSize = -1)
+        {
+            CvContourArray contours = new CvContourArray();
+            CvImage fillUpRegionsTemp = CvImage.Zeros(source.Rows, source.Cols, DepthType.Cv8U, 1);
+            MCvScalar sColor = new MCvScalar(255);
+            GenContourRegion(ref source, ref contours, RetrType.External);
+            DrawContours(ref fillUpRegionsTemp, ref contours, source.Size, sColor, -1, -1);
+            CvImage holeRegions = new CvImage();
+            CvInvoke.BitwiseXor(fillUpRegionsTemp, source, holeRegions);
+            CvImage selectRegions = new CvImage();
+            CvImage closingRegions = new CvImage();
+            CvImage regionFilterMaxWidth = new CvImage();
+            CvImage regionFilterMinWidth = new CvImage();
+
+            if (nMaxSize > 0)
+            {
+                ClosingCircle(ref source, ref closingRegions, nMaxSize);
+                CvInvoke.BitwiseAnd(holeRegions, closingRegions, regionFilterMaxWidth);
+            }
+            else
+                regionFilterMaxWidth = holeRegions.Clone();
+
+            if (nMinSize > 0)
+            {
+                OpeningCircle(ref holeRegions, ref regionFilterMinWidth, nMinSize);
+            }
+            else
+                regionFilterMinWidth = holeRegions.Clone();
+
+            CvInvoke.BitwiseAnd(regionFilterMinWidth, regionFilterMaxWidth, selectRegions);
+
+
+            //CvPointArray point_regions = new CvPointArray();
+            //List<Rectangle> rectArray = new List<Rectangle>();
+            //SelectRegion(ref holeRegions, ref selectRegions, ref rectArray, nMinWidth, nMinHeight, nMaxWidth, nMaxHeight);
+            CvInvoke.BitwiseOr(source, selectRegions, fillUpRegions);
+
+            return true;
+        }
+
 
         // Extract External Contours
         public static bool ExtractExternalContours(ref CvImage source, ref CvImage result, ref CvContourArray contours, int thickness = 1)

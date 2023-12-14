@@ -348,7 +348,12 @@
   <ItemGroup>
     <Resource Include="Magnus.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\EmergencyButton.png" />
+    <Resource Include="Resources\ResetButton.png" />
+    <Resource Include="Resources\StartButton.png" />
+    <Resource Include="Resources\StopButton.png" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\save-image.png" />
   </ItemGroup>

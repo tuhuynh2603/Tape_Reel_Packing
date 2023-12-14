@@ -49,6 +49,10 @@ namespace Magnus_WPF_1.Source.Application
         public Thread threadInspecOffline;
         public Thread m_TeachThread;
         public Thread[] m_SaveInspectImageThread;
+
+
+        public Thread m_IOStatusThread;
+
         public static List<ArrayOverLay>[] list_arrayOverlay;
         public static Queue<ImageSaveData> m_SaveInspectImageQueue = new Queue<ImageSaveData>(); // create a queue to hold messages
         public HiWinRobotInterface m_hiWinRobotInterface;
@@ -113,6 +117,44 @@ namespace Magnus_WPF_1.Source.Application
         #region ContructorDocComponent
 
 
+
+        public int m_EmergencyStatus = 0;
+        public int m_ImidiateStatus = 0;
+        public int m_ResetMachineStatus = 0;
+
+
+        public int m_EmergencyStatus_Simulate = 0;
+        public int m_ImidiateStatus_Simulate = 0;
+        public int m_ResetMachineStatus_Simulate = 0;
+
+        private void IOStatusThread_Fcn()
+        {
+            while(MainWindow.mainWindow != null)
+            {
+
+
+                m_EmergencyStatus =  m_EmergencyStatus_Simulate;
+                m_ImidiateStatus =  m_ImidiateStatus_Simulate;
+                m_ResetMachineStatus =  m_ResetMachineStatus_Simulate;
+
+                if (m_hiWinRobotInterface == null)
+                {
+                    Thread.Sleep(100);
+                    continue;
+                }
+                if(HiWinRobotInterface.m_RobotConnectID < 0)
+                {
+                    Thread.Sleep(100);
+                    continue;
+                }
+
+                m_EmergencyStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.EMERGENCY_STATUS) | m_EmergencyStatus_Simulate;
+                m_ImidiateStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.IMIDIATE_STATUS) | m_ImidiateStatus_Simulate;
+                m_ResetMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RESET_STATUS) | m_ResetMachineStatus_Simulate;
+                Thread.Sleep(100);
+            }
+        }
+
         private void ContructorDocComponent()
         {
             m_Tracks = new Track[Application.m_nTrack];
@@ -127,8 +169,11 @@ namespace Magnus_WPF_1.Source.Application
             thread_StreamCamera = new Thread[Application.m_nTrack];
             list_arrayOverlay = new List<ArrayOverLay>[Application.m_nTrack];
             //string[] nSeriCam = { "02C89933333", "none" };
-
-
+            if (m_IOStatusThread == null)
+            {
+                m_IOStatusThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => IOStatusThread_Fcn()));
+                m_IOStatusThread.Start();
+            }
 
             for (int index_track = 0; index_track < Application.m_nTrack; index_track++)
             {
@@ -425,7 +470,7 @@ namespace Magnus_WPF_1.Source.Application
                 if (MainWindow.mainWindow == null)
                     return -1;
 
-                if ( !MainWindow.mainWindow.bEnableRunSequence)
+                if (!MainWindow.mainWindow.bEnableRunSequence)
                 {
                     return -1;
                 }
@@ -584,13 +629,13 @@ namespace Magnus_WPF_1.Source.Application
 
                 //Trigger conveyor off
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_CONVEYER_ONOFF, false);
-                while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_READY) == 0)
-                {
-                    if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
-                    {
-                        return;
-                    }
-                }
+                //while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_READY) == 0)
+                //{
+                //    if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
+                //    {
+                //        return;
+                //    }
+                //}
                 //
                 Master.VisionReadyEvent[0].Reset();
                 m_hardwareTriggerSnapEvent[0].Set();
@@ -627,8 +672,8 @@ namespace Magnus_WPF_1.Source.Application
                 if(nCamera1InspectionResult == (int)ERROR_CODE.PASS)
                     nEmptyTrayHoles++;
 
-                if(nEmptyTrayHoles >= 5)
-                    m_hardwareTriggerSnapEvent[1].Set();
+                //if(nEmptyTrayHoles >= 5)
+                //    m_hardwareTriggerSnapEvent[1].Set();
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nStep++} : Trigger Barcode ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
                 nError = WaitForNextStepSequenceEvent("Trigger Barcode Done. Press next to Move to Ready position");

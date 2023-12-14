@@ -425,31 +425,43 @@ namespace Magnus_WPF_1.Source.Application
             color = new SolidColorBrush(Colors.Yellow);
             m_imageViews[0].DrawStringOverlay("(X, Y, Angle) = (" + pCenter.X.ToString() + ", " + pCenter.Y.ToString() + ", " + ((int)dAngle).ToString() + ")", (int)pCenter.X + 10, (int)pCenter.Y, color, 20);
 
-            if (nResult == -(int)ERROR_CODE.NO_PATTERN_FOUND)
+
+            if (nResult == (int)ERROR_CODE.PASS)
             {
-                color = new SolidColorBrush(Colors.Red);
-                m_imageViews[0].DrawString("Device not found! ", 10, 10, color, 31);
+                color = new SolidColorBrush(Colors.Green);
+                m_imageViews[0].DrawString(/*m_cap.GetCaptureProperty(CapProp.Focus).ToString() */ "Good", 10, 10, color, 31);
+                color = new SolidColorBrush(Colors.Yellow);
+                //m_imageViews[0].DrawString("Delta: = (" + dShiftX.ToString() + ", " + dShiftY.ToString() + ", " + dDeltaAngle.ToString() + ")", 10, 40, color, 18);
+
             }
             else
             {
-                if (nResult == -(int)ERROR_CODE.OPPOSITE_CHIP)
+                color = new SolidColorBrush(Colors.Red);
+
+                switch (nResult)
                 {
-                    color = new SolidColorBrush(Colors.Red);
-                    m_imageViews[0].DrawString("Black Chip Found", 10, 10, color, 31);
-                    //m_imageViews[0].DrawString("Score: " + ((int)dScoreOutput).ToString(), 10, 35, color, 31);
+
+                    case -(int)ERROR_CODE.NO_PATTERN_FOUND:
+                        m_imageViews[0].DrawString("Device not found! ", 10, 10, color, 31);
+
+                        break;
+
+                    case -(int)ERROR_CODE.OPPOSITE_CHIP:
+                        m_imageViews[0].DrawString("Black Chip ", 10, 10, color, 31);
+
+                        break;
+
+                    case -(int)ERROR_CODE.NO_LABEL:
+                        m_imageViews[0].DrawString("No Label ", 10, 10, color, 31);
+
+                        break;
+                    case -(int)ERROR_CODE.PROCESS_ERROR:
+                        m_imageViews[0].DrawString("Process Error", 10, 10, color, 31);
+
+                        break;
 
                 }
-                else
-                {
-                    color = new SolidColorBrush(Colors.Green);
-                    m_imageViews[0].DrawString(/*m_cap.GetCaptureProperty(CapProp.Focus).ToString() */ "Good", 10, 10, color, 31);
-                    color = new SolidColorBrush(Colors.Yellow);
-                    //m_imageViews[0].DrawString("Delta: = (" + dShiftX.ToString() + ", " + dShiftY.ToString() + ", " + dDeltaAngle.ToString() + ")", 10, 40, color, 18);
-
-                }
-
             }
-
             //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             //{
             //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Draw Overlay time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
@@ -573,6 +585,8 @@ namespace Magnus_WPF_1.Source.Application
             return nResult;
         }
 
+        public bool m_bInspecting = false;
+
         private void InspectThread()
         {
             Master.InspectEvent[m_nTrackID].Reset();
@@ -581,6 +595,7 @@ namespace Magnus_WPF_1.Source.Application
                 try
                 {
                     Master.InspectEvent[m_nTrackID].Reset();
+                    m_bInspecting = false;
                     while (!Master.InspectEvent[m_nTrackID].WaitOne(10))
                     {
                         if (MainWindow.mainWindow == null)
@@ -588,7 +603,7 @@ namespace Magnus_WPF_1.Source.Application
                         Thread.Sleep(5);
                     }
                     Master.InspectEvent[m_nTrackID].Reset();
-
+                    m_bInspecting = true;
                     if (m_CurrentSequenceDeviceID < 0 || m_CurrentSequenceDeviceID >= m_nResult.Length)
                         m_CurrentSequenceDeviceID = 0;
 
@@ -643,7 +658,7 @@ namespace Magnus_WPF_1.Source.Application
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
                             MainWindow.mainWindow.UpdateMappingResult(m_CurrentSequenceDeviceID, m_nResult[m_CurrentSequenceDeviceID]);
-                            MainWindow.mainWindow.UpdateStatisticResult(m_nResult[m_CurrentSequenceDeviceID]);
+                            MainWindow.mainWindow.UpdateStatisticResult(m_nResult[m_CurrentSequenceDeviceID], m_nTrackID);
                         });
 
                     });

@@ -1177,9 +1177,9 @@ namespace Magnus_WPF_1
             statisticView.ClearStatistic(nTrackID);
         }
 
-        internal void UpdateStatisticResult(int nResult)
+        internal void UpdateStatisticResult(int nResult, int nTrack)
         {
-            statisticView.UpdateValueStatistic(nResult);
+            statisticView.UpdateValueStatistic(nResult, nTrack);
 
         }
 
@@ -1540,5 +1540,64 @@ namespace Magnus_WPF_1
                 //grd_Defect_Settings.Visibility = Visibility.Collapsed;
 
         }
+
+        private void btn_Imidiate_Stop_Checked(object sender, RoutedEventArgs e)
+        {
+            master.m_ImidiateStatus_Simulate = (bool)btn_Imidiate_Stop.IsChecked == false ? 0: 1;
+        }
+
+        private void btn_Emergency_Stop_Checked(object sender, RoutedEventArgs e)
+        {
+            //string path = @"/Resources/green-chip.png";
+
+            master.m_EmergencyStatus_Simulate = (bool)btn_Emergency_Stop.IsChecked == false ? 0 : 1;
+            //btn_Emergency_Stop.Content = new BitmapImage(new Uri(path, UriKind.Relative));
+        }
+
+        private void btn_Reset_Machine_Click(object sender, RoutedEventArgs e)
+        {
+            master.m_ResetMachineStatus_Simulate = 1;
+        }
+
+        public bool m_bShowOverlay = true;
+
+
+        private void btn_ShowOverlay_Click(object sender, RoutedEventArgs e)
+        {
+            m_bShowOverlay = !m_bShowOverlay;
+            ShowOverlay(m_bShowOverlay);
+        }
+
+        public void ShowOverlay(bool bShow)
+        {
+
+            if (activeImageDock == null) return;
+            int trackID = activeImageDock.trackID;
+            if (master == null)
+                return;
+
+            if (master.m_Tracks[trackID].m_imageViews[0].bufferImage == null)
+                return;
+
+            if (master.m_Tracks[trackID].m_bInspecting)
+                return;
+
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                if (bShow)
+                {
+                    int nResult = master.m_Tracks[trackID].m_nResult[master.m_Tracks[trackID].m_CurrentSequenceDeviceID];
+                    master.m_Tracks[trackID].DrawInspectionResult(ref nResult, ref master.m_Tracks[trackID].m_Center_Vision, ref master.m_Tracks[trackID].m_dDeltaAngleInspection);
+                }
+                else
+                {
+                    master.m_Tracks[trackID].m_imageViews[0].ClearOverlay();
+                    master.m_Tracks[trackID].m_imageViews[0].ClearText();
+                }
+
+
+            });
+        }
+
     }
 }

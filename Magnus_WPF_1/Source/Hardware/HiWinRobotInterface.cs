@@ -38,7 +38,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             CHIPDETECT_SENSOR = 2,
             AIR_PRESSURESTATUS = 3,
             EMERGENCY_STATUS = 4,
-            QUICK_STOP_STATUS = 5,
+            IMIDIATE_STATUS = 5,
             RESET_STATUS = 6,
             IN_CONVEYER_ONOFF = 7
 
@@ -48,13 +48,13 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         {
             ROBOT_AIR_ON = 1,
             ROBOT_AIR_OFF = 5,
-
             ROBOT_READY = 2,
-            ROBOT_PLACE_DONE = 3,
+            EMERGENCY_STATUS = 3,
             ROBOT_CONVEYER_ONOFF = 4,
-            ROBOT_ARLAMP = 6,
-            ROBOT_RESET = 7,
+            IMIDIATE_STATUS = 6,
+            ROBOT_ARLAMP = 7,
             ROBOT_HEART_BEAT = 8,
+
         }
 
 

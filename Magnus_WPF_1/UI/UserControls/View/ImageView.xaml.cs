@@ -1115,6 +1115,14 @@ namespace Magnus_WPF_1.UI.UserControls.View
             //    L_DeviceLocationRoi_Temp.Width = _imageWidth;
             //    L_DeviceLocationRoi_Temp.Height = _imageHeight;
             //}
+            if(Source.Application.Application.categoriesTeachParam.LD_LabelLocations.Count < 5)
+            {
+                Source.Application.Application.categoriesTeachParam.LD_LabelLocations.Clear();
+                for (int n = 0; n< 5; n++)
+                {
+                    Source.Application.Application.categoriesTeachParam.LD_LabelLocations.Add(new Rectangles(new Point(100, 100), 100, 100));
+                }    
+            }    
 
             if (true)
             {
@@ -1145,48 +1153,48 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
                 nCurrentStep++;
             }
-            //if (true)
-            //{
-            //    if (L_PVIArea.Count() < 5)
-            //    {
-            //        L_PVIArea.Clear();
+            if (true)
+            {
+                if (L_PVIArea.Count() < 5)
+                {
+                    L_PVIArea.Clear();
 
-            //        for (int nPVIArea = 0; nPVIArea < 5; nPVIArea++)
-            //        {
-            //            L_PVIArea.Add(Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi);
-            //        }
-            //    }
-            //    for (int nPVIArea = 0; nPVIArea < 5; nPVIArea++)
-            //    {
-            //        Rectangles lPVIAreaTemp = L_PVIArea[nPVIArea];
-            //        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-            //        {
-            //            UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Please Locate Pvi Area " + nPVIArea.ToString(), "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
-            //            controlWin.Visibility = Visibility.Visible;
-            //            SetControlWin(lPVIAreaTemp);
-            //        });
+                    for (int nPVIArea = 0; nPVIArea < 5; nPVIArea++)
+                    {
+                        L_PVIArea.Add(Source.Application.Application.categoriesTeachParam.LD_LabelLocations[nPVIArea]);
+                    }
+                }
+                for (int nPVIArea = 0; nPVIArea < Source.Application.Application.categoriesTeachParam.LD_NumberROILocation; nPVIArea++)
+                {
+                    Rectangles lPVIAreaTemp = L_PVIArea[nPVIArea];
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Please Locate Pvi Area " + nPVIArea.ToString(), "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+                        controlWin.Visibility = Visibility.Visible;
+                        SetControlWin(lPVIAreaTemp);
+                    });
 
-            //        if (waitNextTeachStep() < 0)
-            //            return;
+                    if (waitNextTeachStep() < 0)
+                        return;
 
-            //        nCurrentStep++;
+                    nCurrentStep++;
 
-            //        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-            //        {
-            //            L_PVIArea[nPVIArea] = (GetRectangle());
-            //            //Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi = L_DeviceLocationRoi_Temp;
-            //            controlWin.Visibility = Visibility.Collapsed;
-            //            UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Pvi Area " + nPVIArea.ToString() + " is Taught", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
-            //            UpdateRegionOverlay();
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        L_PVIArea[nPVIArea] = GetRectangle();
+                        //Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi = L_DeviceLocationRoi_Temp;
+                        controlWin.Visibility = Visibility.Collapsed;
+                        UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Pvi Area " + nPVIArea.ToString() + " is Taught", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+                        UpdateRegionOverlay();
 
-            //        });
+                    });
 
-            //        if (waitNextTeachStep() < 0)
-            //            return;
+                    if (waitNextTeachStep() < 0)
+                        return;
 
-            //        nCurrentStep++;
-            //    }
-            //}
+                    nCurrentStep++;
+                }
+            }
 
             if (true)
             {
@@ -1237,6 +1245,10 @@ namespace Magnus_WPF_1.UI.UserControls.View
             var result = MessageBox.Show("Do you want to save teach parameter ?", "Save Teach Parameter", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
             {
+                for (int n = 0; n< 5; n++)
+                {
+                    Source.Application.Application.categoriesTeachParam.LD_LabelLocations[n] = L_PVIArea[n];
+                }    
                 //SetTeachParameterToCategories();
                 MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
                 MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.SetTemplateImage();

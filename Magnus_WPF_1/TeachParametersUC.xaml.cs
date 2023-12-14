@@ -266,7 +266,7 @@ namespace Magnus_WPF_1
         /// </summary>
         // [CategoryOrder("TOP SURFACE", 0)]
         [CategoryOrder("LOCATION", 0)]
-        //[CategoryOrder("INSPECTION", 1)]
+        [CategoryOrder("LABEL", 1)]
         //[CategoryOrder("TOP PATTERN", 1)]
         [DisplayName("Teach Parameter")]
         public class CategoryTeachParameter
@@ -418,52 +418,61 @@ namespace Magnus_WPF_1
             #endregion
 
 
-            //#region LABEL
+            #region LABEL
+
+            [Browsable(false)]
+            [Category("LABEL DEFECT")]
+            [DisplayName("Label Locations")]
+            [Range(0, 5)]
+            [Description("")]
+            [PropertyOrder(0)]
+            public List<Rectangles> LD_LabelLocations { get; set; }
 
             //[Browsable(false)]
-            //[Category("LABEL")]
-            //[DisplayName("Device Location Roi")]
-            //[Range(0, 5)]
-            //[Description("")]
-            //[PropertyOrder(0)]
-            //public Rectangles LB_LabelnRoi { get; set; }
+            [Category("LABEL DEFECT")]
+            [DisplayName("Number ROI Location")]
+            [Range(0, 5)]
+            [DefaultValue(1)]
+            [Description("")]
+            [PropertyOrder(1)]
+            public int LD_NumberROILocation { get; set; }
 
-            ////[Browsable(false)]
-            //[Category("LABEL")]
-            //[DisplayName("Lower Threshold")]
-            //[Range(0, 255)]
-            //[DefaultValue(0)]
-            //[Description("")]
-            //[PropertyOrder(1)]
-            //public int LB_lowerThreshold { get; set; }
-            ////[Browsable(false)]
-            //[Category("LABEL")]
-            //[DisplayName("Upper Threshold")]
-            //[Range(0, 255)]
-            //[DefaultValue(255)]
-            //[Description("")]
-            //[PropertyOrder(2)]
-            //public int LB_upperThreshold { get; set; }
+            //[Browsable(false)]
+            [Category("LABEL DEFECT")]
+            [DisplayName("Lower Threshold")]
+            [Range(0, 255)]
+            [DefaultValue(0)]
+            [Description("")]
+            [PropertyOrder(2)]
+            public int LD_lowerThreshold { get; set; }
+            //[Browsable(false)]
+            [Category("LABEL DEFECT")]
+            [DisplayName("Upper Threshold")]
+            [Range(0, 255)]
+            [DefaultValue(255)]
+            [Description("")]
+            [PropertyOrder(3)]
+            public int LD_upperThreshold { get; set; }
 
-            ////[Browsable(false)]
-            //[Category("LABEL")]
-            //[DisplayName("Opening Mask")]
-            //[Range(1, 500)]
-            //[DefaultValue(11)]
-            //[Description("")]
-            //[PropertyOrder(3)]
-            //public int LB_OpeningMask { get; set; }
+            //[Browsable(false)]
+            [Category("LABEL DEFECT")]
+            [DisplayName("Opening Mask")]
+            [Range(1, 100)]
+            [DefaultValue(1)]
+            [Description("")]
+            [PropertyOrder(4)]
+            public int LD_OpeningMask { get; set; }
 
-            ////[Browsable(false)]
-            //[Category("LABEL")]
-            //[DisplayName("Dilation Mask")]
-            //[Range(1, 500)]
-            //[DefaultValue(30)]
-            //[Description("")]
-            //[PropertyOrder(4)]
-            //public int LB_DilationMask { get; set; }
+            //[Browsable(false)]
+            [Category("LABEL DEFECT")]
+            [DisplayName("Dilation Mask")]
+            [Range(1, 100)]
+            [DefaultValue(1)]
+            [Description("")]
+            [PropertyOrder(5)]
+            public int LD_DilationMask { get; set; }
 
-            //#endregion
+            #endregion
         }
     }
 }

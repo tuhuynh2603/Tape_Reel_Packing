@@ -209,6 +209,17 @@ namespace Magnus_WPF_1.Source.Application
             ReadLine("LOCATION", "Scale Image Ratio", ini, ref dictTeachParam);
             ReadLine("LOCATION", "Min Score", ini, ref dictTeachParam);
             ReadLine("LOCATION", "Corner Index", ini, ref dictTeachParam);
+
+
+            for (int n = 0; n < 5; n++)
+                ReadLine("LABEL DEFECT", "Label Locations" + (n + 1).ToString(), ini, ref dictTeachParam);
+
+            ReadLine("LABEL DEFECT", "Number ROI Location", ini, ref dictTeachParam);
+            ReadLine("LABEL DEFECT", "Lower Threshold", ini, ref dictTeachParam);
+            ReadLine("LABEL DEFECT", "Upper Threshold", ini, ref dictTeachParam);
+            ReadLine("LABEL DEFECT", "Opening Mask", ini, ref dictTeachParam);
+            ReadLine("LABEL DEFECT", "Dilation Mask", ini, ref dictTeachParam);
+
             //ReadLine("TOP PATTERN", "no of pattern", ini, ref dictTeachParam);
             ////ReadLine("TOP PATTERN", "no of pattern", ini, ref categoriesTeachParam.TP_noOfPattern);
             ////categoriesTeachParam.TP_noOfPattern = dictTeachParam[]
@@ -257,6 +268,15 @@ namespace Magnus_WPF_1.Source.Application
             WriteLine("LOCATION", "Scale Image Ratio", ini, categoriesTeachParam.L_ScaleImageRatio.ToString());
             WriteLine("LOCATION", "Min Score", ini, categoriesTeachParam.L_MinScore.ToString());
             WriteLine("LOCATION", "Corner Index", ini, categoriesTeachParam.L_CornerIndex.ToString());
+
+            for(int n = 0; n < 5; n++)
+                WriteLine("LABEL DEFECT", "Label Locations" + (n+1).ToString(), ini, ConvertRectanglesToString(categoriesTeachParam.LD_LabelLocations[n]));
+
+            WriteLine("LABEL DEFECT", "Number ROI Location", ini, categoriesTeachParam.LD_NumberROILocation.ToString());
+            WriteLine("LABEL DEFECT", "Lower Threshold", ini, categoriesTeachParam.LD_lowerThreshold.ToString());
+            WriteLine("LABEL DEFECT", "Upper Threshold", ini, categoriesTeachParam.LD_upperThreshold.ToString());
+            WriteLine("LABEL DEFECT", "Opening Mask", ini, categoriesTeachParam.LD_DilationMask.ToString());
+            WriteLine("LABEL DEFECT", "Dilation Mask", ini, categoriesTeachParam.LD_DilationMask.ToString());
 
             //WriteLine("TOP PATTERN", "no of pattern", ini, categoriesTeachParam.TP_noOfPattern.ToString());
 

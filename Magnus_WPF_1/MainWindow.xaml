@@ -735,7 +735,7 @@
                                           IsChecked="False" Checked="btn_Debug_sequence_Checked" Unchecked="btn_Debug_sequence_Unchecked">
                             </ToggleButton>
 
-                            <Button x:Name="btn_Debug_sequence_PreviousStep" Content="{StaticResource debugSequencePreviousStepImage}"
+                            <!--<Button x:Name="btn_Debug_sequence_PreviousStep" Content="{StaticResource debugSequencePreviousStepImage}"
                                     Margin="0,0,0,0" HorizontalAlignment ="Center"
                                     Background="Transparent" BorderThickness="0"
                                     Click ="btn_Debug_sequence_PreviousStep_Click">
@@ -746,7 +746,7 @@
                                     Margin="0,0,0,0" HorizontalAlignment ="Center"
                                     Background="Transparent" BorderThickness="0"
                                     Click ="btn_Debug_sequence_NextStep_Click">
-                            </Button>
+                            </Button>-->
 
                             <ToggleButton x:Name="btn_Imidiate_Stop" 
                                     Content="{StaticResource ImidiateStopImage}"
@@ -816,7 +816,7 @@
 
             <Grid x:Name="grd_PopupDialog" SizeChanged="GridSettingChangedSize"></Grid>
             <Grid x:Name="grd_CameraPopupDialog" SizeChanged="GridSettingChangedSize"></Grid>
-
+            <Grid x:Name="grd_popup_WarningMessageBox"  SizeChanged="GridSettingChangedSize"></Grid>
         </Grid>
         
         <Grid x:Name="Layout1" Margin="0 130 0 0" 
@@ -928,7 +928,7 @@
             </Grid>
         </Grid>
 
-        <Popup x:Name="popup_uc" Height="auto" Width="100"
+        <Popup x:Name="popup_uc" Height="auto" Width="Auto"
                    AllowsTransparency="True"
                    HorizontalOffset="0"
                    VerticalOffset="-10">
@@ -936,5 +936,20 @@
                 <local:PopupUserControl x:Name="Header" Foreground="#E0FFFF"/>
             </Grid>
         </Popup>
+
+        <!--<Popup x:Name="popup_WarningMessageBox" Height="300" Width="600"
+                   AllowsTransparency="True"
+                   HorizontalOffset="0"
+                   VerticalOffset="-10"
+                    IsOpen="False"
+                    IsEnabled="False">
+            --><!--<Grid x:Name="grd_popup_WarningMessageBox"  Height="300" Width="600">
+            </Grid>-->
+            <!--<Grid>
+                <local:PopupUserControl x:Name="Header" Foreground="#E0FFFF"/>
+            </Grid>--><!--
+        </Popup>-->
+
+
     </Grid>
 </Window>

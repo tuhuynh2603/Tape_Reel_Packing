@@ -185,6 +185,9 @@
     <Compile Include="UI\UserControls\View\StatisticView.xaml.cs">
       <DependentUpon>StatisticView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\UserControls\WarningMessageBox.xaml.cs">
+      <DependentUpon>WarningMessageBox.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -250,6 +253,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\UserControls\View\StatisticView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\UserControls\WarningMessageBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -381,6 +388,21 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\chevron-triple-down-custom.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Download_2.png" />
+    <Resource Include="Resources\NextButton_1.png" />
+    <Resource Include="Resources\NextButton_2.png" />
+    <Resource Include="Resources\ResetButton_2.png" />
+    <Resource Include="Resources\SequenceNextButton.png" />
+    <Resource Include="Resources\SequencePreviousButton.png" />
+    <Resource Include="Resources\SequenceRetry.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\AbortSequenceButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ContinueSequenceButton.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

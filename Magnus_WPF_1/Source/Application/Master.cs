@@ -34,9 +34,11 @@ namespace Magnus_WPF_1.Source.Application
         public static ManualResetEvent[] InspectDoneEvent;
         public static AutoResetEvent[] m_hardwareTriggerSnapEvent;
         public static AutoResetEvent[] m_OfflineTriggerSnapEvent;
-        public bool m_bNextStepSequence = false;
+        public int m_bNextStepSequence = 0;
 
         public static AutoResetEvent m_NextStepSequenceEvent;
+        public static AutoResetEvent m_EmergencyStopSequenceEvent;
+
         public static ManualResetEvent[] VisionReadyEvent;
 
         // public AutoDeleteImagesDlg m_AutoDeleteImagesDlg = new AutoDeleteImagesDlg();
@@ -129,7 +131,7 @@ namespace Magnus_WPF_1.Source.Application
         public int m_EmergencyStatus_Simulate = 0;
         public int m_ImidiateStatus_Simulate = 0;
         public int m_ResetMachineStatus_Simulate = 0;
-        public bool m_bMachineNotReadyNeedToReset = true;
+        public bool m_bMachineNotReadyNeedToReset = false;
         public bool m_bNeedToImidiateStop= false;
 
         private void ContructorDocComponent()
@@ -141,6 +143,7 @@ namespace Magnus_WPF_1.Source.Application
             VisionReadyEvent = new ManualResetEvent[Application.m_nTrack];
             m_hardwareTriggerSnapEvent = new AutoResetEvent[Application.m_nTrack];
             m_NextStepSequenceEvent = new AutoResetEvent(false);
+            m_EmergencyStopSequenceEvent = new AutoResetEvent(false);
             m_SaveInspectImageThread = new Thread[Application.m_nTrack];
             thread_InspectSequence = new Thread[Application.m_nTrack];
             thread_StreamCamera = new Thread[Application.m_nTrack];
@@ -407,10 +410,28 @@ namespace Magnus_WPF_1.Source.Application
             }
         }
 
+        public void func_ResetSequenceThread()
+        {
+            if (ResetSequence() < 0)
+            {
+                lock (this)
+                {
+                    m_bMachineNotReadyNeedToReset = true;
+                }
+                WaitForNextStepSequenceEvent(" Reset Machine Failed. Please try again!");
+            }
 
+        }
         public int ResetSequence(bool bEnableStepMode = true)
         {
-
+            bool bMachineNotReadyNeedToReset = m_bMachineNotReadyNeedToReset;
+            if (m_ResetMachineStatus > 0 && m_bMachineNotReadyNeedToReset)
+            {
+                lock(this)
+                {
+                    m_bMachineNotReadyNeedToReset = false;
+                }
+            }
         ResetSequence_Step1:
             int nError = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
             Master.VisionReadyEvent[0].Reset();
@@ -424,9 +445,19 @@ namespace Magnus_WPF_1.Source.Application
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
             nError = WaitForNextStepSequenceEvent("Reset Sequence: Stop motor Done. Press Next to Move to place position");
             if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT) return -1;
-            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
+
+            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE)
             {
                 goto ResetSequence_Step1;
+            }
+            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_GOBACK)
+            {
+                goto ResetSequence_Step1;
+            }
+            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_RETRY)
+            {
+                goto ResetSequence_Step1;
+
             }
 
         ResetSequence_Step2:
@@ -434,9 +465,13 @@ namespace Magnus_WPF_1.Source.Application
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
             nError = WaitForNextStepSequenceEvent("Reset Sequence: Moving done. Press Next to put the device to position");
             if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT) return -1;
-            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
+            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE)
             {
                 goto ResetSequence_Step2;
+            }
+            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_GOBACK)
+            {
+                goto ResetSequence_Step1;
             }
             else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_RETRY)
             {
@@ -450,13 +485,17 @@ namespace Magnus_WPF_1.Source.Application
             Thread.Sleep(500);
             nError = WaitForNextStepSequenceEvent("Reset Sequence: Put device done. Press Next to turn off all the airs");
             if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT) return -1;
-            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
+            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE)
             {
                 goto ResetSequence_Step3;
             }
-            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_RETRY)
+            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_GOBACK)
             {
                 goto ResetSequence_Step2;
+            }
+            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_RETRY)
+            {
+                goto ResetSequence_Step1;
 
             }
 
@@ -466,13 +505,17 @@ namespace Magnus_WPF_1.Source.Application
             Thread.Sleep(500);
             nError = WaitForNextStepSequenceEvent("Reset Sequence: Press Next to Move to Ready position");
             if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT) return -1;
-            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
+            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE)
             {
                 goto ResetSequence_Step4;
             }
-            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_RETRY)
+            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_GOBACK)
             {
                 goto ResetSequence_Step3;
+            }
+            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_RETRY)
+            {
+                goto ResetSequence_Step1;
 
             }
 
@@ -481,13 +524,17 @@ namespace Magnus_WPF_1.Source.Application
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
             nError = WaitForNextStepSequenceEvent("Reset Sequence: Press Next to Complete Reset Sequence");
             if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT) return -1;
-            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
+            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE)
             {
                 goto ResetSequence_Step5;
             }
-            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_RETRY)
+            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_GOBACK)
             {
                 goto ResetSequence_Step4;
+            }
+            else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_RETRY)
+            {
+                goto ResetSequence_Step1;
 
             }
 
@@ -509,49 +556,55 @@ namespace Magnus_WPF_1.Source.Application
             SEQUENCE_ABORT = -1,
             SEQUENCE_CONTINUE = 0,
             SEQUENCE_IMIDIATE_BUTTON_CONTINUE = 1,
-            SEQUENCE_GOBACK = 1,
-            SEQUENCE_RETRY = 2
+            SEQUENCE_GOBACK = 2,
+            SEQUENCE_RETRY = 3
         }
         public int WaitForNextStepSequenceEvent(string strDebugMessage = "")
         {
-            
-            while (!m_NextStepSequenceEvent.WaitOne(10))
+            //if (strDebugMessage == "")
+            //{
+            //    MainWindow.mainWindow.PopupWarningMessageBox(strDebugMessage, false, m_bMachineNotReadyNeedToReset, false);
+            //    return (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
+            //}
+
+            m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
+            if (m_bMachineNotReadyNeedToReset || m_bNeedToImidiateStop)
             {
-                if (MainWindow.mainWindow == null)
+                m_EmergencyStopSequenceEvent.Reset();
+
+                MainWindow.mainWindow.PopupWarningMessageBox(strDebugMessage, true, m_bMachineNotReadyNeedToReset);
+                if(m_bMachineNotReadyNeedToReset)
                     return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
 
-                if (!MainWindow.mainWindow.bEnableRunSequence)
-                    return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
+                while (!m_EmergencyStopSequenceEvent.WaitOne(10))
+                {
+                    if (MainWindow.mainWindow == null)
+                        return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
+                }
+                //Show Dialog
+            }
+            else if(MainWindow.mainWindow.m_bEnableDebugSequence)
+            {
+                m_NextStepSequenceEvent.Reset();
+                MainWindow.mainWindow.PopupWarningMessageBox(strDebugMessage, false, m_bMachineNotReadyNeedToReset);
+                while (!m_NextStepSequenceEvent.WaitOne(10))
+                {
+                    if (MainWindow.mainWindow == null)
+                        return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
 
-                if (!MainWindow.mainWindow.m_bEnableDebugSequence || m_bNeedToImidiateStop || m_bMachineNotReadyNeedToReset)
-                    break;
+                    //if (!MainWindow.mainWindow.bEnableRunSequence)
+                    //    return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
 
-                // Retry button
+                    if (!MainWindow.mainWindow.m_bEnableDebugSequence || m_bNeedToImidiateStop || m_bMachineNotReadyNeedToReset)
+                        return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
+
+                }
 
             }
 
-            if (m_bMachineNotReadyNeedToReset)
-            {
-                // Popup Message Box
-                // Abort/ Continue/
-                MessageBox.Show("Emergency Stop Button Has Been Pressed !", "", MessageBoxButton.OK);
-                return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
+            MainWindow.mainWindow.PopupWarningMessageBox(strDebugMessage, false, m_bMachineNotReadyNeedToReset, false);
 
-            }
-            else
-                if(m_bNeedToImidiateStop)
-            {
-                if (MessageBox.Show("Would you like to continue sequence ?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                    return (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE;
-                else
-                    return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
-            }
-
-            if(m_bNextStepSequence)
-                return (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
-            else
-                return (int)SEQUENCE_OPTION.SEQUENCE_GOBACK;
-
+            return m_bNextStepSequence;
         }
 
         void func_RobotSequence()
@@ -562,10 +615,19 @@ namespace Magnus_WPF_1.Source.Application
             // Reset All motor
 
             // Home Move // init OutPut
-            ResetSequence();
+            if (ResetSequence() < 0)
+            {
+                lock (this)
+                {
+                    m_bMachineNotReadyNeedToReset = true;
+                }
+                nError = WaitForNextStepSequenceEvent(" Reset Machine Failed. End Sequence...");
+                return;
+            }
             //Wait for Signal from PLC when they ready for new Lot so we can create new lot ID
             while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_READY) == 0)
             {
+                // Need popup Dialog if waiting too long 
                 if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection || m_bMachineNotReadyNeedToReset)
                     return;
             }
@@ -991,7 +1053,7 @@ namespace Magnus_WPF_1.Source.Application
 
                 m_EmergencyStatus = m_EmergencyStatus_Simulate;
                 m_ImidiateStatus = m_ImidiateStatus_Simulate;
-                //m_ResetMachineStatus =  m_ResetMachineStatus_Simulate;
+                m_ResetMachineStatus =  m_ResetMachineStatus_Simulate;
 
                 if (m_hiWinRobotInterface == null)
                 {
@@ -1006,7 +1068,7 @@ namespace Magnus_WPF_1.Source.Application
 
                 m_EmergencyStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.EMERGENCY_STATUS) | m_EmergencyStatus_Simulate;
                 m_ImidiateStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.IMIDIATE_STATUS) | m_ImidiateStatus_Simulate;
-                //m_ResetMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RESET_STATUS) | m_ResetMachineStatus_Simulate;
+                m_ResetMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RESET_STATUS) | m_ResetMachineStatus_Simulate;
 
                 if (m_EmergencyStatus + m_ImidiateStatus > 0)
                     m_hiWinRobotInterface.StopMotor();

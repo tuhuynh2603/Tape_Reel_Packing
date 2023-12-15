@@ -32,6 +32,8 @@ namespace Magnus_WPF_1
         public static MainWindow mainWindow;
         public OutputLogView outputLogView;
         public DefectInfor defectInfor = new DefectInfor();
+        public WarningMessageBox m_WarningMessageBoxUC = new WarningMessageBox();
+
         public static string[] titles = new string[] { "Top Camera", "Barcode Reader", "Flap Side 2 " };
 
         private int screenWidth = 2000;// System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width;
@@ -214,7 +216,6 @@ namespace Magnus_WPF_1
             for (int nTrack = 0; nTrack < Source.Application.Application.m_nTrack; nTrack++)
                 master.loadTeachImageToUI(nTrack);
             //Source.Application.Application.LoadTeachParam();
-
 
         }
 
@@ -846,6 +847,7 @@ namespace Magnus_WPF_1
             //grd_PopupDialog.Children.Add(master.teachParameter);
             //grd_PopupDialog.Children.Add(master.m_Tracks[]);
             //tab_controls.SelectedIndex = currentTabIndex;
+            grd_Dialog_Settings.Visibility = Visibility.Visible;
 
 
         }
@@ -987,6 +989,7 @@ namespace Magnus_WPF_1
             grd_PopupDialog.Children.Add(master.teachParameter);
             //grd_PopupDialog.Children.Add(master.m_Tracks[]);
             tab_controls.SelectedIndex = currentTabIndex;
+            grd_Dialog_Settings.Visibility = Visibility.Visible;
 
         }
 
@@ -1138,6 +1141,8 @@ namespace Magnus_WPF_1
 
             grd_PopupDialog.Children.Add(master.mappingParameter);
             tab_controls.SelectedIndex = currentTabIndex;
+            grd_Dialog_Settings.Visibility = Visibility.Visible;
+
         }
 
         private void btn_enable_saveimage_Unchecked(object sender, RoutedEventArgs e)
@@ -1488,6 +1493,7 @@ namespace Magnus_WPF_1
             grd_PopupDialog.Children.Add(master.m_BarcodeReader.m_BarcodeReader);
             //grd_PopupDialog.Visibility = Visibility.Visible;
             grd_PopupDialog.Visibility = Visibility.Visible;
+            grd_Dialog_Settings.Visibility = Visibility.Visible;
 
         }
 
@@ -1514,16 +1520,16 @@ namespace Magnus_WPF_1
 
         private void btn_Debug_sequence_PreviousStep_Click(object sender, RoutedEventArgs e)
         {
-            master.m_bNextStepSequence = false;
-            if (m_bEnableDebugSequence)
-                Master.m_NextStepSequenceEvent.Set();
+            //master.m_bNextStepSequence = false;
+            //if (m_bEnableDebugSequence)
+            //    Master.m_NextStepSequenceEvent.Set();
         }
 
         private void btn_Debug_sequence_NextStep_Click(object sender, RoutedEventArgs e)
         {
-            master.m_bNextStepSequence = true;
-            if (m_bEnableDebugSequence)
-                Master.m_NextStepSequenceEvent.Set();
+            //master.m_bNextStepSequence = true;
+            //if (m_bEnableDebugSequence)
+            //    Master.m_NextStepSequenceEvent.Set();
         }
 
         int m_nPLCGridViewIndex = 0;
@@ -1539,6 +1545,7 @@ namespace Magnus_WPF_1
             grd_PopupDialog.Children.Clear();
             grd_PopupDialog.Children.Add(master.m_plcComm);
             grd_PopupDialog.Visibility = Visibility.Visible;
+            grd_Dialog_Settings.Visibility = Visibility.Visible;
         }
 
         private void btn_PLCCOMM_Setting_Unchecked(object sender, RoutedEventArgs e)
@@ -1556,18 +1563,32 @@ namespace Magnus_WPF_1
         private void btn_Emergency_Stop_Click(object sender, RoutedEventArgs e)
         {
             master.m_EmergencyStatus_Simulate = (bool)btn_Emergency_Stop.IsChecked == false ? 0 : 1;
+            Master.m_EmergencyStopSequenceEvent.Set();
 
         }
 
         private void btn_Imidiate_Stop_Click(object sender, RoutedEventArgs e)
         {
             master.m_ImidiateStatus_Simulate = (bool)btn_Imidiate_Stop.IsChecked == false ? 0 : 1;
+            Master.m_EmergencyStopSequenceEvent.Set();
         }
 
         private void btn_Reset_Machine_Click(object sender, RoutedEventArgs e)
         {
             if(master.m_ResetMachineStatus_Simulate == 0)
                 master.m_ResetMachineStatus_Simulate = 1;
+
+            if (master.thread_RobotSequence == null)
+            {
+                master.thread_RobotSequence = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.ResetSequence()));
+                master.thread_RobotSequence.Start();
+            }
+            else if (!master.thread_RobotSequence.IsAlive)
+            {
+                master.thread_RobotSequence = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.ResetSequence()));
+                master.thread_RobotSequence.Start();
+            }
+
         }
 
         public bool m_bShowOverlay = true;
@@ -1607,6 +1628,36 @@ namespace Magnus_WPF_1
                 }
 
 
+            });
+        }
+
+
+        public void PopupWarningMessageBox(string strDebugMessage, bool bIsEmergencyImidiateClicked, bool bIsNeedToAbort, bool bIsPopup = true)
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+
+                grd_Dialog_Settings.Margin = new Thickness(0, 160, 0, 0);
+                grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Center;
+                grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Center;
+                grd_Dialog_Settings.Width = 600;
+                grd_Dialog_Settings.Height = 300;
+
+                if (bIsPopup)
+                {
+                    grd_popup_WarningMessageBox.Children.Clear();
+                    m_WarningMessageBoxUC.updateMessageString(strDebugMessage, bIsEmergencyImidiateClicked, bIsNeedToAbort);
+                    grd_popup_WarningMessageBox.Children.Add(m_WarningMessageBoxUC);
+                    grd_popup_WarningMessageBox.Visibility = Visibility.Visible;
+                    grd_Dialog_Settings.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    grd_popup_WarningMessageBox.Children.Clear();
+                    grd_popup_WarningMessageBox.Visibility = Visibility.Collapsed;
+                    grd_Dialog_Settings.Visibility = Visibility.Collapsed;
+
+                }
             });
         }
 

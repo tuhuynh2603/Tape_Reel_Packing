@@ -5,37 +5,53 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Magnus_WPF_1.UI.UserControls.View"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="400">
+             d:DesignHeight="350" d:DesignWidth="1000">
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2.1*"></ColumnDefinition>
-            <ColumnDefinition  Width="2.1*"></ColumnDefinition>
+            <ColumnDefinition Width="10.1*"></ColumnDefinition>
             <ColumnDefinition  Width="2.1*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0" x:Name="Grid_CanVas_Mapping"  SizeChanged="Grid_CanVas_Mapping_SizeChanged">
-            <GroupBox Margin="10" Header="Mapping Result" Foreground="WhiteSmoke" FontSize="20">
-                <Border  Height="auto" BorderBrush="WhiteSmoke" CornerRadius="3" BorderThickness="3"  Background="Transparent" Opacity="0.8" Margin="9,9,9,1">
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                        <Canvas  Margin="5" x:Name="canvas_Mapping" VerticalAlignment="Top"  MouseMove="canvas_Mapping_MouseMove" HorizontalAlignment="Left" MouseLeftButtonDown="canvas_Mapping_MouseLeftButtonDown" MouseLeave="canvas_Mapping_MouseLeave">
-                            <Border x:Name="border_boundingbox_focus"></Border>
-                            <Border x:Name="border_boundingbox_clicked"></Border>
-                        </Canvas>
-                    </ScrollViewer>
-                </Border>
-            </GroupBox>
-        </Grid>
 
-        <Border  Grid.Column="1"  Height="auto" BorderBrush="WhiteSmoke" CornerRadius="3" BorderThickness="3"  Background="Transparent" Opacity="0.8" Margin="9,9,9,1">
+            <!--<GroupBox Grid.Row="0" Margin="10" Header="Mapping Result" Foreground="WhiteSmoke" FontSize="20">
+                <Grid>-->
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition Height="40"/>
+
+                    </Grid.RowDefinitions>
+                    <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                            <Canvas  Margin="5" x:Name="canvas_Mapping" VerticalAlignment="Top"  MouseMove="canvas_Mapping_MouseMove" HorizontalAlignment="Left" MouseLeftButtonDown="canvas_Mapping_MouseLeftButtonDown" MouseLeave="canvas_Mapping_MouseLeave">
+                                <Border x:Name="border_boundingbox_moving"></Border>
+                                <!--<Border x:Name="border_boundingbox_clicked"></Border>-->
+                            </Canvas>
+                    </ScrollViewer>
+                    <Grid  Grid.Row="1">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Background="Gray">
+                            <Button x:Name="btn_Previous_Page" Click="btn_Previous_Page_Click" Content="Previous" Width="100"></Button>
+                            <TextBlock x:Name="text_Current_Page" Text="1" FontSize="20" 
+                                       TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" Foreground="White" Background="Gray"></TextBlock>
+                            <Button x:Name="btn_Next_Page" Click="btn_Next_Page_Click"  Content="Next" Width="100"></Button>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            <!--</GroupBox>
+
+            
+        </Grid>-->
+
+        <!--<Border  Grid.Column="1"  Height="auto" BorderBrush="WhiteSmoke" CornerRadius="3" BorderThickness="3"  Background="Transparent" Opacity="0.8" Margin="9,9,9,1">
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <Canvas  Margin="5" x:Name="canvas_Mapping_NextPage"  MouseMove="canvas_Mapping_NextPage_MouseMove"  HorizontalAlignment="Left" VerticalAlignment="Top" MouseLeftButtonDown="canvas_Mapping_NextPage_MouseLeftButtonDown"  MouseLeave="canvas_Mapping_NextPage_MouseLeave">
-                    <Border x:Name="border_boundingbox_NextPage_focus"></Border>
-                    <Border x:Name="border_boundingbox_NextPage_clicked"></Border>
+                <Canvas  Margin="5" x:Name="canvas_Mapping_2"  MouseMove="canvas_Mapping_NextPage_MouseMove"  HorizontalAlignment="Left" VerticalAlignment="Top" MouseLeftButtonDown="canvas_Mapping_NextPage_MouseLeftButtonDown"  MouseLeave="canvas_Mapping_NextPage_MouseLeave">
+                    <Border x:Name="border_boundingbox_focus_2"></Border>
+                    <Border x:Name="border_boundingbox_clicked_2"></Border>
                 </Canvas>
             </ScrollViewer>
-        </Border>
+        </Border>-->
 
-        <Grid Grid.Column="2">
+        <Grid Grid.Column="1">
 
             <Border Height="Auto"
                                                     CornerRadius="8" BorderThickness="3" 
@@ -43,11 +59,11 @@
                                                     Margin="0.2,0,0.4,0.2">
                 <DockPanel  LastChildFill="True">
                     <DockPanel LastChildFill="True" DockPanel.Dock="Top">
-                        <GroupBox Margin="5" Header="Statistics" Foreground="WhiteSmoke" FontSize="20" Style="{x:Null}">
+                        <GroupBox Margin="5" Header="Statistics" Foreground="WhiteSmoke" FontSize="15" Style="{x:Null}">
 
                                 <Grid>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="25"/>
+                                        <RowDefinition Height="50"/>
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
                                     <Grid Grid.Row="0" Margin="5,5,50,5">
@@ -106,11 +122,11 @@
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <Border Name="HighlightBorder" Width="Auto"
-                                Margin="0"
-                                Padding="5"
-                                BorderThickness="0"
-                                BorderBrush="#FF606060"
-                                Background="{Binding BrushRowList}">
+                                                    Margin="0"
+                                                    Padding="5"
+                                                    BorderThickness="0"
+                                                    BorderBrush="#FF606060"
+                                                    Background="{Binding BrushRowList}">
                                                     <Grid>
 
                                                         <Grid.ColumnDefinitions>
@@ -120,35 +136,35 @@
 
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Name="nameStatistic"
-                                            Grid.Column="0"
-                                            FontSize="16"
-                                            FontFamily="Microsoft New Tai Lue"
-                                            HorizontalAlignment="Left"
-                                            Text="{Binding nameSummary,Mode=TwoWay}"
-                                            TextWrapping="Wrap"
-                                            Foreground="{Binding color}">
+                                                            Grid.Column="0"
+                                                            FontSize="16"
+                                                            FontFamily="Microsoft New Tai Lue"
+                                                            HorizontalAlignment="Left"
+                                                            Text="{Binding nameSummary,Mode=TwoWay}"
+                                                            TextWrapping="Wrap"
+                                                            Foreground="{Binding color}">
                                                         </TextBlock>
                                                         <TextBlock Name="valueStatistic_Camera1"
-                                            Grid.Column="1"
-                                            FontSize="16"
-                                            FontFamily="Microsoft New Tai Lue"
-                                            HorizontalAlignment="Right"
-                                            TextAlignment="Right"
-                                            VerticalAlignment="Center"
-                                            Text="{Binding valueSummary_Camera1,Mode=TwoWay}"
-                                            TextWrapping="Wrap"
-                                            Foreground="{Binding color}">
+                                                            Grid.Column="1"
+                                                            FontSize="16"
+                                                            FontFamily="Microsoft New Tai Lue"
+                                                            HorizontalAlignment="Right"
+                                                            TextAlignment="Right"
+                                                            VerticalAlignment="Center"
+                                                            Text="{Binding valueSummary_Camera1,Mode=TwoWay}"
+                                                            TextWrapping="Wrap"
+                                                            Foreground="{Binding color}">
                                                         </TextBlock>
                                                         <TextBlock Name="valueStatistic_Camera2"
-                                            Grid.Column="2"
-                                            FontSize="16"
-                                            FontFamily="Microsoft New Tai Lue"
-                                            HorizontalAlignment="Right"
-                                            TextAlignment="Right"
-                                            VerticalAlignment="Center"
-                                            Text="{Binding valueSummary_Camera2,Mode=TwoWay}"
-                                            TextWrapping="Wrap"
-                                            Foreground="{Binding color}">
+                                                            Grid.Column="2"
+                                                            FontSize="16"
+                                                            FontFamily="Microsoft New Tai Lue"
+                                                            HorizontalAlignment="Right"
+                                                            TextAlignment="Right"
+                                                            VerticalAlignment="Center"
+                                                            Text="{Binding valueSummary_Camera2,Mode=TwoWay}"
+                                                            TextWrapping="Wrap"
+                                                            Foreground="{Binding color}">
                                                         </TextBlock>
                                                     </Grid>
                                                 </Border>

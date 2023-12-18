@@ -35,11 +35,11 @@
                 </StackPanel>
             </StackPanel>
         </Border>
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="0,40,0,0">
+        <ScrollViewer x:Name="scv_StepDebugScrollView" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="0,40,0,0" MouseWheel="ScrollViewer_MouseWheel">
             <!--<Border CornerRadius="0" BorderThickness="1" BorderBrush="#FF86D2F9" Background="#FF242526">-->
                 <ListView x:Name="lvDefect" FontSize="15" Width="Auto"  Background="Black" 
                           SelectionChanged="lvDefect_SelectionChanged"
-                          FocusableChanged="lvDefect_FocusableChanged">
+                          FocusableChanged="lvDefect_FocusableChanged" PreviewMouseWheel="lvDefect_PreviewMouseWheel">
                     
                     <ListView.ItemTemplate>
                         <DataTemplate>

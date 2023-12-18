@@ -400,7 +400,7 @@ namespace Magnus_WPF_1
                         Title = titles[track_index * num_Doc + doc_index],
                         Content = master.m_Tracks[track_index].m_imageViews[doc_index],
                         ContentId = "N/A ",
-                        CanFloat = false,
+                        CanFloat = true,
                         CanClose = false,
                         //CanMove = false,
                     };
@@ -418,7 +418,7 @@ namespace Magnus_WPF_1
             outPutLogViewDoc.ContentId = "";
 
             outPutLogViewDoc.CanClose = false;
-            outPutLogViewDoc.CanHide = false;
+            outPutLogViewDoc.CanHide = true;
             outPutLogViewDoc.AutoHideMinWidth = screenWidth / 1;
 
             outPutLogViewPane = new LayoutAnchorablePane();
@@ -439,7 +439,7 @@ namespace Magnus_WPF_1
 
             #region Statistic Contruction
             m_MappingViewDoc = new LayoutAnchorable();
-            m_MappingViewDoc.Title = "Output Log View";
+            m_MappingViewDoc.Title = "Mapping Results";
             m_MappingViewDoc.Content = m_staticView;
             m_MappingViewDoc.ContentId = "";
 
@@ -451,8 +451,8 @@ namespace Magnus_WPF_1
             m_MappingPaneGroup.Children.Add(m_MappingViewPane);
 
             m_MappingPaneGroup.DockWidth = new System.Windows.GridLength(screenWidth);
-            m_MappingPaneGroup.DockHeight = new System.Windows.GridLength(screenHeight / 4);
-            m_MappingPaneGroup.DockMinHeight = screenHeight / 4;
+            m_MappingPaneGroup.DockHeight = new System.Windows.GridLength(screenHeight / 6);
+            m_MappingPaneGroup.DockMinHeight = screenHeight / 10;
             m_MappingPaneGroup.DockMinWidth = screenWidth / 10;
             m_MappingViewPane.Children.Add(m_MappingViewDoc);
 
@@ -465,14 +465,14 @@ namespace Magnus_WPF_1
 
             #region Show UI
             m_layout = new LayoutPanel();
-            m_layout.Orientation = Orientation.Vertical;
+            m_layout.Orientation = Orientation.Horizontal;
             m_layout.Children.Add(mainPanelGroup);
-            m_layout.Children.Add(m_MappingPaneGroup);
+            m_layout.Children.Add(outPutLogPaneGroup);
             
-            m_layoutPanel.Orientation = Orientation.Horizontal;
+            m_layoutPanel.Orientation = Orientation.Vertical;
             m_layoutPanel.Children.Add(m_layout);
-            m_layoutPanel.Children.Add(outPutLogPaneGroup);
-
+            m_layoutPanel.Children.Add(m_MappingPaneGroup);
+            
             layoutHPSF = new LayoutRoot();
             layoutHPSF.RootPanel = m_layoutPanel;
             #endregion
@@ -528,6 +528,8 @@ namespace Magnus_WPF_1
                 imagesViewDoc[trackID].CanClose = false;
                 imagesViewDoc[trackID].CanFloat = false;
                 m_layoutPanel.ReplaceChildAt(0, bigPanelGroup);
+                m_layoutPanel.RemoveChildAt(1);
+                //m_layoutPanel.Orientation = Orientation.Horizontal;
             }
             else
             {
@@ -537,6 +539,7 @@ namespace Magnus_WPF_1
                 imageZoomViewPane.ReplaceChild(imagesViewDoc[trackID], bigDoc);
                 imagesViewPane[trackID].Children.Add(imagesViewDoc[trackID]);
                 m_layoutPanel.ReplaceChildAt(0, m_layout);
+                m_layoutPanel.Children.Add(m_MappingPaneGroup);
             }
             isOneSpecificDocState = !isOneSpecificDocState;
             child_PreviewMouseRightButtonDown(activeImageDock, null);

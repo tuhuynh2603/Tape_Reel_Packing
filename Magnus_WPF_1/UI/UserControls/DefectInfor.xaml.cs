@@ -88,5 +88,19 @@ namespace Magnus_WPF_1.UI.UserControls
         private void lvDefect_FocusableChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
         }
+
+        private void ScrollViewer_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            //ScrollViewer scv = (ScrollViewer)sender;
+            scv_StepDebugScrollView.ScrollToVerticalOffset(scv_StepDebugScrollView.VerticalOffset - e.Delta);
+            e.Handled = true;
+        }
+
+        private void lvDefect_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            //ScrollViewer scv = (ScrollViewer)sender;
+            scv_StepDebugScrollView.ScrollToVerticalOffset(scv_StepDebugScrollView.VerticalOffset - e.Delta);
+            e.Handled = true;
+        }
     }
 }

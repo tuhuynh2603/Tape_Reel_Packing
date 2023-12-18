@@ -836,8 +836,8 @@
                 <avalonDock:DockingManager x:Name="dockManager"  Grid.Column="0"
                                        ActiveContentChanged="dockManager_ActiveContentChanged"                                  
                                        AllowMixedOrientation="True" 
-                                       GridSplitterWidth="5" 
-                                       GridSplitterHeight="5"
+                                       GridSplitterWidth="10" 
+                                       GridSplitterHeight="10"
                                        Layout="{Binding layoutHPSF, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}">
                     <avalonDock:DockingManager.Theme>
                         <avalonDock:Vs2013DarkTheme/>

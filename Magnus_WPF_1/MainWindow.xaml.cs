@@ -31,6 +31,10 @@ namespace Magnus_WPF_1
 
         public static MainWindow mainWindow;
         public OutputLogView outputLogView;
+        public StatisticView m_staticView;
+        public int m_nDeviceX = 5;
+        public int m_nDeviceY = 5;
+        public int m_nTotalDevicePerLot = 1000;
         public DefectInfor defectInfor = new DefectInfor();
         public WarningMessageBox m_WarningMessageBoxUC = new WarningMessageBox();
 
@@ -57,8 +61,13 @@ namespace Magnus_WPF_1
 
         private LayoutDocument teachViewDoc;
         public static ImageView activeImageDock;
-        public static
         LayoutPanel m_layout;
+
+        private LayoutAnchorablePaneGroup m_MappingPaneGroup;
+        private LayoutAnchorablePane m_MappingViewPane;
+        private LayoutAnchorable m_MappingViewDoc;
+        LayoutPanel m_layOut_OutPutLog;
+        LayoutPanel m_layOut_Mapping;
 
 
         private Point _startPositionDlg;
@@ -73,6 +82,31 @@ namespace Magnus_WPF_1
                 OnPropertyChanged("layoutHPSF");
             }
         }
+
+        private LayoutRoot _layout_OutputLog;
+        public LayoutRoot layout_OutputLog
+        {
+            get { return _layout_OutputLog; }
+            set
+            {
+                _layout_OutputLog = value;
+                OnPropertyChanged("layout_OutputLog");
+            }
+        }
+
+        private LayoutRoot _layout_Mapping;
+
+        public LayoutRoot layout_Mapping
+        {
+            get { return _layout_Mapping; }
+            set
+            {
+                _layout_Mapping = value;
+                OnPropertyChanged("layout_Mapping");
+            }
+        }
+
+        
 
         private double _dialogDefectHeight;
         private double _dialogDefectWidth;
@@ -179,6 +213,7 @@ namespace Magnus_WPF_1
             mainWindow = this;
             master = new Master(this);
             outputLogView = new OutputLogView(this);
+            m_staticView = new StatisticView(this);
             //master.m_SaveInspectImageThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread(true)));
 
             btn_enable_saveimage.IsChecked = Source.Application.Application.m_bEnableSavingOnlineImage;
@@ -186,7 +221,6 @@ namespace Magnus_WPF_1
 
             ContrucUIComponent();
             MappingImageDockToAvalonDock();
-            InitCanvasMapping();
             StateChanged += delegate (object sender, EventArgs e)
             {
                 if ((sender as Window) == null)
@@ -220,312 +254,10 @@ namespace Magnus_WPF_1
         }
 
 
-        public Point m_CanvasMovePoint = new Point(0, 0);
-        int m_nWidthMappingRect = 100;
-        int m_nStepMappingRect = 102;
-        int m_nDeviceX = 5;
-        int m_nDeviceY = 5;
-        int m_nTotalDevicePerLot = 1000;
-        int m_nNumberMappingPage = 1;
-        int m_nWidthMappingPageRect = 100;
-        int m_nStepMappingPageRect = 102;
-        public Point m_CanvasMovePagePoint = new Point(0, 0);
-        int m_nPageID = 0;
-
-        Image[] arr_imageMapping;
-        Label[] arr_textBlockMapping;
-
-        Image[] arr_imageMappingPage;
-        Label[] arr_textBlockMappingPage;
-
-        private void InitCanvasMapping()
-        {
-
-
-            m_nDeviceX = Source.Application.Application.categoriesMappingParam.M_NumberDeviceX;
-            m_nDeviceY = Source.Application.Application.categoriesMappingParam.M_NumberDeviceY;
-            m_nTotalDevicePerLot = Source.Application.Application.categoriesMappingParam.M_NumberDevicePerLot;
-            double dPage = Math.Round(m_nTotalDevicePerLot / m_nDeviceX / m_nDeviceY * 1.0);
-            m_nNumberMappingPage = (int)dPage;
-
-            int nMaxDeviceStep = m_nDeviceX > m_nDeviceY ? m_nDeviceX : m_nDeviceY;
-            if (canvas_Mapping.Children != null)
-            {
-                //canvas_Mapping.Children.RemoveRange(0, canvas_Mapping.Children.Count);
-                canvas_Mapping.Children.Clear();
-
-            }
-
-            m_nWidthMappingRect = 500 / nMaxDeviceStep;
-            m_nStepMappingRect = m_nWidthMappingRect + 10 / nMaxDeviceStep;
-            string path = @"/Resources/gray-chip.png";
-            arr_imageMapping = new Image[m_nDeviceX * m_nDeviceY];
-            arr_textBlockMapping = new Label[m_nDeviceX * m_nDeviceY];
-            int nID = 0;
-            for (int nDeviceX = 0; nDeviceX < m_nDeviceX; nDeviceX++)
-            {
-                for (int nDeviceY = 0; nDeviceY < m_nDeviceY; nDeviceY++)
-                {
-                    nID = nDeviceX + nDeviceY * m_nDeviceX;
-                    //Canvas canvas_temp = new Canvas();
-                    arr_imageMapping[nID] = new Image();
-                    arr_imageMapping[nID].Source = new BitmapImage(new Uri(path, UriKind.Relative));
-                    arr_imageMapping[nID].Width = 0.95 * m_nWidthMappingRect;
-                    arr_imageMapping[nID].Height = 0.95 * m_nWidthMappingRect;
-                    arr_textBlockMapping[nID] = new Label();
-                    arr_textBlockMapping[nID].Content = (nDeviceX + 1 + nDeviceY * m_nDeviceX);
-                    arr_textBlockMapping[nID].FontSize = 0.95 * m_nWidthMappingRect / 3;
-                    arr_textBlockMapping[nID].MinWidth = 0.95 * m_nWidthMappingRect;
-                    arr_textBlockMapping[nID].Foreground = new SolidColorBrush(Colors.Yellow);
-                    arr_textBlockMapping[nID].HorizontalContentAlignment = HorizontalAlignment.Center;
-                    Canvas.SetLeft(arr_imageMapping[nID], m_nStepMappingRect * nDeviceX);
-                    Canvas.SetTop(arr_imageMapping[nID], m_nStepMappingRect * nDeviceY);
-                    canvas_Mapping.Children.Add(arr_imageMapping[nID]);
-
-                    Canvas.SetLeft(arr_textBlockMapping[nID], m_nStepMappingRect * nDeviceX);
-                    Canvas.SetTop(arr_textBlockMapping[nID], m_nStepMappingRect * nDeviceY + arr_textBlockMapping[nID].FontSize / 3);
-                    canvas_Mapping.Children.Add(arr_textBlockMapping[nID]);
-
-
-                }
-            }
-
-            border_boundingbox_focus.Width = m_nWidthMappingRect;
-            border_boundingbox_focus.Height = m_nWidthMappingRect;
-            border_boundingbox_focus.BorderThickness = new Thickness(0);
-            border_boundingbox_focus.BorderBrush = new SolidColorBrush(Colors.WhiteSmoke);
-            Canvas.SetLeft(border_boundingbox_focus, 0);
-            Canvas.SetTop(border_boundingbox_focus, 0);
-            canvas_Mapping.Children.Add(border_boundingbox_focus);
 
 
 
-            border_boundingbox_clicked.Width = m_nWidthMappingRect;
-            border_boundingbox_clicked.Height = m_nWidthMappingRect;
-            border_boundingbox_clicked.BorderThickness = new Thickness(0);
-            border_boundingbox_clicked.BorderBrush = new SolidColorBrush(Colors.Yellow);
-            Canvas.SetLeft(border_boundingbox_clicked, 0);
-            Canvas.SetTop(border_boundingbox_clicked, 0);
-            canvas_Mapping.Children.Add(border_boundingbox_clicked);
 
-            InitCanvasMappingPage();
-        }
-
-        private int Check_mapping_Cursor_ID(Point cur_point, bool bIsclicked)
-        {
-            int nIDX = (int)(cur_point.X / m_nStepMappingRect);
-            int nIDY = (int)(cur_point.Y / m_nStepMappingRect);
-
-            if (nDeviceID != nIDX + nIDY * m_nDeviceX)
-            {
-                nDeviceID = nIDX + nIDY * m_nDeviceX;
-                if (nIDX < m_nDeviceX && nIDY < m_nDeviceY)
-                {
-                    Canvas.SetLeft(border_boundingbox_focus, m_nStepMappingRect * nIDX);
-                    Canvas.SetTop(border_boundingbox_focus, m_nStepMappingRect * nIDY);
-                    border_boundingbox_focus.BorderThickness = new Thickness(2);
-                }
-                else
-                {
-                    border_boundingbox_focus.BorderThickness = new Thickness(0);
-                    //border_boundingbox_clicked.BorderThickness = new Thickness(0);
-
-                }
-            }
-
-            if (bIsclicked)
-            {
-                Canvas.SetLeft(border_boundingbox_clicked, m_nStepMappingRect * nIDX);
-                Canvas.SetTop(border_boundingbox_clicked, m_nStepMappingRect * nIDY);
-                border_boundingbox_clicked.BorderThickness = new Thickness(2);
-            }
-
-            //canvas_Mapping.Children.RemoveAt(nIDX + nIDY * 10);
-            return nIDX + nIDY * m_nDeviceX;
-
-        }
-        private void canvas_Mapping_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-
-            m_CanvasMovePoint = e.GetPosition(canvas_Mapping);
-            int nID = Check_mapping_Cursor_ID(m_CanvasMovePoint, true);
-            master.m_Tracks[activeImageDock.trackID].m_nCurrentClickMappingID = nID + m_nPageID * m_nDeviceX * m_nDeviceY;
-
-            master.m_Tracks[activeImageDock.trackID].CheckInspectionOnlineThread();
-            if (bEnableRunSequence || bEnableOfflineInspection)
-                Master.m_OfflineTriggerSnapEvent[activeImageDock.trackID].Set();
-            else
-                Master.InspectEvent[activeImageDock.trackID].Set();
-        }
-
-        private void canvas_Mapping_MouseMove(object sender, MouseEventArgs e)
-        {
-            m_CanvasMovePoint = e.GetPosition(canvas_Mapping);
-            Check_mapping_Cursor_ID(m_CanvasMovePoint, false);
-        }
-
-        private void canvas_Mapping_MouseLeave(object sender, MouseEventArgs e)
-        {
-            border_boundingbox_focus.BorderThickness = new Thickness(0);
-            nDeviceID = -1;
-        }
-
-        private void InitCanvasMappingPage()
-        {
-
-
-            double dPage = m_nTotalDevicePerLot * 1.0 / m_nDeviceX * 1.0 / m_nDeviceY * 1.0;
-            m_nNumberMappingPage = (int)dPage;
-            if (m_nNumberMappingPage < dPage)
-                m_nNumberMappingPage = (int)dPage + 1;
-            int nMaxDeviceStep = m_nNumberMappingPage;
-            if (canvas_Mapping_NextPage.Children != null)
-            {
-                //canvas_Mapping.Children.RemoveRange(0, canvas_Mapping.Children.Count);
-                canvas_Mapping_NextPage.Children.Clear();
-
-            }
-
-            m_nWidthMappingPageRect = 50;
-            m_nStepMappingPageRect = 60;
-            string path = @"/Resources/blue-chip.png";
-            arr_imageMappingPage = new Image[m_nNumberMappingPage];
-            arr_textBlockMappingPage = new Label[m_nNumberMappingPage];
-            int nID = 0;
-            for (int nPage = 0; nPage < m_nNumberMappingPage; nPage++)
-            {
-                    nID = nPage;
-                    //Canvas canvas_temp = new Canvas();
-                    arr_imageMappingPage[nID] = new Image();
-                    arr_imageMappingPage[nID].Source = new BitmapImage(new Uri(path, UriKind.Relative));
-                    arr_imageMappingPage[nID].Width = 0.95 * m_nWidthMappingPageRect;
-                    arr_imageMappingPage[nID].Height = 0.95 * m_nWidthMappingPageRect;
-                    arr_textBlockMappingPage[nID] = new Label();
-                    arr_textBlockMappingPage[nID].Content = nID + 1;
-                    arr_textBlockMappingPage[nID].FontSize = 0.95 * m_nWidthMappingPageRect / 3;
-                    arr_textBlockMappingPage[nID].MinWidth = 0.95 * m_nWidthMappingPageRect;
-                    arr_textBlockMappingPage[nID].Foreground = new SolidColorBrush(Colors.Yellow);
-                    arr_textBlockMappingPage[nID].HorizontalContentAlignment = HorizontalAlignment.Center;
-                    Canvas.SetLeft(arr_imageMappingPage[nID], m_nStepMappingPageRect * nPage);
-                    Canvas.SetTop(arr_imageMappingPage[nID], m_nStepMappingPageRect );
-                    canvas_Mapping_NextPage.Children.Add(arr_imageMappingPage[nID]);
-
-                    Canvas.SetLeft(arr_textBlockMappingPage[nID], m_nStepMappingPageRect * nPage);
-                    Canvas.SetTop(arr_textBlockMappingPage[nID], m_nStepMappingPageRect + arr_textBlockMappingPage[nID].FontSize / 3);
-                    canvas_Mapping_NextPage.Children.Add(arr_textBlockMappingPage[nID]);
-            }
-
-            border_boundingbox_NextPage_focus.Width = m_nWidthMappingPageRect;
-            border_boundingbox_NextPage_focus.Height = m_nWidthMappingPageRect;
-            border_boundingbox_NextPage_focus.BorderThickness = new Thickness(0);
-            border_boundingbox_NextPage_focus.BorderBrush = new SolidColorBrush(Colors.WhiteSmoke);
-            Canvas.SetLeft(border_boundingbox_NextPage_focus, 0);
-            Canvas.SetTop(border_boundingbox_NextPage_focus, 0);
-            canvas_Mapping_NextPage.Children.Add(border_boundingbox_NextPage_focus);
-
-
-            border_boundingbox_NextPage_clicked.Width = m_nWidthMappingPageRect;
-            border_boundingbox_NextPage_clicked.Height = m_nWidthMappingPageRect;
-            border_boundingbox_NextPage_clicked.BorderThickness = new Thickness(0);
-            border_boundingbox_NextPage_clicked.BorderBrush = new SolidColorBrush(Colors.Yellow);
-            Canvas.SetLeft(border_boundingbox_NextPage_clicked, 0);
-            Canvas.SetTop(border_boundingbox_NextPage_clicked, 0);
-            canvas_Mapping_NextPage.Children.Add(border_boundingbox_NextPage_clicked);
-        }
-
-
-        private int Check_mapping_Page_Cursor_ID(Point cur_point, bool bIsclicked)
-        {
-            int nIDX = (int)(cur_point.X / m_nStepMappingPageRect);
-            //int nIDY = (int)(cur_point.Y / m_nStepMappingPageRect);
-
-            if (m_nPageID != nIDX )
-            {
-                if (nIDX < m_nNumberMappingPage)
-                {
-                    Canvas.SetLeft(border_boundingbox_NextPage_focus, m_nStepMappingPageRect * nIDX);
-                    Canvas.SetTop(border_boundingbox_NextPage_focus, m_nStepMappingPageRect);
-                    border_boundingbox_NextPage_focus.BorderThickness = new Thickness(2);
-                }
-                else
-                {
-                    border_boundingbox_NextPage_focus.BorderThickness = new Thickness(0);
-                    //border_boundingbox_clicked.BorderThickness = new Thickness(0);
-
-                }
-            }
-
-            if (bIsclicked)
-            {
-                Canvas.SetLeft(border_boundingbox_NextPage_clicked, m_nStepMappingPageRect * nIDX);
-                Canvas.SetTop(border_boundingbox_NextPage_clicked, m_nStepMappingPageRect);
-                border_boundingbox_NextPage_clicked.BorderThickness = new Thickness(2);
-            }
-
-            //canvas_Mapping.Children.RemoveAt(nIDX + nIDY * 10);
-            return nIDX;
-
-        }
-
-        private void canvas_Mapping_NextPage_MouseMove(object sender, MouseEventArgs e)
-        {
-            m_CanvasMovePagePoint = e.GetPosition(canvas_Mapping_NextPage);
-            Check_mapping_Page_Cursor_ID(m_CanvasMovePagePoint, false);
-        }
-
-        private void canvas_Mapping_NextPage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            m_CanvasMovePagePoint = e.GetPosition(canvas_Mapping_NextPage);
-            int nCurrentPageID = Check_mapping_Page_Cursor_ID(m_CanvasMovePagePoint, true);
-
-            if (m_nPageID == nCurrentPageID)
-                return;
-
-            m_nPageID = nCurrentPageID;
-            UpdateMappingResultPage();
-        }
-
-        public void UpdateMappingResultPage()
-        {
-            string path = @"/Resources/gray-chip.png";
-            string pathFail = @"/Resources/red-chip.png";
-            string pathPass = @"/Resources/green-chip.png";
-
-            int nResult1, nResult2, nResultTotal;
-            for (int nID = 0; nID < arr_imageMapping.Length; nID++)
-            {
-                nResult1 = master.m_Tracks[0].m_nResult[nID + m_nPageID * arr_imageMapping.Length];
-                nResult2 = master.m_Tracks[1].m_nResult[nID + m_nPageID * arr_imageMapping.Length];
-                nResultTotal = (int)ERROR_CODE.NUM_DEFECTS;
-
-                if (nResult1 < (int)ERROR_CODE.PASS || nResult2 < (int)ERROR_CODE.PASS)
-                    nResultTotal = -1;
-                else if (nResult1 == (int)ERROR_CODE.PASS || nResult2 == (int)ERROR_CODE.PASS)
-                    nResultTotal = (int)ERROR_CODE.PASS;
-
-                switch (nResultTotal)
-                {
-                    case (int)ERROR_CODE.NUM_DEFECTS:
-                        arr_imageMapping[nID].Source = new BitmapImage(new Uri(path, UriKind.Relative));
-                        break;
-
-                    case (int)ERROR_CODE.PASS:
-                        arr_imageMapping[nID].Source = new BitmapImage(new Uri(pathPass, UriKind.Relative));
-                        break;
-                    default:
-                        arr_imageMapping[nID].Source = new BitmapImage(new Uri(pathFail, UriKind.Relative));
-                        break;
-                }
-            }
-        }
-
-        private void canvas_Mapping_NextPage_MouseLeave(object sender, MouseEventArgs e)
-        {
-            border_boundingbox_NextPage_focus.BorderThickness = new Thickness(0);
-            //m_nPageID = -1;
-        }
-
-        int nDeviceID = -1;
 
 
 
@@ -561,8 +293,8 @@ namespace Magnus_WPF_1
             btn_run_sequence.IsChecked = true;
             bEnableRunSequence = (bool)btn_run_sequence.IsChecked;
             inspect_offline_btn.IsEnabled = false;
-            ResetMappingResult(nTrack);
-            ResetStatisticResult(nTrack);
+            m_staticView.ResetMappingResult(nTrack);
+            m_staticView.ClearStatistic(nTrack);
             for (int n = 0; n < Application.m_nTrack; n++)
             {
                 master.RunOnlineSequenceThread(n);
@@ -640,6 +372,8 @@ namespace Magnus_WPF_1
             mainPanelGroup.Orientation = Orientation.Horizontal;
             outPutLogPaneGroup = new LayoutAnchorablePaneGroup();
             outPutLogPaneGroup.Orientation = Orientation.Vertical;
+            m_MappingPaneGroup = new LayoutAnchorablePaneGroup();
+            m_MappingPaneGroup.Orientation = Orientation.Vertical;
 
             int numTrack, num_Doc, total_doc;
             numTrack = Magnus_WPF_1.Source.Application.Application.m_nTrack;
@@ -657,7 +391,7 @@ namespace Magnus_WPF_1
             for (int track_index = 0; track_index < numTrack; track_index++)
             {
                 imagesViewPane[track_index] = new LayoutDocumentPane();
-                imagesViewPane[track_index].CanRepositionItems = false;
+                imagesViewPane[track_index].CanRepositionItems = true;
                 imagesViewPaneGroup.Children.Add(imagesViewPane[track_index]);
                 for (int doc_index = 0; doc_index < num_Doc; doc_index++)
                 {
@@ -690,22 +424,54 @@ namespace Magnus_WPF_1
             outPutLogViewPane = new LayoutAnchorablePane();
             outPutLogPaneGroup.Children.Add(outPutLogViewPane);
 
-            outPutLogPaneGroup.DockWidth = new System.Windows.GridLength(screenWidth / 8);
+            outPutLogPaneGroup.DockWidth = new System.Windows.GridLength(screenWidth / 4);
             outPutLogPaneGroup.DockHeight = new System.Windows.GridLength(screenHeight / 5);
             outPutLogPaneGroup.DockMinHeight = screenHeight / 5;
             outPutLogPaneGroup.DockMinWidth = screenWidth / 10;
-
             outPutLogViewPane.Children.Add(outPutLogViewDoc);
+
+            //m_layOut_OutPutLog = new LayoutPanel();
+            //m_layOut_OutPutLog.Children.Add(outPutLogPaneGroup);
+            //layout_OutputLog = new LayoutRoot();
+            //layout_OutputLog.RootPanel = m_layOut_OutPutLog;
             #endregion
+
+
+            #region Statistic Contruction
+            m_MappingViewDoc = new LayoutAnchorable();
+            m_MappingViewDoc.Title = "Output Log View";
+            m_MappingViewDoc.Content = m_staticView;
+            m_MappingViewDoc.ContentId = "";
+
+            m_MappingViewDoc.CanClose = false;
+            m_MappingViewDoc.CanHide = false;
+            m_MappingViewDoc.AutoHideMinWidth = screenWidth / 1;
+
+            m_MappingViewPane = new LayoutAnchorablePane();
+            m_MappingPaneGroup.Children.Add(m_MappingViewPane);
+
+            m_MappingPaneGroup.DockWidth = new System.Windows.GridLength(screenWidth);
+            m_MappingPaneGroup.DockHeight = new System.Windows.GridLength(screenHeight / 4);
+            m_MappingPaneGroup.DockMinHeight = screenHeight / 4;
+            m_MappingPaneGroup.DockMinWidth = screenWidth / 10;
+            m_MappingViewPane.Children.Add(m_MappingViewDoc);
+
+            //m_layOut_Mapping = new LayoutPanel();
+            //m_layOut_Mapping.Children.Add(m_MappingPaneGroup);
+            //layout_Mapping = new LayoutRoot();
+            //layout_Mapping.RootPanel = m_layOut_Mapping;
+            #endregion
+
 
             #region Show UI
             m_layout = new LayoutPanel();
             m_layout.Orientation = Orientation.Vertical;
             m_layout.Children.Add(mainPanelGroup);
-            m_layout.Children.Add(outPutLogPaneGroup);
+            m_layout.Children.Add(m_MappingPaneGroup);
+            
             m_layoutPanel.Orientation = Orientation.Horizontal;
             m_layoutPanel.Children.Add(m_layout);
-            //m_layoutPanel.Children.Add(statisticPaneGroup);
+            m_layoutPanel.Children.Add(outPutLogPaneGroup);
 
             layoutHPSF = new LayoutRoot();
             layoutHPSF.RootPanel = m_layoutPanel;
@@ -1118,7 +884,7 @@ namespace Magnus_WPF_1
             if (m_nDeviceX != Source.Application.Application.categoriesMappingParam.M_NumberDeviceX || m_nDeviceY != Source.Application.Application.categoriesMappingParam.M_NumberDeviceY)
             {
                 master.LoadRecipe();
-                InitCanvasMapping();
+                m_staticView.InitCanvasMapping();
             }
 
             //DisbleButtonStandard();
@@ -1155,36 +921,6 @@ namespace Magnus_WPF_1
         {
             //master.applications.m_bEnableSavingOnlineImage = (bool)enable_saveimage_btn.IsChecked;
             Source.Application.Application.m_bEnableSavingOnlineImage = (bool)btn_enable_saveimage.IsChecked;
-
-        }
-
-        public void UpdateMappingResult(int nID, int nResult)
-        {
-            string path = @"/Resources/green-chip.png";
-
-            if (nResult < 0)
-                path = @"/Resources/red-chip.png";
-            if (nID < m_nPageID * arr_imageMapping.Length || nID >= (m_nPageID + 1) * arr_imageMapping.Length)
-                return;
-
-            arr_imageMapping[nID % arr_imageMapping.Length].Source = new BitmapImage(new Uri(path, UriKind.Relative));
-
-        }
-        public void ResetMappingResult(int nTrackID = (int)TRACK_TYPE.TRACK_CAM1)
-        {
-            string path = @"/Resources/gray-chip.png";
-            for (int nID = 0; nID < arr_imageMapping.Length; nID++)
-                arr_imageMapping[nID].Source = new BitmapImage(new Uri(path, UriKind.Relative));
-        }
-
-        public void ResetStatisticResult(int nTrackID = (int)TRACK_TYPE.TRACK_CAM1)
-        {
-            statisticView.ClearStatistic(nTrackID);
-        }
-
-        internal void UpdateStatisticResult(int nResult, int nTrack)
-        {
-            statisticView.UpdateValueStatistic(nResult, nTrack);
 
         }
 

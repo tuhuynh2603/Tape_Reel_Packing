@@ -821,19 +821,23 @@
         
         <Grid x:Name="Layout1" Margin="0 130 0 0" 
               
-            HorizontalAlignment="Stretch" Background="Black">
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Black">
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2.46*"></ColumnDefinition>
-                <ColumnDefinition Width="1*"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"></RowDefinition>
+                <!--<RowDefinition Height="1*"></RowDefinition>-->
+            </Grid.RowDefinitions>
             <!--image view-->
             <Grid Grid.Column="0">
-                <avalonDock:DockingManager x:Name="dockManager" 
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3.5*"/>
+                    <!--<ColumnDefinition Width="1*"/>-->
+                </Grid.ColumnDefinitions>
+                <avalonDock:DockingManager x:Name="dockManager"  Grid.Column="0"
                                        ActiveContentChanged="dockManager_ActiveContentChanged"                                  
                                        AllowMixedOrientation="True" 
-                                       GridSplitterWidth="1" 
-                                       GridSplitterHeight="1"
+                                       GridSplitterWidth="5" 
+                                       GridSplitterHeight="5"
                                        Layout="{Binding layoutHPSF, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}">
                     <avalonDock:DockingManager.Theme>
                         <avalonDock:Vs2013DarkTheme/>
@@ -841,46 +845,86 @@
                     <avalonDock:DockingManager.DocumentHeaderTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                
+
                                 <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
                                 <TextBlock Text="{Binding ContentId}" Margin="0 0 0 0" FontSize="10" FontWeight="Bold"/>
                             </StackPanel>
                         </DataTemplate>
                     </avalonDock:DockingManager.DocumentHeaderTemplate>
                 </avalonDock:DockingManager>
+
+                <!--<Grid Grid.Column="1">
+                    <avalonDock:DockingManager x:Name="OutputLogDockManager" 
+                                       AllowMixedOrientation="True" 
+                                       GridSplitterWidth="5" 
+                                       GridSplitterHeight="5"
+                                       Layout="{Binding layout_OutputLog, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}">
+                        <avalonDock:DockingManager.Theme>
+                            <avalonDock:Vs2013DarkTheme/>
+                        </avalonDock:DockingManager.Theme>
+                        <avalonDock:DockingManager.DocumentHeaderTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+
+                                    <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding ContentId}" Margin="0 0 0 0" FontSize="10" FontWeight="Bold"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </avalonDock:DockingManager.DocumentHeaderTemplate>
+                    </avalonDock:DockingManager>
+                </Grid>-->
+
             </Grid>
 
-            <Grid Grid.Column="1" Margin="0 0 0 0">
+            <!--<avalonDock:DockingManager x:Name="mappingDocManager"  Grid.Row="1"
+                                       AllowMixedOrientation="True" 
+                                       GridSplitterWidth="5" 
+                                       GridSplitterHeight="5"
+                                       Layout="{Binding layout_Mapping, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}">
+                <avalonDock:DockingManager.Theme>
+                    <avalonDock:Vs2013DarkTheme/>
+                </avalonDock:DockingManager.Theme>
+                <avalonDock:DockingManager.DocumentHeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+
+                            <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding ContentId}" Margin="0 0 0 0" FontSize="10" FontWeight="Bold"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </avalonDock:DockingManager.DocumentHeaderTemplate>
+            </avalonDock:DockingManager>-->
+
+            <!--<Grid Grid.Column="1" Margin="0 0 0 0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="2.1*"></RowDefinition>
+                        <RowDefinition Height="0.5*"></RowDefinition>
                         <RowDefinition Height="1*"></RowDefinition>
                     </Grid.RowDefinitions>
-                        <Grid Grid.Row="0"  >
-                            <GroupBox Margin="10" Header="Mapping Result" Foreground="WhiteSmoke" FontSize="20">
-                                <Border  Height="auto" BorderBrush="WhiteSmoke" CornerRadius="3" BorderThickness="3"  Background="Transparent" Opacity="0.8" Margin="9,9,9,1">
-
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="10*"></RowDefinition>
-                                        <RowDefinition Height="1*"></RowDefinition>
-                                        <RowDefinition Height="1*"></RowDefinition>
-                
-                                    </Grid.RowDefinitions>
-                                    <Canvas Grid.Row="0" Margin="10" x:Name="canvas_Mapping"  Width ="Auto"  MouseMove="canvas_Mapping_MouseMove" HorizontalAlignment="Left" MouseLeftButtonDown="canvas_Mapping_MouseLeftButtonDown" MouseLeave="canvas_Mapping_MouseLeave">
+                    <Grid Grid.Row="0" x:Name="Grid_CanVas_Mapping"  SizeChanged="Grid_CanVas_Mapping_SizeChanged">
+                        <GroupBox Margin="10" Header="Mapping Result" Foreground="WhiteSmoke" FontSize="20">
+                            <Border  Height="auto" BorderBrush="WhiteSmoke" CornerRadius="3" BorderThickness="3"  Background="Transparent" Opacity="0.8" Margin="9,9,9,1">
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                                    <Canvas  Margin="5" x:Name="canvas_Mapping" VerticalAlignment="Top"  MouseMove="canvas_Mapping_MouseMove" HorizontalAlignment="Left" MouseLeftButtonDown="canvas_Mapping_MouseLeftButtonDown" MouseLeave="canvas_Mapping_MouseLeave">
                                         <Border x:Name="border_boundingbox_focus"></Border>
                                         <Border x:Name="border_boundingbox_clicked"></Border>
                                     </Canvas>
-                                    <Canvas Grid.Row="1" x:Name="canvas_Mapping_NextPage" Width ="Auto"  MouseMove="canvas_Mapping_NextPage_MouseMove"  HorizontalAlignment="Left" MouseLeftButtonDown="canvas_Mapping_NextPage_MouseLeftButtonDown"  MouseLeave="canvas_Mapping_NextPage_MouseLeave">
-                                        <Border x:Name="border_boundingbox_NextPage_focus"></Border>
-                                        <Border x:Name="border_boundingbox_NextPage_clicked"></Border>
-                                    </Canvas>
-                                </Grid>
-                            </Border>
-                            </GroupBox>
-                        </Grid>
+                            </ScrollViewer>
+                        </Border>
+                    </GroupBox>
+                    </Grid>
 
-                    <Grid Grid.Row="1">
+                    <Border  Grid.Row="1"  Height="auto" BorderBrush="WhiteSmoke" CornerRadius="3" BorderThickness="3"  Background="Transparent" Opacity="0.8" Margin="9,9,9,1">
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                            <Canvas  Margin="5" x:Name="canvas_Mapping_NextPage"  MouseMove="canvas_Mapping_NextPage_MouseMove"  HorizontalAlignment="Left" VerticalAlignment="Top" MouseLeftButtonDown="canvas_Mapping_NextPage_MouseLeftButtonDown"  MouseLeave="canvas_Mapping_NextPage_MouseLeave">
+                                <Border x:Name="border_boundingbox_NextPage_focus"></Border>
+                                <Border x:Name="border_boundingbox_NextPage_clicked"></Border>
+                            </Canvas>
+                        </ScrollViewer>
+                    </Border>
+
+                    <Grid Grid.Row="2">
 
                         <Border Height="Auto"
                                                     CornerRadius="8" BorderThickness="3" 
@@ -897,7 +941,7 @@
                         </Border>
                     </Grid>
             </Grid>
-        </Grid>
+        </Grid>-->
 
             <!--Mapping-->
 

@@ -650,17 +650,16 @@ namespace Magnus_WPF_1.Source.Application
                         {
                             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                             {
-                                MainWindow.mainWindow.ResetMappingResult(m_nTrackID);
+                                MainWindow.mainWindow.m_staticView.ResetMappingResult(m_nTrackID);
 
                             });
                         }
 
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            MainWindow.mainWindow.UpdateMappingResult(m_CurrentSequenceDeviceID, m_nResult[m_CurrentSequenceDeviceID]);
-                            MainWindow.mainWindow.UpdateStatisticResult(m_nResult[m_CurrentSequenceDeviceID], m_nTrackID);
+                            MainWindow.mainWindow.m_staticView.UpdateMappingResult(m_CurrentSequenceDeviceID, m_nResult[m_CurrentSequenceDeviceID]);
+                            MainWindow.mainWindow.m_staticView.UpdateValueStatistic(m_nResult[m_CurrentSequenceDeviceID], m_nTrackID);
                         });
-
                     });
                 }
                 catch (Exception e)

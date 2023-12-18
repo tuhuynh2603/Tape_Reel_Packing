@@ -836,7 +836,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                         HWinRobot.disconnect(m_RobotConnectID);
                         m_RobotConnectID = -1;
                     }
-                            
+                        
                 }
 
                 if (System.Windows.Application.Current == null)
@@ -859,13 +859,8 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                         MainWindow.mainWindow.color_RobotStatus = "Black";
                         MainWindow.mainWindow.label_Robot_Status.Content = m_strRobotIPAddress;
                         MainWindow.mainWindow.label_Robot_Status.Background = new SolidColorBrush(Colors.Gray);
-
                     }
                 });
-
-
-
-
                 Thread.Sleep(100);
             }
             HWinRobot.disconnect(m_RobotConnectID);

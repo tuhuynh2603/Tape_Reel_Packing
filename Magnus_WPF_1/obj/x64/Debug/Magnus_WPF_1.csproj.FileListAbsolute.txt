@@ -47,7 +47,6 @@ C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Microsoft.Dynamic.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Microsoft.Scripting.Metadata.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Microsoft.Scripting.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\cs-CZ\Xceed.Wpf.AvalonDock.resources.dll
-C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\System.Numerics.Vectors.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Magnus_WPF_1.exe.config
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\PopupUserControl.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\DefectInfor.g.cs
@@ -80,8 +79,6 @@ C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\sv\ZedGraph.resources.
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\tr\ZedGraph.resources.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\zh-cn\ZedGraph.resources.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\zh-tw\ZedGraph.resources.dll
-C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\MathNet.Numerics.dll
-C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\System.ValueTuple.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Communication.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\Keyence.AutoID.SDK.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\VncClientControlCommon.dll
@@ -102,3 +99,8 @@ C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\Output
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\PixelRuler.baml
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\View\ImageView.baml
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\View\StatisticView.baml
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\EasyModbus.dll
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Source\Hardware\PLCCOMM.g.cs
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\WarningMessageBox.g.cs
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Source\Hardware\PLCCOMM.baml
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\WarningMessageBox.baml

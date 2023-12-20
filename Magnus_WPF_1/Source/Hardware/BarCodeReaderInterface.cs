@@ -123,7 +123,10 @@ namespace Magnus_WPF_1.Source.Hardware
 		}
 
 		bool bIsDownload = false;
-		public string GetBarCodeStringAndImage(string strCmd = "")
+
+		int nDeviceID = 0;
+		string nstrFolderBackup = "";
+		public string GetBarCodeStringAndImage(int nID = -1)
 		{
 			if (bIsDownload)
 				return "";
@@ -133,12 +136,28 @@ namespace Magnus_WPF_1.Source.Hardware
 			if (MainWindow.mainWindow.master.m_Tracks[1].m_strCurrentLot == "" || MainWindow.mainWindow.master.m_Tracks[1].m_strCurrentLot == null)
 				MainWindow.mainWindow.master.m_Tracks[1].m_strCurrentLot = "Dummy";
 
-			string strFolder = Path.Combine(Application.Application.pathImageSave, MainWindow.mainWindow.master.m_Tracks[1].m_strCurrentLot);
+			string strFolder = Path.Combine(Application.Application.pathImageSave, MainWindow.mainWindow.master.m_Tracks[1].m_strCurrentLot,"Barcode");
+
+			if (nstrFolderBackup != strFolder)
+			{
+				nstrFolderBackup = strFolder;
+				nDeviceID = 0;
+			}
+
 			if (!Directory.Exists(strFolder))
 				Directory.CreateDirectory(strFolder);
 
 			string strImageFullName;
-			string strtime = string.Format("{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+			if (nID < 0)
+			{
+				nDeviceID++;
+			}
+			else
+				nDeviceID = nID;
+
+
+
+			//strDeviceID = string.Format("{0}{1}{2}+{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
 
 			string resp = m_reader.ExecCommand("LON,01");
 			if (resp.Length > 0)
@@ -156,8 +175,8 @@ namespace Magnus_WPF_1.Source.Hardware
 			Thread.Sleep(200);
 
 
-			LogMessage.WriteToDebugViewer(3, "Message responsed from Barcode Bank 2: " + str);
-			strImageFullName = Path.Combine(strFolder, strtime + "_" + str + "_" + str2 + ".bmp");
+			LogMessage.WriteToDebugViewer(3, $"Message responsed from Barcode Bank 2: {str}");
+			strImageFullName = Path.Combine(strFolder,  $"{str}+{str2}_{nDeviceID}.bmp");
 
 			System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
 			{

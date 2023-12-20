@@ -145,7 +145,7 @@ namespace Magnus_WPF_1.Source.Hardware
         private void combo_commandSendToBarCode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
-           MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(combo_commandSendToBarCode.SelectedItem.ToString());
+           MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage();
         }
 
         private void button_Clear_Click(object sender, RoutedEventArgs e)

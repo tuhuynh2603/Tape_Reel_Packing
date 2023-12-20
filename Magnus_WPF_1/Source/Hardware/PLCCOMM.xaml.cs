@@ -20,7 +20,17 @@ namespace Magnus_WPF_1.Source.Hardware
     /// </summary>
     public partial class PLCCOMM : UserControl
     {
-        ModbusClient m_modbusClient;
+        public enum PLC_ADDRESS
+        {
+            PLC_BARCODE_TRIGGER = 1000,
+            PLC_READY_STATUS = 1001,
+            PLC_CURRENT_BARCODE_CHIP_COUNT = 1002,
+            PLC_CURRENT_ROBOT_CHIP_COUNT = 1003,
+            PLC_RESET_LOT = 1004
+
+        }
+
+        public ModbusClient m_modbusClient;
         public string m_strCommAddress = "127.0.0.1";
         int m_PLCPort = 502;
         public PLCCOMM()
@@ -101,20 +111,20 @@ namespace Magnus_WPF_1.Source.Hardware
                 if (combo_PLC_Comm_Function.SelectedIndex == 0)
                 {
 
-                    int[] ival = new int[1];
+                    int nValue = 0;
                     if (text_MemoryAdress_Status.Text.Length > 0)
                     {
-                        bool success = Int32.TryParse(text_MemoryAdress_Status.Text, out ival[0]);
+                        bool success = Int32.TryParse(text_MemoryAdress_Status.Text, out nValue);
                         if (success == false)
                             MessageBox.Show("Wrong format input");
                     }
                     else
                         MessageBox.Show("Wrong format input");
-                    m_modbusClient.WriteMultipleRegisters(iadr, ival);
+                    WritePLCRegister(iadr, nValue);
                 }
                 else
                 {
-                    text_MemoryAdress_Status.Text = m_modbusClient.ReadHoldingRegisters(iadr, 1)[0].ToString();
+                    text_MemoryAdress_Status.Text = ReadPLCRegister(iadr).ToString();
 
                 }
             }
@@ -122,6 +132,19 @@ namespace Magnus_WPF_1.Source.Hardware
             //ModbusServer.HoldingRegisters regs = m_modbusServer.holdingRegisters;
             //modbusClient.WriteSingleCoil(4, !modbusClient.ReadCoils(4, 1)[0]);
             //bool[] status = modbusClient.ReadCoils(4, 1);
+        }
+
+        public int ReadPLCRegister(int nAddress)
+        {
+            return m_modbusClient.ReadHoldingRegisters(nAddress, 1)[0];
+        }
+
+        public void WritePLCRegister(int nAddress, int nValue)
+        {
+            int[] ival = new int[1];
+            ival[0] = nValue; 
+            m_modbusClient.WriteMultipleRegisters(nAddress, ival);
+
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

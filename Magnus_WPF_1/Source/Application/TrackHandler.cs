@@ -610,25 +610,30 @@ namespace Magnus_WPF_1.Source.Application
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
                         m_InspectionCore.LoadImageToInspection(m_imageViews[0].btmSource);
-
-                        if (Application.m_bEnableSavingOnlineImage == true && MainWindow.mainWindow.bEnableRunSequence)
-                        {
-                            ImageSaveData imageSaveData = new ImageSaveData();
-                            imageSaveData.nDeviceID = m_CurrentSequenceDeviceID;
-                            imageSaveData.strLotID = m_strCurrentLot;
-                            imageSaveData.imageSave = BitmapSourceConvert.ToMat(m_imageViews[0].btmSource).Clone();
-                            lock (Master.m_SaveInspectImageQueue)
-                            {
-                                Master.m_SaveInspectImageQueue.Enqueue(imageSaveData);
-                            }
-                        }
-
                     });
 
                     Stopwatch timeIns = new Stopwatch();
                     timeIns.Start();
                     PointF pCenter, pCorner;
                     m_nResult[m_CurrentSequenceDeviceID] = Inspect(ref mainWindow.master.m_Tracks[m_nTrackID], out pCenter, out pCorner);
+
+                    if (Application.m_bEnableSavingOnlineImage == true /*&& MainWindow.mainWindow.bEnableRunSequence*/ && m_nTrackID == 0)
+                    {
+                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+                            ImageSaveData imageSaveData = new ImageSaveData();
+                            imageSaveData.nDeviceID = m_CurrentSequenceDeviceID;
+                            imageSaveData.strLotID = m_strCurrentLot == null ? "DUMMY" : m_strCurrentLot;
+                            imageSaveData.nTrackID = m_nTrackID;
+                            imageSaveData.bFail = m_nResult[m_CurrentSequenceDeviceID];
+                            imageSaveData.imageSave = BitmapSourceConvert.ToMat(m_imageViews[0].btmSource).Clone();
+                            lock (Master.m_SaveInspectImageQueue)
+                            {
+                                Master.m_SaveInspectImageQueue[m_nTrackID].Enqueue(imageSaveData);
+                            }
+                        });
+                    }
+
                     m_Center_Vision = pCenter;
                     double dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(m_Center_Vision, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint);
                     m_dDeltaAngleInspection = dDeltaAngle;
@@ -840,9 +845,6 @@ namespace Magnus_WPF_1.Source.Application
             CheckInspectionOnlineThread();
             int nWidth = 0, nHeight = 0;
             //Todo If Reset lot ID, need to create new lot ID and reset current Device ID to 0
-            m_CurrentSequenceDeviceID = 0;
-            m_strCurrentLot = string.Format("TrayID_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
-
             if (m_nTrackID == 0)
             {
                 if (!hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
@@ -901,18 +903,15 @@ namespace Magnus_WPF_1.Source.Application
                 else
                 {  
                     //Scan Barcode
-                    MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage();
+                    MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(m_CurrentSequenceDeviceID);
                 }
 
 
                 // Update Current Device ID
                 m_CurrentSequenceDeviceID++;
-                if (m_CurrentSequenceDeviceID >= Source.Application.Application.categoriesMappingParam.M_NumberDevicePerLot)
+                if (m_CurrentSequenceDeviceID >= Source.Application.Application.categoriesMappingParam.M_NumberDevicePerLot || m_CurrentSequenceDeviceID < 0)
                     m_CurrentSequenceDeviceID = 0;
-                if (m_CurrentSequenceDeviceID == 0)
-                {
-                    m_strCurrentLot = string.Format("TrayID_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
-                }
+
 
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {

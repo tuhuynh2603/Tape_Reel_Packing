@@ -295,10 +295,8 @@ namespace Magnus_WPF_1
             inspect_offline_btn.IsEnabled = false;
             m_staticView.ResetMappingResult(nTrack);
             m_staticView.ClearStatistic(nTrack);
-            for (int n = 0; n < Application.m_nTrack; n++)
-            {
-                master.RunOnlineSequenceThread(n);
-            }
+            master.RunOnlineSequenceThread(nTrack);
+
             //master.RunOnlineSequenceThread(0);
 
             //if (nTrack == (int)TRACK_TYPE.TRACK_ALL)
@@ -310,8 +308,11 @@ namespace Magnus_WPF_1
             //}
             //else
             //    master.RunOnlineSequenceThread(nTrack);
+            if(nTrack == 0)
+                master.RobotSequenceThread();
+            else
+                master.RobotSequenceThread();
 
-            master.RobotSequenceThread();
             //Master.commHIKRobot.CreateAndSendMessageToHIKRobot(SignalFromVision.Vision_Ready);
         }
         public void Stop_Sequence(int nTrack = (int)TRACK_TYPE.TRACK_ALL)

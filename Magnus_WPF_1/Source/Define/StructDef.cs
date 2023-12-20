@@ -287,6 +287,8 @@ namespace Magnus_WPF_1.Source.Define
     {
         public int nDeviceID;
         public string strLotID;
+        public int nTrackID;
+        public int bFail;
         public Emgu.CV.Mat imageSave;
     }
     public enum TRACK_TYPE :int

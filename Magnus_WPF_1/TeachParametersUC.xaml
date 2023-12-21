@@ -9,16 +9,33 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <StackPanel>
-            <xceedtk:PropertyGrid  x:Name="pgr_PropertyGrid_Teach"
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0">
+                <xceedtk:PropertyGrid  x:Name="pgr_PropertyGrid_Teach"
                                   SelectedObject="{Binding}" Margin="0,0,0,30"
                                   ShowTitle="True"
                                   ShowSearchBox="false"
                                   ShowSummary="True"
                                   Background="#FF322F2E" 
-                                  Foreground="LightGray"></xceedtk:PropertyGrid>
+                                  Foreground="LightGray"
+                                  PropertyValueChanged="pgr_PropertyGrid_Teach_PropertyValueChanged"></xceedtk:PropertyGrid>
 
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="30">
+                <!--<xceedtk:PropertyGrid  x:Name="pgr_PropertyGrid_Area"
+                                  SelectedObject="{Binding}" Margin="0,0,0,30"
+                                  ShowTitle="False"
+                                  ShowSearchBox="false"
+                                  ShowSummary="False"
+                                  Background="#FF322F2E" 
+                                  Foreground="LightGray"
+                                  PropertyValueChanged ="pgr_PropertyGrid_Area_PropertyValueChanged"></xceedtk:PropertyGrid>-->
+
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="30">
                 <Button Name="btn_ok" FontSize="8" Padding="0"
                     Background="#FF343333"
                     Height="25" 
@@ -40,7 +57,9 @@
                     <materialDesign:PackIcon Kind="RemoveCircle" Height="24" Width="24" Foreground="#FFFD1A12"/>
                 </Button>
             </StackPanel>
-        </StackPanel>
+
+        </Grid>
+
 
         <ComboBox Height="25" x:Name="track_ComboBox" Margin="50,-520,0,0" Foreground="Black" SelectedIndex="0"
                           SelectionChanged="track_ComboBox_SelectionChanged">

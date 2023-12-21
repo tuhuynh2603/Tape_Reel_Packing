@@ -20,169 +20,32 @@ namespace Magnus_WPF_1
     /// </summary>
     public partial class TeachParametersUC : UserControl
     {
-        private Dictionary<string, string> _dictTeachParam = new Dictionary<string, string>();
+        //private Dictionary<string, string> _dictTeachParam = new Dictionary<string, string>();
         int m_nTrackSelected = 0;
-        public CategoryTeachParameter categoriesTeachParam = new CategoryTeachParameter();
+        //public CategoryTeachParameter categoriesTeachParam = new CategoryTeachParameter();
+        public int nDefectROIIndex = 0;
 
         public TeachParametersUC()
         {
             InitializeComponent();
-            this.DataContext = categoriesTeachParam;
+            this.DataContext = Application.Application.categoriesTeachParam;
         }
 
-        private Rectangles GetRectangles(string str)
-        {
-            if (str == "")
-                return new Rectangles(0, 0, 0, 0);
-            string[] value = str.Split(':');
-            if (value.Length == 4)
-                return new Rectangles(double.Parse(value[0]), double.Parse(value[1]), double.Parse(value[2]), double.Parse(value[3]));
-            else
-                return new Rectangles(double.Parse(value[0]), double.Parse(value[1]), double.Parse(value[2]), double.Parse(value[3]), double.Parse(value[4]));
 
-        }
-        private List<int> ConverStringToList(string str)
-        {
-            List<int> list = new List<int>();
-            string[] value = str.Split(':');
-            foreach (string s in value)
-            {
-                list.Add(int.Parse(s));
-            }
-            return list;
-        }
         public bool UpdateTeachParamFromDictToUI(Dictionary<string, string> dictTeachParam)
         {
-            this._dictTeachParam = dictTeachParam;
-            try
-            {
-                PropertyInfo[] arrInfo = Application.Application.categoriesTeachParam.GetType().GetProperties();
-                for (int i = 0; i < arrInfo.Count(); i++)
-                {
-                    PropertyInfo info = arrInfo[i];
-                    Type type = info.PropertyType;
-                    if (type.Name == "Int32")
-                    {
-                        int value = 0;
-                        bool success = true;
-
-                        string str_value = "";
-                        dictTeachParam.TryGetValue(info.Name, out str_value);
-                        if (str_value == null)
-                            value = (int)info.GetCustomAttribute<DefaultValueAttribute>().Value;
-                        else
-                            success = Int32.TryParse(dictTeachParam[info.Name].ToString(), out value);
-
-                        if (success == false)
-                            value = (int)info.GetCustomAttribute<DefaultValueAttribute>().Value;
-                        info.SetValue(Application.Application.categoriesTeachParam, value);
-                        info.SetValue(categoriesTeachParam, value);
-                    }
-                    else if (type.Name == "Color")
-                    {
-                        info.SetValue(Application.Application.categoriesTeachParam, dictTeachParam[info.Name] == "white" ? Colors.White : Colors.Black);
-                    }
-
-                    else if (type.Name == "THRESHOLD_TYPE")
-                    {
-                        THRESHOLD_TYPE value;
-                        bool success = Enum.TryParse(dictTeachParam.Values.ElementAt(i), out value);
-                        if (success == false)
-                            value = (THRESHOLD_TYPE)info.GetCustomAttribute<DefaultValueAttribute>().Value;
-                        info.SetValue(Application.Application.categoriesTeachParam, value);
-                        info.SetValue(categoriesTeachParam, value);
-                    }
-
-                    else if (type.Name == "OBJECT_COLOR")
-                    {
-                        OBJECT_COLOR value;
-                        bool success = Enum.TryParse(dictTeachParam.Values.ElementAt(i), out value);
-                        if (success == false)
-                            value = (OBJECT_COLOR)info.GetCustomAttribute<DefaultValueAttribute>().Value;
-                        info.SetValue(Application.Application.categoriesTeachParam, value);
-                        info.SetValue(categoriesTeachParam, value);
-                    }
-
-
-                    else if (type.Name == "Double")
-                    {
-                        double value = 0.0;
-                        bool success = true;
-                        string str_value = "";
-
-                        //CultureInfo cultureInfo = new CultureInfo("en-US"); // US culture, uses "." as decimal separator
-                          
-                        dictTeachParam.TryGetValue(info.Name, out str_value);
-                        if (str_value == null)
-                        {
-                            value = (double)info.GetCustomAttribute<DefaultValueAttribute>().Value;
-                        }
-                        else
-                            success = double.TryParse(str_value, /*NumberStyles.Float, cultureInfo,*/ out value);
-
-                        if (success == false)
-                            value = (double)info.GetCustomAttribute<DefaultValueAttribute>().Value;
-                        info.SetValue(Application.Application.categoriesTeachParam, value);
-                        info.SetValue(categoriesTeachParam, value);
-
-                    }
-                    else if (type.Name == "List`1")
-                    {
-                        if (type.FullName.Contains("Int32"))
-                        {
-                            int[] value = new int[3];
-                            List<int> listValue;
-                            string str_value = "";
-                            dictTeachParam.TryGetValue(info.Name, out str_value);
-                            if (str_value == null)
-                            {   
-                                value = (int[])info.GetCustomAttribute<DefaultValueAttribute>().Value;
-                                listValue = new List<int>(value);
-                            }
-                            else
-                                listValue = ConverStringToList(dictTeachParam[info.Name]);
-                            info.SetValue(Application.Application.categoriesTeachParam, listValue);
-                            info.SetValue(categoriesTeachParam, listValue);
-
-                        }
-                        else if (type.FullName.Contains("Rectangles"))
-                        {
-                            List<Rectangles> listValue = new List<Rectangles> { };
-                            foreach (KeyValuePair<string, string> kvp in dictTeachParam)
-                            {
-                                if (kvp.Key.Contains(info.Name))
-                                    listValue.Add(GetRectangles(dictTeachParam[kvp.Key.ToString()]));
-                            }
-                            info.SetValue(Application.Application.categoriesTeachParam, listValue);
-                            info.SetValue(categoriesTeachParam, listValue);
-                        }
-                    }
-
-                    else if (type.Name == "Rectangles")
-                    {
-                        Rectangles rect = GetRectangles(dictTeachParam[info.Name]);
-                        info.SetValue(Application.Application.categoriesTeachParam, rect);
-                        info.SetValue(categoriesTeachParam, rect);
-
-                    }
-                    else if (type.Name == "String")
-                    {
-                        string str = dictTeachParam[info.Name].ToString();
-                        if (str == "")
-                            str = (string)info.GetCustomAttribute<DefaultValueAttribute>().Value;
-                        info.SetValue(Application.Application.categoriesTeachParam, str);
-                        info.SetValue(categoriesTeachParam, str);
-
-                    }
-                }
-            }
-            catch
-            {
-                pgr_PropertyGrid_Teach.Update();
+            if (dictTeachParam == null)
                 return false;
-            }
-            pgr_PropertyGrid_Teach.Update();
-            return true;
+            //_dictTeachParam = dictTeachParam;
+            object category = Application.Application.categoriesTeachParam;
+            //object category_local = categoriesTeachParam;
+
+            bool bSuccess = Application.Application.UpdateParamFromDictToUI(dictTeachParam, ref category);
+            Application.Application.categoriesTeachParam = (CategoryTeachParameter)category;
+            //categoriesTeachParam = (CategoryTeachParameter)category_local;
+            //pgr_PropertyGrid_Teach.Update();
+
+            return bSuccess;
         }
 
         private void track_ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -190,45 +53,72 @@ namespace Magnus_WPF_1
             if (m_nTrackSelected != track_ComboBox.SelectedIndex)
                 m_nTrackSelected = track_ComboBox.SelectedIndex;
             {
-                ReloadParameterUI(m_nTrackSelected);
+                ReloadTeachParameterUI(m_nTrackSelected, nDefectROIIndex);
             }
 
         }
 
-        public void ReloadParameterUI(int nTrack)
+        public void ReloadTeachParameterUI(int nTrack, int nArea = 0)
         {
             Application.Application.dictTeachParam.Clear();
             Application.Application.LoadTeachParamFromFileToDict(ref nTrack);
-
             //m_Tracks[nTrack].m_InspectionCore.LoadTeachImageToInspectionCore(nTrack);
             UpdateTeachParamFromDictToUI(Application.Application.dictTeachParam);
+
+            ReloadAreaParameterUI(m_nTrackSelected, nDefectROIIndex);
+            pgr_PropertyGrid_Teach.Update();
+
         }
 
-        public void LoadTeachParamFromUIToDict()
+
+
+        public void ReloadAreaParameterUI(int nTrack, int nArea = 0)
         {
-            System.Reflection.PropertyInfo[] infos = categoriesTeachParam.GetType().GetProperties();
-            System.Reflection.PropertyInfo[] infosApp = Application.Application.categoriesTeachParam.GetType().GetProperties();
+            Application.Application.dictTeachParam.Clear();
+            Application.Application.LoadAreaParamFromFileToDict(ref nTrack, nDefectROIIndex);
+            //m_Tracks[nTrack].m_InspectionCore.LoadTeachImageToInspectionCore(nTrack);
+            UpdateTeachParamFromDictToUI(Application.Application.dictPVIAreaParam[nDefectROIIndex]);
+            pgr_PropertyGrid_Teach.Update();
 
-           
-            for (int i = 0; i < infos.Length; i++)
-            {
-                var attributes = infos[i].GetCustomAttributes(typeof(BrowsableAttribute), true);
-                bool isBrowsable = true;
-                if (attributes.Length > 0)
-                {
-                    BrowsableAttribute browseAttr = (BrowsableAttribute)attributes[0];
-                    isBrowsable = browseAttr.Browsable;
-                    //Console.WriteLine($"Is MyProperty browsable? {isBrowsable}");
-                }
-
-                if (isBrowsable == true)
-                {
-                    infosApp[i].SetValue(Application.Application.categoriesTeachParam, infos[i].GetValue(categoriesTeachParam));
-                    Type type = infos[i].PropertyType;
-                    _dictTeachParam[infos[i].Name] = infos[i].GetValue(categoriesTeachParam).ToString();
-                }
-            }
         }
+
+        private void pgr_PropertyGrid_Teach_PropertyValueChanged(object sender, Xceed.Wpf.Toolkit.PropertyGrid.PropertyValueChangedEventArgs e)
+        {
+            if (nDefectROIIndex != (int)Application.Application.categoriesTeachParam.DR_DefectROIIndex)
+            {
+                nDefectROIIndex = (int)Application.Application.categoriesTeachParam.DR_DefectROIIndex;
+                ReloadAreaParameterUI(m_nTrackSelected, nDefectROIIndex);
+            }
+
+        }
+
+
+
+        //public void LoadTeachParamFromUIToDict()
+        //{
+        //    System.Reflection.PropertyInfo[] infos = Application.Application.categoriesTeachParam.GetType().GetProperties();
+        //    //System.Reflection.PropertyInfo[] infosApp = Application.Application.categoriesTeachParam.GetType().GetProperties();
+
+
+        //    for (int i = 0; i < infos.Length; i++)
+        //    {
+        //        var attributes = infos[i].GetCustomAttributes(typeof(BrowsableAttribute), true);
+        //        bool isBrowsable = true;
+        //        if (attributes.Length > 0)
+        //        {
+        //            BrowsableAttribute browseAttr = (BrowsableAttribute)attributes[0];
+        //            isBrowsable = browseAttr.Browsable;
+        //            //Console.WriteLine($"Is MyProperty browsable? {isBrowsable}");
+        //        }
+
+        //        if (isBrowsable == true)
+        //        {
+        //            //infosApp[i].SetValue(Application.Application.categoriesTeachParam, infos[i].GetValue(categoriesTeachParam));
+        //            Type type = infos[i].PropertyType;
+        //            _dictTeachParam[infos[i].Name] = infos[i].GetValue(Application.Application.categoriesTeachParam).ToString();
+        //        }
+        //    }
+        //}
 
         private void btn_Save_Param_Teach_Click(object sender, System.Windows.RoutedEventArgs e)
         {
@@ -241,12 +131,17 @@ namespace Magnus_WPF_1
             try
             {
                 Mouse.OverrideCursor = Cursors.Wait;
-                LoadTeachParamFromUIToDict();
+                //LoadTeachParamFromUIToDict();
                 MainWindow mainWindow = (MainWindow)System.Windows.Application.Current.MainWindow;
-                mainWindow.master.WriteTeachParam(m_nTrackSelected);
                 mainWindow.master.m_Tracks[m_nTrackSelected].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
+                mainWindow.master.m_Tracks[m_nTrackSelected].m_InspectionCore.UpdateAreaParameterFromUIToInspectionCore((int)Application.Application.categoriesTeachParam.DR_DefectROIIndex);       
+                mainWindow.master.WriteTeachParam(m_nTrackSelected);
+                Application.Application.LoadTeachParamFromFileToDict(ref m_nTrackSelected);
+                Application.Application.LoadAreaParamFromFileToDict(ref m_nTrackSelected, (int)Application.Application.categoriesTeachParam.DR_DefectROIIndex);
+                pgr_PropertyGrid_Teach.Update();
+
                 Mouse.OverrideCursor = null;
-                mainWindow.teach_parameters_btn.IsChecked = false;
+                //mainWindow.teach_parameters_btn.IsChecked = false;
                 return true;
             }
             catch (Exception)
@@ -256,18 +151,31 @@ namespace Magnus_WPF_1
         }
         private void btn_Cancel_Save_Param_Teach_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            UpdateTeachParamFromDictToUI(_dictTeachParam);
+            UpdateTeachParamFromDictToUI(Application.Application.dictTeachParam);
+            pgr_PropertyGrid_Teach.Update();
+
             MainWindow mainWindow = (MainWindow)System.Windows.Application.Current.MainWindow;
             mainWindow.teach_parameters_btn.IsChecked = false;
         }
+        //public class AreaComboBox : IItemsSource
+        //{
+        //    Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection m_ComboBox_Area = new Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection();
 
+        //    public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues()
+        //    {
+        //        m_ComboBox_Area.Add("Area 1");
+        //        m_ComboBox_Area.Add("Area 2");
+        //        m_ComboBox_Area.Add("Area 3");
+        //        m_ComboBox_Area.Add("Area 4");
+        //        m_ComboBox_Area.Add("Area 5");
+
+        //        return m_ComboBox_Area;
+        //    }
+        //}
         /// <summary>
         /// Model For PropertyGrid
         /// </summary>
-        // [CategoryOrder("TOP SURFACE", 0)]
         [CategoryOrder("LOCATION", 0)]
-        [CategoryOrder("LABEL", 1)]
-        //[CategoryOrder("TOP PATTERN", 1)]
         [DisplayName("Teach Parameter")]
         public class CategoryTeachParameter
         {
@@ -282,7 +190,7 @@ namespace Magnus_WPF_1
             [PropertyOrder(0)]
             public Rectangles L_DeviceLocationRoi { get; set; }
 
-            //[Browsable(false)]
+            [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Threshold Method")]
             [DefaultValue(THRESHOLD_TYPE.BINARY_THRESHOLD)]
@@ -290,7 +198,7 @@ namespace Magnus_WPF_1
             [PropertyOrder(1)]
             public THRESHOLD_TYPE L_ThresholdType { get; set; }
 
-            //[Browsable(false)]
+            [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Object Color")]
             [DefaultValue(OBJECT_COLOR.BLACK)]
@@ -298,7 +206,7 @@ namespace Magnus_WPF_1
             [PropertyOrder(2)]
             public OBJECT_COLOR L_ObjectColor { get; set; }
 
-            //[Browsable(false)]
+            [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Lower Threshold")]
             [Range(0, 255)]
@@ -307,7 +215,7 @@ namespace Magnus_WPF_1
             [PropertyOrder(3)]
 
             public int L_lowerThreshold { get; set; }
-            //[Browsable(false)]
+            [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Upper Threshold")]
             [Range(0, 255)]
@@ -316,7 +224,7 @@ namespace Magnus_WPF_1
             [PropertyOrder(4)]
             public int L_upperThreshold { get; set; }
 
-            //[Browsable(false)]
+            [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Lower Threshold Inner Chip")]
             [Range(0, 255)]
@@ -324,7 +232,9 @@ namespace Magnus_WPF_1
             [Description("")]
             [PropertyOrder(5)]
             public int L_lowerThresholdInnerChip { get; set; }
-            //[Browsable(false)]
+
+
+            [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Upper Threshold Inner Chip")]
             [Range(0, 255)]
@@ -334,7 +244,7 @@ namespace Magnus_WPF_1
             public int L_upperThresholdInnerChip { get; set; }
 
 
-            //[Browsable(false)]
+            [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Opening Mask")]
             [Range(1, 500)]
@@ -343,7 +253,7 @@ namespace Magnus_WPF_1
             [PropertyOrder(7)]
             public int L_OpeningMask { get; set; }
 
-            //[Browsable(false)]
+            [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Dilation Mask")]
             [Range(1, 500)]
@@ -352,7 +262,7 @@ namespace Magnus_WPF_1
             [PropertyOrder(8)]
             public int L_DilationMask { get; set; }
 
-            //[Browsable(false)]
+            [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Min Width Device")]
             [Range(0, 99999)]
@@ -361,7 +271,7 @@ namespace Magnus_WPF_1
             [PropertyOrder(9)]
             public int L_MinWidthDevice { get; set; }
 
-            //[Browsable(false)]
+            [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Min Height Device")]
             [Range(0, 99999)]
@@ -378,7 +288,7 @@ namespace Magnus_WPF_1
             [PropertyOrder(11)]
             public Rectangles L_TemplateRoi { get; set; }
 
-            //[Browsable(false)]
+            [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Number Side")]
             [Range(1, 360)]
@@ -387,7 +297,7 @@ namespace Magnus_WPF_1
             [PropertyOrder(12)]
             public int L_NumberSide { get; set; }
 
-            //[Browsable(false)]
+            [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Scale Image Ratio")]
             [Range(0.1, 1)]
@@ -396,7 +306,7 @@ namespace Magnus_WPF_1
             [PropertyOrder(13)]
             public double L_ScaleImageRatio { get; set; }
 
-            //[Browsable(false)]
+            [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Min Score")]
             [Range(0.0, 99999.0)]
@@ -417,27 +327,55 @@ namespace Magnus_WPF_1
 
             #endregion
 
-
-            #region LABEL
+            #region Area
 
             [Browsable(false)]
-            [Category("LABEL DEFECT")]
-            [DisplayName("Label Locations")]
+            [Category("DEFECT ROI")]
+            [DisplayName("Defect ROI Locations")]
             [Range(0, 5)]
             [Description("")]
             [PropertyOrder(0)]
-            public List<Rectangles> LD_LabelLocations { get; set; }
+            public List<Rectangles> DR_DefectROILocations { get; set; }
 
-            //[Browsable(false)]
-            [Category("LABEL DEFECT")]
+            [Browsable(true)]
+            [Category("DEFECT ROI")]
             [DisplayName("Number ROI Location")]
-            [Range(0, 5)]
+            [Range(0, (int)AREA_INDEX.TOTAL_AREA)]
             [DefaultValue(1)]
             [Description("")]
             [PropertyOrder(1)]
-            public int LD_NumberROILocation { get; set; }
+            public int DR_NumberROILocation { get; set; }
+
+            [Browsable(true)]
+            [Category("DEFECT ROI")]
+            [DisplayName("Defect ROI Index")]
+            [DefaultValue(AREA_INDEX.A1)]
+            [PropertyOrder(2)]
+            [Range((int)AREA_INDEX.A1, (int)AREA_INDEX.A5)]
+            //[ItemsSource(typeof(AreaComboBox))]
+            public AREA_INDEX DR_DefectROIIndex { get; set; }
+
+            #endregion
+
+            #region LABEL
+
+            [Browsable(true)]
+            [Category("LABEL DEFECT")]
+            [DisplayName("Area Enable")]
+            [PropertyOrder(0)]
+            [DefaultValue(false)]
+            public bool LD_AreaEnable { get; set; }
 
             //[Browsable(false)]
+            //[Category("LABEL DEFECT")]
+            //[DisplayName("Number ROI Location")]
+            //[Range(0, 5)]
+            //[DefaultValue(1)]
+            //[Description("")]
+            //[PropertyOrder(1)]
+            //public int LD_NumberROILocation { get; set; }
+
+            [Browsable(true)]
             [Category("LABEL DEFECT")]
             [DisplayName("Lower Threshold")]
             [Range(0, 255)]
@@ -445,7 +383,9 @@ namespace Magnus_WPF_1
             [Description("")]
             [PropertyOrder(2)]
             public int LD_lowerThreshold { get; set; }
-            //[Browsable(false)]
+
+
+            [Browsable(true)]
             [Category("LABEL DEFECT")]
             [DisplayName("Upper Threshold")]
             [Range(0, 255)]
@@ -454,7 +394,7 @@ namespace Magnus_WPF_1
             [PropertyOrder(3)]
             public int LD_upperThreshold { get; set; }
 
-            //[Browsable(false)]
+            [Browsable(true)]
             [Category("LABEL DEFECT")]
             [DisplayName("Opening Mask")]
             [Range(1, 100)]
@@ -463,7 +403,7 @@ namespace Magnus_WPF_1
             [PropertyOrder(4)]
             public int LD_OpeningMask { get; set; }
 
-            //[Browsable(false)]
+            [Browsable(true)]
             [Category("LABEL DEFECT")]
             [DisplayName("Dilation Mask")]
             [Range(1, 100)]
@@ -473,6 +413,94 @@ namespace Magnus_WPF_1
             public int LD_DilationMask { get; set; }
 
             #endregion
+
+            //[DisplayName("Defect Parameter")]
+            //[CategoryOrder("AREA", 1)]
+            //[CategoryOrder("LABEL", 1)]
+            //public class CategoryAreaParameter
+            //{
+            //    #region Area
+            //    [Category("AREA")]
+            //    [Browsable(true)]
+            //    [DisplayName("Area Index")]
+            //    [DefaultValue(AREA_INDEX.A1)]
+            //    //[ItemsSource(typeof(AreaComboBox))]
+            //    [PropertyOrder(0)]
+            //    public AREA_INDEX A_AreaIndex { get; set; }
+
+            //    #endregion
+
+            //    #region LABEL
+
+            //    [Browsable(false)]
+            //    [Category("LABEL DEFECT")]
+            //    [DisplayName("Label Locations")]
+            //    [Range(0, 5)]
+            //    [Description("")]
+            //    [PropertyOrder(0)]
+            //    public Rectangles LD_LabelLocations { get; set; }
+
+
+            //    [Category("LABEL DEFECT")]
+            //    [DisplayName("Area Enable")]
+            //    [PropertyOrder(0)]
+            //    [DefaultValue(false)]
+            //    public bool LD_AreaEnable { get; set; }
+
+            //    //[Browsable(false)]
+            //    //[Category("LABEL DEFECT")]
+            //    //[DisplayName("Number ROI Location")]
+            //    //[Range(0, 5)]
+            //    //[DefaultValue(1)]
+            //    //[Description("")]
+            //    //[PropertyOrder(1)]
+            //    //public int LD_NumberROILocation { get; set; }
+
+            //    //[Browsable(false)]
+            //    [Category("LABEL DEFECT")]
+            //    [DisplayName("Lower Threshold")]
+            //    [Range(0, 255)]
+            //    [DefaultValue(0)]
+            //    [Description("")]
+            //    [PropertyOrder(2)]
+            //    public int LD_lowerThreshold { get; set; }
+            //    //[Browsable(false)]
+            //    [Category("LABEL DEFECT")]
+            //    [DisplayName("Upper Threshold")]
+            //    [Range(0, 255)]
+            //    [DefaultValue(255)]
+            //    [Description("")]
+            //    [PropertyOrder(3)]
+            //    public int LD_upperThreshold { get; set; }
+
+            //    //[Browsable(false)]
+            //    [Category("LABEL DEFECT")]
+            //    [DisplayName("Opening Mask")]
+            //    [Range(1, 100)]
+            //    [DefaultValue(1)]
+            //    [Description("")]
+            //    [PropertyOrder(4)]
+            //    public int LD_OpeningMask { get; set; }
+
+            //    //[Browsable(false)]
+            //    [Category("LABEL DEFECT")]
+            //    [DisplayName("Dilation Mask")]
+            //    [Range(1, 100)]
+            //    [DefaultValue(1)]
+            //    [Description("")]
+            //    [PropertyOrder(5)]
+            //    public int LD_DilationMask { get; set; }
+
+            //    #endregion
+            //}
+
+        }
+
+
+
+        private void pgr_PropertyGrid_Area_PropertyValueChanged(object sender, Xceed.Wpf.Toolkit.PropertyGrid.PropertyValueChangedEventArgs e)
+        {
+
         }
     }
 }

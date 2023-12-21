@@ -1115,14 +1115,15 @@ namespace Magnus_WPF_1.UI.UserControls.View
             //    L_DeviceLocationRoi_Temp.Width = _imageWidth;
             //    L_DeviceLocationRoi_Temp.Height = _imageHeight;
             //}
-            if(Source.Application.Application.categoriesTeachParam.LD_LabelLocations.Count < 5)
+
+            if (Source.Application.Application.categoriesTeachParam.DR_DefectROILocations.Count < (int)AREA_INDEX.TOTAL_AREA)
             {
-                Source.Application.Application.categoriesTeachParam.LD_LabelLocations.Clear();
-                for (int n = 0; n< 5; n++)
+                Source.Application.Application.categoriesTeachParam.DR_DefectROILocations.Clear();
+                for (int n = 0; n < (int)AREA_INDEX.TOTAL_AREA; n++)
                 {
-                    Source.Application.Application.categoriesTeachParam.LD_LabelLocations.Add(new Rectangles(new Point(100, 100), 100, 100));
-                }    
-            }    
+                    Source.Application.Application.categoriesTeachParam.DR_DefectROILocations.Add(new Rectangles(new Point(100, 100), 100, 100));
+                }
+            }
 
             if (true)
             {
@@ -1155,16 +1156,16 @@ namespace Magnus_WPF_1.UI.UserControls.View
             }
             if (true)
             {
-                if (L_PVIArea.Count() < 5)
+                if (L_PVIArea.Count() < Source.Application.Application.categoriesTeachParam.DR_DefectROILocations.Count)
                 {
                     L_PVIArea.Clear();
 
-                    for (int nPVIArea = 0; nPVIArea < 5; nPVIArea++)
+                    for (int nPVIArea = 0; nPVIArea < Source.Application.Application.categoriesTeachParam.DR_DefectROILocations.Count; nPVIArea++)
                     {
-                        L_PVIArea.Add(Source.Application.Application.categoriesTeachParam.LD_LabelLocations[nPVIArea]);
+                        L_PVIArea.Add(Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nPVIArea]);
                     }
                 }
-                for (int nPVIArea = 0; nPVIArea < Source.Application.Application.categoriesTeachParam.LD_NumberROILocation; nPVIArea++)
+                for (int nPVIArea = 0; nPVIArea < Source.Application.Application.categoriesTeachParam.DR_NumberROILocation; nPVIArea++)
                 {
                     Rectangles lPVIAreaTemp = L_PVIArea[nPVIArea];
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
@@ -1245,10 +1246,10 @@ namespace Magnus_WPF_1.UI.UserControls.View
             var result = MessageBox.Show("Do you want to save teach parameter ?", "Save Teach Parameter", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
             {
-                for (int n = 0; n< 5; n++)
+                for (int n = 0; n < (int)AREA_INDEX.TOTAL_AREA; n++)
                 {
-                    Source.Application.Application.categoriesTeachParam.LD_LabelLocations[n] = L_PVIArea[n];
-                }    
+                    Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[n] = L_PVIArea[n];
+                }
                 //SetTeachParameterToCategories();
                 MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
                 MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.SetTemplateImage();

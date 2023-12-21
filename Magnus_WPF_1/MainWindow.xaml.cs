@@ -755,7 +755,7 @@ namespace Magnus_WPF_1
             master.teachParameter.Height = 600;
             //master.m_Tracks[0].m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autofocus, 1);
             master.teachParameter.track_ComboBox.SelectedIndex = activeImageDock.trackID;
-            master.teachParameter.ReloadParameterUI(activeImageDock.trackID);
+            master.teachParameter.ReloadTeachParameterUI(activeImageDock.trackID);
             grd_PopupDialog.Children.Add(master.teachParameter);
             //grd_PopupDialog.Children.Add(master.m_Tracks[]);
             tab_controls.SelectedIndex = currentTabIndex;
@@ -885,7 +885,9 @@ namespace Magnus_WPF_1
             mapping_parameters_btn.IsChecked = false;
             grd_PopupDialog.Children.Clear();
 
-            if (m_nDeviceX != Source.Application.Application.categoriesMappingParam.M_NumberDeviceX || m_nDeviceY != Source.Application.Application.categoriesMappingParam.M_NumberDeviceY)
+            if (m_nDeviceX != Source.Application.Application.categoriesMappingParam.M_NumberDeviceX 
+                || m_nDeviceY != Source.Application.Application.categoriesMappingParam.M_NumberDeviceY
+                ||m_nTotalDevicePerLot != Source.Application.Application.categoriesMappingParam.M_NumberDevicePerLot)
             {
                 master.LoadRecipe();
                 m_staticView.InitCanvasMapping();

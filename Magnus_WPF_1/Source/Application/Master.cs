@@ -103,18 +103,28 @@ namespace Magnus_WPF_1.Source.Application
         {
             Application.dictMappingParam.Clear();
             Application.LoadMappingParamFromFile();
-            mappingParameter.LoadMappingParamFromDictToUI(Application.dictMappingParam);
+            mappingParameter.UpdateMappingParamFromDictToUI(Application.dictMappingParam);
 
             #region Load Teach Paramter
             for(int nTrack = 0; nTrack < Application.m_nTrack; nTrack++)
             {
                 Application.dictTeachParam.Clear();
                 Application.LoadTeachParamFromFileToDict(ref nTrack);
-
                 //m_Tracks[nTrack].m_InspectionCore.LoadTeachImageToInspectionCore(nTrack);
                 teachParameter.UpdateTeachParamFromDictToUI(Application.dictTeachParam);
-
                 m_Tracks[nTrack].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
+
+
+                for (int nArea = 0; nArea < (int)AREA_INDEX.TOTAL_AREA; nArea++)
+                {
+                    Application.dictPVIAreaParam[nArea] = new Dictionary<string, string>();
+
+                    Application.LoadAreaParamFromFileToDict(ref nTrack, nArea);
+                    teachParameter.UpdateTeachParamFromDictToUI(Application.dictPVIAreaParam[nArea]);
+                    m_Tracks[nTrack].m_InspectionCore.UpdateAreaParameterFromUIToInspectionCore(nArea);
+                }
+
+
                 m_Tracks[nTrack].m_InspectionCore.LoadTeachImageToInspectionCore(nTrack);
                 m_Tracks[nTrack].AutoTeach(ref m_Tracks[nTrack]);
             }

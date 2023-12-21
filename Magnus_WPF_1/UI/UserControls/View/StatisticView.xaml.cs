@@ -92,7 +92,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             MainWindow.mainWindow.m_nDeviceX = Source.Application.Application.categoriesMappingParam.M_NumberDeviceX;
             MainWindow.mainWindow.m_nDeviceY = Source.Application.Application.categoriesMappingParam.M_NumberDeviceY;
             MainWindow.mainWindow.m_nTotalDevicePerLot = Source.Application.Application.categoriesMappingParam.M_NumberDevicePerLot;
-            double dPage = Math.Round(MainWindow.mainWindow.m_nTotalDevicePerLot / MainWindow.mainWindow.m_nDeviceX / MainWindow.mainWindow.m_nDeviceY * 1.0);
+            double dPage = Math.Ceiling((MainWindow.mainWindow.m_nTotalDevicePerLot *1.0) / (MainWindow.mainWindow.m_nDeviceX * 1.0 )/ MainWindow.mainWindow.m_nDeviceY * 1.0);
             m_nNumberMappingPage = (int)dPage;
 
             int nMaxDeviceStep = MainWindow.mainWindow.m_nDeviceX > MainWindow.mainWindow.m_nDeviceY ? MainWindow.mainWindow.m_nDeviceX : MainWindow.mainWindow.m_nDeviceY;

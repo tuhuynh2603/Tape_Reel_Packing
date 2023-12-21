@@ -50,7 +50,15 @@ namespace Magnus_WPF_1.Source.Define
         ANY_COLOR
     };
 
-    
+    public enum AREA_INDEX: int
+    {
+        A1 = 0,
+        A2,
+        A3,
+        A4,
+        A5,
+        TOTAL_AREA
+    }
 
     public enum DIRECTION : int
     {

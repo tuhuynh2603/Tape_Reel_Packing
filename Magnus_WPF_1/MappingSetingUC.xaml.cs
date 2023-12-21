@@ -21,11 +21,11 @@ namespace Magnus_WPF_1
     {
         private Dictionary<string, string> _dictMappingParam = new Dictionary<string, string>();
 
-        public CatergoryMappingParameters categoriesMappingParam = new CatergoryMappingParameters();
+        //public CatergoryMappingParameters categoriesMappingParam = new CatergoryMappingParameters();
         public MappingSetingUC()
         {
             InitializeComponent();
-            this.DataContext = categoriesMappingParam;
+            this.DataContext = Application.Application.categoriesMappingParam;
 
         }
 
@@ -51,135 +51,40 @@ namespace Magnus_WPF_1
             }
             return list;
         }
-        public bool LoadMappingParamFromDictToUI(Dictionary<string, string> dictTeachParam)
+        public bool UpdateMappingParamFromDictToUI(Dictionary<string, string> dictParam)
         {
-            this._dictMappingParam = dictTeachParam;
-            try
-            {
-                PropertyInfo[] arrInfo = Application.Application.categoriesMappingParam.GetType().GetProperties();
-                for (int i = 0; i < arrInfo.Count(); i++)
-                {
-                    PropertyInfo info = arrInfo[i];
-                    Type type = info.PropertyType;
-                    if (type.Name == "Int32")
-                    {
-                        int value = 0;
-                        bool success = Int32.TryParse(dictTeachParam[info.Name].ToString(), out value);
-                        if (success == false)
-                            value = (int)info.GetCustomAttribute<DefaultValueAttribute>().Value;
-                        info.SetValue(Application.Application.categoriesMappingParam, value);
-                        info.SetValue(categoriesMappingParam, value);
-                    }
-                    else if (type.Name == "Color")
-                    {
-                        info.SetValue(Application.Application.categoriesMappingParam, dictTeachParam[info.Name] == "white" ? Colors.White : Colors.Black);
-                    }
-                    else if (type.Name == "THRESHOLD_TYPE")
-                    {
-                        THRESHOLD_TYPE value;
-                        bool success = Enum.TryParse(_dictMappingParam.Values.ElementAt(i), out value);
-                        if (success == false)
-                            value = (THRESHOLD_TYPE)info.GetCustomAttribute<DefaultValueAttribute>().Value;
-                        info.SetValue(Application.Application.categoriesMappingParam, value);
-                        info.SetValue(categoriesMappingParam, value);
-                    }
-
-                    else if (type.Name == "OBJECT_COLOR")
-                    {
-                        OBJECT_COLOR value;
-                        bool success = Enum.TryParse(_dictMappingParam.Values.ElementAt(i), out value);
-                        if (success == false)
-                            value = (OBJECT_COLOR)info.GetCustomAttribute<DefaultValueAttribute>().Value;
-                        info.SetValue(Application.Application.categoriesMappingParam, value);
-                        info.SetValue(categoriesMappingParam, value);
-                    }
-
-                    else if (type.Name == "Double")
-                    {
-                        double value = 0.0;
-                        bool success = double.TryParse(dictTeachParam[info.Name].ToString(), out value);
-                        if (success == false)
-                            value = (double)info.GetCustomAttribute<DefaultValueAttribute>().Value;
-                        info.SetValue(Application.Application.categoriesMappingParam, value);
-                        info.SetValue(categoriesMappingParam, value);
-
-                    }
-                    else if (type.Name == "List`1")
-                    {
-                        if (type.FullName.Contains("Int32"))
-                        {
-                            int[] value = new int[3];
-                            List<int> listValue;
-                            if (dictTeachParam[info.Name] == "")
-                            {
-                                value = (int[])info.GetCustomAttribute<DefaultValueAttribute>().Value;
-                                listValue = new List<int>(value);
-                            }
-                            else
-                                listValue = ConverStringToList(dictTeachParam[info.Name]);
-                            info.SetValue(Application.Application.categoriesMappingParam, listValue);
-                            info.SetValue(categoriesMappingParam, listValue);
-
-                        }
-                        else if (type.FullName.Contains("Rectangles"))
-                        {
-                            List<Rectangles> listValue = new List<Rectangles> { };
-                            foreach (KeyValuePair<string, string> kvp in dictTeachParam)
-                            {
-                                if (kvp.Key.Contains(info.Name))
-                                    listValue.Add(GetRectangles(dictTeachParam[kvp.Key.ToString()]));
-                            }
-                            info.SetValue(Application.Application.categoriesMappingParam, listValue);
-                            info.SetValue(categoriesMappingParam, listValue);
-                        }
-                    }
-
-                    else if (type.Name == "Rectangles")
-                    {
-                        Rectangles rect = GetRectangles(dictTeachParam[info.Name]);
-                        info.SetValue(Application.Application.categoriesMappingParam, rect);
-                        info.SetValue(categoriesMappingParam, rect);
-
-                    }
-                    else if (type.Name == "String")
-                    {
-                        string str = dictTeachParam[info.Name].ToString();
-                        if (str == "")
-                            str = (string)info.GetCustomAttribute<DefaultValueAttribute>().Value;
-                        info.SetValue(Application.Application.categoriesMappingParam, str);
-                        info.SetValue(categoriesMappingParam, str);
-
-                    }
-                }
-            }
-            catch
-            {
-                return false;
-            }
+            //_dictMappingParam = dictParam;
+            object category = Application.Application.categoriesMappingParam;
+            //object category_local = categoriesMappingParam;
+            bool bSuccess = Application.Application.UpdateParamFromDictToUI(dictParam, ref category/*, ref category_local*/);
+            Application.Application.categoriesMappingParam = (CatergoryMappingParameters)category;
+            //categoriesMappingParam = (CatergoryMappingParameters)category_local;
             pgr_PropertyGrid_Mapping.Update();
-            return true;
+            return bSuccess;
         }
-        public void UpdateDictionaryParam()
-        {
-            System.Reflection.PropertyInfo[] infos = categoriesMappingParam.GetType().GetProperties();
-            System.Reflection.PropertyInfo[] infosApp = Application.Application.categoriesMappingParam.GetType().GetProperties();
 
-            for (int i = 0; i < infos.Length; i++)
-            {
-                infosApp[i].SetValue(Application.Application.categoriesMappingParam, infos[i].GetValue(categoriesMappingParam));
-                Type type = infos[i].PropertyType;
-                _dictMappingParam[infos[i].Name] = infos[i].GetValue(categoriesMappingParam).ToString();
-            }
-        }
+        //public void UpdateDictionaryParam()
+        //{
+        //    System.Reflection.PropertyInfo[] infos = Application.Application.categoriesMappingParam.GetType().GetProperties();
+        //    System.Reflection.PropertyInfo[] infosApp = Application.Application.categoriesMappingParam.GetType().GetProperties();
+
+        //    for (int i = 0; i < infos.Length; i++)
+        //    {
+        //        //infosApp[i].SetValue(Application.Application.categoriesMappingParam, infos[i].GetValue(Application.Application.categoriesMappingParam));
+        //        Type type = infos[i].PropertyType;
+        //        _dictMappingParam[infos[i].Name] = infos[i].GetValue(Application.Application.categoriesMappingParam).ToString();
+        //    }
+        //}
 
         public bool SaveParameterMappingDefault()
         {
             try
             {
                 Mouse.OverrideCursor = Cursors.Wait;
-                UpdateDictionaryParam();
+                //UpdateDictionaryParam();
                 MainWindow mainWindow = (MainWindow)System.Windows.Application.Current.MainWindow;
                 mainWindow.master.WriteMappingParam();
+                Application.Application.LoadMappingParamFromFile();
                 Mouse.OverrideCursor = null;
                 mainWindow.mapping_parameters_btn.IsChecked = false;
                 return true;
@@ -197,7 +102,7 @@ namespace Magnus_WPF_1
 
         private void btn_cancel_Click(object sender, RoutedEventArgs e)
         {
-            LoadMappingParamFromDictToUI(_dictMappingParam);
+            UpdateMappingParamFromDictToUI(Application.Application.dictMappingParam);
             MainWindow mainWindow = (MainWindow)System.Windows.Application.Current.MainWindow;
             mainWindow.mapping_parameters_btn.IsChecked = false;
         }
@@ -208,7 +113,7 @@ namespace Magnus_WPF_1
         {
 
             #region MAPPING
-            //[Browsable(false)]
+            [Browsable(true)]
             [Category("MAPPING")]
             [DisplayName("Number Device X")]
             [Range(5, 100)]
@@ -216,7 +121,7 @@ namespace Magnus_WPF_1
             [Description("")]
             [PropertyOrder(0)]
             public int M_NumberDeviceX { get; set; }
-            //[Browsable(false)]
+            [Browsable(true)]
             [Category("MAPPING")]
             [DisplayName("Number Device Y")]
             [Range(5, 100)]
@@ -225,7 +130,7 @@ namespace Magnus_WPF_1
             [PropertyOrder(1)]
             public int M_NumberDeviceY { get; set; }
 
-            //[Browsable(false)]
+            [Browsable(true)]
             [Category("MAPPING")]
             [DisplayName("Number Device Per Lot")]
             [Range(1, 10000)]

@@ -340,7 +340,7 @@ namespace Magnus_WPF_1
             [Browsable(true)]
             [Category("DEFECT ROI")]
             [DisplayName("Number ROI Location")]
-            [Range(0, (int)AREA_INDEX.TOTAL_AREA)]
+            [Range(0, Application.Application.TOTAL_AREA)]
             [DefaultValue(1)]
             [Description("")]
             [PropertyOrder(1)]
@@ -351,7 +351,6 @@ namespace Magnus_WPF_1
             [DisplayName("Defect ROI Index")]
             [DefaultValue(AREA_INDEX.A1)]
             [PropertyOrder(2)]
-            [Range((int)AREA_INDEX.A1, (int)AREA_INDEX.A5)]
             //[ItemsSource(typeof(AreaComboBox))]
             public AREA_INDEX DR_DefectROIIndex { get; set; }
 
@@ -397,8 +396,8 @@ namespace Magnus_WPF_1
             [Browsable(true)]
             [Category("LABEL DEFECT")]
             [DisplayName("Opening Mask")]
-            [Range(1, 100)]
-            [DefaultValue(1)]
+            [Range(0, 100)]
+            [DefaultValue(0)]
             [Description("")]
             [PropertyOrder(4)]
             public int LD_OpeningMask { get; set; }
@@ -406,11 +405,20 @@ namespace Magnus_WPF_1
             [Browsable(true)]
             [Category("LABEL DEFECT")]
             [DisplayName("Dilation Mask")]
-            [Range(1, 100)]
-            [DefaultValue(1)]
+            [Range(0, 100)]
+            [DefaultValue(0)]
             [Description("")]
             [PropertyOrder(5)]
             public int LD_DilationMask { get; set; }
+
+            [Browsable(true)]
+            [Category("LABEL DEFECT")]
+            [DisplayName("Object Cover PerCent")]
+            [Range(0, 100)]
+            [DefaultValue(50)]
+            [Description("")]
+            [PropertyOrder(6)]
+            public int LD_ObjectCoverPercent { get; set; }
 
             #endregion
 

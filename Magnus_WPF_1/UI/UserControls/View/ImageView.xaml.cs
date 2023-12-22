@@ -1116,10 +1116,10 @@ namespace Magnus_WPF_1.UI.UserControls.View
             //    L_DeviceLocationRoi_Temp.Height = _imageHeight;
             //}
 
-            if (Source.Application.Application.categoriesTeachParam.DR_DefectROILocations.Count < (int)AREA_INDEX.TOTAL_AREA)
+            if (Source.Application.Application.categoriesTeachParam.DR_DefectROILocations.Count < Source.Application.Application.TOTAL_AREA)
             {
                 Source.Application.Application.categoriesTeachParam.DR_DefectROILocations.Clear();
-                for (int n = 0; n < (int)AREA_INDEX.TOTAL_AREA; n++)
+                for (int n = 0; n < Source.Application.Application.TOTAL_AREA; n++)
                 {
                     Source.Application.Application.categoriesTeachParam.DR_DefectROILocations.Add(new Rectangles(new Point(100, 100), 100, 100));
                 }
@@ -1246,7 +1246,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             var result = MessageBox.Show("Do you want to save teach parameter ?", "Save Teach Parameter", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
             {
-                for (int n = 0; n < (int)AREA_INDEX.TOTAL_AREA; n++)
+                for (int n = 0; n < Source.Application.Application.TOTAL_AREA; n++)
                 {
                     Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[n] = L_PVIArea[n];
                 }

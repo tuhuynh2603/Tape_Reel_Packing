@@ -57,7 +57,6 @@ namespace Magnus_WPF_1.Source.Define
         A3,
         A4,
         A5,
-        TOTAL_AREA
     }
 
     public enum DIRECTION : int

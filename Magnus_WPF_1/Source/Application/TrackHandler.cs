@@ -491,12 +491,12 @@ namespace Magnus_WPF_1.Source.Application
                 PointF pCorner = new PointF(0,0);
                 nResult = m_InspectionCore.Inspect(ref m_InspectionCore.m_TeachImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, ref m_StepDebugInfors, false);
                 //Draw Result
-                if (nResult == 0)
-                {
+                //if (nResult == 0)
+                //{
                     m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint = pCenter;
                     m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint = pCorner;
                     //m_InspectionCore.m_DeviceLocationResult.m_dAngleOxDevice = MagnusMatrix.AngleWithXAxis(pCorner.X - pCenter.X, pCorner.Y - pCenter.Y);
-                }
+                //}
 
 
 

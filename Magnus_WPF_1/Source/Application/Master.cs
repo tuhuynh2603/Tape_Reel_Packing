@@ -115,7 +115,7 @@ namespace Magnus_WPF_1.Source.Application
                 m_Tracks[nTrack].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
 
 
-                for (int nArea = 0; nArea < (int)AREA_INDEX.TOTAL_AREA; nArea++)
+                for (int nArea = 0; nArea < Application.TOTAL_AREA; nArea++)
                 {
                     Application.dictPVIAreaParam[nArea] = new Dictionary<string, string>();
 

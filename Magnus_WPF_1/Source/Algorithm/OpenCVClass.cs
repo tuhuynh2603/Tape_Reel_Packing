@@ -4,6 +4,7 @@ using Emgu.CV.Structure;
 using Magnus_WPF_1.Source.Define;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using static Magnus_WPF_1.Source.Define.Rectangles;
@@ -69,12 +70,19 @@ namespace Magnus_WPF_1.Source.Algorithm
         }
 
         //Get Region Points
+        public static int GetArea(ref CvImage source)
+        {
+            Matrix<byte> matrix = new Matrix<byte>(source.Rows, source.Cols, source.NumberOfChannels);
+
+            source.CopyTo(matrix);
+            return (int)matrix.Sum / 255;
+        }
         public static bool GetRegionPoints(ref CvImage source, List<int> Rows, List<int> Cols)
         {
             Matrix<byte> matrix = new Matrix<byte>(source.Rows, source.Cols, source.NumberOfChannels);
 
             source.CopyTo(matrix);
-
+            int nsize = (int)(matrix.Sum / 255);
             for (int i = 0; i < source.Rows - 1; i++)
             {
                 for (int j = 0; j < source.Cols - 1; j++)
@@ -409,8 +417,11 @@ namespace Magnus_WPF_1.Source.Algorithm
             CvImage labelImage = new CvImage(source.Size, DepthType.Cv32S, 1);
             CvImage stats = new CvImage();
             CvImage centroids = new CvImage();
+            //Stopwatch timeIns = new Stopwatch();
+            //timeIns.Start();
             nLabels = CvInvoke.ConnectedComponentsWithStats(source, labelImage, stats, centroids, LineType.EightConnected, DepthType.Cv32S);
-
+            //LogMessage.LogMessage.WriteToDebugViewer(5, $"Connection time : {timeIns.ElapsedMilliseconds} ms");
+            //timeIns.Restart();
             int maxAreaIndexLabel = -1;
             int maxArea = 0;
 
@@ -427,10 +438,16 @@ namespace Magnus_WPF_1.Source.Algorithm
                 }
             if (maxAreaIndexLabel == -1)
                 return false;
+
+            //LogMessage.LogMessage.WriteToDebugViewer(5, $"Get Max Area time : {timeIns.ElapsedMilliseconds} ms");
+            //timeIns.Restart();
+
             //Get size result equal size of source
             CvImage imgtest = new CvImage(source.Size, DepthType.Cv32S, 1);
             imgtest.SetTo(new MCvScalar(maxAreaIndexLabel));
             CvInvoke.Compare(labelImage, imgtest, result, CmpType.Equal);
+            //LogMessage.LogMessage.WriteToDebugViewer(5, $"End selectbiggest time : {timeIns.ElapsedMilliseconds} ms");
+            //timeIns.Restart();
             return true;
         }
         // select region  by width height 
@@ -512,8 +529,6 @@ namespace Magnus_WPF_1.Source.Algorithm
             CvInvoke.WarpAffine(source, rotatedImage, mapMatrix, szTemplateSize);
             return rotatedImage;
         }
-
-
         // Shift Image
         public static bool ShiftImage(CvImage source, ref CvImage result, ref PointF[] srcPnt, ref PointF[] dstPnt)
         {

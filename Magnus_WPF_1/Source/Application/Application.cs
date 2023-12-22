@@ -13,6 +13,7 @@ namespace Magnus_WPF_1.Source.Application
 {
     public class Application
     {
+        public const int TOTAL_AREA = 5;
         public static int m_nTrack = (int)TRACK_TYPE.TRACK_ALL;
         public static int m_nDoc = 1;
         public static bool m_bEnableSavingOnlineImage = true;
@@ -23,7 +24,7 @@ namespace Magnus_WPF_1.Source.Application
         public static MappingSetingUC.CatergoryMappingParameters categoriesMappingParam = new MappingSetingUC.CatergoryMappingParameters();
 
         public static Dictionary<string, string> dictTeachParam = new Dictionary<string, string>();
-        public static Dictionary<string, string>[] dictPVIAreaParam = new Dictionary<string, string>[(int)AREA_INDEX.TOTAL_AREA];
+        public static Dictionary<string, string>[] dictPVIAreaParam = new Dictionary<string, string>[TOTAL_AREA];
         public static Dictionary<string, string> dictMappingParam = new Dictionary<string, string>();
 
         public static string pathRecipe;// = "C:\\Wisely\\C#\\Magnus_WPF_1\\Config";
@@ -229,14 +230,14 @@ namespace Magnus_WPF_1.Source.Application
 
         }
 
-        public static void LoadAreaParamFromFileToDict(ref int nTrack, int nAreaIndex = (int)AREA_INDEX.TOTAL_AREA)
+        public static void LoadAreaParamFromFileToDict(ref int nTrack, int nAreaIndex = TOTAL_AREA)
         {
             if (currentRecipe == null || pathRecipe == null)
                 return;
 
-            //if (nAreaIndex == (int)AREA_INDEX.TOTAL_AREA)
+            //if (nAreaIndex == TOTAL_AREA)
             //{
-            //    for (int n = 0; n < (int)AREA_INDEX.TOTAL_AREA; n++)
+            //    for (int n = 0; n < TOTAL_AREA; n++)
             //    {
 
             //        string strFileName = $"PVIAreaParameters_Track{nTrack + 1}_Area{n + 1}" + ".cfg";
@@ -263,6 +264,7 @@ namespace Magnus_WPF_1.Source.Application
             ReadLine_Magnus("LABEL DEFECT", $"Upper Threshold", ini, ref dictPVIAreaParam[nAreaIndex]);
             ReadLine_Magnus("LABEL DEFECT", $"Opening Mask", ini, ref dictPVIAreaParam[nAreaIndex]);
             ReadLine_Magnus("LABEL DEFECT", $"Dilation Mask", ini, ref dictPVIAreaParam[nAreaIndex]);
+            ReadLine_Magnus("LABEL DEFECT", $"Object Cover PerCent", ini, ref dictPVIAreaParam[nAreaIndex]);
             //}
         }
 
@@ -295,6 +297,9 @@ namespace Magnus_WPF_1.Source.Application
             WriteLine("LABEL DEFECT", $"Upper Threshold", ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_LD_upperThreshold.ToString());
             WriteLine("LABEL DEFECT", $"Opening Mask", ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_LD_OpeningMask.ToString());
             WriteLine("LABEL DEFECT", $"Dilation Mask", ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_LD_DilationMask.ToString());
+            WriteLine("LABEL DEFECT", $"Object Cover PerCent", ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_LD_ObjectCoverPercent.ToString());
+
+            
 
         }
 
@@ -308,7 +313,7 @@ namespace Magnus_WPF_1.Source.Application
             IniFile ini = new IniFile(pathFile);
 
             ReadLine_Magnus("LOCATION", "Device Location Roi", ini, ref dictTeachParam);
-            ReadLine_Magnus("LOCATION", "Threshold Type", ini, ref dictTeachParam);
+            ReadLine_Magnus("LOCATION", "Threshold Method", ini, ref dictTeachParam);
             ReadLine_Magnus("LOCATION", "Object Color", ini, ref dictTeachParam);
             ReadLine_Magnus("LOCATION", "lower threshold", ini, ref dictTeachParam);
             ReadLine_Magnus("LOCATION", "upper threshold", ini, ref dictTeachParam);
@@ -329,7 +334,7 @@ namespace Magnus_WPF_1.Source.Application
             ReadLine_Magnus("DEFECT ROI", $"Number ROI Location", ini, ref dictTeachParam);
             ReadLine_Magnus("DEFECT ROI", "Area Index", ini, ref dictTeachParam);
 
-            for (int n = 0; n < (int)AREA_INDEX.TOTAL_AREA; n++)
+            for (int n = 0; n < TOTAL_AREA; n++)
             {
                 ReadLine_Magnus("DEFECT ROI", $"Defect ROI Locations {n + 1}", ini, ref dictTeachParam);
                 //ReadLine_Magnus("LABEL DEFECT", $"Area Enable {n + 1}", ini, ref dictTeachParam);
@@ -376,7 +381,7 @@ namespace Magnus_WPF_1.Source.Application
             InspectionCore inspectionCore = MainWindow.mainWindow.master.m_Tracks[0].m_InspectionCore;
 
             WriteLine("LOCATION", "Device Location Roi", ini, ConvertRectanglesToString(inspectionCore.m_DeviceLocationParameter.m_L_DeviceLocationRoi));
-            WriteLine("LOCATION", "Threshold Type", ini, inspectionCore.m_DeviceLocationParameter.m_L_ThresholdType.ToString());
+            WriteLine("LOCATION", "Threshold Method", ini, inspectionCore.m_DeviceLocationParameter.m_L_ThresholdType.ToString());
             WriteLine("LOCATION", "Object Color", ini, inspectionCore.m_DeviceLocationParameter.m_L_ObjectColor.ToString());
           
             WriteLine("LOCATION", "lower threshold", ini, inspectionCore.m_DeviceLocationParameter.m_L_lowerThreshold.ToString());
@@ -399,7 +404,7 @@ namespace Magnus_WPF_1.Source.Application
             WriteLine("DEFECT ROI", $"Number ROI Location", ini, inspectionCore.m_DeviceLocationParameter.m_DR_NumberROILocation.ToString());
             WriteLine("DEFECT ROI", $"Defect ROI Index", ini, inspectionCore.m_DeviceLocationParameter.m_DR_DefectROIIndex.ToString());
 
-            for (int nAreaIndex = 0; nAreaIndex < (int)AREA_INDEX.TOTAL_AREA; nAreaIndex++)
+            for (int nAreaIndex = 0; nAreaIndex < TOTAL_AREA; nAreaIndex++)
             {
                 
                 WriteLine("DEFECT ROI", $"Defect ROI Locations {nAreaIndex+1}", ini, ConvertRectanglesToString(inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_DR_DefectROILocations));

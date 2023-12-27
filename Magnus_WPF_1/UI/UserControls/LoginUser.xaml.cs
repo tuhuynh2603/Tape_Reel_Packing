@@ -11,6 +11,7 @@ using System.Windows;
 using Magnus_WPF_1.Source.Define;
 using Magnus_WPF_1.Source.Application;
 using Application = Magnus_WPF_1.Source.Application.Application;
+using Magnus_WPF_1.Source.LogMessage;
 
 namespace Magnus_WPF_1.UI.UserControls
 {
@@ -90,7 +91,11 @@ namespace Magnus_WPF_1.UI.UserControls
 			foreach (DataRow row in tableAccount.Rows)
 			{
 				if (row["username"].ToString() == username)
-					return row["password"].ToString();
+                {
+					string strPass = row["password"].ToString();
+					return strPass;
+
+				}
 			}
 			return null;
 		}
@@ -220,6 +225,79 @@ namespace Magnus_WPF_1.UI.UserControls
 
 		private void Login_Click(object sender, System.Windows.RoutedEventArgs e)
 		{
+			string pw = "";
+			if (userName.Foreground == Brushes.Gray && userName.Text == "")
+			{
+				NotifyLogin.Text = "Type your Username !";
+				return;
+			}
+			if (passWord.Foreground == Brushes.Gray)
+				pw = EncryptPass("");
+			else pw = EncryptPass(passWord.Password);
+			if (!CheckUsername(userName.Text))
+			{
+				NotifyLogin.Text = "Username is wrong !";
+				return;
+			}
+			else if (pw == GetPassword(userName.Text))
+			{
+				main.IsFisrtLogin = true;
+				//main.AddHotKey();
+				MainWindow.accountUser = userName.Text;
+				MainWindow.accessLevel = GetAccessLevel(userName.Text);
+
+				MainWindow.UICurrentState = UISTate.IDLE_STATE;
+				//for (int itrack = 0; itrack < Source.Application.Application.m_nTrack; itrack++)
+				//{
+				//	if (!main.master.m_Tracks[itrack].isAvailable)
+				//	{
+				//		MainWindow.UICurrentState = UISTate.IDLE_NOCAM_STATE;
+				//		break;
+				//	}
+				//}
+				currentUser.Content = userName.Text;
+				currentAccesslevel.Content = AccessLevelString(GetAccessLevel(userName.Text));
+				LogMessage.WriteToDebugViewer(0, string.Format("Login to user '{0}' Success", userName.Text));
+				ResetTextBox();
+
+				//main.ChangeUIState();
+				main.btnLogIn.IsChecked = false;
+				main.btnLogIn.IsEnabled = true;
+				main.btnLogIn.Content = MainWindow.accountUser.ToString();
+				main.acessLevel.Text = MainWindow.accessLevel.ToString();
+				ResetTextBox();
+				main.enableButton(true);
+				//main.RegistryPreference();
+				//main.master.inspectionParameter.InitReferenceBoxSize();
+
+				//bool isFullCam = true;
+				//for (int itrack = 0; itrack < Application.Application.num_track; itrack++)
+				//{
+				//	if (!main.master.trackSF[itrack].isAvailable)
+				//	{
+				//		isFullCam = false;
+				//		break;
+				//	}		
+				//}
+				//if (isFullCam)
+				//	CommPLC.PlcCommMode = PLCCommMode.PLC_ONLINE;
+
+				//else
+				//	CommPLC.PlcCommMode = PLCCommMode.PLC_SIMULATOR;
+
+				//main.master.commPLC.isVisionReady = true;
+				//main.master.commPLC.UpdateSentMessageToPLC((int)VisionProcess.VISION_READY);
+
+				//KeepHeartBeat();
+				return;
+			}
+			else
+			{
+				LogMessage.WriteToDebugViewer(0, string.Format("Login to user '{0}' Fail, Password is wrong.", userName.Text));
+				NotifyLogin.Text = "Password is wrong !";
+				return;
+			}
+
 		}
 		//private System.Windows.Threading.DispatcherTimer dispatcherTimer;
 		//private int time = 0;
@@ -260,16 +338,82 @@ namespace Magnus_WPF_1.UI.UserControls
 		//}
 		private void Cancel_Click(object sender, System.Windows.RoutedEventArgs e)
 		{
+			int currentTabIndex = main.tab_controls.SelectedIndex;
+			main.btnLogIn.IsChecked = false;
+			main.btnLogIn.IsEnabled = true;
+			if (main.IsFisrtLogin)
+			{
+				//main.AddHotKey();
+				//if (main.master.trackSF[0].isAvailable)
+				//{
+				//	main.tabRibbon.IsEnabled = true;
 
+				//	main.tabItem_View.IsEnabled = true;
+				//}
+				//else
+				//{
+				//	main.tabRibbon.IsEnabled = true;
+				//	main.tabItem_View.IsEnabled = true;
+				//}
+			}
+			main.tab_controls.SelectedIndex = currentTabIndex;
+			ResetTextBox();
 		}
 		private void ChangePW_Click(object sender, System.Windows.RoutedEventArgs e)
 		{
 
-
+			if (NewPassWord.Foreground == Brushes.Gray) NewPassWord.Password = "";
+			if (ConfirmNewPassWord.Foreground == Brushes.Gray) ConfirmNewPassWord.Password = "";
+			if (NewPassWord.Password != ConfirmNewPassWord.Password)
+			{
+				NotifyChangePw.Text = "Password and Confirm password is not match !\nCheck again.";
+				return;
+			}
+			else
+			{
+				if (NewPassWord.Foreground == Brushes.Gray) NewPassWord.Password = "";
+				string newpass = NewPassWord.Password;
+				ResetTextBox();
+				if (ChangePasswordDataTable(MainWindow.accountUser, newpass))
+				{
+					NotifyChangePw.Text = "Password is changed !";
+					LogMessage.WriteToDebugViewer(0, string.Format("User '{0}' changed Password", MainWindow.accountUser));
+				}
+				else
+					NotifyChangePw.Text = "Password can not change !";
+			}
 		}
 
 		private void CreateNewUser_Click(object sender, System.Windows.RoutedEventArgs e)
 		{
+			if (passWordNew.Foreground == Brushes.Gray) passWordNew.Password = "";
+			if (ConfirmPassWordNew.Foreground == Brushes.Gray) ConfirmPassWordNew.Password = "";
+			if (userNameNew.Foreground == Brushes.Gray || userNameNew.Text == "")
+			{
+				NotifyNewUser.Text = "Type Username !";
+				return;
+			}
+
+			if (CheckUsername(userNameNew.Text))
+			{
+				NotifyNewUser.Text = "Username is exist! Create another Username";
+				return;
+			}
+			if (passWordNew.Password != ConfirmPassWordNew.Password)
+			{
+				NotifyNewUser.Text = "Password and Confirm password is not match !\n Check again.";
+				return;
+			}
+
+			DataRow row = tableAccount.NewRow();
+			row["username"] = userNameNew.Text;
+			row["password"] = EncryptPass(passWordNew.Password);
+			row["access"] = GetCheckedRadionbutton();
+			tableAccount.Rows.Add(row);
+			LogMessage.WriteToDebugViewer(0, string.Format("Create new Account '{0}' Success", userName.Text));
+			SaveLogAccount();
+			ResetTextBox();
+			NotifyNewUser.Text = string.Format("Created new account Username: '{0}',\nAccess Level: {1}", row["username"], AccessLevelString((AccessLevel)row["access"]));
 
 
 		}
@@ -279,20 +423,229 @@ namespace Magnus_WPF_1.UI.UserControls
 		#region EVENT MOUSEDOWN
 		private void logInMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
+			//main.CleanHotKey();
+			//foreach (COMMAND_CODE cmd in Master.cmdCode)
+			//{
+			//	if (cmd != COMMAND_CODE.IDLE)
+			//	{
+			//		if (MessageBox.Show("Can not Login Software, Software is busy", "Log In", MessageBoxButton.OK, MessageBoxImage.Warning) == MessageBoxResult.OK)
+			//		{
+			//			if (main.master.trackSF[0].isAvailable)
+			//			{
+			//				MainWindow.UICurrentState = UISTate.IDLE_STATE;
+			//			}
+			//			else
+			//			{
+			//				MainWindow.UICurrentState = UISTate.IDLE_NOCAM_STATE;
+
+			//			}
+			//			main.ChangeUIState();
+			//			main.btnLogIn.IsChecked = false;
+			//			main.btnLogIn.IsEnabled = true;
+
+			//			return;
+			//		}
+			//	}
+			//}
+			Panel.SetZIndex(panelLogIn, 2);
+			Panel.SetZIndex(panelChangePassword, 0);
+			Panel.SetZIndex(panelCreateUser, 0);
+			ResetTextBox();
+			userName.Focus();
 		}
 		private void NewUserMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
-
+			//main.CleanHotKey();
+			if (MainWindow.accountUser != "None")
+			{
+				Panel.SetZIndex(panelLogIn, 0);
+				Panel.SetZIndex(panelChangePassword, 0);
+				Panel.SetZIndex(panelCreateUser, 2);
+				ResetTextBox();
+				userNameNew.Focus();
+				engineerLevel.IsEnabled = true;
+				operatorLevel.IsEnabled = true;
+				userLevel.IsEnabled = true;
+				if (MainWindow.accessLevel == AccessLevel.Engineer)
+				{
+					engineerLevel.IsEnabled = true;
+					engineerLevel.IsChecked = true;
+				}
+				else if (MainWindow.accessLevel == AccessLevel.Operator)
+				{
+					engineerLevel.IsEnabled = false;
+					operatorLevel.IsChecked = true;
+				}
+				else if (MainWindow.accessLevel == AccessLevel.User)
+				{
+					engineerLevel.IsEnabled = false;
+					operatorLevel.IsEnabled = false;
+					userLevel.IsChecked = true;
+				}
+			}
+			else
+			{
+				MessageBox.Show("Log in before create new account", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+			}
 		}
 		private void ChangePWMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
+			//main.CleanHotKey();
+			if (MainWindow.accountUser != "None")
+			{
+				Panel.SetZIndex(panelLogIn, 0);
+				Panel.SetZIndex(panelChangePassword, 2);
+				Panel.SetZIndex(panelCreateUser, 0);
+				ResetTextBox();
+				NewPassWord.Focus();
+			}
+			else
+			{
+				MessageBox.Show("Log in before change password", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+			}
 		}
 		private void DeleteUserMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
+			if (MainWindow.accountUser != "None")
+			{
+				//foreach (COMMAND_CODE cmd in Master.cmdCode)
+				//{
+				//	if (cmd != COMMAND_CODE.IDLE)
+				//	{
+				//		if (MessageBox.Show("Can not Delete current account, Software is busy", "Delete current account", MessageBoxButton.OK, MessageBoxImage.Warning) == MessageBoxResult.OK)
+				//		{
+				//			main.btnLogIn.IsChecked = false;
+				//			main.btnLogIn.IsEnabled = true;
+				//			return;
+				//		}
+				//	}
+				//}
+				if (MessageBox.Show(string.Format("Are you sure delete this account '{0}'", MainWindow.accountUser), "Information", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
+				{
 
+					MainWindow.accessLevel = GetAccessLevel(MainWindow.accountUser);
+					string pw = GetPassword(MainWindow.accountUser);
+					if (MainWindow.accountUser == "Engineer" && MainWindow.accessLevel == AccessLevel.Engineer && pw == Source.Application.Application.PwsDefault)
+					{
+						MessageBox.Show("Can not Delete this Acount", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+					}
+					else
+					{
+						if (MainWindow.accessLevel != (int)AccessLevel.None)
+						{
+							tableAccount.Rows.Remove(GetRow(MainWindow.accountUser));
+							SaveLogAccount();
+							MainWindow.UICurrentState = UISTate.LOGOUT_STATE;
+							//main.ChangeUIState();
+							LogMessage.WriteToDebugViewer(0, string.Format("Delete user '{0}'", currentUser.Content));
+							currentUser.Content = "None";
+							currentAccesslevel.Content = "None";
+							main.btnLogIn.IsChecked = false;
+							main.btnLogIn.IsEnabled = true;
+							main.btnLogIn.Label = currentUser.Content.ToString();
+							main.acessLevel.Text = currentAccesslevel.Content.ToString();
+						}
+						main.IsFisrtLogin = false;
+					}
+				}
+				else
+				{
+					int currentTabIndex = main.tab_controls.SelectedIndex;
+					//if (main.master.trackSF[0].isAvailable)
+					//{
+
+					//	main.tab_Production.IsEnabled = true;
+					//	main.tab_Offline.IsEnabled = true;
+					//	main.tab_Hardware.IsEnabled = true;
+					//	main.tab_View.IsEnabled = true;
+					//	main.tab_Parameter.IsEnabled = true;
+					//}
+					//else
+					//{
+					//	main.tab_Production.IsEnabled = true;
+					//	main.tab_Offline.IsEnabled = true;
+					//	main.tab_Hardware.IsEnabled = false;
+					//	main.tab_View.IsEnabled = true;
+					//	main.tab_Parameter.IsEnabled = true;
+					//}
+					main.btnLogIn.IsChecked = false;
+					main.btnLogIn.IsEnabled = true;
+					//main.AddHotKey();
+					main.tab_controls.SelectedIndex = currentTabIndex;
+				}
+			}
+			else
+			{
+				MessageBox.Show("Log in before delete account", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+			}
 		}
 		private void LogOutMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
+			if (MainWindow.accountUser != "None")
+			{
+				//foreach (COMMAND_CODE cmd in Master.cmdCode)
+				//{
+				//	if (cmd != COMMAND_CODE.IDLE)
+				//	{
+				//		if (MessageBox.Show("Can not Logout Software, Software is busy", "Log Out", MessageBoxButton.OK, MessageBoxImage.Warning) == MessageBoxResult.OK)
+				//		{
+				//			main.btnLogIn.IsChecked = false;
+				//			main.btnLogIn.IsEnabled = true;
+				//			ResetTextBox();
+				//			return;
+				//		}
+				//	}
+				//}
+				if (MessageBox.Show("Log Out This Account ?", "Question ?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+				{
+
+					currentUser.Content = "None";
+					currentAccesslevel.Content = "None";
+
+					main.IsFisrtLogin = false;
+					//main.CleanHotKey();
+					MainWindow.UICurrentState = UISTate.LOGOUT_STATE;
+					//main.ChangeUIState();
+					LogMessage.WriteToDebugViewer(0, string.Format("Loged out of user '{0}'", currentUser.Content));
+					currentUser.Content = "None";
+					currentAccesslevel.Content = "None";
+					main.acessLevel.Text = "None";
+					main.btnLogIn.Label = "None";
+					main.btnLogIn.Content = "None";
+					main.btnLogIn.IsChecked = false;
+					main.btnLogIn.IsEnabled = true;
+					main.enableButton(false);
+
+
+				}
+				ResetTextBox();
+
+				//else
+				//{
+				//	int currentTabIndex = main.tab_controls.SelectedIndex;
+				//	if (main.master.trackSF[0].isAvailable)
+				//	{
+				//		main.tab_Production.IsEnabled = true;
+				//		main.tab_Offline.IsEnabled = true;
+				//		main.tab_Hardware.IsEnabled = true;
+				//		main.tab_View.IsEnabled = true;
+				//		main.tab_Parameter.IsEnabled = true;
+				//	}
+				//	else
+				//	{
+				//		main.tab_Production.IsEnabled = true;
+				//		main.tab_Offline.IsEnabled = true;
+				//		main.tab_Hardware.IsEnabled = false;
+				//		main.tab_View.IsEnabled = true;
+				//		main.tab_Parameter.IsEnabled = true;
+				//	}
+				//	main.btnLogIn.IsChecked = false;
+				//	main.btnLogIn.IsEnabled = true;
+				//	main.AddHotKey();
+				//	ResetTextBox();
+				//	main.tab_controls.SelectedIndex = currentTabIndex;
+				//}
+			}
 		}
 		#endregion
 

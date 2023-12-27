@@ -166,6 +166,7 @@
     <Compile Include="TeachParametersUC.xaml.cs">
       <DependentUpon>TeachParametersUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\CommandBase.cs" />
     <Compile Include="UI\UserControls\DefectInfor.xaml.cs">
       <DependentUpon>DefectInfor.xaml</DependentUpon>
     </Compile>
@@ -177,6 +178,9 @@
     </Compile>
     <Compile Include="UI\UserControls\PixelRuler.xaml.cs">
       <DependentUpon>PixelRuler.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\UserControls\RecipeManageView.xaml.cs">
+      <DependentUpon>RecipeManageView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\UserControls\View\ImageView.xaml.cs">
       <DependentUpon>ImageView.xaml</DependentUpon>
@@ -245,6 +249,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\UserControls\PixelRuler.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\UserControls\RecipeManageView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

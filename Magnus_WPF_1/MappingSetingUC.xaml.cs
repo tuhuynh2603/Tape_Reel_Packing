@@ -86,7 +86,7 @@ namespace Magnus_WPF_1
                 mainWindow.master.WriteMappingParam();
                 Application.Application.LoadMappingParamFromFile();
                 Mouse.OverrideCursor = null;
-                mainWindow.mapping_parameters_btn.IsChecked = false;
+                mainWindow.btn_mapping_parameters.IsChecked = false;
                 return true;
             }
             catch (Exception)
@@ -104,7 +104,7 @@ namespace Magnus_WPF_1
         {
             UpdateMappingParamFromDictToUI(Application.Application.dictMappingParam);
             MainWindow mainWindow = (MainWindow)System.Windows.Application.Current.MainWindow;
-            mainWindow.mapping_parameters_btn.IsChecked = false;
+            mainWindow.btn_mapping_parameters.IsChecked = false;
         }
 
         [CategoryOrder("MAPPING", 0)]

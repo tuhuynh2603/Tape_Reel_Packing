@@ -1,9 +1,11 @@
 ﻿using Magnus_WPF_1.Source.Algorithm;
 using Magnus_WPF_1.Source.Define;
+using Magnus_WPF_1.UI.UserControls;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -93,6 +95,34 @@ namespace Magnus_WPF_1.Source.Application
                 else
                     m_strCameraSerial.Add((string)registerPreferences.GetValue("Camera" + (nTrack + 1).ToString() + " IP Serial: "));
             }
+
+        }
+
+        public static void setRecipeToRegister(string strRecipe)
+        {
+            currentRecipe = strRecipe;
+
+            RegistryKey registerPreferences = Registry.CurrentUser.CreateSubKey(pathRegistry + "\\Preferences", true);
+            registerPreferences.SetValue("Recipe Name", currentRecipe);
+        }
+
+        public static string UserDefault;
+        public static string LevelDefault;
+        public static string PwsDefault;
+
+        private string nameUserDefault;
+        private string levelUserDefault;
+        private string pwsUserDefault;
+
+        public void acountDefault()
+        {
+            UserDefault = "Engineer";
+            LevelDefault = "Engineer";
+            PwsDefault = "6_XZ_VVc25>?";
+
+            nameUserDefault = "Name=" + UserDefault;
+            levelUserDefault = "Level=" + LevelDefault;
+            pwsUserDefault = "Pswd=" + PwsDefault;
 
         }
 
@@ -191,6 +221,7 @@ namespace Magnus_WPF_1.Source.Application
         }
 
         public static CameraSettingParam cameraSettingParam = new CameraSettingParam();
+
         public static void LoadCamSetting(int nTrack)
         {
 
@@ -290,7 +321,7 @@ namespace Magnus_WPF_1.Source.Application
             file.Create();
 
             IniFile ini = new IniFile(pathFile);
-            InspectionCore inspectionCore = MainWindow.mainWindow.master.m_Tracks[0].m_InspectionCore;
+            InspectionCore inspectionCore = MainWindow.mainWindow.master.m_Tracks[nTrack].m_InspectionCore;
 
             WriteLine("LABEL DEFECT", $"Area Enable", ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_DR_AreaEnable.ToString());
             WriteLine("LABEL DEFECT", $"Lower Threshold", ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_LD_lowerThreshold.ToString());
@@ -378,7 +409,7 @@ namespace Magnus_WPF_1.Source.Application
             file.Create();
 
             IniFile ini = new IniFile(pathFile);
-            InspectionCore inspectionCore = MainWindow.mainWindow.master.m_Tracks[0].m_InspectionCore;
+            InspectionCore inspectionCore = MainWindow.mainWindow.master.m_Tracks[nTrack].m_InspectionCore;
 
             WriteLine("LOCATION", "Device Location Roi", ini, ConvertRectanglesToString(inspectionCore.m_DeviceLocationParameter.m_L_DeviceLocationRoi));
             WriteLine("LOCATION", "Threshold Method", ini, inspectionCore.m_DeviceLocationParameter.m_L_ThresholdType.ToString());
@@ -689,5 +720,91 @@ namespace Magnus_WPF_1.Source.Application
                 return new Rectangles(double.Parse(value[0]), double.Parse(value[1]), double.Parse(value[2]), double.Parse(value[3]), double.Parse(value[4]));
 
         }
+
+
+        #region Acount
+        public DataTable tableAccount = new DataTable();
+        public static LoginUser loginUser = new LoginUser();
+        public void ReadLogAccount()
+        {
+            DataColumn column = new DataColumn();
+
+            tableAccount = new DataTable();
+            column.ColumnName = "username";
+            column.DataType = typeof(string);
+            column.Unique = true;
+            tableAccount.Columns.Add(column);
+
+            column = new DataColumn();
+            column.ColumnName = "access";
+            column.DataType = typeof(AccessLevel);
+            column.Unique = false;
+            tableAccount.Columns.Add(column);
+
+            column = new DataColumn();
+            column.ColumnName = "password";
+            column.DataType = typeof(string);
+            column.Unique = false;
+            tableAccount.Columns.Add(column);
+
+            Directory.CreateDirectory(pathRecipe);
+            string pathFile = Path.Combine(pathRecipe, "LogAccount.lgn");
+            if (!File.Exists(pathFile))
+            {
+                // pw: Engineer
+                string[] fileAccount =
+                {
+                    "[NUM USER]",
+                    "NoOfUsers=1",
+                    "",
+                    "[User0]",
+                   nameUserDefault,
+                   levelUserDefault,
+                   pwsUserDefault,
+                };
+
+                using (StreamWriter Files = new StreamWriter(pathFile))
+                {
+                    foreach (string line in fileAccount)
+                        Files.WriteLine(line);
+                }
+                // To do: convert datatable
+                GetTableAccount(tableAccount, fileAccount);
+                loginUser.tableAccount = tableAccount;
+            }
+            else
+            {
+                string[] fileAccount = File.ReadAllLines(pathFile);
+                GetTableAccount(tableAccount, fileAccount);
+                loginUser.tableAccount = tableAccount;
+
+            }
+        }
+        public void GetTableAccount(DataTable tableacount, string[] accounts)
+        {
+            DataRow row;
+            foreach (string line in accounts)
+            {
+                if (line.Contains("[User"))
+                {
+                    int pos = Array.IndexOf(accounts, line);
+                    row = tableacount.NewRow();
+                    row["username"] = accounts[++pos].Split('=')[1];
+                    row["access"] = StringToAccessLevel(accounts[++pos].Split('=')[1]);
+                    row["password"] = accounts[++pos].Split('=')[1];
+                    tableacount.Rows.Add(row);
+                }
+            }
+        }
+        private AccessLevel StringToAccessLevel(string level)
+        {
+            if (string.Compare(level, "Engineer", true) == 0) return AccessLevel.Engineer;
+            else if (string.Compare(level, "Operator", true) == 0) return AccessLevel.Operator;
+            else if (string.Compare(level, "User", true) == 0) return AccessLevel.User;
+            else return AccessLevel.None;
+        }
+
+        #endregion
+
     }
 }

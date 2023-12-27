@@ -183,8 +183,10 @@ namespace Magnus_WPF_1.Source.Algorithm
             m_DeviceLocationParameter.m_L_upperThresholdInnerChip = Source.Application.Application.categoriesTeachParam.L_upperThresholdInnerChip;
 
 
-            if (Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.Width > globalImageSize.Width)
-                Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi = new Rectangles(new System.Windows.Point(300,300), 300,300);
+            if (Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.Width > globalImageSize.Width
+                ||Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.TopLeft.X >= globalImageSize.Width
+                || Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.TopLeft.Y >= globalImageSize.Height)
+                Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi = new Rectangles(new System.Windows.Point(globalImageSize.Width / 2, globalImageSize.Height / 2), 300,300);
 
             m_DeviceLocationParameter.m_L_DeviceLocationRoi = Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi;
 
@@ -193,8 +195,10 @@ namespace Magnus_WPF_1.Source.Algorithm
             m_DeviceLocationParameter.m_L_MinWidthDevice = Source.Application.Application.categoriesTeachParam.L_MinWidthDevice;
             m_DeviceLocationParameter.m_L_MinHeightDevice = Source.Application.Application.categoriesTeachParam.L_MinHeightDevice;
 
-            if (Source.Application.Application.categoriesTeachParam.L_TemplateRoi.Width > globalImageSize.Width)
-                Source.Application.Application.categoriesTeachParam.L_TemplateRoi = new Rectangles(new System.Windows.Point(300, 300), 300, 300);
+            if (Source.Application.Application.categoriesTeachParam.L_TemplateRoi.Width > globalImageSize.Width ||
+                Source.Application.Application.categoriesTeachParam.L_TemplateRoi.TopLeft.X >= globalImageSize.Width
+                || Source.Application.Application.categoriesTeachParam.L_TemplateRoi.TopLeft.Y >= globalImageSize.Height)
+                Source.Application.Application.categoriesTeachParam.L_TemplateRoi = new Rectangles(new System.Windows.Point(globalImageSize.Width / 2, globalImageSize.Height / 2), 300, 300);
             m_DeviceLocationParameter.m_L_TemplateRoi = Source.Application.Application.categoriesTeachParam.L_TemplateRoi;
 
             m_DeviceLocationParameter.m_L_StepTemplate = Source.Application.Application.categoriesTeachParam.L_NumberSide;
@@ -208,8 +212,10 @@ namespace Magnus_WPF_1.Source.Algorithm
             for (int nArea = 0; nArea < Application.TOTAL_AREA; nArea++)
             {
 
-                if (Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea].Width > globalImageSize.Width)
-                    Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea] = new Rectangles(new System.Windows.Point(300, 300), 300, 300);
+                if (Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea].Width > globalImageSize.Width ||
+                    Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea].TopLeft.X >= globalImageSize.Width
+                    || Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea].TopLeft.Y >= globalImageSize.Height)
+                        Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea] = new Rectangles(new System.Windows.Point(globalImageSize.Width/2, globalImageSize.Height/2), 300, 300);
 
                 m_SurfaceDefectParameter[nArea].m_DR_DefectROILocations = Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea];
                 //m_SurfaceDefectParameter.m_LD_NumberROILocation = Source.Application.Application.categoriesTeachParam.LD_NumberROILocation;

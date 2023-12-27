@@ -6,6 +6,7 @@ using Magnus_WPF_1.Source.LogMessage;
 using Magnus_WPF_1.UI.UserControls;
 using Magnus_WPF_1.UI.UserControls.View;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
@@ -194,6 +195,8 @@ namespace Magnus_WPF_1
             }
         }
 
+        public static UISTate UICurrentState { get; internal set; }
+
 
         #endregion
 
@@ -202,13 +205,18 @@ namespace Magnus_WPF_1
         private LayoutPanel m_layoutPanel;
         public delegate void StateWindow(WindowState state);
         public static StateWindow changeStateWindow;
+
+        List<KeyBinding> hotkey = new List<KeyBinding>();
+
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = this;
+            DataContext = this;
             //ButtonNameFCN = "123";
             //LogMessage.LogDebugMessage(1, "Start Application");
             LogMessage.WriteToDebugViewer(0, string.Format("Start Application...."));
+
+            enableButton(false);
 
             mainWindow = this;
             master = new Master(this);
@@ -251,12 +259,25 @@ namespace Magnus_WPF_1
                 master.loadTeachImageToUI(nTrack);
             //Source.Application.Application.LoadTeachParam();
 
+            for (int n = 0; n < InputBindings.Count; n++)
+                hotkey.Add((KeyBinding)InputBindings[n]);
+
         }
 
 
 
 
-
+        public void UpdateCameraConnectionStatus(int nTrack, bool bIsconnected)
+        {
+            if (nTrack == 0)
+            {
+                label_Camera_Status.Content = $"{Application.m_strCameraSerial[nTrack]}";
+                if(bIsconnected)
+                    label_Camera_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
+                else
+                    label_Camera_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Red);
+            }
+        }
 
 
 
@@ -265,8 +286,11 @@ namespace Magnus_WPF_1
 
         private void btn_inspect_offline_Checked(object sender, RoutedEventArgs e)
         {
+            if (inspect_offline_btn.IsEnabled == false)
+                return;
 
             bEnableOfflineInspection = (bool)inspect_offline_btn.IsChecked;
+
             //for (int n = 0; n < Application.m_nTrack; n++)
             //{
             //    master.RunOfflineSequenceThread(n);
@@ -575,7 +599,7 @@ namespace Magnus_WPF_1
         public bool bEnableGrabCycle = false;
         private void btn_stream_camera_Checked(object sender, RoutedEventArgs e)
         {
-            bEnableGrabCycle = (bool)stream_camera_btn.IsChecked;
+            bEnableGrabCycle = (bool)btn_stream_camera.IsChecked;
 
             if (master.thread_StreamCamera[activeImageDock.trackID] == null)
             {
@@ -591,13 +615,13 @@ namespace Magnus_WPF_1
 
         private void btn_stream_camera_UnChecked(object sender, RoutedEventArgs e)
         {
-            bEnableGrabCycle = (bool)stream_camera_btn.IsChecked;
+            bEnableGrabCycle = (bool)btn_stream_camera.IsChecked;
 
         }
 
         private void btn_Camera_Setting_Checked(object sender, RoutedEventArgs e)
         {
-            bool bEnable = (bool)camera_setting_btn.IsChecked;
+            bool bEnable = (bool)btn_camera_setting.IsChecked;
 
             int currentTabIndex = tab_controls.SelectedIndex;
             //tt_DialogSettings.X = 0;
@@ -617,16 +641,17 @@ namespace Magnus_WPF_1
             //grd_PopupDialog.Children.Add(master.teachParameter);
             //grd_PopupDialog.Children.Add(master.m_Tracks[]);
             //tab_controls.SelectedIndex = currentTabIndex;
+            grd_PopupDialog.Visibility = Visibility.Visible;
             grd_Dialog_Settings.Visibility = Visibility.Visible;
-
 
         }
 
         private void btn_Camera_Setting_Unchecked(object sender, RoutedEventArgs e)
         {
-            bool bEnable = (bool)camera_setting_btn.IsChecked;
+            bool bEnable = (bool)btn_camera_setting.IsChecked;
             grd_PopupDialog.Children.Clear();
-
+            grd_PopupDialog.Visibility = Visibility.Collapsed;
+            grd_Dialog_Settings.Visibility = Visibility.Collapsed;
         }
 
         private void PreviewMouseDownInspectionBtn(object sender, MouseButtonEventArgs e)
@@ -704,7 +729,8 @@ namespace Magnus_WPF_1
         //public bool bEnableSingleSnapImages = true;
         private void btn_inspect_Click(object sender, RoutedEventArgs e)
         {
-
+            if (inspect_btn.IsEnabled == false)
+                return;
             //if (bEnableSingleSnapImages)
             //    bEnableSingleSnapImages = false;
 
@@ -760,6 +786,7 @@ namespace Magnus_WPF_1
             //grd_PopupDialog.Children.Add(master.m_Tracks[]);
             tab_controls.SelectedIndex = currentTabIndex;
             grd_Dialog_Settings.Visibility = Visibility.Visible;
+            grd_PopupDialog.Visibility = Visibility.Visible;
 
         }
 
@@ -852,7 +879,7 @@ namespace Magnus_WPF_1
             btn_abort_teach.IsEnabled = true;
             inspect_btn.IsEnabled = false;
             load_teach_image_btn.IsEnabled = false;
-            stream_camera_btn.IsEnabled = false;
+            btn_stream_camera.IsEnabled = false;
             teach_parameters_btn.IsEnabled = false;
             btn_save_teach_image.IsEnabled = false;
 
@@ -864,7 +891,7 @@ namespace Magnus_WPF_1
             btn_abort_teach.IsEnabled = false;
             inspect_btn.IsEnabled = true;
             load_teach_image_btn.IsEnabled = true;
-            stream_camera_btn.IsEnabled = true;
+            btn_stream_camera.IsEnabled = true;
             teach_parameters_btn.IsEnabled = true;
             btn_save_teach_image.IsEnabled = true;
         }
@@ -882,7 +909,7 @@ namespace Magnus_WPF_1
 
         private void btn_mapping_parameters_Unchecked(object sender, RoutedEventArgs e)
         {
-            mapping_parameters_btn.IsChecked = false;
+            btn_mapping_parameters.IsChecked = false;
             grd_PopupDialog.Children.Clear();
 
             if (m_nDeviceX != Source.Application.Application.categoriesMappingParam.M_NumberDeviceX 
@@ -893,12 +920,15 @@ namespace Magnus_WPF_1
                 m_staticView.InitCanvasMapping();
             }
 
+            grd_PopupDialog.Visibility = Visibility.Collapsed;
+            grd_Dialog_Settings.Visibility = Visibility.Collapsed;
+
             //DisbleButtonStandard();
         }
 
         private void btn_mapping_parameters_Checked(object sender, RoutedEventArgs e)
         {
-            mapping_parameters_btn.IsChecked = true;
+            btn_mapping_parameters.IsChecked = true;
 
             int currentTabIndex = tab_controls.SelectedIndex;
             tt_DialogSettings.X = 0;
@@ -913,6 +943,7 @@ namespace Magnus_WPF_1
 
             grd_PopupDialog.Children.Add(master.mappingParameter);
             tab_controls.SelectedIndex = currentTabIndex;
+            grd_PopupDialog.Visibility = Visibility.Visible;
             grd_Dialog_Settings.Visibility = Visibility.Visible;
 
         }
@@ -945,27 +976,27 @@ namespace Magnus_WPF_1
 
         }
 
-        private void tbl_Recipe_Name_IsMouseDirectlyOverChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            bool isMouseOver = (bool)e.NewValue;
-            if (!isMouseOver)
-                return;
-            TextBlock textBlock = (TextBlock)sender;
-            ((ToolTip)textBlock.ToolTip).Visibility =
-                 Visibility.Visible;
-            string pathRecipe = Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe);
-            tbl_recipe_name_tooltip.Text = pathRecipe;
-        }
-        private void tbl_Recipe_ID_IsMouseDirectlyOverChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            bool isMouseOver = (bool)e.NewValue;
-            if (!isMouseOver)
-                return;
-            TextBlock textBlock = (TextBlock)sender;
-            ((ToolTip)textBlock.ToolTip).Visibility =
-                 Visibility.Visible;
-            string pathRecipe = Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe);
-        }
+        //private void tbl_Recipe_Name_IsMouseDirectlyOverChanged(object sender, DependencyPropertyChangedEventArgs e)
+        //{
+        //    bool isMouseOver = (bool)e.NewValue;
+        //    if (!isMouseOver)
+        //        return;
+        //    TextBlock textBlock = (TextBlock)sender;
+        //    ((ToolTip)textBlock.ToolTip).Visibility =
+        //         Visibility.Visible;
+        //    string pathRecipe = Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe);
+        //    tbl_recipe_name_tooltip.Text = pathRecipe;
+        //}
+        //private void tbl_Recipe_ID_IsMouseDirectlyOverChanged(object sender, DependencyPropertyChangedEventArgs e)
+        //{
+        //    bool isMouseOver = (bool)e.NewValue;
+        //    if (!isMouseOver)
+        //        return;
+        //    TextBlock textBlock = (TextBlock)sender;
+        //    ((ToolTip)textBlock.ToolTip).Visibility =
+        //         Visibility.Visible;
+        //    string pathRecipe = Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe);
+        //}
 
 
         public static bool isRobotControllerOpen = false;
@@ -986,46 +1017,6 @@ namespace Magnus_WPF_1
         //    isRobotControllerOpen = (bool)btn_CommLog.IsChecked;
         //    master.OpenHiwinRobotDialog(isRobotControllerOpen);
         //}
-
-
-
-        private void btn_LogIn_Unchecked(object sender, RoutedEventArgs e)
-        {
-            //Source.Application.Application.loginUser.PreviewKeyDown -= Source.Application.Application.loginUser.KeyShortcut;
-            //tabItem_Production.IsSelected = true;
-        }
-        private void btn_LogIn_Checked(object sender, RoutedEventArgs e)
-        {
-            //Source.Application.Application.loginUser.AssignMainWindow();
-            //tt_DialogSettings.X = 0;
-            //tt_DialogSettings.Y = 0;
-            //btnLogIn.IsEnabled = false;
-            //grd_PopupDialog.Children.Clear();
-            //DisableDialogLogin();
-            //grd_PopupDialog.Children.Add(Source.Application.Application.loginUser);
-            //CleanHotKey();
-
-            //Source.Application.Application.loginUser.PreviewKeyDown += Source.Application.Application.loginUser.KeyShortcut;
-            //foreach (COMMAND_CODE cmd in Master.cmdCode)
-            //{
-            //    if (cmd != COMMAND_CODE.IDLE)
-            //    {
-            //        Panel.SetZIndex(Application.Application.loginUser.panelCreateUser, 2);
-            //        grd_Dialog_Settings.Margin = new Thickness(0, 0, 0, 0);
-            //        DialogUCHeight = Source.Application.Application.loginUser.Height;
-            //        DialogUCWidth = Source.Application.Application.loginUser.Width;
-            //        grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Center;
-            //        grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Center;
-            //        return;
-            //    }
-            //}
-            //Panel.SetZIndex(Source.Application.Application.loginUser.panelLogIn, 3);
-            //DialogUCHeight = Source.Application.Application.loginUser.Height;
-            //DialogUCWidth = Source.Application.Application.loginUser.Width;
-            //grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Center;
-            //grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Center;
-
-        }
 
         public void btn_Online_click(object sender, RoutedEventArgs e)
         {
@@ -1243,6 +1234,8 @@ namespace Magnus_WPF_1
         {
             //grd_Defect_Settings.Visibility = Visibility.Collapsed;
             grd_PopupDialog.Children.Clear();
+            grd_PopupDialog.Visibility = Visibility.Collapsed;
+            grd_Dialog_Settings.Visibility = Visibility.Collapsed;
         }
 
 
@@ -1295,7 +1288,10 @@ namespace Magnus_WPF_1
             //grd_Defect.Children.RemoveAt(m_nPLCGridViewIndex);
             //if(grd_Defect.Children.Count == 0)
             grd_PopupDialog.Children.Clear();
-                //grd_Defect_Settings.Visibility = Visibility.Collapsed;
+            grd_PopupDialog.Visibility = Visibility.Collapsed;
+            grd_Dialog_Settings.Visibility = Visibility.Collapsed;
+
+            //grd_Defect_Settings.Visibility = Visibility.Collapsed;
 
         }
 
@@ -1401,6 +1397,168 @@ namespace Magnus_WPF_1
 
                 }
             });
+        }
+
+        public RecipeManageView m_RecipeManage;
+        internal static string accountUser;
+        internal static AccessLevel accessLevel;
+
+        private void btn_LoadRecipe_Click(object sender, RoutedEventArgs e)
+        {
+            OpenRecipeDialog((bool)btn_LoadRecipe.IsChecked);
+        }
+
+
+
+        public void OpenRecipeDialog(bool bEnable)
+        {
+
+
+            if (bEnable)
+            {
+                AddHotKey();
+
+                m_RecipeManage = new RecipeManageView();
+                grd_Dialog_Settings.Margin = new Thickness(0, 160, 0, 0);
+                grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Top;
+                grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Left;
+                grd_Dialog_Settings.Width = m_RecipeManage.Width;
+                grd_Dialog_Settings.Height = m_RecipeManage.Height;
+
+                grd_PopupDialog.Children.Clear();
+                m_RecipeManage.InitComboRecipe();
+                grd_PopupDialog.Children.Add(m_RecipeManage);
+                grd_PopupDialog.Visibility = Visibility.Visible;
+                grd_Dialog_Settings.Visibility = Visibility.Visible;
+
+                //btn_LoadRecipe.IsChecked = bEnable;
+
+            }
+            else
+            {
+                CleanHotKey();
+
+                grd_PopupDialog.Children.Clear();
+                grd_PopupDialog.Visibility = Visibility.Collapsed;
+                grd_Dialog_Settings.Visibility = Visibility.Collapsed;
+
+                //btn_LoadRecipe.IsChecked = bEnable;
+            }
+
+        }
+
+        public void enableButton(bool bEnable)
+        {
+
+            if (bEnable)
+                AddHotKey();
+            else
+                CleanHotKey();
+
+            tabItem_View.IsEnabled = bEnable;
+            tab_vision_view.IsEnabled = bEnable;
+
+            inspect_btn.IsEnabled = bEnable;
+            debug_btn.IsEnabled = bEnable;
+            inspect_offline_btn.IsEnabled = bEnable;
+            btn_load_image_File.IsEnabled = bEnable;
+            btn_save_current_image.IsEnabled = bEnable;
+            load_teach_image_btn.IsEnabled = bEnable;
+            btn_save_teach_image.IsEnabled = bEnable;
+            btn_enable_saveimage.IsEnabled = bEnable;
+            teach_parameters_btn.IsEnabled = bEnable;
+            btn_mapping_parameters.IsEnabled = bEnable;
+            btn_teach.IsEnabled = bEnable;
+            btn_next_teach.IsEnabled = bEnable;
+            btn_abort_teach.IsEnabled = bEnable;
+
+            //HardWare
+            btn_stream_camera.IsEnabled = bEnable;
+            btn_camera_setting.IsEnabled = bEnable;
+            btn_Robot_Controller.IsEnabled = bEnable;
+            btn_BarCodeReader_Setting.IsEnabled = bEnable;
+            btn_PLCCOMM_Setting.IsEnabled = bEnable;
+
+
+            btn_Binarize_Group.IsEnabled = bEnable;
+            btn_ShowOverlay.IsEnabled = bEnable;
+            btn_Pixel_Ruler.IsEnabled = bEnable;
+            btn_Clear_Comm.IsEnabled = bEnable;
+
+
+            btn_run_sequence.IsEnabled = bEnable;
+            btn_Debug_sequence.IsEnabled = bEnable;
+            btn_Imidiate_Stop.IsEnabled = bEnable;
+            btn_Emergency_Stop.IsEnabled = bEnable;
+            btn_Reset_Machine.IsEnabled = bEnable;
+            btn_Emergency_Stop.IsEnabled = bEnable;
+
+            btn_LoadRecipe.IsEnabled = bEnable;
+
+        }
+
+        private void CleanHotKey()
+        {
+            
+            foreach (var obj in hotkey)
+            {
+                InputBindings.Remove(obj);
+            }
+        }
+        private void AddHotKey()
+        {
+            foreach (var obj in hotkey)
+            {
+                if (!InputBindings.Contains(obj))
+                    InputBindings.Add(obj);
+            }
+            //InputBindings.AddRange(hotkey);
+        }
+
+
+        private void btn_LogIn_Unchecked(object sender, RoutedEventArgs e)
+        {
+            Source.Application.Application.loginUser.PreviewKeyDown -= Source.Application.Application.loginUser.KeyShortcut;
+            //tabItem_Production.IsSelected = true;
+            grd_PopupDialog.Children.Clear();
+            grd_PopupDialog.Visibility = Visibility.Collapsed;
+            grd_Dialog_Settings.Visibility = Visibility.Collapsed;
+        }
+
+        private void btn_LogIn_Checked(object sender, RoutedEventArgs e)
+        {
+            Source.Application.Application.loginUser.AssignMainWindow();
+            tt_DialogSettings.X = 0;
+            tt_DialogSettings.Y = 0;
+            btnLogIn.IsEnabled = false;
+            grd_PopupDialog.Children.Clear();
+            //DisableDialogLogin();
+            grd_PopupDialog.Children.Add(Source.Application.Application.loginUser);
+            CleanHotKey();
+
+            Source.Application.Application.loginUser.PreviewKeyDown += Source.Application.Application.loginUser.KeyShortcut;
+            //foreach (COMMAND_CODE cmd in Master.cmdCode)
+            //{
+            //    if (cmd != COMMAND_CODE.IDLE)
+            //    {
+            //        Panel.SetZIndex(Application.Application.loginUser.panelCreateUser, 2);
+            //        grd_Dialog_Settings.Margin = new Thickness(0, 0, 0, 0);
+            //        DialogUCHeight = Application.Application.loginUser.Height;
+            //        DialogUCWidth = Application.Application.loginUser.Width;
+            //        grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Center;
+            //        grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Center;
+            //        return;
+            //    }
+            //}
+            Panel.SetZIndex(Source.Application.Application.loginUser.panelLogIn, 3);
+            //_dialogDefectHeight = Source.Application.Application.loginUser.Height;
+            //DialogUCWidth = Source.Application.Application.loginUser.Width;
+            grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Center;
+            grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Center;
+            grd_PopupDialog.Visibility = Visibility.Visible;
+            grd_Dialog_Settings.Visibility = Visibility.Visible;
+            Source.Application.Application.loginUser.userName.Focus();
+
         }
 
     }

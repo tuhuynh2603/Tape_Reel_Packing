@@ -31,7 +31,7 @@
                 <!--<Image Source="/Resource/ED_LOGO_Circle.png"                 
             		Stretch="Uniform"
             		VerticalAlignment="Center" Height="80" Margin="15,20,0,0"/>-->
-                <TextBlock Text="WELCOME TO EMAGE "
+                <TextBlock Text="WELCOME TO HD "
             		Foreground="#FF01249C"
             		FontFamily="Segoe Print"
             		FontSize="14"
@@ -208,10 +208,10 @@
                          BorderThickness="3"
                          Background="#FFF0EEDB">
                     <TextBox x:Name="userName" 
-                         Width="200"
                          Foreground="Gray"
                          Text="USERNAME" Background="{x:Null}"
                          BorderBrush="{x:Null}"
+                         BorderThickness="0"
                          ToolTip="Enter Username" 
                          LostFocus="TextBoxLostFocus" GotFocus="TextboxGotFocus"></TextBox>
                 </Border>

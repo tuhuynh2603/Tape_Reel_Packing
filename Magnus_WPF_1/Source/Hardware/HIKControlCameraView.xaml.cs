@@ -20,13 +20,14 @@ namespace Magnus_WPF_1.Source.Hardware
         //Thread m_hReceiveThread = null;
         string m_strCameraSerial;
         int m_nTrack;
+        public bool m_bIsConnected = false;
         public HIKControlCameraView(string strCameraID, int nTrack)
         {
             InitializeComponent();
             //this.Closing += Window_Closing;
 
             DeviceListAcq();
-            InitializeCamera(strCameraID);
+            MainWindow.mainWindow.UpdateCameraConnectionStatus(nTrack, InitializeCamera(strCameraID));
             m_strCameraSerial = strCameraID;
             m_nTrack = nTrack;
             // ch:设置采集连续模式 | en:Set Continues Aquisition Mode
@@ -133,8 +134,7 @@ namespace Magnus_WPF_1.Source.Hardware
                 return;
             }
 
-            InitializeCamera(m_strCameraSerial);
-
+            MainWindow.mainWindow.UpdateCameraConnectionStatus(m_nTrack, InitializeCamera(m_strCameraSerial));
             // ch:设置采集连续模式 | en:Set Continues Aquisition Mode
             //bnGetParam_Click(null, null);
 
@@ -157,9 +157,9 @@ namespace Magnus_WPF_1.Source.Hardware
             bnSetParam.IsEnabled = true;
         }
 
-        public void InitializeCamera(string strCameraID)
+        public bool InitializeCamera(string strCameraID)
         {
-
+            m_bIsConnected = false;
             int nCameraIndex = -1;
             MyCamera.MV_CC_DEVICE_INFO devices;
             if (strCameraID != "")
@@ -201,7 +201,7 @@ namespace Magnus_WPF_1.Source.Hardware
 
 
             if ( nCameraIndex < 0)
-                return;
+                return false;
 
            /* MyCamera.MV_CC_DEVICE_INFO*/ devices =
                 (MyCamera.MV_CC_DEVICE_INFO)Marshal.PtrToStructure(m_stDeviceList.pDeviceInfo[nCameraIndex],
@@ -213,14 +213,14 @@ namespace Magnus_WPF_1.Source.Hardware
                 m_MyCamera = new MyCamera();
                 if (null == m_MyCamera)
                 {
-                    return;
+                    return false;
                 }
             }
 
             int nRet = m_MyCamera.MV_CC_CreateDevice_NET(ref devices);
             if (MyCamera.MV_OK != nRet)
             {
-                return;
+                return false;
             }
 
             if (m_MyCamera.MV_CC_IsDeviceConnected_NET())
@@ -234,7 +234,7 @@ namespace Magnus_WPF_1.Source.Hardware
             {
                 m_MyCamera.MV_CC_DestroyDevice_NET();
                 ShowErrorMsg("Device open fail!", nRet);
-                return;
+                return false;
             }
 
             // ch:探测网络最佳包大小(只对GigE相机有效) | en:Detection network optimal package size(It only works for the GigE camera)
@@ -269,7 +269,9 @@ namespace Magnus_WPF_1.Source.Hardware
                 Application.Application.cameraSettingParam.exposureTime = expose;
                 Application.Application.cameraSettingParam.frameRate = frameRate;
                 //Application.Application.WriteCamSetting(m_nTrack);
-            }    
+            }
+            m_bIsConnected = true;
+            return true;
         }
 
         private void bnClose_Click(object sender, RoutedEventArgs e)

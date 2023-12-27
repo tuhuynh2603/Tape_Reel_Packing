@@ -156,7 +156,9 @@ namespace Magnus_WPF_1.Source.Application
         public int Stream_HIKCamera()
         {
             if (!hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
-                hIKControlCameraView.InitializeCamera(m_strSeriCamera);
+            {
+               MainWindow.mainWindow.UpdateCameraConnectionStatus(m_nTrackID, hIKControlCameraView.InitializeCamera(m_strSeriCamera));
+            }
 
             int nRet = hIKControlCameraView.m_MyCamera.MV_CC_StartGrabbing_NET();
             if (MyCamera.MV_OK != nRet)
@@ -198,7 +200,7 @@ namespace Magnus_WPF_1.Source.Application
         public int SingleSnap_HIKCamera()
         {
             if (!hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
-                hIKControlCameraView.InitializeCamera(m_strSeriCamera);
+                MainWindow.mainWindow.UpdateCameraConnectionStatus(m_nTrackID, hIKControlCameraView.InitializeCamera(m_strSeriCamera));
 
             int nRet = hIKControlCameraView.m_MyCamera.MV_CC_StartGrabbing_NET();
             if (MyCamera.MV_OK != nRet)
@@ -848,7 +850,7 @@ namespace Magnus_WPF_1.Source.Application
             if (m_nTrackID == 0)
             {
                 if (!hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
-                    hIKControlCameraView.InitializeCamera(m_strSeriCamera);
+                    MainWindow.mainWindow.UpdateCameraConnectionStatus(m_nTrackID, hIKControlCameraView.InitializeCamera(m_strSeriCamera));
 
                 int nRet = hIKControlCameraView.m_MyCamera.MV_CC_StartGrabbing_NET();
                 if (MyCamera.MV_OK != nRet)

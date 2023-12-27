@@ -117,7 +117,7 @@
             <GradientStop Color="#FFFFBA40" Offset="0.439"/>
             <GradientStop Color="#FFBFAD5E" Offset="0.808"/>
         </LinearGradientBrush>
-        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FF282323"/>
+        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FF322F2E"/>
         <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FF0073B9"/>
         <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF9F9F9F"/>
 
@@ -130,8 +130,54 @@
                     <ControlTemplate TargetType="{x:Type ToggleButton}">
                         <Border x:Name="border"
                                 BorderBrush="AliceBlue" 
-                                CornerRadius="3"
-                                BorderThickness="1" 
+                                Background="DarkSlateGray"
+                                CornerRadius="0"
+                                BorderThickness="0" 
+                                SnapsToDevicePixels="true">
+                            <ContentPresenter x:Name="contentPresenter" 
+                                              Focusable="False" 
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              Margin="{TemplateBinding Padding}" 
+                                              RecognizesAccessKey="True" 
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource MouseOverButtonStyle}"/>
+                                <Setter Property="BorderThickness" TargetName="border" Value="0"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource CheckedButtonStyle}"/>
+                                <Setter Property="BorderThickness" TargetName="border" Value="0"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="border" 
+                                        Value="{StaticResource Button.Disabled.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" 
+                                        Value="{StaticResource Button.Disabled.Border}"/>
+                                <Setter Property="TextElement.Foreground"
+                                        TargetName="contentPresenter"
+                                        Value="{StaticResource Button.Disabled.Foreground}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ToggleButtonStyle2" TargetType="{x:Type ToggleButton}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Background" Value="{x:Null}"/>
+            <Setter Property="IsChecked" Value="False"></Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border x:Name="border"
+                                BorderBrush="AliceBlue" 
+                                Background="#FF322F2E"
+                                CornerRadius="0"
+                                BorderThickness="0" 
                                 SnapsToDevicePixels="true">
                             <ContentPresenter x:Name="contentPresenter" 
                                               Focusable="False" 
@@ -190,14 +236,14 @@
 
     </Window.CommandBindings>
     <Window.InputBindings>
-        <KeyBinding  Key="i" Command="{StaticResource Routed_btn_inspect_Click}"></KeyBinding>
-        <KeyBinding  Key="l" Command="{StaticResource Routed_Btn_load_teach_image_Click}"></KeyBinding>
-        <KeyBinding  Key="b" Command="{StaticResource Routed_btn_Binarize_Click}"></KeyBinding>
-        <KeyBinding  Key="p" Command="{StaticResource Routed_btn_Pixel_Ruler_Click}"></KeyBinding>
-        <KeyBinding  Key="Space" Command="{StaticResource Routed_btn_next_teach_click}"></KeyBinding>
-        <KeyBinding  Key="Esc" Command="{StaticResource Routed_btn_abort_teach_Click}"></KeyBinding>
-        <KeyBinding  Key="X" Modifiers="Shift" Command="{StaticResource Routed_btn_Clear_Comm_Click}"></KeyBinding>
-        <KeyBinding  Key="O" Command="{StaticResource Routed_btn_ShowOverlay_Click}"></KeyBinding>
+        <KeyBinding x:Name="KeyBinding_i"  Key="i" Command="{StaticResource Routed_btn_inspect_Click}"></KeyBinding>
+        <KeyBinding x:Name="KeyBinding_l"   Key="l" Command="{StaticResource Routed_Btn_load_teach_image_Click}"></KeyBinding>
+        <KeyBinding x:Name="KeyBinding_b"   Key="b" Command="{StaticResource Routed_btn_Binarize_Click}"></KeyBinding>
+        <KeyBinding x:Name="KeyBinding_p"   Key="p" Command="{StaticResource Routed_btn_Pixel_Ruler_Click}"></KeyBinding>
+        <KeyBinding x:Name="KeyBinding_Space"   Key="Space" Command="{StaticResource Routed_btn_next_teach_click}"></KeyBinding>
+        <KeyBinding x:Name="KeyBinding_Esc"   Key="Esc" Command="{StaticResource Routed_btn_abort_teach_Click}"></KeyBinding>
+        <KeyBinding x:Name="KeyBinding_X_Shift"   Key="X" Modifiers="Shift" Command="{StaticResource Routed_btn_Clear_Comm_Click}"></KeyBinding>
+        <KeyBinding x:Name="KeyBinding_O"   Key="O" Command="{StaticResource Routed_btn_ShowOverlay_Click}"></KeyBinding>
 
         
         
@@ -220,11 +266,11 @@
                             <GradientStop Color="#FF2662B1" Offset="0.919"/>
                         </LinearGradientBrush>
                     </dragablz:TabablzControl.Background>
-                    <TabItem Name="tabRibbon" Header="Magnus" Background="Transparent">
+                    <TabItem Name="tab_vision_view" Header="INSPECTION SETTING" Background="Transparent">
                         <StackPanel Orientation="Horizontal" 
                                             IsEnabled="True" 
                                             Name="tabMasterView">
-                            <Border BorderBrush="#FF2662B1" BorderThickness="3" Margin="0,3,0,0">
+                            <Border BorderBrush="#FF2662B1" BorderThickness="0,0,3,0" Margin="0,0,0,-2">
                                 <RibbonGroup Name="inspection_group">
                                     <RibbonGroup.Style>
                                         <Style TargetType="RibbonGroup">
@@ -269,7 +315,8 @@
                                                             Label="Offline Inspection"
                                                             LargeImageSource="Resources\run-custom.png"
                                                             CheckedBackground="{StaticResource CheckedButtonStyle}"
-                                                            MouseOverBackground="{StaticResource MouseOverButtonStyle}"                                                        Foreground="GhostWhite"
+                                                            MouseOverBackground="{StaticResource MouseOverButtonStyle}"                                                      
+                                                            Foreground="GhostWhite"
                                                             PreviewMouseDown="PreviewMouseDownInspectionBtn"
                                                             Width="auto" 
                                                             Checked="btn_inspect_offline_Checked"
@@ -318,7 +365,7 @@
                                                             Checked="btn_teach_parameters_Checked"
                                                             Unchecked="btn_teach_parameters_Unchecked" />
 
-                                    <RibbonToggleButton Name="mapping_parameters_btn"
+                                    <RibbonToggleButton Name="btn_mapping_parameters"
                                                             Label="Mapping Setting"
                                                             LargeImageSource="Resources\blue-chip.png"
                                                             MouseOverBackground="{StaticResource MouseOverButtonStyle}"
@@ -357,7 +404,7 @@
                                 </RibbonGroup>
                             </Border>
 
-                            <Border BorderBrush="GhostWhite" BorderThickness="0,0,1,0" Margin="0,3,0,0">
+                            <Border BorderBrush="GhostWhite" BorderThickness="0,0,1,0" Margin="0,0,0,0">
                                 <Grid>
                                     <RibbonGroup Name="hardware_group">
                                         <RibbonGroup.Style>
@@ -392,7 +439,7 @@
                                                     <ColumnDefinition></ColumnDefinition>
                                                     <ColumnDefinition></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
-                                                <RibbonToggleButton Name="stream_camera_btn" Grid.Column="0"
+                                                <RibbonToggleButton Name="btn_stream_camera" Grid.Column="0"
                                                         Label="Stream Camera"
                                                         LargeImageSource="Resources\camera-custom.png" Foreground="GhostWhite"
                                                         Checked="btn_stream_camera_Checked"
@@ -401,7 +448,7 @@
                                                         MouseOverBackground="{StaticResource MouseOverButtonStyle}"
                                                         Width="auto"/>
 
-                                                <RibbonToggleButton Name="camera_setting_btn" Grid.Column="1"
+                                                <RibbonToggleButton Name="btn_camera_setting" Grid.Column="1"
                                                         Label="Camera Setting"
                                                         LargeImageSource="Resources\camera-iris-custom.png" Foreground="GhostWhite"
                                                         Checked="btn_Camera_Setting_Checked"
@@ -411,7 +458,9 @@
                                                         Width="auto"/>
                                             </Grid>
                     
-                                            <Label x:Name="label_Camera_Status" Margin="-7,0,0,5" FontSize="10" Grid.Row="0" Content="Disconnected" VerticalContentAlignment="Top"  HorizontalContentAlignment="Center" BorderThickness="3,3,3,0" BorderBrush="#FF2662B1">
+                                            <Label x:Name="label_Camera_Status" Margin="-9,0,0,5" FontSize="10" Grid.Row="0" Content="Disconnected" 
+                                                   VerticalContentAlignment="Top"  HorizontalContentAlignment="Center"
+                                                   BorderThickness="3,3,0,0" BorderBrush="#FF2662B1">
                                                 <!--<Label.Foreground>
                                                     <SolidColorBrush Color="{Binding color_RobotStatus}">
                                                     </SolidColorBrush>
@@ -438,7 +487,7 @@
                                                         Width="Auto"/>
 
                                             <Label x:Name="label_Robot_Status" Margin="0,0,0,5" FontSize="10" Grid.Row="0" Content="Disconnected" VerticalContentAlignment="Top" 
-                                                   BorderThickness="3,3,3,0" BorderBrush="#FF2662B1">
+                                                   BorderThickness="3,3,0,0" BorderBrush="#FF2662B1">
                                                 <Label.Foreground>
                                                     <SolidColorBrush Color="{Binding color_RobotStatus}">
                                                     </SolidColorBrush>
@@ -467,7 +516,8 @@
                                                 
                                             </RibbonToggleButton>
 
-                                            <Label x:Name="label_Barcode_Status"  Margin="0,0,0,5" FontSize="10" Grid.Row="0" Content="Disconnected" VerticalContentAlignment="Top" BorderThickness="3,3,3,0" BorderBrush="#FF2662B1">
+                                            <Label x:Name="label_Barcode_Status"  Margin="0,0,0,5" FontSize="10" Grid.Row="0" Content="Disconnected" 
+                                                   VerticalContentAlignment="Top" BorderThickness="3,3,0,0" BorderBrush="#FF2662B1">
                                                 <Label.Foreground>
                                                     <SolidColorBrush Color="{Binding color_barcodeReaderStatus}">
                                                     </SolidColorBrush>
@@ -495,7 +545,9 @@
 
                                             </RibbonToggleButton>
 
-                                            <Label x:Name="label_PLCCOMM_Status"  Margin="0,0,-8,5" FontSize="10" Grid.Row="0" Content="Disconnected" VerticalContentAlignment="Top" BorderThickness="3,3,0,0" BorderBrush="#FF2662B1">
+                                            <Label x:Name="label_PLCCOMM_Status"  Margin="0,0,-8,5" FontSize="10" Grid.Row="0" 
+                                                   Content="Disconnected" VerticalContentAlignment="Top" 
+                                                   BorderThickness="3,3,0,0" BorderBrush="#FF2662B1">
                                             </Label>
                                         </Grid>
 
@@ -508,7 +560,7 @@
                         </StackPanel>
                     </TabItem>
 
-                    <TabItem x:Name="tabItem_View" Header="VIEW" Background="#FF6FBDDE">
+                    <TabItem x:Name="tabItem_View" Header="TOOL VIEW" Background="#FF6FBDDE">
                         <TabItem.OpacityMask>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#FFD6CDCD" Offset="0"/>
@@ -519,7 +571,7 @@
                                 IsEnabled="True"
                                 Name="tab_View">
                             <!--Binarize group-->
-                            <RibbonGroup Name="btn_Binarize_Group" BorderThickness="5" BorderBrush="AntiqueWhite">
+                            <RibbonGroup Name="btn_Binarize_Group">
                                 <RibbonGroup.Header>
                                     <TextBlock Text="Binary Image" FontFamily="Microsoft New Tai Lue" 
                                            Foreground="#FFD6F9FF" FontSize="13" FontWeight="Bold">
@@ -549,8 +601,9 @@
                                           Click="btn_ShowOverlay_Click"/>
 
                             </RibbonGroup>
-                            <!--Tool-->
-                            <RibbonGroup Name="rgb_Tool_Group"  BorderThickness="5" BorderBrush="AntiqueWhite" >
+                            <Label Width="3" Background="#FF2662B1" Margin="0,0,0,-3"></Label>
+                                <!--Tool-->
+                            <RibbonGroup Name="rgb_Tool_Group">
                                 <RibbonGroup.Header>
                                     <TextBlock Text="Tool" FontFamily="Microsoft New Tai Lue" 
                                            Foreground="#FFD6F9FF" FontSize="13" FontWeight="Bold">
@@ -588,7 +641,7 @@
 
                 </dragablz:TabablzControl>
 
-                <Border Margin="-4,0,0,0" BorderBrush="#FF2662B1" BorderThickness="3" Height="Auto">
+                <Border Margin="-3,0,0,0" BorderBrush="#FF2662B1" BorderThickness="3,3,3,0" Height="Auto">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="25"></RowDefinition>
@@ -603,103 +656,140 @@
                                 <!--<Border BorderBrush="#707070" Width="380" BorderThickness="1" 
                                         VerticalAlignment="Center"
                                         CornerRadius="5">-->
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" >
-                                    <!--Recipe ID-->
-                                    <TextBlock  Text="Lot ID: " Margin="5 0 0 0"
-                                            Width="80" Foreground="#00BFFF"
-                                            FontSize="15" FontWeight="Bold"
-                                            VerticalAlignment="Center"  />
-                                    <TextBlock  x:Name="tbl_Recipe_ID"
+                                <Border BorderBrush="#FF2662B1" BorderThickness="0,0,2,0">
+                                        <!--Recipe ID-->
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,-5,0,0">
+
+                                            <TextBlock  Text="Lot ID: " Margin="0 0 0 0"
+                                                Width="Auto" Foreground="#00BFFF"
+                                                FontSize="15" FontWeight="Bold"
+                                                VerticalAlignment="Center"  />
                                             
-                                            Width="Auto" MinWidth="50" Foreground="WhiteSmoke"
-                                            FontSize="15" FontWeight="Bold"
-                                            VerticalAlignment="Center"   
-                                            IsMouseDirectlyOverChanged="tbl_Recipe_ID_IsMouseDirectlyOverChanged">
-                                        <TextBlock.ToolTip>
-                                            <ToolTip Visibility="Collapsed"                                            
-                                             Width="auto"                                          
-                                             Margin="0,0,0,15"
-                                             Background="White">
-                                                <WrapPanel Orientation="Horizontal" MaxWidth="900"
-                                               Height="auto">
-                                                    <TextBlock  Name="tbl_recipe_id_tooltip" 
-                                                Text="Current ID Recipe "
-                                                HorizontalAlignment="Left"   
-                                                VerticalAlignment="Center"                                                                                                                                                 
-                                                Foreground="Black"
-                                                FontFamily="Tahoma" 
+                                            <TextBlock  x:Name="text_LotID"                                         
+                                                    Width="Auto" MinWidth="50" Foreground="WhiteSmoke"
+                                                    Background="DarkSlateGray"
+                                                    FontSize="15" FontWeight="Bold"
+                                                    Margin="0,0,0,0"
+                                                    VerticalAlignment="Center">
+                                            
+                                                <TextBlock.ToolTip>
+                                                    <ToolTip Visibility="Collapsed"                                            
+                                                     Width="auto"                                          
+                                                     Margin="0,0,0,15"
+                                                     Background="White">
+                                                        <WrapPanel Orientation="Horizontal" MaxWidth="900"
+                                                       Height="auto">
+                                                        <TextBlock  Name="text_LotID_id_tooltip" 
+                                                        Text="Current Lot ID "
+                                                        HorizontalAlignment="Left"   
+                                                        VerticalAlignment="Center"                                                                                                                                                 
+                                                        Foreground="Black"
+                                                        FontFamily="Tahoma" 
+                                                        FontSize="15"
+                                                        TextWrapping="Wrap">
+                                                            </TextBlock>
+                                                        </WrapPanel>
+                                                    </ToolTip>
+                                                </TextBlock.ToolTip>
+                                            </TextBlock>
+                                            <!--Recipe Name-->
+                                            <TextBlock Text="Recipe: "
+                                                 Margin="18,0,0,0"
+                                                 Width="Auto" Foreground="#00BFFF"
+                                                 FontSize="15" FontWeight="Bold"
+                                                 VerticalAlignment="Center">
+                                            </TextBlock>
+                                            <!--<TextBlock x:Name="tbl_Recipe_Name"
+                                                Width="Auto" MinWidth="100" Foreground="White"
+                                                VerticalAlignment="Center"
                                                 FontSize="15"
-                                                TextWrapping="Wrap">
-                                                    </TextBlock>
-                                                </WrapPanel>
-                                            </ToolTip>
-                                        </TextBlock.ToolTip>
-                                    </TextBlock>
-                                    <!--Recipe Name-->
-                                    <TextBlock Text="Recipe Name: "
-                                         Width="110" Foreground="#00BFFF"
-                                         FontSize="15" FontWeight="Bold"
-                                         VerticalAlignment="Center">
-                                    </TextBlock>
-                                    <TextBlock x:Name="tbl_Recipe_Name"
-                                        Width="Auto" MinWidth="50" Foreground="White"
-                                        VerticalAlignment="Center"
-                                        FontSize="15"
-                                        IsMouseDirectlyOverChanged="tbl_Recipe_Name_IsMouseDirectlyOverChanged">
-                                        <TextBlock.ToolTip>
-                                            <ToolTip Visibility="Collapsed"                                            
-                                                Width="auto"                                          
-                                                Margin="0,0,0,15"
-                                                Background="WhiteSmoke">
-                                                <WrapPanel Orientation="Horizontal" MaxWidth="900"
-                                               Height="auto">
-                                                    <TextBlock  Name="tbl_recipe_name_tooltip"    
+                                                IsMouseDirectlyOverChanged="tbl_Recipe_Name_IsMouseDirectlyOverChanged">
+                                                <TextBlock.ToolTip>
+                                                    <ToolTip Visibility="Collapsed"                                            
+                                                        Width="auto"                                          
+                                                        Margin="0,0,0,15"
+                                                        Background="WhiteSmoke">
+                                                        <WrapPanel Orientation="Horizontal" MaxWidth="900"
+                                                       Height="auto">
+                                                            <TextBlock  Name="tbl_recipe_name_tooltip"    
                                                     
-                                                HorizontalAlignment="Left"   
-                                                VerticalAlignment="Center"                                                                                                                                                 
-                                                Foreground="Black"
-                                                FontFamily="Tahoma" 
-                                                FontSize="15"
-                                                TextWrapping="Wrap">
-                                                    </TextBlock>
-                                                </WrapPanel>
-                                            </ToolTip>
-                                        </TextBlock.ToolTip>
-                                    </TextBlock>
-                                </StackPanel>
+                                                        HorizontalAlignment="Left"   
+                                                        VerticalAlignment="Center"                                                                                                                                                 
+                                                        Foreground="Black"
+                                                        FontFamily="Tahoma" 
+                                                        FontSize="15"
+                                                        TextWrapping="Wrap">
+                                                            </TextBlock>
+                                                        </WrapPanel>
+                                                    </ToolTip>
+                                                </TextBlock.ToolTip>
+                                            </TextBlock>-->
+                                            <!--<ToggleButton x:Name="btn_LoadRecipe" 
+                                                          Click="btn_LoadRecipe_Click" 
+                                                          Content="None" MinWidth="100" 
+                                                          Background="DarkSlateGray"
+                                                          Foreground="White" 
+                                                          BorderThickness="0" 
+                                                          FontSize="18">
+                                                
+                                            </ToggleButton>-->
+
+                                        <RibbonToggleButton x:Name="btn_LoadRecipe" 
+                                          Style="{DynamicResource ToggleButtonStyle1}"
+                                          Content="None"                                     
+                                          MinWidth="80"
+                                          Margin="0 -5 0 0" 
+                                          FontFamily="Microsoft New Tai Lue"
+                                          VerticalAlignment="Center"
+                                          FontSize="15" Width="auto"
+                                          Click="btn_LoadRecipe_Click" 
+                                          Foreground="GhostWhite" 
+                                          MouseOverBackground="{StaticResource BgButton}" 
+                                          CheckedBackground="{StaticResource BgButton}"></RibbonToggleButton>
+
+
+
+                                    </StackPanel>
+                                </Border>
                                 <!--</Border>-->
 
 
-                                <Label Content="Access Level:"
+                               <Label Content="Access Level:"
                                Foreground="#00BFFF"
-                               VerticalAlignment="Center"                      
-                               FontSize="11" 
-                               Margin="8 0 0 0"
+                               VerticalAlignment="Center"
+                               VerticalContentAlignment="Center"
+                               FontSize="15" 
+                               Margin="8 -5 0 0"
                                FontFamily="Microsoft New Tai Lue"/>
+                                
                                 <TextBlock x:Name="acessLevel"  
                                Text="None"                       
-                               MinWidth="0"
-                               Height="18"
+                               MinWidth="50"
                                FontFamily="Microsoft New Tai Lue"
                                VerticalAlignment="Center"
                                HorizontalAlignment="Center"
-                               Margin="0 4 0 0"
-                               FontSize="10" Width="auto"                                   
+                               TextAlignment="Center"
+                               FontSize="15" 
+                               Margin="0 -5 0 0"
+                               Background="DarkSlateGray"            
+                               Width="auto"                                   
                                Foreground="GhostWhite" />
                                 <!--login button-->
                                 <Label Content="User:"
                                Foreground="#00BFFF"
                                VerticalAlignment="Center"                      
-                               FontSize="11" 
+                               FontSize="15" 
+                               Margin="18 -5 0 0" 
                                FontFamily="Microsoft New Tai Lue"/>
+                                
                                 <RibbonToggleButton x:Name="btnLogIn" 
                                           Style="{DynamicResource ToggleButtonStyle1}"
                                           Content="None"                                     
                                           MinWidth="80"
-                                          Height="18"
+                                          Margin="0 -5 0 0" 
                                           FontFamily="Microsoft New Tai Lue"
                                           VerticalAlignment="Center"
-                                          FontSize="10" Width="auto"
+                                          FontSize="15" Width="auto"
                                           Checked="btn_LogIn_Checked"
                                           Unchecked="btn_LogIn_Unchecked"
                                           Foreground="GhostWhite" 
@@ -720,20 +810,21 @@
 
                         </Border>
 
-                        <StackPanel Grid.Row="1" Height="Auto" Orientation="Horizontal">
-                            <ToggleButton x:Name="btn_run_sequence" 
+                        <StackPanel Grid.Row="1" Height="Auto" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <RibbonToggleButton x:Name="btn_run_sequence" 
                                     Content="{StaticResource runSequenceImage}"
-                         
-                                    Margin="0,0,0,0" HorizontalAlignment ="Center"
-                                    Background="Transparent" BorderThickness="0"
+                                    Style="{DynamicResource ToggleButtonStyle2}"
+                                    MouseOverBackground="{StaticResource BgButton}" 
+                                    CheckedBackground="{StaticResource BgButton}"
                                     IsChecked="False" Checked="btn_run_sequence_Checked" Unchecked="btn_run_sequence_Unchecked">
-                            </ToggleButton>
+                            </RibbonToggleButton>
 
-                            <ToggleButton x:Name="btn_Debug_sequence" Content="{StaticResource debugSequenceImage}"
-                                    Margin="0,0,0,0" HorizontalAlignment ="Center"
-                                    Background="Transparent" BorderThickness="0"
+                            <RibbonToggleButton x:Name="btn_Debug_sequence" Content="{StaticResource debugSequenceImage}"
+                                    Style="{DynamicResource ToggleButtonStyle2}"
+                                    MouseOverBackground="{StaticResource BgButton}" 
+                                    CheckedBackground="{StaticResource BgButton}"
                                           IsChecked="False" Checked="btn_Debug_sequence_Checked" Unchecked="btn_Debug_sequence_Unchecked">
-                            </ToggleButton>
+                            </RibbonToggleButton>
 
                             <!--<Button x:Name="btn_Debug_sequence_PreviousStep" Content="{StaticResource debugSequencePreviousStepImage}"
                                     Margin="0,0,0,0" HorizontalAlignment ="Center"
@@ -748,31 +839,31 @@
                                     Click ="btn_Debug_sequence_NextStep_Click">
                             </Button>-->
 
-                            <ToggleButton x:Name="btn_Imidiate_Stop" 
+                            <RibbonToggleButton x:Name="btn_Imidiate_Stop" 
                                     Content="{StaticResource ImidiateStopImage}"
-                         
-                                    Margin="0,0,0,0" HorizontalAlignment ="Center"
-                                    Background="Transparent" BorderThickness="0"
+                                    Style="{DynamicResource ToggleButtonStyle2}"
+                                    MouseOverBackground="{StaticResource BgButton}" 
+                                    CheckedBackground="{StaticResource BgButton}"
                                     IsChecked="False"
                                     Click="btn_Imidiate_Stop_Click">
-                            </ToggleButton>
+                            </RibbonToggleButton>
 
-                            <ToggleButton x:Name="btn_Emergency_Stop" 
+                            <RibbonToggleButton x:Name="btn_Emergency_Stop" 
                                     Content="{StaticResource EmergencyStopImage}"
-                         
-                                    Margin="0,0,0,0" HorizontalAlignment ="Center"
-                                    Background="Transparent" BorderThickness="0"
+                                    Style="{DynamicResource ToggleButtonStyle2}"
+                                    MouseOverBackground="{StaticResource BgButton}" 
+                                    CheckedBackground="{StaticResource BgButton}"
                                     IsChecked="False"
                                     Click="btn_Emergency_Stop_Click">
-                            </ToggleButton>
-                
-                            <Button x:Name="btn_Reset_Machine" 
+                            </RibbonToggleButton>
+
+                            <RibbonToggleButton x:Name="btn_Reset_Machine" 
                                     Content="{StaticResource ResetImage}"
-                         
-                                    Margin="0,0,0,0" HorizontalAlignment ="Center"
-                                    Background="Transparent" BorderThickness="0"
+                                    Style="{DynamicResource ToggleButtonStyle2}"
+                                    MouseOverBackground="{StaticResource BgButton}" 
+                                    CheckedBackground="{StaticResource BgButton}"
                                     Click="btn_Reset_Machine_Click">
-                            </Button>
+                            </RibbonToggleButton>
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -817,6 +908,8 @@
             <Grid x:Name="grd_PopupDialog" SizeChanged="GridSettingChangedSize"></Grid>
             <Grid x:Name="grd_CameraPopupDialog" SizeChanged="GridSettingChangedSize"></Grid>
             <Grid x:Name="grd_popup_WarningMessageBox"  SizeChanged="GridSettingChangedSize"></Grid>
+            <Grid x:Name="grd_popup_Recipe"  SizeChanged="GridSettingChangedSize"></Grid>
+
         </Grid>
         
         <Grid x:Name="Layout1" Margin="0 130 0 0" 

@@ -11,6 +11,7 @@ using System.Windows.Media.Imaging;
 namespace Magnus_WPF_1.Source.Application
 {
     using Magnus_WPF_1.Source.Hardware;
+    using Microsoft.Win32;
     using System.Diagnostics;
     using System.Windows;
     using static HiWinRobotInterface;
@@ -26,6 +27,7 @@ namespace Magnus_WPF_1.Source.Application
         public BarCodeReaderInterface m_BarcodeReader ;
         public TeachParametersUC teachParameter = new TeachParametersUC();
         public MappingSetingUC mappingParameter = new MappingSetingUC();
+
         public static bool m_bIsTeaching;
         public static AutoResetEvent m_NextStepTeachEvent;
         //public CommLog commLog = new CommLog();
@@ -80,11 +82,28 @@ namespace Magnus_WPF_1.Source.Application
 
             m_BarcodeReader = new BarCodeReaderInterface();
             LoadRecipe();
+            ReadLogAccount();
+
             m_hiWinRobotInterface = new HiWinRobotInterface();
             m_plcComm = new PLCCOMM();
             m_nActiveTrack = 0;
 
         }
+
+        public void ReadLogAccount()
+        {
+            applications.acountDefault();
+            try
+            {
+                applications.ReadLogAccount();
+                LogMessage.LogMessage.WriteToDebugViewer(2, string.Format("Read Log Account Success "));
+            }
+            catch (Exception)
+            {
+                LogMessage.LogMessage.WriteToDebugViewer(2, string.Format("Read Log Account Failed "));
+            }
+        }
+
 
 
         public void DeleteMaster()
@@ -99,8 +118,20 @@ namespace Magnus_WPF_1.Source.Application
                 VisionReadyEvent[nTrack].Dispose();
             }
         }
-        public void LoadRecipe(bool isLoadRecipeManualy = false)
+        public void LoadRecipe(string strRecipe = "")
         {
+            if(strRecipe !="")
+            {
+                Application.setRecipeToRegister(strRecipe);
+            }
+
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                MainWindow.mainWindow.btn_LoadRecipe.Content = Application.currentRecipe;
+            });
+
+
+
             Application.dictMappingParam.Clear();
             Application.LoadMappingParamFromFile();
             mappingParameter.UpdateMappingParamFromDictToUI(Application.dictMappingParam);
@@ -665,7 +696,7 @@ namespace Magnus_WPF_1.Source.Application
             //Just for testing 
 
             //
-            int nChipCount = 0;
+            //int nChipCount = 0;
             while (MainWindow.mainWindow.bEnableRunSequence || MainWindow.mainWindow.bEnableOfflineInspection || m_bMachineNotReadyNeedToReset)
             {
 
@@ -1169,7 +1200,7 @@ namespace Magnus_WPF_1.Source.Application
                         nFailCount = 0;
                     }
 
-                    string strPassFail = "PASS";
+                    //string strPassFail = "PASS";
                     m_FailstrLotIDFolder = strLotIDFolder;
                     string path_image = Path.Combine(strLotIDFolder, "PASS", $"Device_{data.nDeviceID + 1}" + ".bmp");
 

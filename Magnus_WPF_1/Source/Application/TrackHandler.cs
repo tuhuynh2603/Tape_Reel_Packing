@@ -34,7 +34,7 @@ namespace Magnus_WPF_1.Source.Application
         public ImageView[] m_imageViews;
         public int[] m_nResult;
         public int m_nTrackID;
-        public HIKControlCameraView hIKControlCameraView;
+        public HIKControlCameraView m_hIKControlCameraView;
         public string m_strSeriCamera = "";
         Mat m_frame = new Mat();
         public VideoCapture m_cap;
@@ -58,7 +58,7 @@ namespace Magnus_WPF_1.Source.Application
 
             Application.LoadCamSetting(indexTrack);
             if (serieCam != "none"  && serieCam != "")
-                hIKControlCameraView = new HIKControlCameraView(serieCam, indexTrack);
+                m_hIKControlCameraView = new HIKControlCameraView(serieCam, indexTrack);
             m_strSeriCamera = serieCam;
             //m_cap = new VideoCapture(0);
             //m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, m_Width);
@@ -155,15 +155,15 @@ namespace Magnus_WPF_1.Source.Application
 
         public int Stream_HIKCamera()
         {
-            if (!hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
+            if (!m_hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
             {
-               MainWindow.mainWindow.UpdateCameraConnectionStatus(m_nTrackID, hIKControlCameraView.InitializeCamera(m_strSeriCamera));
+               MainWindow.mainWindow.UpdateCameraConnectionStatus(m_nTrackID, m_hIKControlCameraView.InitializeCamera(m_strSeriCamera));
             }
 
-            int nRet = hIKControlCameraView.m_MyCamera.MV_CC_StartGrabbing_NET();
+            int nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StartGrabbing_NET();
             if (MyCamera.MV_OK != nRet)
             {
-                hIKControlCameraView.m_bGrabbing = false;
+                m_hIKControlCameraView.m_bGrabbing = false;
                 return 0;
             }
             while (MainWindow.mainWindow.bEnableGrabCycle)
@@ -173,57 +173,57 @@ namespace Magnus_WPF_1.Source.Application
 
                 int nWidth = 0, nHeight = 0;
 
-                nRet = hIKControlCameraView.m_MyCamera.MV_CC_SetCommandValue_NET("TriggerSoftware");
+                nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_SetCommandValue_NET("TriggerSoftware");
                 if (MyCamera.MV_OK != nRet)
                 {
                     //OutputDe("Trigger Software Fail!", nRet);
-                    nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+                    nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
                     return 0;
                 }
 
-                hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);
+                m_hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);
                 m_imageViews[0].UpdateSourceImageMono();
                 //m_imageViews[0].UpdateNewImageColor(m_imageViews[0].bufferImage, nWidth, nHeight, 96);
                 if (MyCamera.MV_OK != nRet)
                 {
-                    hIKControlCameraView.m_bGrabbing = false;
-                    nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+                    m_hIKControlCameraView.m_bGrabbing = false;
+                    nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
                     return 0;
                 }
             }
 
-            nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+            nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
             return 0;
         }
 
 
         public int SingleSnap_HIKCamera()
         {
-            if (!hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
-                MainWindow.mainWindow.UpdateCameraConnectionStatus(m_nTrackID, hIKControlCameraView.InitializeCamera(m_strSeriCamera));
+            if (!m_hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
+                MainWindow.mainWindow.UpdateCameraConnectionStatus(m_nTrackID, m_hIKControlCameraView.InitializeCamera(m_strSeriCamera));
 
-            int nRet = hIKControlCameraView.m_MyCamera.MV_CC_StartGrabbing_NET();
+            int nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StartGrabbing_NET();
             if (MyCamera.MV_OK != nRet)
             {
-                hIKControlCameraView.m_bGrabbing = false;
+                m_hIKControlCameraView.m_bGrabbing = false;
                 return -1;
             }
 
             int nWidth = 0, nHeight = 0;
-            nRet = hIKControlCameraView.m_MyCamera.MV_CC_SetCommandValue_NET("TriggerSoftware");
+            nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_SetCommandValue_NET("TriggerSoftware");
             if (MyCamera.MV_OK != nRet)
             {
                 //OutputDe("Trigger Software Fail!", nRet);
-                nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+                nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
                 return -1;
             }
-            hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);
+            m_hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);
             m_imageViews[0].UpdateSourceImageMono();
             // m_imageViews[0].UpdateNewImageColor(m_imageViews[0].bufferImage, nWidth, nHeight, 96);
-            nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+            nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
             if (MyCamera.MV_OK != nRet)
             {
-                hIKControlCameraView.m_bGrabbing = false;
+                m_hIKControlCameraView.m_bGrabbing = false;
                 return -1;
             }
             return 0;
@@ -604,6 +604,10 @@ namespace Magnus_WPF_1.Source.Application
                             return;
                         Thread.Sleep(5);
                     }
+
+                    if (m_imageViews[0].btmSource == null)
+                        continue;
+
                     Master.InspectEvent[m_nTrackID].Reset();
                     m_bInspecting = true;
                     if (m_CurrentSequenceDeviceID < 0 || m_CurrentSequenceDeviceID >= m_nResult.Length)
@@ -611,6 +615,7 @@ namespace Magnus_WPF_1.Source.Application
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
+
                         m_InspectionCore.LoadImageToInspection(m_imageViews[0].btmSource);
                     });
 
@@ -849,15 +854,18 @@ namespace Magnus_WPF_1.Source.Application
             //Todo If Reset lot ID, need to create new lot ID and reset current Device ID to 0
             if (m_nTrackID == 0)
             {
-                if (!hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
-                    MainWindow.mainWindow.UpdateCameraConnectionStatus(m_nTrackID, hIKControlCameraView.InitializeCamera(m_strSeriCamera));
 
-                int nRet = hIKControlCameraView.m_MyCamera.MV_CC_StartGrabbing_NET();
-                if (MyCamera.MV_OK != nRet)
-                {
-                    hIKControlCameraView.m_bGrabbing = false;
-                    return;
-                }
+                m_hIKControlCameraView.m_MyCamera.MV_CC_CloseDevice_NET();
+                m_hIKControlCameraView.m_MyCamera.MV_CC_DestroyDevice_NET();
+
+                //if (!m_hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
+                MainWindow.mainWindow.UpdateCameraConnectionStatus(m_nTrackID, m_hIKControlCameraView.InitializeCamera(m_strSeriCamera));
+                int nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StartGrabbing_NET();
+                //if (MyCamera.MV_OK != nRet)
+                //{
+                //    hIKControlCameraView.m_bGrabbing = false;
+                //    return;
+                //}
             }
 
             //m_cap.ImageGrabbed += Online_ImageGrabbed;
@@ -886,26 +894,36 @@ namespace Magnus_WPF_1.Source.Application
                 if (m_nTrackID == 0)
                 {
                     //Snap camera
-                    int nRet = hIKControlCameraView.m_MyCamera.MV_CC_SetCommandValue_NET("TriggerSoftware");
+                    int nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_SetCommandValue_NET("TriggerSoftware");
                     if (MyCamera.MV_OK != nRet)
                     {
-                        nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+                        nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Trigger Software Failed!.", (int)ERROR_CODE.NO_LABEL);
+
+                        });
                         return;
                     }
 
-                    hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);
+                    m_hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);
                     if (MyCamera.MV_OK != nRet)
                     {
-                        nRet = hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+                        nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Capture and Get Image buffer Failed!.", (int)ERROR_CODE.NO_LABEL);
+
+                        });
                         return;
                     }
                     m_imageViews[0].UpdateSourceImageMono();
 
                 }
                 else
-                {  
+                {
                     //Scan Barcode
-                    MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(m_CurrentSequenceDeviceID);
+                    string strBarcodeResult = MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(m_CurrentSequenceDeviceID);
                 }
 
 

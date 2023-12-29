@@ -344,6 +344,7 @@ namespace Magnus_WPF_1.Source.Application
             IniFile ini = new IniFile(pathFile);
 
             ReadLine_Magnus("LOCATION", "Device Location Roi", ini, ref dictTeachParam);
+            ReadLine_Magnus("LOCATION", "Location Enable", ini, ref dictTeachParam);
             ReadLine_Magnus("LOCATION", "Threshold Method", ini, ref dictTeachParam);
             ReadLine_Magnus("LOCATION", "Object Color", ini, ref dictTeachParam);
             ReadLine_Magnus("LOCATION", "lower threshold", ini, ref dictTeachParam);
@@ -361,6 +362,14 @@ namespace Magnus_WPF_1.Source.Application
             ReadLine_Magnus("LOCATION", "Min Score", ini, ref dictTeachParam);
             ReadLine_Magnus("LOCATION", "Corner Index", ini, ref dictTeachParam);
 
+
+            ReadLine_Magnus("OPPOSITE CHIP", "Enable", ini, ref dictTeachParam);
+            ReadLine_Magnus("OPPOSITE CHIP", "lower threshold", ini, ref dictTeachParam);
+            ReadLine_Magnus("OPPOSITE CHIP", "upper threshold", ini, ref dictTeachParam);
+            ReadLine_Magnus("OPPOSITE CHIP", "Opening Mask", ini, ref dictTeachParam);
+            ReadLine_Magnus("OPPOSITE CHIP", "Dilation Mask", ini, ref dictTeachParam);
+            ReadLine_Magnus("OPPOSITE CHIP", "Min Width Device", ini, ref dictTeachParam);
+            ReadLine_Magnus("OPPOSITE CHIP", "Min Height Device", ini, ref dictTeachParam);
 
             ReadLine_Magnus("DEFECT ROI", $"Number ROI Location", ini, ref dictTeachParam);
             ReadLine_Magnus("DEFECT ROI", "Area Index", ini, ref dictTeachParam);
@@ -412,6 +421,8 @@ namespace Magnus_WPF_1.Source.Application
             InspectionCore inspectionCore = MainWindow.mainWindow.master.m_Tracks[nTrack].m_InspectionCore;
 
             WriteLine("LOCATION", "Device Location Roi", ini, ConvertRectanglesToString(inspectionCore.m_DeviceLocationParameter.m_L_DeviceLocationRoi));
+            WriteLine("LOCATION", "Location Enable", ini, inspectionCore.m_DeviceLocationParameter.m_L_LocationEnable.ToString());
+
             WriteLine("LOCATION", "Threshold Method", ini, inspectionCore.m_DeviceLocationParameter.m_L_ThresholdType.ToString());
             WriteLine("LOCATION", "Object Color", ini, inspectionCore.m_DeviceLocationParameter.m_L_ObjectColor.ToString());
           
@@ -429,6 +440,15 @@ namespace Magnus_WPF_1.Source.Application
             WriteLine("LOCATION", "Scale Image Ratio", ini, inspectionCore.m_DeviceLocationParameter.m_L_ScaleImageRatio.ToString());
             WriteLine("LOCATION", "Min Score", ini, inspectionCore.m_DeviceLocationParameter.m_L_MinScore.ToString());
             WriteLine("LOCATION", "Corner Index", ini, inspectionCore.m_DeviceLocationParameter.m_L_CornerIndex.ToString());
+
+
+            WriteLine("OPPOSITE CHIP", "Enable", ini, inspectionCore.m_blackChipParameter.m_OC_EnableCheck.ToString());
+            WriteLine("OPPOSITE CHIP", "lower threshold", ini, inspectionCore.m_blackChipParameter.m_OC_lowerThreshold.ToString());
+            WriteLine("OPPOSITE CHIP", "upper threshold", ini, inspectionCore.m_blackChipParameter.m_OC_upperThreshold.ToString());
+            WriteLine("OPPOSITE CHIP", "Opening Mask", ini, inspectionCore. m_blackChipParameter.m_OC_OpeningMask.ToString());
+            WriteLine("OPPOSITE CHIP", "Dilation Mask", ini, inspectionCore.m_blackChipParameter.m_OC_DilationMask.ToString());
+            WriteLine("OPPOSITE CHIP", "Min Width Device", ini, inspectionCore. m_blackChipParameter.m_OC_MinWidthDevice.ToString());
+            WriteLine("OPPOSITE CHIP", "Min Height Device", ini, inspectionCore.m_blackChipParameter.m_OC_MinHeightDevice.ToString());
 
 
 

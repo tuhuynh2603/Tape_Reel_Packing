@@ -18,4 +18,11 @@
     <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
     <EnableSQLServerDebugging>true</EnableSQLServerDebugging>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <RemoteDebugEnabled>true</RemoteDebugEnabled>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <RemoteDebugMachine>DESKTOP-J62N07U:4024</RemoteDebugMachine>
+    <AuthenticationMode>None</AuthenticationMode>
+    <StartWorkingDirectory>C:\Wisely\C#\Release\</StartWorkingDirectory>
+  </PropertyGroup>
 </Project>

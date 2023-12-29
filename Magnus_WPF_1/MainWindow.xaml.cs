@@ -271,11 +271,14 @@ namespace Magnus_WPF_1
         {
             if (nTrack == 0)
             {
-                label_Camera_Status.Content = $"{Application.m_strCameraSerial[nTrack]}";
-                if(bIsconnected)
-                    label_Camera_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
-                else
-                    label_Camera_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Red);
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    label_Camera_Status.Content = $"{Application.m_strCameraSerial[nTrack]}";
+                    if (bIsconnected)
+                        label_Camera_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
+                    else
+                        label_Camera_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Red);
+                });
             }
         }
 
@@ -311,16 +314,26 @@ namespace Magnus_WPF_1
         private void btn_run_sequence_Checked(object sender, RoutedEventArgs e)
         {
             Run_Sequence(activeImageDock.trackID);
+
         }
         public void Run_Sequence(int nTrack = (int)TRACK_TYPE.TRACK_ALL)
         {
             btn_run_sequence.IsChecked = true;
             bEnableRunSequence = (bool)btn_run_sequence.IsChecked;
             inspect_offline_btn.IsEnabled = false;
-            m_staticView.ResetMappingResult(nTrack);
-            m_staticView.ClearStatistic(nTrack);
-            master.RunOnlineSequenceThread(nTrack);
 
+
+
+
+            m_staticView.ResetMappingResult(0);
+            m_staticView.ClearStatistic(0);
+            master.RunOnlineSequenceThread(0);
+            master.RobotSequenceThread();
+
+            m_staticView.ResetMappingResult(1);
+            m_staticView.ClearStatistic(1);
+            master.RunOnlineSequenceThread(1);
+            master.BarcodeReaderSequenceThread();
             //master.RunOnlineSequenceThread(0);
 
             //if (nTrack == (int)TRACK_TYPE.TRACK_ALL)
@@ -332,10 +345,6 @@ namespace Magnus_WPF_1
             //}
             //else
             //    master.RunOnlineSequenceThread(nTrack);
-            if(nTrack == 0)
-                master.RobotSequenceThread();
-            else
-                master.RobotSequenceThread();
 
             //Master.commHIKRobot.CreateAndSendMessageToHIKRobot(SignalFromVision.Vision_Ready);
         }
@@ -628,8 +637,8 @@ namespace Magnus_WPF_1
             //tt_DialogSettings.Y = 0;
 
             grd_PopupDialog.Children.Clear();
-            if(master.m_Tracks[0].hIKControlCameraView != null)
-                grd_PopupDialog.Children.Add(master.m_Tracks[0].hIKControlCameraView);
+            if(master.m_Tracks[0].m_hIKControlCameraView != null)
+                grd_PopupDialog.Children.Add(master.m_Tracks[0].m_hIKControlCameraView);
 
             grd_Dialog_Settings.Margin = new Thickness(0, 160, 0, 0);
             grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Top;
@@ -796,6 +805,8 @@ namespace Magnus_WPF_1
 
             teach_parameters_btn.IsChecked = false;
             grd_PopupDialog.Children.Clear();
+            grd_Dialog_Settings.Visibility = Visibility.Collapsed;
+            grd_PopupDialog.Visibility = Visibility.Collapsed;
             //DisbleButtonStandard();
         }
 
@@ -1203,6 +1214,7 @@ namespace Magnus_WPF_1
         {
             isRobotControllerOpen = (bool)btn_Robot_Controller.IsChecked;
             master.OpenHiwinRobotDialog(isRobotControllerOpen);
+
         }
 
         private void btn_Robot_Controller_Unchecked(object sender, RoutedEventArgs e)
@@ -1313,6 +1325,7 @@ namespace Magnus_WPF_1
 
         private void btn_Reset_Machine_Click(object sender, RoutedEventArgs e)
         {
+            btn_Reset_Machine.IsChecked = false;
             if(master.m_ResetMachineStatus_Simulate == 0)
                 master.m_ResetMachineStatus_Simulate = 1;
 
@@ -1561,5 +1574,23 @@ namespace Magnus_WPF_1
 
         }
 
+       public bool bNextStepSimulateSequence = false;
+        private void btn_Simulate_Sequence_Click(object sender, RoutedEventArgs e)
+        {
+            if(bNextStepSimulateSequence == false)
+                bNextStepSimulateSequence = true;
+            btn_Simulate_Sequence.IsChecked = false;
+        }
+
+
+        public bool bNextStepSimulateSequence_2 = false;
+
+        private void btn_Simulate_Sequence_2_Click(object sender, RoutedEventArgs e)
+        {
+            if (bNextStepSimulateSequence_2 == false)
+                bNextStepSimulateSequence_2 = true;
+            btn_Simulate_Sequence_2.IsChecked = false;
+
+        }
     }
 }

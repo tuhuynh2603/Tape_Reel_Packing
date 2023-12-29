@@ -176,7 +176,7 @@ namespace Magnus_WPF_1.Source.Application
         public int m_EmergencyStatus_Simulate = 0;
         public int m_ImidiateStatus_Simulate = 0;
         public int m_ResetMachineStatus_Simulate = 0;
-        public bool m_bMachineNotReadyNeedToReset = false;
+        public bool m_bMachineNotReadyNeedToReset = true;
         public bool m_bNeedToImidiateStop= false;
 
         private void ContructorDocComponent()
@@ -487,6 +487,11 @@ namespace Magnus_WPF_1.Source.Application
 
             // Stop Motor
             m_hiWinRobotInterface.StopMotor();
+            if(MainWindow.mainWindow.m_bEnableDebugSequence)
+                HWinRobot.set_operation_mode(m_RobotConnectID, (int)ROBOT_OPERATION_MODE.MODE_MANUAL);
+            else
+                HWinRobot.set_operation_mode(m_RobotConnectID, (int)ROBOT_OPERATION_MODE.MODE_AUTO);
+
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
             nError = WaitForNextStepSequenceEvent("Reset Sequence: Stop motor Done. Press Next to Move to place position");
             if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT) return -1;
@@ -506,7 +511,7 @@ namespace Magnus_WPF_1.Source.Application
             }
 
         ResetSequence_Step2:
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.PRE_FAILED_PLACE_POSITION);
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.PRE_FAILED_PLACE_POSITION, true);
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
             nError = WaitForNextStepSequenceEvent("Reset Sequence: Moving done. Press Next to put the device to position");
             if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT) return -1;
@@ -669,13 +674,25 @@ namespace Magnus_WPF_1.Source.Application
                 nError = WaitForNextStepSequenceEvent(" Reset Machine Failed. End Sequence...");
                 return;
             }
+
+            HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON, true);
+
             //Wait for Signal from PLC when they ready for new Lot so we can create new lot ID
             while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_READY) == 0)
             {
                 // Need popup Dialog if waiting too long 
                 if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection || m_bMachineNotReadyNeedToReset)
                     return;
+
+
+                if (MainWindow.mainWindow.bNextStepSimulateSequence )
+                {
+                    MainWindow.mainWindow.bNextStepSimulateSequence = false;
+                    break;
+
+                }
             }
+            HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON, false);
 
             nError = WaitForNextStepSequenceEvent("Begin Sequence: Press Next to trigger camera 1");
 
@@ -696,6 +713,8 @@ namespace Magnus_WPF_1.Source.Application
             //Just for testing 
 
             //
+            m_Tracks[0].m_strCurrentLot = string.Format("DUMMY_TrayID_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+
             //int nChipCount = 0;
             while (MainWindow.mainWindow.bEnableRunSequence || MainWindow.mainWindow.bEnableOfflineInspection || m_bMachineNotReadyNeedToReset)
             {
@@ -705,13 +724,28 @@ namespace Magnus_WPF_1.Source.Application
 
                 int nStep = 1;
                 LogMessage.LogMessage.WriteToDebugViewer(9, "Begin Sequence");
-                if(m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT) > 0)
+                readPLC:
+                if(m_plcComm.m_modbusClient.Connected)
                 {
-                    m_Tracks[0].m_strCurrentLot = string.Format("TrayID_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+                    if (m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT) > 0)
+                    {
+                        m_Tracks[0].m_strCurrentLot = string.Format("TrayID_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+                    }
+
+                    m_Tracks[0].m_CurrentSequenceDeviceID = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_CURRENT_ROBOT_CHIP_COUNT);
                 }
                 else
-                    m_Tracks[0].m_CurrentSequenceDeviceID = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_CURRENT_ROBOT_CHIP_COUNT);
+                {
+                    nError = WaitForNextStepSequenceEvent("Read PLC Failed. PLC connection timeout.");
+                    if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT)
+                        break;
+                    else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_GOBACK)
+                    {
+                        goto readPLC;
+                    }
+                }
 
+                //m_Tracks[0].m_CurrentSequenceDeviceID
                 // Step 1: wait for station 1 inspection
                 timeIns.Restart();
 
@@ -740,6 +774,11 @@ namespace Magnus_WPF_1.Source.Application
                     //m_hardwareTriggerSnapEvent[0].Set();
                     HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
                     HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Image processing Failed!.", (int)ERROR_CODE.NO_LABEL);
+
+                    });
                     break;
                 }
 
@@ -847,16 +886,22 @@ namespace Magnus_WPF_1.Source.Application
                     return;
 
                 //Trigger conveyor on
-                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_CONVEYER_ONOFF, true);
+                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON, true);
                 //
 
-                while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.AIR_PRESSURESTATUS) == 0)
-                {
-                    if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
-                    {
-                        return;
-                    }
-                }
+                //while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.AIR_PRESSURESTATUS) == 0)
+                //{
+                //    if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
+                //    {
+                //        return;
+                //    }
+
+                //    if (MainWindow.mainWindow.bNextStepSimulateSequence)
+                //    {
+                //        MainWindow.mainWindow.bNextStepSimulateSequence = false;
+                //        break;
+                //    }
+                //}
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nStep++} : Move to  Pre pick  position again ({timeIns.ElapsedMilliseconds} ms)");
                 nError = WaitForNextStepSequenceEvent("Move to prepick position done. Press Next to move up to pre pick position");
@@ -879,8 +924,10 @@ namespace Magnus_WPF_1.Source.Application
                 if (m_bMachineNotReadyNeedToReset)
                     return;
                 //Step 6: Move To Pass fail position
-                string strPrePosition = nCamera1InspectionResult == 0 ? SequencePointData.PRE_PASS_PLACE_POSITION : SequencePointData.PRE_FAILED_PLACE_POSITION;
-                string strPosition = nCamera1InspectionResult == 0 ? SequencePointData.PASS_PLACE_POSITION : SequencePointData.FAILED_PLACE_POSITION;
+                string strPrePosition = nCamera1InspectionResult == (int)ERROR_CODE.PASS ? SequencePointData.PRE_PASS_PLACE_POSITION 
+                                       : nCamera1InspectionResult == (int)ERROR_CODE.OPPOSITE_CHIP? SequencePointData.PRE_FAILED_BLACK_PLACE_POSITION 
+                                       : SequencePointData.PRE_FAILED_PLACE_POSITION;
+                //string strPosition = nCamera1InspectionResult == 0 ? SequencePointData.PASS_PLACE_POSITION : SequencePointData.FAILED_PLACE_POSITION;
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nStep++} : Move To Pass fail position ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
 
                 MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(strPrePosition);
@@ -912,15 +959,18 @@ namespace Magnus_WPF_1.Source.Application
                 if (m_bMachineNotReadyNeedToReset)
                     return;
                 //Trigger conveyor off
-                HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_CONVEYER_ONOFF, false);
-                //while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_READY) == 0)
-                //{
-                //    if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
-                //    {
-                //        return;
-                //    }
-                //}
-                //
+
+
+                while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_READY) == 0)
+                {
+                    if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
+                    {
+                        return;
+                    }
+                }
+                HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON, false);
+
+
                 Master.VisionReadyEvent[0].Reset();
                 m_hardwareTriggerSnapEvent[0].Set();
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nStep++} : Trigger camera  1  ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
@@ -945,7 +995,7 @@ namespace Magnus_WPF_1.Source.Application
                 if (m_bMachineNotReadyNeedToReset)
                     return;
                 //Step 8: Wait For PLC Ready
-                while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_READY) == 0)
+                while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_BARCODE_READY) == 0)
                 {
                     if (!MainWindow.mainWindow.bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
                     {
@@ -978,6 +1028,9 @@ namespace Magnus_WPF_1.Source.Application
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, true);
                 Thread.Sleep(50);
+                HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
+                HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
+
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nStep++} : Put device to the tray ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
 
                 //if(nEmptyTrayHoles >= 5)
@@ -1011,7 +1064,26 @@ namespace Magnus_WPF_1.Source.Application
 
                 if(nCamera1InspectionResult ==-(int)ERROR_CODE.PASS)
                     m_Tracks[0].m_CurrentSequenceDeviceID++;
-                m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_CURRENT_ROBOT_CHIP_COUNT, m_Tracks[0].m_CurrentSequenceDeviceID);
+
+
+                sendToPLC:
+               int nErrorPLC = m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_CURRENT_ROBOT_CHIP_COUNT, m_Tracks[0].m_CurrentSequenceDeviceID);
+                if(nErrorPLC < 0)
+                {
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"PLC connection failed.");
+                    });
+
+
+                    nError = WaitForNextStepSequenceEvent("Write to PLC Failed. PLC connection timeout.");
+                    if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT)
+                        break;
+                    else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_GOBACK)
+                    {
+                        goto sendToPLC;
+                    }
+                }
 
             RobotSequence_Step11:
 
@@ -1065,11 +1137,23 @@ namespace Magnus_WPF_1.Source.Application
         void func_BarcodeReaderSequence()
         {
             Master.m_hardwareTriggerSnapEvent[1].Reset();
+
             int nChipCount = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_CURRENT_BARCODE_CHIP_COUNT);
-            if (nChipCount == 0)
+
+            //if (nChipCount < 0)
+            //{
+            //    MessageBox.Show("Connect to PLC failed. Please check the connection and try again!");
+            //    return;
+            //}
+
+            if (nChipCount <= 0)
             {
                 m_Tracks[1].m_strCurrentLot = string.Format("TrayID_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+                nChipCount = 0;
+                MessageBox.Show("Connect to PLC failed. Please check the connection and try again!");
+
             }
+
 
             while (MainWindow.mainWindow.bEnableRunSequence)
             {
@@ -1092,6 +1176,14 @@ namespace Magnus_WPF_1.Source.Application
                         MessageBox.Show("Connect to PLC failed. Please check the connection and try again!");
                         return;
                     }
+
+                    if (MainWindow.mainWindow.bNextStepSimulateSequence_2)
+                    {
+                        m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_TRIGGER, 1);
+                        MainWindow.mainWindow.bNextStepSimulateSequence_2 = false;
+                        break;
+                    }
+
                 }
 
                 m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_TRIGGER, 0);
@@ -1276,6 +1368,10 @@ namespace Magnus_WPF_1.Source.Application
         {
             //HiWinRobotInterface.m_hiWinRobotUserControl.Visibility = System.Windows.Visibility.Visible;
             //defectInfor.lvDefect.View = gridView;
+            HWinRobot.set_operation_mode(HiWinRobotInterface.m_RobotConnectID, (int)ROBOT_OPERATION_MODE.MODE_MANUAL);
+            m_hiWinRobotInterface.m_hiWinRobotUserControl.check_Manual.IsChecked = true;
+            m_hiWinRobotInterface.m_hiWinRobotUserControl.check_Auto.IsChecked = false;
+
             if (bIschecked)
             {
                 MainWindow.mainWindow.grd_Defect.Height = m_hiWinRobotInterface.m_hiWinRobotUserControl.Height;

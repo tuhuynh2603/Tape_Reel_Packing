@@ -60,6 +60,28 @@
             <!--<TextBlock Grid.Row="1" Text="Imidiate Stop" Foreground="Yellow" TextAlignment="Center" FontSize="20"></TextBlock>-->
         </Grid>
 
+
+
+        <Grid x:Key="SimulateSequence" Margin="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"></RowDefinition>
+                <RowDefinition Height="1*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Image Grid.Row="0"  Source="Resources\NextButton_2.png"></Image>
+            <TextBlock Grid.Row="1" Text="Robot" Foreground="Yellow" TextAlignment="Center" FontSize="20"></TextBlock>
+        </Grid>
+
+
+        <Grid x:Key="SimulateSequence2" Margin="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"></RowDefinition>
+                <RowDefinition Height="1*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Image Grid.Row="0"  Source="Resources\NextButton_2.png"></Image>
+            <TextBlock Grid.Row="1" Text="BarCode" Foreground="Yellow" TextAlignment="Center" FontSize="20"></TextBlock>
+        </Grid>
+
+
         <Grid x:Key="EmergencyStopImage" Margin="3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="3*"></RowDefinition>
@@ -826,6 +848,23 @@
                                           IsChecked="False" Checked="btn_Debug_sequence_Checked" Unchecked="btn_Debug_sequence_Unchecked">
                             </RibbonToggleButton>
 
+
+                            <RibbonToggleButton x:Name="btn_Simulate_Sequence" 
+                                    Content="{StaticResource SimulateSequence}"
+                                    Style="{DynamicResource ToggleButtonStyle2}"
+                                    MouseOverBackground="{StaticResource BgButton}" 
+                                    CheckedBackground="{StaticResource BgButton}"
+                                    Click="btn_Simulate_Sequence_Click">
+                            </RibbonToggleButton>
+
+                            <RibbonToggleButton x:Name="btn_Simulate_Sequence_2" 
+                                    Content="{StaticResource SimulateSequence2}"
+                                    Style="{DynamicResource ToggleButtonStyle2}"
+                                    MouseOverBackground="{StaticResource BgButton}" 
+                                    CheckedBackground="{StaticResource BgButton}"
+                                    Click ="btn_Simulate_Sequence_2_Click">
+                            </RibbonToggleButton>
+                            
                             <!--<Button x:Name="btn_Debug_sequence_PreviousStep" Content="{StaticResource debugSequencePreviousStepImage}"
                                     Margin="0,0,0,0" HorizontalAlignment ="Center"
                                     Background="Transparent" BorderThickness="0"
@@ -864,6 +903,8 @@
                                     CheckedBackground="{StaticResource BgButton}"
                                     Click="btn_Reset_Machine_Click">
                             </RibbonToggleButton>
+
+
                         </StackPanel>
                     </Grid>
                 </Border>

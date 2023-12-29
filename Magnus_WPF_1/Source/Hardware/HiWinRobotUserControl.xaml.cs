@@ -77,8 +77,8 @@ namespace Magnus_WPF_1.Source.Hardware
             m_List_sequencePointData.Add(new SequencePointData() { m_PointComment = SequencePointData.PICK_POSITION });
             m_List_sequencePointData.Add(new SequencePointData() { m_PointComment = SequencePointData.PRE_PASS_PLACE_POSITION });
             m_List_sequencePointData.Add(new SequencePointData() { m_PointComment = SequencePointData.PASS_PLACE_POSITION });
+            m_List_sequencePointData.Add(new SequencePointData() { m_PointComment = SequencePointData.PRE_FAILED_BLACK_PLACE_POSITION });
             m_List_sequencePointData.Add(new SequencePointData() { m_PointComment = SequencePointData.PRE_FAILED_PLACE_POSITION });
-            m_List_sequencePointData.Add(new SequencePointData() { m_PointComment = SequencePointData.FAILED_PLACE_POSITION });
 
 
             m_List_sequencePointData.Add(new SequencePointData() { m_PointComment = SequencePointData.CALIB_ROBOT_POSITION_1 });
@@ -282,10 +282,10 @@ namespace Magnus_WPF_1.Source.Hardware
 
         public void SetMotorSpeed()
         {
-            HWinRobot.set_acc_dec_ratio(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(m_nAccRatioPercentValue));
-            HWinRobot.set_ptp_speed(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(m_PTPSpeedPercentValue));
-            HWinRobot.set_lin_speed(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(m_nLinearSpeedValue));
-            HWinRobot.set_override_ratio(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(m_nOverridePercent));
+            HWinRobot.set_acc_dec_ratio(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(slider_AccRatioPercent.Value));
+            HWinRobot.set_ptp_speed(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(slider_PTPSpeedPercent.Value));
+            HWinRobot.set_lin_speed(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(slider_LinearSpeed.Value));
+            HWinRobot.set_override_ratio(HiWinRobotInterface.m_RobotConnectID, Convert.ToInt16(slider_OverridePercent.Value));
         }
 
         public List<SequencePointData> m_List_sequencePointData = new List<SequencePointData>();
@@ -944,28 +944,53 @@ namespace Magnus_WPF_1.Source.Hardware
             //int nAlarmCount = 0;
             //HWinRobot.get_alarm_log_count(HiWinRobotInterface.m_RobotConnectID, ref nAlarmCount);
             HWinRobot.clear_alarm(HiWinRobotInterface.m_RobotConnectID);
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                button_Next_Calibration.IsEnabled = true;
+            });
             if (WaitForNextStepCalibrationEvent("Calibration sequence!. Press OK to Home Move and move to ready position") < 0)
                 return;
-
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                button_Next_Calibration.IsEnabled = false;
+            });
             HomeMove();
             MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.READY_POSITION);
             // Please put calibration jig to the workplace 
 
+
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                button_Next_Calibration.IsEnabled = true;
+            });
             if (WaitForNextStepCalibrationEvent("Please put calibration jig to the workplace then press Next to trigger camera 1 to get calibration position") < 0)
                 return;
 
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                button_Next_Calibration.IsEnabled = false;
+            });
             if (MainWindow.mainWindow.master.m_Tracks[0].SingleSnap_HIKCamera() < 0)
             {
                 MessageBox.Show("Cannot open camera 1. Please Check camera connection again! Stop calibration...", "", MessageBoxButton.OK);
-                //return;
+                return;
             }
 
             System.Drawing.PointF[] vision_points;
             System.Drawing.PointF[] robot_points = new System.Drawing.PointF[3];
             MainWindow.mainWindow.master.m_Tracks[0].CalibrationGet3Points(out vision_points);
+
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                button_Next_Calibration.IsEnabled = true;
+            });
             if (WaitForNextStepCalibrationEvent("Done. Please press Next to move the robot to 1st Point.") < 0)
                 return;
 
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                button_Next_Calibration.IsEnabled = false;
+            });
             if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_1) < 0)
             {
                 if (MessageBox.Show("Move Failed, please click OK then reset alarm and manually move the robot to position 1", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
@@ -978,7 +1003,10 @@ namespace Magnus_WPF_1.Source.Hardware
             }
 
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
-
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                button_Next_Calibration.IsEnabled = true;
+            });
             if (WaitForNextStepCalibrationEvent(" Done. Please press Next to save and move the robot to 2nd Point.") < 0)
                 return;
 
@@ -988,7 +1016,10 @@ namespace Magnus_WPF_1.Source.Hardware
             //pData.GetXYZPoint(ref drobotPoint);
             HWinRobot.get_current_position(HiWinRobotInterface.m_RobotConnectID, drobotPoint);
             robot_points[nPointIndex++] = new System.Drawing.PointF((float)drobotPoint[0], (float)drobotPoint[1]);
-
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                button_Next_Calibration.IsEnabled = false;
+            });
             if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_2) < 0)
             {
                 if (MessageBox.Show("Move Failed, please click OK then reset alarm and manually move the robot to position 2", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
@@ -1000,13 +1031,19 @@ namespace Magnus_WPF_1.Source.Hardware
 
             }
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
-
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                button_Next_Calibration.IsEnabled = true;
+            });
             if (WaitForNextStepCalibrationEvent(" Done. Please press Next to save and move the robot to 3rd Point.") < 0)
                 return;
 
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                button_Next_Calibration.IsEnabled = false;
+            });
             HWinRobot.get_current_position(HiWinRobotInterface.m_RobotConnectID, drobotPoint);
             robot_points[nPointIndex++] = new System.Drawing.PointF((float)drobotPoint[0], (float)drobotPoint[1]);
-
 
             if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_3) < 0)
             {
@@ -1019,7 +1056,10 @@ namespace Magnus_WPF_1.Source.Hardware
 
             }
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
-
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                button_Next_Calibration.IsEnabled = true;
+            });
             if (WaitForNextStepCalibrationEvent(" Done. Please press Next to save the 3rd Point.") < 0)
                 return;
 
@@ -1031,7 +1071,10 @@ namespace Magnus_WPF_1.Source.Hardware
 
             //Docalibration();
             Mat mat_CameraRobotTransform = Application.Track.MagnusMatrix.CalculateTransformMatrix(vision_points, robot_points);
-
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                button_Next_Calibration.IsEnabled = true;
+            });
             if (WaitForNextStepCalibrationEvent("Calibration Done. Please press Next complete the sequence.") < 0)
                 return;
 

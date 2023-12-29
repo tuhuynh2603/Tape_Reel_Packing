@@ -268,6 +268,8 @@ namespace Magnus_WPF_1.Source.Hardware
                 Application.Application.cameraSettingParam.gain = gain;
                 Application.Application.cameraSettingParam.exposureTime = expose;
                 Application.Application.cameraSettingParam.frameRate = frameRate;
+                ShowErrorMsg($"Failed! gain{gain} expose {expose} frameRate {frameRate}", (int)MyCamera.MV_ALG_E_PARAM_VALUE);
+
                 //Application.Application.WriteCamSetting(m_nTrack);
             }
             m_bIsConnected = true;
@@ -276,33 +278,6 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void bnClose_Click(object sender, RoutedEventArgs e)
         {
-
-            var result = MessageBox.Show("Would you like to save camera parameters ?", "", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            if (result == MessageBoxResult.Yes)
-            {
-
-                try
-                {
-                    float.Parse(tbExposure.Text);
-                    float.Parse(tbGain.Text);
-                    float.Parse(tbFrameRate.Text);
-                }
-                catch
-                {
-                    ShowErrorMsg("Please enter correct type!", 0);
-                    return;
-                }
-
-                if (SetParameterToCamera(Application.Application.cameraSettingParam.exposureTime, Application.Application.cameraSettingParam.gain, Application.Application.cameraSettingParam.frameRate))
-                {
-                    Application.Application.cameraSettingParam.gain = float.Parse(tbGain.Text);
-                    Application.Application.cameraSettingParam.exposureTime = float.Parse(tbExposure.Text);
-                    Application.Application.cameraSettingParam.frameRate = float.Parse(tbFrameRate.Text);
-                    Application.Application.WriteCamSetting(m_nTrack);
-                }
-                //return;
-                //master.m_Tracks[0].m_imageViews[0].SaveTeachImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp"));
-            }
 
             // ch:取流标志位清零 | en:Reset flow flag bit
             if (m_bGrabbing == true)
@@ -535,7 +510,6 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void bnSetParam_Click(object sender, RoutedEventArgs e)
         {
-
             try
             {
                 float.Parse(tbExposure.Text);
@@ -548,9 +522,22 @@ namespace Magnus_WPF_1.Source.Hardware
                 return;
             }
 
-            SetParameterToCamera(float.Parse(tbExposure.Text), float.Parse(tbGain.Text), float.Parse(tbFrameRate.Text));
+            bool bSetOK = SetParameterToCamera(float.Parse(tbExposure.Text), float.Parse(tbGain.Text), float.Parse(tbFrameRate.Text));
+            if (!bSetOK)
+            {
+                MessageBox.Show("Set param to Camera failed. Please check again!");
 
+                return;
+            }
 
+            var result = MessageBox.Show("Would you like to save camera parameters ?", "", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                Application.Application.cameraSettingParam.gain = float.Parse(tbGain.Text);
+                Application.Application.cameraSettingParam.exposureTime = float.Parse(tbExposure.Text);
+                Application.Application.cameraSettingParam.frameRate = float.Parse(tbFrameRate.Text);
+                Application.Application.WriteCamSetting(m_nTrack);
+            }
         }
 
         public bool SetParameterToCamera(float fExpose, float fGain, float fFrameRate)

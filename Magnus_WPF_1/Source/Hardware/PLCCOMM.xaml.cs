@@ -136,14 +136,41 @@ namespace Magnus_WPF_1.Source.Hardware
 
         public int ReadPLCRegister(int nAddress)
         {
-            return m_modbusClient.ReadHoldingRegisters(nAddress, 1)[0];
+
+            if (m_modbusClient.Connected)
+                try
+                {
+                    return m_modbusClient.ReadHoldingRegisters(nAddress, 1)[0];
+
+                }
+                catch(Exception e)
+                {
+
+                    return -1;
+                }
+            else
+                return -1;
         }
 
-        public void WritePLCRegister(int nAddress, int nValue)
+        public int WritePLCRegister(int nAddress, int nValue)
         {
             int[] ival = new int[1];
-            ival[0] = nValue; 
-            m_modbusClient.WriteMultipleRegisters(nAddress, ival);
+            ival[0] = nValue;
+            if (m_modbusClient.Connected)
+            {
+                try
+                {
+                    m_modbusClient.WriteMultipleRegisters(nAddress, ival);
+
+                }
+                catch(Exception e)
+                {
+                    return -1;
+                }
+            }
+            else
+                return -1;
+            return 0;
 
         }
 
@@ -155,7 +182,15 @@ namespace Magnus_WPF_1.Source.Hardware
         private void button_PLC_Connect_Click(object sender, RoutedEventArgs e)
         {
             if(!m_modbusClient.Connected)
-                 m_modbusClient.Connect();
+                try
+                {
+                    m_modbusClient.Connect();
+
+                }
+                catch
+                {
+                    return;
+                }
             else
                 m_modbusClient.Disconnect();
 

@@ -176,6 +176,11 @@ namespace Magnus_WPF_1
         /// Model For PropertyGrid
         /// </summary>
         [CategoryOrder("LOCATION", 0)]
+        [CategoryOrder("OPPOSITE CHIP", 1)]
+        [CategoryOrder("DEFECT ROI", 2)]
+        [CategoryOrder("LABEL DEFECT", 3)]
+
+
         [DisplayName("Teach Parameter")]
         public class CategoryTeachParameter
         {
@@ -190,12 +195,21 @@ namespace Magnus_WPF_1
             [PropertyOrder(0)]
             public Rectangles L_DeviceLocationRoi { get; set; }
 
+
+            [Browsable(true)]
+            [Category("LOCATION")]
+            [DisplayName("Location Enable")]
+            [PropertyOrder(1)]
+            [DefaultValue(true)]
+            public bool L_LocationEnable{ get; set; }
+
+
             [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Threshold Method")]
             [DefaultValue(THRESHOLD_TYPE.BINARY_THRESHOLD)]
             [Description("Threshold method")]
-            [PropertyOrder(1)]
+            [PropertyOrder(2)]
             public THRESHOLD_TYPE L_ThresholdType { get; set; }
 
             [Browsable(true)]
@@ -203,7 +217,7 @@ namespace Magnus_WPF_1
             [DisplayName("Object Color")]
             [DefaultValue(OBJECT_COLOR.BLACK)]
             [Description("The color of Object want to catch")]
-            [PropertyOrder(2)]
+            [PropertyOrder(3)]
             public OBJECT_COLOR L_ObjectColor { get; set; }
 
             [Browsable(true)]
@@ -212,7 +226,7 @@ namespace Magnus_WPF_1
             [Range(0, 255)]
             [DefaultValue(0)]
             [Description("")]
-            [PropertyOrder(3)]
+            [PropertyOrder(4)]
 
             public int L_lowerThreshold { get; set; }
             [Browsable(true)]
@@ -221,7 +235,7 @@ namespace Magnus_WPF_1
             [Range(0, 255)]
             [DefaultValue(255)]
             [Description("")]
-            [PropertyOrder(4)]
+            [PropertyOrder(5)]
             public int L_upperThreshold { get; set; }
 
             [Browsable(true)]
@@ -230,7 +244,7 @@ namespace Magnus_WPF_1
             [Range(0, 255)]
             [DefaultValue(0)]
             [Description("")]
-            [PropertyOrder(5)]
+            [PropertyOrder(6)]
             public int L_lowerThresholdInnerChip { get; set; }
 
 
@@ -240,7 +254,7 @@ namespace Magnus_WPF_1
             [Range(0, 255)]
             [DefaultValue(255)]
             [Description("")]
-            [PropertyOrder(6)]
+            [PropertyOrder(7)]
             public int L_upperThresholdInnerChip { get; set; }
 
 
@@ -250,7 +264,7 @@ namespace Magnus_WPF_1
             [Range(1, 500)]
             [DefaultValue(11)]
             [Description("")]
-            [PropertyOrder(7)]
+            [PropertyOrder(8)]
             public int L_OpeningMask { get; set; }
 
             [Browsable(true)]
@@ -259,7 +273,7 @@ namespace Magnus_WPF_1
             [Range(1, 500)]
             [DefaultValue(30)]
             [Description("")]
-            [PropertyOrder(8)]
+            [PropertyOrder(9)]
             public int L_DilationMask { get; set; }
 
             [Browsable(true)]
@@ -268,7 +282,7 @@ namespace Magnus_WPF_1
             [Range(0, 99999)]
             [DefaultValue(50)]
             [Description("")]
-            [PropertyOrder(9)]
+            [PropertyOrder(10)]
             public int L_MinWidthDevice { get; set; }
 
             [Browsable(true)]
@@ -277,7 +291,7 @@ namespace Magnus_WPF_1
             [Range(0, 99999)]
             [DefaultValue(50)]
             [Description("")]
-            [PropertyOrder(10)]
+            [PropertyOrder(11)]
             public int L_MinHeightDevice { get; set; }
 
             [Browsable(false)]
@@ -285,7 +299,7 @@ namespace Magnus_WPF_1
             [DisplayName("Template Roi")]
             [Range(0, 5)]
             [Description("")]
-            [PropertyOrder(11)]
+            [PropertyOrder(12)]
             public Rectangles L_TemplateRoi { get; set; }
 
             [Browsable(true)]
@@ -294,7 +308,7 @@ namespace Magnus_WPF_1
             [Range(1, 360)]
             [DefaultValue(4)]
             [Description("")]
-            [PropertyOrder(12)]
+            [PropertyOrder(13)]
             public int L_NumberSide { get; set; }
 
             [Browsable(true)]
@@ -303,7 +317,7 @@ namespace Magnus_WPF_1
             [Range(0.1, 1)]
             [DefaultValue(1)]
             [Description("Before Inspecting, The image will be scaled by this value to reduce inspection time.")]
-            [PropertyOrder(13)]
+            [PropertyOrder(14)]
             public double L_ScaleImageRatio { get; set; }
 
             [Browsable(true)]
@@ -312,7 +326,7 @@ namespace Magnus_WPF_1
             [Range(0.0, 99999.0)]
             [DefaultValue(50.0)]
             [Description("")]
-            [PropertyOrder(14)]
+            [PropertyOrder(15)]
             public double L_MinScore { get; set; }
 
 
@@ -322,7 +336,7 @@ namespace Magnus_WPF_1
             [Range(0, 3)]
             [DefaultValue(0)]
             [Description("")]
-            [PropertyOrder(15)]
+            [PropertyOrder(16)]
             public int L_CornerIndex { get; set; }
 
             #endregion
@@ -353,6 +367,73 @@ namespace Magnus_WPF_1
             [PropertyOrder(2)]
             //[ItemsSource(typeof(AreaComboBox))]
             public AREA_INDEX DR_DefectROIIndex { get; set; }
+
+            #endregion
+
+            #region OPPOSITE Chip
+
+
+            [Browsable(true)]
+            [Category("OPPOSITE CHIP")]
+            [DisplayName("Enable")]
+            [PropertyOrder(0)]
+            [DefaultValue(false)]
+            public bool OC_EnableCheck { get; set; }
+
+            [Browsable(true)]
+            [Category("OPPOSITE CHIP")]
+            [DisplayName("Min Threshold")]
+            [Range(0, 255)]
+            [DefaultValue(0)]
+            [PropertyOrder(1)]
+            //[ItemsSource(typeof(AreaComboBox))]
+            public int OC_lowerThreshold { get; set; }
+
+            [Browsable(true)]
+            [Category("OPPOSITE CHIP")]
+            [DisplayName("Max Threshold")]
+            [Range(0, 255)]
+            [DefaultValue(100)]
+            [PropertyOrder(2)]
+            //[ItemsSource(typeof(AreaComboBox))]
+            public int OC_upperThreshold { get; set; }
+
+            [Browsable(true)]
+            [Category("OPPOSITE CHIP")]
+            [DisplayName("Opening Mask")]
+            [Range(0, 100)]
+            [DefaultValue(0)]
+            [Description("")]
+            [PropertyOrder(3)]
+            public int OC_OpeningMask { get; set; }
+
+            [Browsable(true)]
+            [Category("OPPOSITE CHIP")]
+            [DisplayName("Dilation Mask")]
+            [Range(0, 100)]
+            [DefaultValue(0)]
+            [Description("")]
+            [PropertyOrder(4)]
+            public int OC_DilationMask { get; set; }
+
+
+            [Browsable(true)]
+            [Category("OPPOSITE CHIP")]
+            [DisplayName("Min Width Device")]
+            [Range(0, 99999)]
+            [DefaultValue(50)]
+            [Description("")]
+            [PropertyOrder(5)]
+            public int OC_MinWidthDevice { get; set; }
+
+            [Browsable(true)]
+            [Category("OPPOSITE CHIP")]
+            [DisplayName("Min Height Device")]
+            [Range(0, 99999)]
+            [DefaultValue(50)]
+            [Description("")]
+            [PropertyOrder(6)]
+            public int OC_MinHeightDevice { get; set; }
 
             #endregion
 

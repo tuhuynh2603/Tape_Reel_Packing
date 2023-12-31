@@ -382,7 +382,7 @@ namespace Magnus_WPF_1
 
             [Browsable(true)]
             [Category("OPPOSITE CHIP")]
-            [DisplayName("Min Threshold")]
+            [DisplayName("lower Threshold")]
             [Range(0, 255)]
             [DefaultValue(0)]
             [PropertyOrder(1)]
@@ -391,7 +391,7 @@ namespace Magnus_WPF_1
 
             [Browsable(true)]
             [Category("OPPOSITE CHIP")]
-            [DisplayName("Max Threshold")]
+            [DisplayName("upper Threshold")]
             [Range(0, 255)]
             [DefaultValue(100)]
             [PropertyOrder(2)]

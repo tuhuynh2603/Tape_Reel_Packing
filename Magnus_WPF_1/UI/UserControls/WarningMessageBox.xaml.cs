@@ -1,4 +1,5 @@
 ﻿using Magnus_WPF_1.Source.Application;
+using Magnus_WPF_1.Source.Define;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,7 +26,7 @@ namespace Magnus_WPF_1.UI.UserControls
     {
 
         private string _m_SequenceWarningMessage = "........";
-
+        private WARNINGMESSAGE _m_warningMessage = WARNINGMESSAGE.MESSAGE_INFORMATION;
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged(string Name)
@@ -50,90 +51,121 @@ namespace Magnus_WPF_1.UI.UserControls
             InitializeComponent();
         }
 
-        public void updateMessageString(string strMessage, bool bStopButtonClicked, bool bNeedToAbort)
+        public void updateMessageString(string strMessage, WARNINGMESSAGE warningtype)
         {
+            _m_warningMessage = warningtype;
             string strDateTime = DateTime.Now.ToString();
             ////m_SequenceWarningMessage = $"[{strDateTime}]:   {strMessage}" ;
             txtWarningMessage.Text = $"[{strDateTime}]:  {strMessage}";
-            if (bNeedToAbort)
-            {
-                txtWarningMessage.Text = $"[{strDateTime}]:  Emergency Button Clicked!";
 
-                btn_Sequence_Continue.IsEnabled = false;
-                btn_Sequence_Continue.Visibility = Visibility.Collapsed;
+            btn_Sequence_Abort.IsEnabled = false;
+            btn_Sequence_Abort.Visibility = Visibility.Collapsed;
 
-                btn_Sequence_Previous.IsEnabled = false;
-                btn_Sequence_Next.IsEnabled = false;
+            btn_Sequence_Continue.IsEnabled = false;
+            btn_Sequence_Continue.Visibility = Visibility.Collapsed;
 
-                btn_Sequence_Previous.Visibility = Visibility.Collapsed;
-                btn_Sequence_Next.Visibility = Visibility.Collapsed;
+            btn_Sequence_Previous.IsEnabled = false;
+            btn_Sequence_Next.IsEnabled = false;
+
+            btn_Sequence_Previous.Visibility = Visibility.Collapsed;
+            btn_Sequence_Next.Visibility = Visibility.Collapsed;
+
+
+
+            switch (warningtype)
+                {
+                case WARNINGMESSAGE.MESSAGE_EMERGENCY:
+                    //txtWarningMessage.Text = $"[{strDateTime}]:  Emergency Button Clicked!";
+
+                    btn_Sequence_Abort.IsEnabled = true;
+                    btn_Sequence_Abort.Visibility = Visibility.Visible
+                        ;
+                    break;
+
+                case WARNINGMESSAGE.MESSAGE_IMIDIATESTOP:
+                    //txtWarningMessage.Text = $"[{strDateTime}]: Imidiate Button Clicked! Please click Continue/Abort to Continue/End Sequence";
+
+                    btn_Sequence_Continue.IsEnabled = true;
+                    btn_Sequence_Continue.Visibility = Visibility.Visible;
+
+                    btn_Sequence_Abort.IsEnabled = true;
+                    btn_Sequence_Abort.Visibility = Visibility.Visible;
+                    break;
+
+                case WARNINGMESSAGE.MESSAGE_STEPDEBUG:
+                    btn_Sequence_Previous.IsEnabled = true;
+                    btn_Sequence_Next.IsEnabled = true;
+
+                    btn_Sequence_Previous.Visibility = Visibility.Visible;
+                    btn_Sequence_Next.Visibility = Visibility.Visible;
+
+                    btn_Sequence_Abort.IsEnabled = true;
+                    btn_Sequence_Abort.Visibility = Visibility.Visible;
+                    break;
+
+                case WARNINGMESSAGE.MESSAGE_INFORMATION:
+                    //txtWarningMessage.Text = $"[{strDateTime}]: {strMessage}";
+
+                    btn_Sequence_Continue.IsEnabled = true;
+                    btn_Sequence_Continue.Visibility = Visibility.Visible;
+                    break;
+
+
             }
 
-            else if (bStopButtonClicked)
-            {
-                txtWarningMessage.Text = $"[{strDateTime}]: Imidiate Button Clicked! Please click Continue/Abort to Continue/End Sequence";
-
-                btn_Sequence_Continue.IsEnabled = true;
-                btn_Sequence_Continue.Visibility = Visibility.Visible;
-
-                btn_Sequence_Previous.IsEnabled = false;
-                btn_Sequence_Next.IsEnabled = false;
-
-                btn_Sequence_Previous.Visibility = Visibility.Collapsed;
-                btn_Sequence_Next.Visibility = Visibility.Collapsed;
-
-
-            }
-            else
-            {
-                btn_Sequence_Previous.IsEnabled = true;
-                btn_Sequence_Next.IsEnabled = true;
-
-                btn_Sequence_Previous.Visibility = Visibility.Visible;
-                btn_Sequence_Next.Visibility = Visibility.Visible;
-
-                btn_Sequence_Continue.IsEnabled = false;
-                btn_Sequence_Continue.Visibility = Visibility.Collapsed;
-            }
         }
 
         private void btn_Sequence_Continue_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE;
 
-            if (MessageBox.Show("Would you like to continue sequence ?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                Master.m_EmergencyStopSequenceEvent.Set();
+            if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
+                return;
 
+            Master.m_NextStepSequenceEvent.Set();
+            if (_m_warningMessage == WARNINGMESSAGE.MESSAGE_IMIDIATESTOP)
+            {
+                MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE;
+                MainWindow.mainWindow.master.m_bNeedToImidiateStop = false;
+            }
             else
-                Master.m_EmergencyStopSequenceEvent.Reset();
+                MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
 
-            MainWindow.mainWindow.master.m_bNeedToImidiateStop = false;
-            MainWindow.mainWindow.PopupWarningMessageBox("", false, false, false);
+            MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
 
         }
 
         private void btn_Sequence_Abort_Click(object sender, RoutedEventArgs e)
         {
-            
-            MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
-                Master.m_EmergencyStopSequenceEvent.Set();
+            if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
+                return;
 
-            MainWindow.mainWindow.PopupWarningMessageBox("", false, false, false);
+            MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
+                Master.m_NextStepSequenceEvent.Set();
+
+            MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
 
         }
 
         private void btn_Sequence_Previous_Click(object sender, RoutedEventArgs e)
         {
+            if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
+                return;
+
             MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_GOBACK;
-            if (MainWindow.mainWindow.m_bEnableDebugSequence)
-                Master.m_NextStepSequenceEvent.Set();
+            Master.m_NextStepSequenceEvent.Set();
+
+            MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
+
         }
 
         private void btn_Sequence_Next_Click(object sender, RoutedEventArgs e)
         {
+
             MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
-            if (MainWindow.mainWindow.m_bEnableDebugSequence)
-                Master.m_NextStepSequenceEvent.Set();
+            Master.m_NextStepSequenceEvent.Set();
+
+            MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
+
         }
     }
 }

@@ -85,7 +85,6 @@ C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\VncClientControlCommon
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\bin\x64\Debug\VncClientControlCommonLib.dll
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Source\Hardware\BarCodeReaderView.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Source\Hardware\BarCodeReaderView.baml
-C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Magnus_WPF_1.csproj.AssemblyReference.cache
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\MainWindow.baml
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\MappingSetingUC.baml
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\PopupUserControl.baml
@@ -106,3 +105,19 @@ C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Source\Hardware\PLCCOM
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\WarningMessageBox.baml
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\RecipeManageView.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\UI\UserControls\RecipeManageView.baml
+C:\HDVisionDebug\x64\concrt140.dll
+C:\HDVisionDebug\x64\cvextern.dll
+C:\HDVisionDebug\x64\msvcp140.dll
+C:\HDVisionDebug\x64\opencv_ffmpeg410_64.dll
+C:\HDVisionDebug\x64\vcruntime140.dll
+C:\HDVisionDebug\Magnus_WPF_1.exe.config
+C:\HDVisionDebug\Magnus_WPF_1.exe
+C:\HDVisionDebug\Magnus_WPF_1.pdb
+C:\HDVision\Debug\x64\concrt140.dll
+C:\HDVision\Debug\x64\cvextern.dll
+C:\HDVision\Debug\x64\msvcp140.dll
+C:\HDVision\Debug\x64\opencv_ffmpeg410_64.dll
+C:\HDVision\Debug\x64\vcruntime140.dll
+C:\HDVision\Debug\Magnus_WPF_1.exe.config
+C:\HDVision\Debug\Magnus_WPF_1.exe
+C:\HDVision\Debug\Magnus_WPF_1.pdb

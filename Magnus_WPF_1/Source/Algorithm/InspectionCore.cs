@@ -889,7 +889,19 @@ namespace Magnus_WPF_1.Source.Algorithm
                     return -(int)ERROR_CODE.NO_PATTERN_FOUND;
 
 
-                p_CornerPoint_Temp = FindNearestPoints_Debug(zoomedInImage, rotateRect_Device, ref list_arrayOverlay, ref debugInfors, bEnableDebug);
+                PointF[] points = rotateRect_Device.GetVertices();
+
+                int nLeft = (int)rotateRect_Device.Center.X;
+                int nTop = (int)rotateRect_Device.Center.Y;
+                for (int n = 0; n < points.Length; n++)
+                {
+                    if (points[n].X < nLeft && points[n].Y < nTop)
+                    {
+                        p_CornerPoint_Temp = points[n];
+                        break;
+                    }
+                }
+                //p_CornerPoint_Temp = FindNearestPoints_Debug(zoomedInImage, rotateRect_Device, ref list_arrayOverlay, ref debugInfors, bEnableDebug);
                 if (p_CornerPoint_Temp.X + p_CornerPoint_Temp.Y == 0)
                     return -(int)ERROR_CODE.NO_LABEL;
 

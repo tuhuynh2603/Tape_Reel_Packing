@@ -358,6 +358,8 @@ namespace Magnus_WPF_1.Source.Hardware
             if (result == MessageBoxResult.Yes)
             {
                 HiWinRobotInterface.SequencePointData.SaveRobotPointsToExcel(m_List_sequencePointData);
+                HiWinRobotInterface.SequencePointData.ReadRobotPointsFromExcel(ref m_List_sequencePointData);
+
             }
         }
 

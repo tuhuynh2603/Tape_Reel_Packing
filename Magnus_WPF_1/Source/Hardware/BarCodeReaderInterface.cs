@@ -183,7 +183,7 @@ namespace Magnus_WPF_1.Source.Hardware
 				m_liveviewForm.DownloadRecentImage(strImageFullName);
 				MainWindow.mainWindow.master.m_Tracks[1].m_imageViews[0].UpdateNewImageMono(strImageFullName);
 			});
-
+			m_reader.ExecCommand("LOFF");
 			bIsDownload = false;
 				return str + "_" + str2;
 		}

@@ -415,6 +415,7 @@ namespace Magnus_WPF_1.Source.Application
             //Stopwatch timeIns = new Stopwatch();
 
             //timeIns.Restart();
+            LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
             SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
             foreach (ArrayOverLay overlay in m_ArrayOverLay)
@@ -423,10 +424,12 @@ namespace Magnus_WPF_1.Source.Application
                 m_imageViews[0].DrawRegionOverlay(overlay.mat_Region, c);
 
             }
+            LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
             color = new SolidColorBrush(Colors.Yellow);
             m_imageViews[0].DrawStringOverlay("(X, Y, Angle) = (" + pCenter.X.ToString() + ", " + pCenter.Y.ToString() + ", " + ((int)dAngle).ToString() + ")", (int)pCenter.X + 10, (int)pCenter.Y, color, 20);
 
+            LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
             if (nResult == (int)ERROR_CODE.PASS)
             {
@@ -508,7 +511,11 @@ namespace Magnus_WPF_1.Source.Application
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
+                        LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
                         DrawInspectionResult(ref nResult, ref pCenter, ref dDeltaAngle);
+                        LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
                     });
                 }
                 return nResult;
@@ -598,36 +605,50 @@ namespace Magnus_WPF_1.Source.Application
                 {
                     Master.InspectEvent[m_nTrackID].Reset();
                     m_bInspecting = false;
+                    LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
                     while (!Master.InspectEvent[m_nTrackID].WaitOne(10))
                     {
                         if (MainWindow.mainWindow == null)
                             return;
                         Thread.Sleep(5);
                     }
+                    LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                     if (m_imageViews[0].btmSource == null)
                         continue;
+
+                    LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                     Master.InspectEvent[m_nTrackID].Reset();
                     m_bInspecting = true;
                     if (m_CurrentSequenceDeviceID < 0 || m_CurrentSequenceDeviceID >= m_nResult.Length)
                         m_CurrentSequenceDeviceID = 0;
 
+                    LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-
+                        LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
                         m_InspectionCore.LoadImageToInspection(m_imageViews[0].btmSource);
+                        LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
                     });
 
                     Stopwatch timeIns = new Stopwatch();
                     timeIns.Start();
                     PointF pCenter, pCorner;
+                    LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
                     m_nResult[m_CurrentSequenceDeviceID] = Inspect(ref mainWindow.master.m_Tracks[m_nTrackID], out pCenter, out pCorner);
+
+                    LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                     if (Application.m_bEnableSavingOnlineImage == true /*&& MainWindow.mainWindow.bEnableRunSequence*/ && m_nTrackID == 0)
                     {
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
+                            LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
                             ImageSaveData imageSaveData = new ImageSaveData();
                             imageSaveData.nDeviceID = m_CurrentSequenceDeviceID;
                             imageSaveData.strLotID = m_strCurrentLot == null ? "DUMMY" : m_strCurrentLot;
@@ -638,13 +659,15 @@ namespace Magnus_WPF_1.Source.Application
                             {
                                 Master.m_SaveInspectImageQueue[m_nTrackID].Enqueue(imageSaveData);
                             }
+                            LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
                         });
                     }
+                    LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                     m_Center_Vision = pCenter;
                     double dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(m_Center_Vision, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint);
                     m_dDeltaAngleInspection = dDeltaAngle;
-
 
 
                     Master.InspectDoneEvent[m_nTrackID].Set();
@@ -653,7 +676,10 @@ namespace Magnus_WPF_1.Source.Application
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
+                        LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
                         DrawInspectionResult(ref m_nResult[m_CurrentSequenceDeviceID], ref pCenter, ref dDeltaAngle);
+                        LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                         m_imageViews[0].tbl_InspectTime.Text = timeIns.ElapsedMilliseconds.ToString();
 
@@ -669,10 +695,20 @@ namespace Magnus_WPF_1.Source.Application
 
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
+                            LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
                             MainWindow.mainWindow.m_staticView.UpdateMappingResult(m_CurrentSequenceDeviceID, m_nResult[m_CurrentSequenceDeviceID], m_nTrackID);
+                            LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
                             MainWindow.mainWindow.m_staticView.UpdateValueStatistic(m_nResult[m_CurrentSequenceDeviceID], m_nTrackID);
+
                         });
+
+                        LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
                     });
+                    LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
                 }
                 catch (Exception e)
                 {

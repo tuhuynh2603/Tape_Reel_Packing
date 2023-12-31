@@ -273,11 +273,16 @@ namespace Magnus_WPF_1
             {
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
+                    LogMessage.WriteToDebugViewer(5 + nTrack, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
                     label_Camera_Status.Content = $"{Application.m_strCameraSerial[nTrack]}";
                     if (bIsconnected)
                         label_Camera_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
                     else
                         label_Camera_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Red);
+
+                    LogMessage.WriteToDebugViewer(5 + nTrack, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
                 });
             }
         }
@@ -1054,7 +1059,11 @@ namespace Magnus_WPF_1
         {
             if (outputLogView == null)
                 return;
+            //LogMessage.WriteToDebugViewer(5 + 0, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
             outputLogView.AddLineOutputLog(text, nStyle);
+            //LogMessage.WriteToDebugViewer(5 + 0, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
         }
 
         #region PIXEL RULER
@@ -1383,7 +1392,7 @@ namespace Magnus_WPF_1
         }
 
 
-        public void PopupWarningMessageBox(string strDebugMessage, bool bIsEmergencyImidiateClicked, bool bIsNeedToAbort, bool bIsPopup = true)
+        public void PopupWarningMessageBox(string strDebugMessage, WARNINGMESSAGE warningtype, bool bIsPopup = true)
         {
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
@@ -1397,7 +1406,7 @@ namespace Magnus_WPF_1
                 if (bIsPopup)
                 {
                     grd_popup_WarningMessageBox.Children.Clear();
-                    m_WarningMessageBoxUC.updateMessageString(strDebugMessage, bIsEmergencyImidiateClicked, bIsNeedToAbort);
+                    m_WarningMessageBoxUC.updateMessageString(strDebugMessage, warningtype);
                     grd_popup_WarningMessageBox.Children.Add(m_WarningMessageBoxUC);
                     grd_popup_WarningMessageBox.Visibility = Visibility.Visible;
                     grd_Dialog_Settings.Visibility = Visibility.Visible;
@@ -1482,13 +1491,13 @@ namespace Magnus_WPF_1
             teach_parameters_btn.IsEnabled = bEnable;
             btn_mapping_parameters.IsEnabled = bEnable;
             btn_teach.IsEnabled = bEnable;
-            btn_next_teach.IsEnabled = bEnable;
-            btn_abort_teach.IsEnabled = bEnable;
+            //btn_next_teach.IsEnabled = bEnable;
+            //btn_abort_teach.IsEnabled = bEnable;
 
             //HardWare
             btn_stream_camera.IsEnabled = bEnable;
             btn_camera_setting.IsEnabled = bEnable;
-            btn_Robot_Controller.IsEnabled = bEnable;
+            //btn_Robot_Controller.IsEnabled = bEnable;
             btn_BarCodeReader_Setting.IsEnabled = bEnable;
             btn_PLCCOMM_Setting.IsEnabled = bEnable;
 
@@ -1505,9 +1514,21 @@ namespace Magnus_WPF_1
             btn_Emergency_Stop.IsEnabled = bEnable;
             btn_Reset_Machine.IsEnabled = bEnable;
             btn_Emergency_Stop.IsEnabled = bEnable;
-
             btn_LoadRecipe.IsEnabled = bEnable;
-
+        }
+        
+        public void  EnableMotorFunction()
+        {
+            if (master == null)
+                return;
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                btn_Robot_Controller.IsEnabled = !master.m_bMachineNotReadyNeedToReset;
+                btn_run_sequence.IsEnabled = !master.m_bMachineNotReadyNeedToReset;
+                //btn_Debug_sequence.IsEnabled = master.m_bMachineNotReadyNeedToReset;
+                //btn_Imidiate_Stop.IsEnabled = !master.m_bMachineNotReadyNeedToReset;
+                //btn_Emergency_Stop.IsEnabled = !master.m_bMachineNotReadyNeedToReset;
+            });
         }
 
         private void CleanHotKey()

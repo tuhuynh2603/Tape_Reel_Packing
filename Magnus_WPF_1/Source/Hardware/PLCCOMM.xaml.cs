@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,15 +23,16 @@ namespace Magnus_WPF_1.Source.Hardware
     {
         public enum PLC_ADDRESS
         {
-            PLC_BARCODE_TRIGGER = 1000,
-            PLC_READY_STATUS = 1001,
-            PLC_CURRENT_BARCODE_CHIP_COUNT = 1002,
-            PLC_CURRENT_ROBOT_CHIP_COUNT = 1003,
-            PLC_RESET_LOT = 1004
-
+            PLC_BARCODE_TRIGGER = 100,
+            PLC_BARCODE_CAPTURE_DONE = 101,
+            PLC_BARCODE_RESULT = 102,
+            PLC_CURRENT_BARCODE_CHIP_COUNT = 103,
+            PLC_CURRENT_ROBOT_CHIP_COUNT = 104,
+            PLC_RESET_LOT = 105,
+            PLC_READY_STATUS = 106,
         }
 
-        public ModbusClient m_modbusClient;
+        public ModbusClient[] m_modbusClient = new ModbusClient[2];
         public string m_strCommAddress = "127.0.0.1";
         int m_PLCPort = 502;
         public PLCCOMM()
@@ -39,12 +41,13 @@ namespace Magnus_WPF_1.Source.Hardware
             m_strCommAddress = Application.Application.GetCommInfo("PLC Comm", m_strCommAddress);
             m_PLCPort = int.Parse(Application.Application.GetCommInfo("PLC Port", m_PLCPort.ToString()));
 
-            m_modbusClient = new ModbusClient(m_strCommAddress, 502);
+            m_modbusClient[0] = new ModbusClient(m_strCommAddress, 502);
+            m_modbusClient[0].ConnectionTimeout = 5000;
             //m_modbusServer.LocalIPAddress = ;
             //m_modbusServer.Port = 502;
-            m_modbusClient.ConnectedChanged += M_modbusClient_ConnectedChanged;
+            m_modbusClient[0].ConnectedChanged += M_modbusClient_ConnectedChanged;
             try {
-                m_modbusClient.Connect();
+                m_modbusClient[0].Connect();
             }
             catch
             {
@@ -52,7 +55,7 @@ namespace Magnus_WPF_1.Source.Hardware
             }
             combo_PLC_Comm_Function.Items.Add("Write Value");
             combo_PLC_Comm_Function.Items.Add("Read Value");
-            m_modbusClient.ReceiveDataChanged += M_modbusClient_ReceiveDataChanged;
+            m_modbusClient[0].ReceiveDataChanged += M_modbusClient_ReceiveDataChanged;
             label_PLC_IPAddress.Content = $"IP: {m_strCommAddress} Port: {m_PLCPort}";
 
         }
@@ -61,7 +64,7 @@ namespace Magnus_WPF_1.Source.Hardware
         {
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                if (m_modbusClient.Connected)
+                if (m_modbusClient[0].Connected)
                 {
                     MainWindow.mainWindow.label_PLCCOMM_Status.Background = new SolidColorBrush(Colors.Green);
                     MainWindow.mainWindow.label_PLCCOMM_Status.Content = $"{m_strCommAddress}:{m_PLCPort}";
@@ -89,6 +92,7 @@ namespace Magnus_WPF_1.Source.Hardware
         private void btn_SendToPLC_Click(object sender, RoutedEventArgs e)
         {
             int iadr = -1;
+            int nTrack = MainWindow.activeImageDock.trackID;
 
             if (text_MemoryAdress.Text.Length > 0)
             {
@@ -120,11 +124,11 @@ namespace Magnus_WPF_1.Source.Hardware
                     }
                     else
                         MessageBox.Show("Wrong format input");
-                    WritePLCRegister(iadr, nValue);
+                    WritePLCRegister(iadr, nValue, nTrack);
                 }
                 else
                 {
-                    text_MemoryAdress_Status.Text = ReadPLCRegister(iadr).ToString();
+                    text_MemoryAdress_Status.Text = ReadPLCRegister(iadr, nTrack).ToString();
 
                 }
             }
@@ -134,38 +138,77 @@ namespace Magnus_WPF_1.Source.Hardware
             //bool[] status = modbusClient.ReadCoils(4, 1);
         }
 
-        public int ReadPLCRegister(int nAddress)
+        public int ReadPLCRegister(int nAddress, int nTrack = 0)
         {
-
-            if (m_modbusClient.Connected)
+            int brepeat = 0;
+            RetryRead:
+            Thread.Sleep(10);
+            if (m_modbusClient[0].Connected)
                 try
                 {
-                    return m_modbusClient.ReadHoldingRegisters(nAddress, 1)[0];
+                    int[] a = new int[10];
 
+                    a = m_modbusClient[0].ReadHoldingRegisters(nAddress, 5);
+
+                    return a[0];
                 }
-                catch(Exception e)
+
+                catch (Exception e)
                 {
+                    brepeat++;
+                    Thread.Sleep(10);
+                    if (brepeat > 5)
+                        return -1;
+                    try
+                    {
+                        m_modbusClient[0].Disconnect();
+                        m_modbusClient[0].Connect();
+                    }
+                    catch
+                    {
+                        goto RetryRead;
+                    }
+                    int a = m_modbusClient[0].ConnectionTimeout;
 
-                    return -1;
+                    goto RetryRead;
                 }
+
             else
                 return -1;
         }
 
-        public int WritePLCRegister(int nAddress, int nValue)
+        public int WritePLCRegister(int nAddress, int nValue, int nTrack = 0)
         {
             int[] ival = new int[1];
             ival[0] = nValue;
-            if (m_modbusClient.Connected)
+            int brepeat = 0;
+        RetryWrite:
+            Thread.Sleep(10);
+            if (m_modbusClient[0].Connected)
             {
                 try
                 {
-                    m_modbusClient.WriteMultipleRegisters(nAddress, ival);
-
+                    m_modbusClient[0].WriteMultipleRegisters(nAddress, ival);
+                    Thread.Sleep(10);
                 }
                 catch(Exception e)
                 {
-                    return -1;
+                    brepeat++;
+                    Thread.Sleep(10);
+                    if (brepeat > 5)
+                        return -1;
+                    try
+                    {
+                        m_modbusClient[0].Disconnect();
+                        m_modbusClient[0].Connect();
+                    }
+                    catch
+                    {
+                        goto RetryWrite;
+                    }
+                    int a = m_modbusClient[0].ConnectionTimeout;
+
+                    goto RetryWrite;
                 }
             }
             else
@@ -181,10 +224,11 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void button_PLC_Connect_Click(object sender, RoutedEventArgs e)
         {
-            if(!m_modbusClient.Connected)
+            int nTrack = MainWindow.activeImageDock.trackID;
+            if (!m_modbusClient[0].Connected)
                 try
                 {
-                    m_modbusClient.Connect();
+                    m_modbusClient[0].Connect();
 
                 }
                 catch
@@ -192,7 +236,7 @@ namespace Magnus_WPF_1.Source.Hardware
                     return;
                 }
             else
-                m_modbusClient.Disconnect();
+                m_modbusClient[0].Disconnect();
 
         }
     }

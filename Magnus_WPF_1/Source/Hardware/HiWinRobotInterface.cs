@@ -35,8 +35,8 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         public enum INPUT_IOROBOT
         {
             PLC_READY = 1,
-            PLC_BARCODE_READY = 2,
-            PLC_ = 3,
+            PLC_READY_2 = 2,
+            PLC_BARCODE_TRIGGER = 3,
             AIR_PRESSURESTATUS = 4,
             EMERGENCY_STATUS = 5,
             IMIDIATE_STATUS = 6,
@@ -48,10 +48,10 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             ROBOT_AIR_ON = 1,
             ROBOT_AIR_OFF = 2,
             ROBOT_READY_CONVEYOR_ON = 3,
-            EMERGENCY_STATUS = 4,
+            ROBOT_PLACE_DONE = 4,
+            EMERGENCY_STATUS = 5,
             IMIDIATE_STATUS = 6,
             RESET_STATUS = 7,
-            ROBOT_HEART_BEAT = 8,
 
         }
 
@@ -957,23 +957,32 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             //{
             //    m_bIsStop = false;
             //}
-
-            while (HWinRobot.get_motion_state(HiWinRobotInterface.m_RobotConnectID) != 1 )
+            int nState = HWinRobot.get_motion_state(HiWinRobotInterface.m_RobotConnectID);
+            while (nState !=1)
             {
                 //robot connection changed => return false
-                if (HWinRobot.get_connection_level(HiWinRobotInterface.m_RobotConnectID) <0)
+                int conn = HWinRobot.get_connection_level(HiWinRobotInterface.m_RobotConnectID);
+                if (conn < 0)
                     return -1;
                 //if (m_bIsStop)
                 //{
-                    
+
                 //    lock (this)
                 //    {
                 //        m_bIsStop = false;
                 //    }
 
                 //    return -1;
+                nState = HWinRobot.get_motion_state(HiWinRobotInterface.m_RobotConnectID);
+                //LogMessage.LogMessage.WriteToDebugViewer(3, $"{nState} ");
 
                 //}
+                if (MainWindow.mainWindow.master.m_EmergencyStatus > 0 || MainWindow.mainWindow.master.m_bNeedToImidiateStop)
+                    return 0;
+
+                if (HWinRobot.get_motor_state(HiWinRobotInterface.m_RobotConnectID) < 1)
+                    return 0;
+
                 Thread.Sleep(5);
             }
             return 0;

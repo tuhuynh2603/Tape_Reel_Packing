@@ -826,5 +826,17 @@ namespace Magnus_WPF_1.Source.Application
 
         #endregion
 
+        public static int LineNumber([System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0)
+        {
+            return lineNumber;
+        }
+        public static string PrintCallerName()
+        {
+            MethodBase caller = new System.Diagnostics.StackTrace().GetFrame(1).GetMethod();
+            string callerMethodName = caller.Name;
+            string calledMethodName = MethodBase.GetCurrentMethod().Name;
+            return $"{callerMethodName}  : {calledMethodName}";
+        }
+
     }
 }

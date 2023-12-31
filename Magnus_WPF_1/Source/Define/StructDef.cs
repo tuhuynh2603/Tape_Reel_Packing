@@ -58,6 +58,13 @@ namespace Magnus_WPF_1.Source.Define
         A4,
         A5,
     }
+    public enum WARNINGMESSAGE: int
+    {
+        MESSAGE_EMERGENCY,
+        MESSAGE_IMIDIATESTOP,
+        MESSAGE_STEPDEBUG,
+        MESSAGE_INFORMATION
+    }
 
     public enum DIRECTION : int
     {

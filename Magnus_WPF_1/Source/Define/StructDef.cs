@@ -142,6 +142,7 @@ namespace Magnus_WPF_1.Source.Define
         NO_PATTERN_FOUND,
         OPPOSITE_CHIP,
         NO_LABEL,
+        CAPTURE_FAIL,
         PROCESS_ERROR,
         NUM_DEFECTS
     };

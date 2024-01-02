@@ -38,6 +38,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             PLC_READY_2 = 2,
             PLC_BARCODE_TRIGGER = 3,
             AIR_PRESSURESTATUS = 4,
+
             EMERGENCY_STATUS = 5,
             IMIDIATE_STATUS = 6,
             RESET_STATUS = 7,
@@ -49,6 +50,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             ROBOT_AIR_OFF = 2,
             ROBOT_READY_CONVEYOR_ON = 3,
             ROBOT_PLACE_DONE = 4,
+
             EMERGENCY_STATUS = 5,
             IMIDIATE_STATUS = 6,
             RESET_STATUS = 7,

@@ -121,3 +121,6 @@ C:\HDVision\Debug\x64\vcruntime140.dll
 C:\HDVision\Debug\Magnus_WPF_1.exe.config
 C:\HDVision\Debug\Magnus_WPF_1.exe
 C:\HDVision\Debug\Magnus_WPF_1.pdb
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Magnus_WPF_1.csproj.AssemblyReference.cache
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Source\Hardware\ETHERNETIP_View.g.cs
+C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\obj\x64\Debug\Source\Hardware\ETHERNETIP_View.baml

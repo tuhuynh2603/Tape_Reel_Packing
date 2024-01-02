@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "MCStEBTP2BuQ08Nk32t22z3mbkgJwSk8nXqcKaMuZ8FVxwmH1/gelC525ELZhgNYoh1oQsMCAkQtRU+qTFZWCA==",
+  "dgSpecHash": "D/OwJTriGHZBYrdjEmtBhGMBcch3ePm7RBYg4vFsTU//nB2NytwwCgr+lWSmMRmA4wujnPBEgGcxmHUQVX5Xzw==",
   "success": true,
   "projectFilePath": "C:\\Wisely\\C#\\Tape_Reel_Packing\\Magnus_WPF_1\\Magnus_WPF_1.csproj",
   "expectedPackageFiles": [
@@ -8,6 +8,7 @@
     "C:\\Users\\huynh\\.nuget\\packages\\dragablz\\0.0.3.234\\dragablz.0.0.3.234.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\dynamiclanguageruntime\\1.3.4\\dynamiclanguageruntime.1.3.4.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\easymodbustcp\\5.6.0\\easymodbustcp.5.6.0.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\eeip\\1.6.0.26419\\eeip.1.6.0.26419.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\emgu.cv\\4.1.0.3408\\emgu.cv.4.1.0.3408.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\epplus\\7.0.1\\epplus.7.0.1.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\epplus.interfaces\\6.1.1\\epplus.interfaces.6.1.1.nupkg.sha512",

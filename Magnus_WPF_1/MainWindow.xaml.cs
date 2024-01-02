@@ -107,6 +107,17 @@ namespace Magnus_WPF_1
             }
         }
 
+        private string _m_strCurrentLotID = "";
+        public string m_strCurrentLotID
+        {
+            get { return _m_strCurrentLotID; }
+            set
+            {
+                _m_strCurrentLotID = value;
+                OnPropertyChanged("m_strCurrentLotID");
+            }
+        }
+
         
 
         private double _dialogDefectHeight;
@@ -315,7 +326,7 @@ namespace Magnus_WPF_1
             bEnableOfflineInspection = (bool)inspect_offline_btn.IsChecked;
         }
 
-        public bool bEnableRunSequence = false;
+        public bool m_bEnableRunSequence = false;
         private void btn_run_sequence_Checked(object sender, RoutedEventArgs e)
         {
             Run_Sequence(activeImageDock.trackID);
@@ -324,10 +335,12 @@ namespace Magnus_WPF_1
         public void Run_Sequence(int nTrack = (int)TRACK_TYPE.TRACK_ALL)
         {
             btn_run_sequence.IsChecked = true;
-            bEnableRunSequence = (bool)btn_run_sequence.IsChecked;
+            m_bEnableRunSequence = (bool)btn_run_sequence.IsChecked;
             inspect_offline_btn.IsEnabled = false;
-
-
+            //
+            string strLotID = string.Format("DUMMY_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+            Application.m_strCurrentLot = Application.GetStringRegistry(Application.m_strCurrentLot_Registry, strLotID);
+            //
 
 
             m_staticView.ResetMappingResult(0);
@@ -355,7 +368,7 @@ namespace Magnus_WPF_1
         }
         public void Stop_Sequence(int nTrack = (int)TRACK_TYPE.TRACK_ALL)
         {
-            bEnableRunSequence = false;
+            m_bEnableRunSequence = false;
             inspect_offline_btn.IsEnabled = true;
             btn_run_sequence.IsChecked = false;
         }
@@ -1523,8 +1536,8 @@ namespace Magnus_WPF_1
                 return;
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                btn_Robot_Controller.IsEnabled = !master.m_bMachineNotReadyNeedToReset;
-                btn_run_sequence.IsEnabled = !master.m_bMachineNotReadyNeedToReset;
+                //btn_Robot_Controller.IsEnabled = !master.m_bMachineNotReadyNeedToReset;
+                //btn_run_sequence.IsEnabled = !master.m_bMachineNotReadyNeedToReset;
                 //btn_Debug_sequence.IsEnabled = master.m_bMachineNotReadyNeedToReset;
                 //btn_Imidiate_Stop.IsEnabled = !master.m_bMachineNotReadyNeedToReset;
                 //btn_Emergency_Stop.IsEnabled = !master.m_bMachineNotReadyNeedToReset;
@@ -1605,12 +1618,23 @@ namespace Magnus_WPF_1
 
 
         public bool bNextStepSimulateSequence_2 = false;
-
         private void btn_Simulate_Sequence_2_Click(object sender, RoutedEventArgs e)
         {
             if (bNextStepSimulateSequence_2 == false)
                 bNextStepSimulateSequence_2 = true;
             btn_Simulate_Sequence_2.IsChecked = false;
+
+        }
+
+        private void text_LotID_TextChanged(object sender, TextChangedEventArgs e)
+        {
+             //text_LotID.IsEnabled = !m_bEnableRunSequence;
+            //if (m_bEnableRunSequence)
+            //    m_strCurrentLotID = Application.m_strCurrentLot;
+        }
+
+        private void text_LotID_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
 
         }
     }

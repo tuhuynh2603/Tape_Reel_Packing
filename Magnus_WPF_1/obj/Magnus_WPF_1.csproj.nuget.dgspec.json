@@ -42,6 +42,10 @@
               "target": "Package",
               "version": "[1.3.4, )"
             },
+            "EEIP": {
+              "target": "Package",
+              "version": "[1.6.0.26419, )"
+            },
             "EPPlus": {
               "target": "Package",
               "version": "[7.0.1, )"

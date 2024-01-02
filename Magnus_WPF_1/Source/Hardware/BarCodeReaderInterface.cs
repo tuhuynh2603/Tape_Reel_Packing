@@ -126,17 +126,33 @@ namespace Magnus_WPF_1.Source.Hardware
 
 		int nDeviceID = 0;
 		string nstrFolderBackup = "";
-		public string GetBarCodeStringAndImage(int nID = -1)
+		public string GetBarCodeStringAndImage(out string strFullPathImageOut, int nID = -1)
 		{
+			strFullPathImageOut = "";
+
 			if (bIsDownload)
 				return "";
 			bIsDownload = true;
 			string str = "";
 			string str2 = "";
-			if (MainWindow.mainWindow.master.m_Tracks[1].m_strCurrentLot == "" || MainWindow.mainWindow.master.m_Tracks[1].m_strCurrentLot == null)
-				MainWindow.mainWindow.master.m_Tracks[1].m_strCurrentLot = "Dummy";
+			string strLotID = "Dummy";
 
-			string strFolder = Path.Combine(Application.Application.pathImageSave, MainWindow.mainWindow.master.m_Tracks[1].m_strCurrentLot,"Barcode");
+			if (MainWindow.mainWindow.master != null)
+			{
+				if (Application.Application.m_strCurrentLot != null && Application.Application.m_strCurrentLot != "")
+					strLotID = Application.Application.m_strCurrentLot;
+
+			}
+	
+
+			string strFolder = Path.Combine(Application.Application.pathImageSave, "PASS IMAGE", "Barcode", strLotID);
+			if (!Directory.Exists(strFolder))
+				Directory.CreateDirectory(strFolder);
+
+			string strFailFolder = Path.Combine(Application.Application.pathImageSave, "FAIL IMAGE", "Barcode", strLotID);
+			if (!Directory.Exists(strFailFolder))
+				Directory.CreateDirectory(strFailFolder);
+
 
 			if (nstrFolderBackup != strFolder)
 			{
@@ -144,8 +160,6 @@ namespace Magnus_WPF_1.Source.Hardware
 				nDeviceID = 0;
 			}
 
-			if (!Directory.Exists(strFolder))
-				Directory.CreateDirectory(strFolder);
 
 			string strImageFullName;
 			if (nID < 0)
@@ -174,10 +188,16 @@ namespace Magnus_WPF_1.Source.Hardware
 			}
 			Thread.Sleep(200);
 
+			string strDeviceID = $"{str}+{str2}";
+			if((str + str2).Length < 1)
+            {
+				strDeviceID = string.Format("Dummy {0}{1}{2}+{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+			}
 
 			LogMessage.WriteToDebugViewer(3, $"Message responsed from Barcode Bank 2: {str}");
-			strImageFullName = Path.Combine(strFolder,  $"{str}+{str2}_{nDeviceID}.bmp");
-
+			strImageFullName = Path.Combine(strFolder,  $"{strDeviceID}_{nDeviceID}.bmp");
+			strFullPathImageOut = strImageFullName;
+			
 			System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
 			{
 				m_liveviewForm.DownloadRecentImage(strImageFullName);

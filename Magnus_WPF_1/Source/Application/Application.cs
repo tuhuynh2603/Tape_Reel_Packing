@@ -31,69 +31,107 @@ namespace Magnus_WPF_1.Source.Application
 
         public static string pathRecipe;// = "C:\\Wisely\\C#\\Magnus_WPF_1\\Config";
         public static string currentRecipe;// = "Recipe1";
+        public static string m_strCurrentLot = "";
+        public const string  m_strCurrentLot_Registry = "Lot ID";
+        public static string[] m_strCurrentDeviceID_Registry = { "Current Device ID 1", "Current Device ID 2" };
+
+
         public static string pathRegistry;
         public static string pathImageSave;
         public static List<string> m_strCameraSerial;
         public static int[] m_Width = { 3840, 680 };
         public static int[] m_Height = { 2748, 512 };
+        static RegistryKey registerPreferences;
 
         public static void CheckRegistry()
         {
             pathRegistry = "Software\\HD Vision\\SemiConductor_1";
             RegistryKey register = Registry.CurrentUser.CreateSubKey(pathRegistry, true);
+            registerPreferences = Registry.CurrentUser.CreateSubKey(pathRegistry + "\\Preferences", true);
+
         }
         public void SetRegistry()
         {
 
         }
+
+
+        public static string GetStringRegistry(string strKey, string strDefault)
+        {
+            string strTemp = "";
+            if ((string)registerPreferences.GetValue(strKey) == "" || (string)registerPreferences.GetValue(strKey) == null)
+            {
+                strTemp = strDefault;
+                registerPreferences.SetValue(strKey, strTemp);
+            }
+            else
+                strTemp = (string)registerPreferences.GetValue(strKey);
+
+            return strTemp;
+        }
+
+        public static void SetStringRegistry(string strKey, string strValue)
+        {
+            //strInOutput = strValue;
+            registerPreferences.SetValue(strKey, strValue);
+        }
+
+
+
+        public static int GetIntRegistry(string strKey, int nDefault)
+        {
+            int nValue = 0;
+            if (registerPreferences.GetValue(strKey) == null)
+            {
+                nValue = nDefault;
+                registerPreferences.SetValue(strKey, nValue);
+            }
+            else
+                nValue = (int)registerPreferences.GetValue(strKey);
+
+            return nValue;
+        }
+
+        public static void SetIntRegistry( string strKey, int nValue)
+        {
+            //nInOutput = nValue;
+            registerPreferences.SetValue(strKey, nValue);
+        }
+
+
+
         public static void LoadRegistry()
         {
-            RegistryKey registerPreferences = Registry.CurrentUser.CreateSubKey(pathRegistry + "\\Preferences", true);
+            pathRecipe = GetStringRegistry("Folder: Recipe", "C:\\Magnus_SemiConductor_Config");
+            if (!Directory.Exists(pathRecipe))
+                Directory.CreateDirectory(pathRecipe);
 
-            if ((string)registerPreferences.GetValue("Folder: Recipe") == "" || (string)registerPreferences.GetValue("Folder: Recipe") == null)
-            {
-                pathRecipe = "C:\\Magnus_SemiConductor_Config";
-                registerPreferences.SetValue("Folder: Recipe", pathRecipe);
-                if (!Directory.Exists(pathRecipe))
-                    Directory.CreateDirectory(pathRecipe);
-            }
-            else
-                pathRecipe = (string)registerPreferences.GetValue("Folder: Recipe");
+            currentRecipe = GetStringRegistry("Recipe Name", "Default");
+            if (!Directory.Exists(pathRecipe + "\\" + currentRecipe))
+                Directory.CreateDirectory(pathRecipe + "\\" + currentRecipe);
 
-            if ((string)registerPreferences.GetValue("Recipe Name") == "" || (string)registerPreferences.GetValue("Recipe Name") == null)
-            {
-                currentRecipe = "Default";
-                if (!Directory.Exists(pathRecipe + "\\" + currentRecipe))
-                    Directory.CreateDirectory(pathRecipe + "\\" + currentRecipe);
-                registerPreferences.SetValue("Recipe Name", "Default");
-            }
-            else
-                currentRecipe = (string)registerPreferences.GetValue("Recipe Name");
+            //// Load lot ID
+
+
+            m_strCurrentLot = GetStringRegistry(m_strCurrentLot_Registry, "");
+            MainWindow.mainWindow.m_strCurrentLotID = m_strCurrentLot;
+
+
 
             #region Load Folder Save Image
+            pathImageSave = GetStringRegistry("Folder: Image Save", "C:\\SemiConductor Images");
 
-            if ((string)registerPreferences.GetValue("Folder: Image Save") == "" || (string)registerPreferences.GetValue("Folder: Image Save") == null)
-            {
-                pathImageSave = "C:\\Magnus SemiConductor Images"; /*+ "\\"+ (string)registerPreferences.GetValue("Recipe")*/;
-                if (!Directory.Exists(pathImageSave))
-                    Directory.CreateDirectory(pathImageSave);
-                registerPreferences.SetValue("Folder: Image Save", pathImageSave);
-            }
-            else
-                pathImageSave = (string)registerPreferences.GetValue("Folder: Image Save");
+
+            if (!Directory.Exists(pathImageSave))
+                Directory.CreateDirectory(pathImageSave);
+
             #endregion
 
 
             m_strCameraSerial = new List<string>();
             for (int nTrack = 0; nTrack < m_nTrack; nTrack++)
             {
-                if ((string)registerPreferences.GetValue("Camera"+ (nTrack+1).ToString() + " IP Serial: ") == "" || (string)registerPreferences.GetValue("Camera" + (nTrack + 1).ToString() + " IP Serial: ") == null)
-                {
-                    m_strCameraSerial.Add(""); /*+ "\\"+ (string)registerPreferences.GetValue("Recipe")*/;
-                    registerPreferences.SetValue("Camera" + (nTrack + 1).ToString() + " IP Serial: ", m_strCameraSerial[nTrack]);
-                }
-                else
-                    m_strCameraSerial.Add((string)registerPreferences.GetValue("Camera" + (nTrack + 1).ToString() + " IP Serial: "));
+                m_strCameraSerial.Add(GetStringRegistry($"Camera{nTrack + 1} IP Serial: ", ""));
             }
 
         }

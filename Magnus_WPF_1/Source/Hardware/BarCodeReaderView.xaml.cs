@@ -144,8 +144,8 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void combo_commandSendToBarCode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
-           MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage();
+           string strFullPathImageOut = "";
+           MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut);
         }
 
         private void button_Clear_Click(object sender, RoutedEventArgs e)
@@ -155,7 +155,8 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void button_Trigger_Click(object sender, RoutedEventArgs e)
         {
-           label_DataReceived.Content =  MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage();
+            string strFullPathImageOut;
+            label_DataReceived.Content =  MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut);
         }
 
 

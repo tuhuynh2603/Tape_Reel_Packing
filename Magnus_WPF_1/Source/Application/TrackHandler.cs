@@ -50,6 +50,8 @@ namespace Magnus_WPF_1.Source.Application
             mainWindow = app;
             m_imageViews = new ImageView[numdoc];
             m_nResult = new int[10000];
+
+
             for(int n = 0; n < m_nResult.Length; n++)
                 m_nResult.SetValue((int)ERROR_CODE.NUM_DEFECTS, n);
 
@@ -86,6 +88,7 @@ namespace Magnus_WPF_1.Source.Application
             //InspectionCore.Initialize();
 
             CheckInspectionOnlineThread();
+            m_CurrentSequenceDeviceID = Application.GetIntRegistry(Application.m_strCurrentDeviceID_Registry[indexTrack], 0);
 
         }
 
@@ -599,6 +602,8 @@ namespace Magnus_WPF_1.Source.Application
         private void InspectThread()
         {
             Master.InspectEvent[m_nTrackID].Reset();
+            PointF pCenter, pCorner;
+            Stopwatch timeIns = new Stopwatch();
             while (MainWindow.mainWindow != null)
             {
                 try
@@ -606,6 +611,11 @@ namespace Magnus_WPF_1.Source.Application
                     Master.InspectEvent[m_nTrackID].Reset();
                     m_bInspecting = false;
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+                    pCenter = new PointF(0, 0);
+                    pCorner = new PointF(0, 0);
+
+
+
                     while (!Master.InspectEvent[m_nTrackID].WaitOne(10))
                     {
                         if (MainWindow.mainWindow == null)
@@ -615,7 +625,10 @@ namespace Magnus_WPF_1.Source.Application
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                     if (m_imageViews[0].btmSource == null)
-                        continue;
+                    {
+                        m_nResult[m_CurrentSequenceDeviceID] = -(int)ERROR_CODE.CAPTURE_FAIL;
+                        goto InspectionDone;
+                    }
 
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
@@ -624,7 +637,6 @@ namespace Magnus_WPF_1.Source.Application
                     if (m_CurrentSequenceDeviceID < 0 || m_CurrentSequenceDeviceID >= m_nResult.Length)
                         m_CurrentSequenceDeviceID = 0;
 
-                    LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
@@ -634,16 +646,15 @@ namespace Magnus_WPF_1.Source.Application
 
                     });
 
-                    Stopwatch timeIns = new Stopwatch();
                     timeIns.Start();
-                    PointF pCenter, pCorner;
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                     m_nResult[m_CurrentSequenceDeviceID] = Inspect(ref mainWindow.master.m_Tracks[m_nTrackID], out pCenter, out pCorner);
 
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
-                    if (Application.m_bEnableSavingOnlineImage == true /*&& MainWindow.mainWindow.bEnableRunSequence*/ && m_nTrackID == 0)
+
+                    if (Application.m_bEnableSavingOnlineImage && m_nTrackID == 0)
                     {
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
@@ -651,7 +662,7 @@ namespace Magnus_WPF_1.Source.Application
 
                             ImageSaveData imageSaveData = new ImageSaveData();
                             imageSaveData.nDeviceID = m_CurrentSequenceDeviceID;
-                            imageSaveData.strLotID = m_strCurrentLot == null ? "DUMMY" : m_strCurrentLot;
+                            imageSaveData.strLotID = Application.m_strCurrentLot == null ? "DUMMY" : Application.m_strCurrentLot;
                             imageSaveData.nTrackID = m_nTrackID;
                             imageSaveData.bFail = m_nResult[m_CurrentSequenceDeviceID];
                             imageSaveData.imageSave = BitmapSourceConvert.ToMat(m_imageViews[0].btmSource).Clone();
@@ -663,16 +674,17 @@ namespace Magnus_WPF_1.Source.Application
 
                         });
                     }
-                    LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
+
+
+                InspectionDone:
                     m_Center_Vision = pCenter;
                     double dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(m_Center_Vision, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint);
                     m_dDeltaAngleInspection = dDeltaAngle;
 
-
                     Master.InspectDoneEvent[m_nTrackID].Set();
                     timeIns.Stop();
-                    LogMessage.WriteToDebugViewer(1, "Total inspection time: " + timeIns.ElapsedMilliseconds.ToString());
+                    LogMessage.WriteToDebugViewer(5 + m_nTrackID, "Total inspection time: " + timeIns.ElapsedMilliseconds.ToString());
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
@@ -693,16 +705,12 @@ namespace Magnus_WPF_1.Source.Application
                             });
                         }
 
-                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                        {
-                            LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+                        LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
-                            MainWindow.mainWindow.m_staticView.UpdateMappingResult(m_CurrentSequenceDeviceID, m_nResult[m_CurrentSequenceDeviceID], m_nTrackID);
-                            LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+                        MainWindow.mainWindow.m_staticView.UpdateMappingResult(m_CurrentSequenceDeviceID, m_nResult[m_CurrentSequenceDeviceID], m_nTrackID);
+                        LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
-                            MainWindow.mainWindow.m_staticView.UpdateValueStatistic(m_nResult[m_CurrentSequenceDeviceID], m_nTrackID);
-
-                        });
+                        MainWindow.mainWindow.m_staticView.UpdateValueStatistic(m_nResult[m_CurrentSequenceDeviceID], m_nTrackID);
 
                         LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
@@ -712,24 +720,25 @@ namespace Magnus_WPF_1.Source.Application
                 }
                 catch (Exception e)
                 {
-                    LogMessage.WriteToDebugViewer(1, "PROCESS ERROR: " + e.ToString());
+                    LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+                    LogMessage.WriteToDebugViewer(5 + m_nTrackID, "Inspection Thread PROCESS ERROR: " + e.ToString());
+                    m_nResult[m_CurrentSequenceDeviceID] = -(int)ERROR_CODE.CAPTURE_FAIL;
+                    Master.InspectDoneEvent[m_nTrackID].Set();
+                    continue;
                 }
             }
-
-
         }
 
 
         public int m_CurrentSequenceDeviceID = -1;
         public int m_nCurrentClickMappingID = -1;
-        public string m_strCurrentLot;
         public PointF m_Center_Vision = new PointF();
         public double m_dDeltaAngleInspection = 0.0;
         public int m_nVisionReady = 0;
         public void func_InspectOfflineThread(string strFolderPath)
         {
 
-            if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.bEnableRunSequence)
+            if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.m_bEnableRunSequence)
                 return;
 
             CheckInspectionOnlineThread();
@@ -741,7 +750,7 @@ namespace Magnus_WPF_1.Source.Application
 
             // Loop through the items and print their names
 
-            while (MainWindow.mainWindow.bEnableOfflineInspection && !mainWindow.bEnableRunSequence)
+            while (MainWindow.mainWindow.bEnableOfflineInspection && !mainWindow.m_bEnableRunSequence)
             {
                 try
                 {
@@ -908,7 +917,7 @@ namespace Magnus_WPF_1.Source.Application
             //m_cap.Start();
             Stopwatch timeIns = new Stopwatch();
             timeIns.Start();
-            while (MainWindow.mainWindow.bEnableRunSequence)
+            while (MainWindow.mainWindow.m_bEnableRunSequence)
             {
 
                 if (MainWindow.mainWindow == null)
@@ -919,14 +928,15 @@ namespace Magnus_WPF_1.Source.Application
                     if (MainWindow.mainWindow == null)
                         return;
 
-                    if (!MainWindow.mainWindow.bEnableRunSequence)
+                    if (!MainWindow.mainWindow.m_bEnableRunSequence)
                     {
                         return;
                     }
 
                 }
                 timeIns.Restart();
-
+                string strFullPathImageOut = "";
+                string strBarcodeResult = "";
                 if (m_nTrackID == 0)
                 {
                     //Snap camera
@@ -939,7 +949,8 @@ namespace Magnus_WPF_1.Source.Application
                             ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Trigger Software Failed!.", (int)ERROR_CODE.NO_LABEL);
 
                         });
-                        return;
+                        m_nResult[m_CurrentSequenceDeviceID] = -(int)ERROR_CODE.NO_PATTERN_FOUND;
+                        goto InspectionDone;
                     }
 
                     m_hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);
@@ -951,20 +962,20 @@ namespace Magnus_WPF_1.Source.Application
                             ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Capture and Get Image buffer Failed!.", (int)ERROR_CODE.NO_LABEL);
 
                         });
-                        return;
+                        m_nResult[m_CurrentSequenceDeviceID] = -(int)ERROR_CODE.NO_PATTERN_FOUND;
+                        goto InspectionDone;
                     }
                     m_imageViews[0].UpdateSourceImageMono();
-
                 }
                 else
                 {
                     //Scan Barcode
-                    string strBarcodeResult = MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(m_CurrentSequenceDeviceID);
+                    strBarcodeResult = MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut, m_CurrentSequenceDeviceID);
                 }
 
 
                 // Update Current Device ID
-                m_CurrentSequenceDeviceID++;
+                //m_CurrentSequenceDeviceID++;
                 if (m_CurrentSequenceDeviceID >= Source.Application.Application.categoriesMappingParam.M_NumberDevicePerLot || m_CurrentSequenceDeviceID < 0)
                     m_CurrentSequenceDeviceID = 0;
 
@@ -984,17 +995,37 @@ namespace Magnus_WPF_1.Source.Application
                     if (MainWindow.mainWindow == null)
                         return;
 
-                    if (!MainWindow.mainWindow.bEnableRunSequence)
+                    if (!MainWindow.mainWindow.m_bEnableRunSequence)
                     {
                         return;
                     }
                 }
-                Master.InspectDoneEvent[m_nTrackID].Reset();
+
+                InspectionDone:
+
+                //      Barcode
+                if(m_nTrackID == 1)
+                {
+                    //device id characters always > 5
+                    if (strBarcodeResult.Length < 5)
+                    {
+                        m_nResult[m_CurrentSequenceDeviceID] = -(int)ERROR_CODE.NO_LABEL;
+                    }
+
+                    if (m_nResult[m_CurrentSequenceDeviceID] != (int)ERROR_CODE.PASS)
+                    {
+                        string strFailImage = strFullPathImageOut.Replace("PASS IMAGE", "FAIL IMAGE");
+                        if (File.Exists(strFullPathImageOut))
+                            File.Move(strFullPathImageOut, strFailImage);
+                    }
+                }
+
+
                 Master.VisionReadyEvent[m_nTrackID].Set();
 
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Inspection sequence time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Device {m_CurrentSequenceDeviceID + 1}, Result = {m_nResult[m_CurrentSequenceDeviceID]}  Inspection sequence time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
 
                 });
                 timeIns.Restart();

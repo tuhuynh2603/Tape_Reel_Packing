@@ -1,5 +1,9 @@
 ﻿//using System.Drawing;
 using Emgu.CV;
+using OfficeOpenXml;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 
@@ -173,6 +177,129 @@ namespace Magnus_WPF_1.Source.Define
         public static int StrokeThickness = 2;
 
     }
+
+
+    public class VisionResultData
+    {
+        public int m_nDeviceIndexOnReel = 0;
+        public string m_strDeviceID = "";
+        public int m_nResult = -(int)ERROR_CODE.NUM_DEFECTS;
+        public VisionResultData(int nDeviceIndexOnReel = 0, string strDeviceID = "", int nResult = -(int)ERROR_CODE.NUM_DEFECTS)
+        {
+            m_nDeviceIndexOnReel = nDeviceIndexOnReel;
+            m_strDeviceID = strDeviceID;
+            m_nResult = nResult;
+        }
+
+        public static void SaveSequenceResultToExcel(string strLotID,int nTrack, VisionResultData data)
+        {
+            string[] strTrackName = {"Camera", "Barcode" };
+            string strRecipePath = Path.Combine(Application.Application.pathStatistics, Application.Application.currentRecipe, strTrackName[nTrack]);
+            if (!Directory.Exists(strRecipePath))
+                Directory.CreateDirectory(strRecipePath);
+
+            string fullpath = Path.Combine(strRecipePath, $"{strLotID}.xlsx");
+
+            //string strDateTime = string.Format("({0}.{1}.{2}_{3}.{4}.{5})", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+            //string backup_path = Path.Combine(strRecipePath, "Backup_Robot Points");
+            //if (!Directory.Exists(backup_path))
+            //    Directory.CreateDirectory(backup_path);
+
+            //string backup_fullpath = Path.Combine(backup_path, $"Robot Points {strDateTime}" + ".cfg");
+
+            FileInfo file = new FileInfo(fullpath);
+
+            if (!file.Exists)
+                file.Create();
+
+            //file.CopyTo(backup_fullpath);
+
+            using (ExcelPackage package = new ExcelPackage(file))
+            {
+
+                bool bCreated = false;
+                for (int n = 0; n < package.Workbook.Worksheets.Count; n++)
+                    if (package.Workbook.Worksheets[n].Name == "Lot Result")
+                    {
+                        bCreated = true;
+                        break;
+                    }
+
+                if (!bCreated)
+                    package.Workbook.Worksheets.Add("Lot Result");
+
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                worksheet.DefaultColWidth = 35;
+                worksheet.DefaultRowHeight = 35;
+                // Header
+                int ncol = 1;
+                worksheet.Cells[1, ncol++].Value = "Device Index";
+                worksheet.Cells[1, ncol++].Value = "Device ID";
+                worksheet.Cells[1, ncol++].Value = "Result";
+
+                // Data
+                int row = data.m_nDeviceIndexOnReel + 2;
+                ncol = 1;
+                worksheet.Cells[row, ncol++].Value = data.m_nDeviceIndexOnReel;
+                worksheet.Cells[row, ncol++].Value = data.m_strDeviceID;
+                worksheet.Cells[row, ncol++].Value = data.m_nResult;
+
+
+                //foreach (var item in data)
+                //{
+                //    ncol = 1;
+                //    worksheet.Cells[row, ncol++].Value = item.m_PointIndex;
+                //    worksheet.Cells[row, ncol++].Value = item.m_PointComment;
+                //    row++;
+                //}
+                package.Save();
+            }
+        }
+
+        public static void ReadLotResultFromExcel(string strLotID, int nTrack, ref VisionResultData[] result)
+        {
+            string[] strTrackName = { "Camera", "Barcode" };
+            string strRecipePath = Path.Combine(Application.Application.pathStatistics, Application.Application.currentRecipe, strTrackName[nTrack]);
+            if (!Directory.Exists(strRecipePath))
+                Directory.CreateDirectory(strRecipePath);
+
+            string fullpath = Path.Combine(strRecipePath, $"{strLotID}.xlsx");
+
+            FileInfo file = new FileInfo(fullpath);
+            if (!file.Exists)
+                file.Create();
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Use NonCommercial license if applicable
+            using (ExcelPackage package = new ExcelPackage(file))
+            {
+                if (package.Workbook.Worksheets.Count == 0)
+                    return;
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                worksheet.DefaultColWidth = 35;
+                worksheet.DefaultRowHeight = 35;
+
+                int rowCount = worksheet.Dimension.Rows;
+
+                for (int row = 2; row <= rowCount; row++)
+                {
+
+                    result[row - 2] = new VisionResultData(row - 1, "", 0);
+
+                    if (row - 2 >= result.Length)
+                        return;
+
+                    int ncol = 1;
+                    result[row - 2].m_nDeviceIndexOnReel = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
+                    result[row - 2].m_strDeviceID = worksheet.Cells[row, ncol++].Value.ToString();
+                    result[row - 2].m_nResult = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
+                   
+                }
+            }
+        }
+    }
+
+
+
     public struct ArrayOverLay
     {
         public Mat mat_Region { get; set; }
@@ -303,7 +430,7 @@ namespace Magnus_WPF_1.Source.Define
         public int nDeviceID;
         public string strLotID;
         public int nTrackID;
-        public int bFail;
+        public int nResult;
         public Emgu.CV.Mat imageSave;
     }
     public enum TRACK_TYPE :int

@@ -44,6 +44,17 @@
             <TextBlock Grid.Row="1" Text="Back" Foreground="black" TextAlignment="Center" FontSize="20"></TextBlock>
         </Grid>
 
+        <Grid x:Key="RetryImage">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"></RowDefinition>
+                <RowDefinition Height="1*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Image Grid.Row="0"   Source="/Resources/SequenceRetry.png"></Image>
+            <TextBlock Grid.Row="1" Text="Retry" Foreground="black" TextAlignment="Center" FontSize="20"></TextBlock>
+        </Grid>
+
+        
+
     </UserControl.Resources>
     
     <Grid Background="White">
@@ -74,6 +85,9 @@
                 
                 <Button  x:Name="btn_Sequence_Next" Background="Transparent" BorderThickness="0"
                      Content="{StaticResource NextImage }"  Click="btn_Sequence_Next_Click"  Margin="5,0,5,0"></Button>
+
+                <Button  x:Name="btn_Retry_Current_Step" Background="Transparent" BorderThickness="0"
+                     Content="{StaticResource RetryImage }"  Click="btn_Retry_Current_Step_Click"  Margin="5,0,5,0"></Button>
 
             </StackPanel>
         </Grid>

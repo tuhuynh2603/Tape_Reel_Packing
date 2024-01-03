@@ -414,7 +414,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             {
                 for (int nID = 0; nID < arr_imageMapping[nTrack].Length; nID++)
                 {
-                    nResultTotal = MainWindow.mainWindow.master.m_Tracks[nTrack].m_nResult[nID + m_nPageID * arr_imageMapping[nTrack].Length];
+                    nResultTotal = MainWindow.mainWindow.master.m_Tracks[nTrack].m_VisionResultDatas[nID + m_nPageID * arr_imageMapping[nTrack].Length].m_nResult;
 
                     switch (nResultTotal)
                     {
@@ -445,16 +445,16 @@ namespace Magnus_WPF_1.UI.UserControls.View
         //}
 
 
-        public void UpdateMappingResult(int nID, int nResult, int nTrack)
+        public void UpdateMappingResult(VisionResultData resultData, int nTrack)
         {
             string path = @"/Resources/green-chip.png";
 
-            if (nResult < 0)
+            if (resultData.m_nResult < 0)
                 path = @"/Resources/red-chip.png";
-            if (nID < m_nPageID * arr_imageMapping.Length || nID >= (m_nPageID + 1) * arr_imageMapping.Length)
+            if (resultData.m_nDeviceIndexOnReel < m_nPageID * arr_imageMapping.Length || resultData.m_nDeviceIndexOnReel >= (m_nPageID + 1) * arr_imageMapping.Length)
                 return;
 
-            arr_imageMapping[nTrack][nID % arr_imageMapping.Length].Source = new BitmapImage(new Uri(path, UriKind.Relative));
+            arr_imageMapping[nTrack][resultData.m_nResult % arr_imageMapping.Length].Source = new BitmapImage(new Uri(path, UriKind.Relative));
 
         }
         public void ResetMappingResult(int nTrackID = (int)TRACK_TYPE.TRACK_CAM1)

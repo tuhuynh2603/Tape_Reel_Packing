@@ -92,13 +92,14 @@ namespace Magnus_WPF_1.Source.Hardware
 					m_BarcodeReader.label_ReaderIP_Address.Content = $"{m_reader.IpAddress}";
 					m_BarcodeReader.Connect.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
 					MainWindow.mainWindow.label_Barcode_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
-
+					MainWindow.mainWindow.label_Barcode_Status.Content = $"{m_reader.IpAddress}";
 				}
 				else
 				{
 					m_BarcodeReader.label_ReaderIP_Address.Content = $"{m_reader.IpAddress}";
 					m_BarcodeReader.Connect.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Red);
 					MainWindow.mainWindow.label_Barcode_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Red);
+					MainWindow.mainWindow.label_Barcode_Status.Content = $"{m_reader.IpAddress}";
 
 				}
 			});

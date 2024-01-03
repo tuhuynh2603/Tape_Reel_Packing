@@ -160,12 +160,25 @@ namespace Magnus_WPF_1.UI.UserControls
 
         private void btn_Sequence_Next_Click(object sender, RoutedEventArgs e)
         {
+            if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
+                return;
 
             MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
             Master.m_NextStepSequenceEvent.Set();
 
             MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
 
+        }
+
+        private void btn_Retry_Current_Step_Click(object sender, RoutedEventArgs e)
+        {
+            if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
+                return;
+
+            MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_RETRY;
+            Master.m_NextStepSequenceEvent.Set();
+
+            MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
         }
     }
 }

@@ -17,8 +17,8 @@
     <Grid x:Name="LoginGrid">
         <Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="#FF3B3845" Offset="0.855"/>
-                <GradientStop Color="#FF56D4E7" Offset="0.541"/>
+                <GradientStop Color="DarkGreen" Offset="0.855"/>
+                <GradientStop Color="DarkSeaGreen" Offset="0.541"/>
             </LinearGradientBrush>
         </Grid.Background>
         <Grid.ColumnDefinitions>
@@ -34,7 +34,7 @@
                 <TextBlock Text="WELCOME TO HD "
             		Foreground="#FF01249C"
             		FontFamily="Segoe Print"
-            		FontSize="14"
+            		FontSize="30"
             		VerticalAlignment="Center"
             		FontWeight="Bold" 
                     Margin="10 20 0 0"/>
@@ -272,13 +272,14 @@
                 BorderThickness="2,0,0,0">
             <Border.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#FF3B3845" Offset="0.855"/>
-                    <GradientStop Color="#FF56D4E7" Offset="0.541"/>
+                    <GradientStop Color="DarkGreen" Offset="0.855"/>
+                    <GradientStop Color="DarkSeaGreen" Offset="0.541"/>
                 </LinearGradientBrush>
             </Border.Background>
             <StackPanel VerticalAlignment="Top" Margin="0,20,0,0"
                         HorizontalAlignment="Center">
-                <Label Content="Create New User" FontSize="25" Foreground="Black"
+                <Label Content="Create New User" FontSize="25"
+            		   Foreground="#FF01249C"
                        FontWeight="Bold" FontStretch="Expanded" HorizontalAlignment="Center"
                        FontFamily="Microsoft YaHei UI"
                        ></Label>
@@ -359,8 +360,8 @@
                             BorderThickness="3" >
                         <Border.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FFD16512" Offset="0"/>
-                                <GradientStop Color="#FFE58B12" Offset="0.996"/>
+                                <GradientStop Color="DeepSkyBlue" Offset="0"/>
+                                <GradientStop Color="Gray" Offset="0.996"/>
                             </LinearGradientBrush>
                         </Border.Background>
                         <Button x:Name="createOk"
@@ -374,8 +375,8 @@
                             BorderThickness="3" >
                         <Border.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FFD16512" Offset="0"/>
-                                <GradientStop Color="#FFE58B12" Offset="0.996"/>
+                                <GradientStop Color="DeepSkyBlue" Offset="0"/>
+                                <GradientStop Color="Gray" Offset="0.996"/>
                             </LinearGradientBrush>
                         </Border.Background>
                         <Button x:Name="createCancel"

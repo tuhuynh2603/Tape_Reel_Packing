@@ -1391,7 +1391,7 @@ namespace Magnus_WPF_1
             {
                 if (bShow)
                 {
-                    int nResult = master.m_Tracks[trackID].m_nResult[master.m_Tracks[trackID].m_CurrentSequenceDeviceID];
+                    int nResult = master.m_Tracks[trackID].m_VisionResultDatas[master.m_Tracks[trackID].m_CurrentSequenceDeviceID].m_nResult;
                     master.m_Tracks[trackID].DrawInspectionResult(ref nResult, ref master.m_Tracks[trackID].m_Center_Vision, ref master.m_Tracks[trackID].m_dDeltaAngleInspection);
                 }
                 else

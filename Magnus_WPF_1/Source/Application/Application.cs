@@ -38,6 +38,8 @@ namespace Magnus_WPF_1.Source.Application
 
         public static string pathRegistry;
         public static string pathImageSave;
+        public static string pathStatistics;
+
         public static List<string> m_strCameraSerial;
         public static int[] m_Width = { 3840, 680 };
         public static int[] m_Height = { 2748, 512 };
@@ -126,6 +128,16 @@ namespace Magnus_WPF_1.Source.Application
                 Directory.CreateDirectory(pathImageSave);
 
             #endregion
+
+            #region Load Folder Lot Result Image
+            pathStatistics = GetStringRegistry("Folder: Statistics", "C:\\SemiConductor Statistics");
+
+
+            if (!Directory.Exists(pathStatistics))
+                Directory.CreateDirectory(pathStatistics);
+
+            #endregion
+
 
 
             m_strCameraSerial = new List<string>();

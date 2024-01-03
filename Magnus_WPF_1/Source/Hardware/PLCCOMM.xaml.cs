@@ -31,6 +31,10 @@ using EasyModbus;
             PLC_RESET_LOT = 105,
             PLC_READY_STATUS = 106,
             PLC_BARCODE_READY =107,
+            PLC_EMERGENCY_STATUS = 108,
+            PLC_IMIDIATE_STATUS = 109,
+            PLC_RESET_STATUS = 110,
+            PLC_ROBOT_RESULT = 111,
 
         }
 

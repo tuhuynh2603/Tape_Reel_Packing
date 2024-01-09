@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              Background="Transparent"
              BorderBrush="Transparent"
-             d:DesignHeight="800" d:DesignWidth="450">
+             d:DesignHeight="500" d:DesignWidth="450">
     <UserControl.Resources>
         <BorderGapMaskConverter x:Key="BorderGapMaskConverter"/>
         <Style x:Key="GroupBoxStyle1" TargetType="{x:Type GroupBox}">
@@ -15,7 +15,7 @@
             <Setter Property="FontFamily" Value=".VnLucida sans"></Setter>
             <Setter Property="FontSize" Value="17"/>
             <Setter Property="Foreground" Value="DodgerBlue"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderThickness" Value="3"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type GroupBox}">

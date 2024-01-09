@@ -184,11 +184,13 @@ namespace Magnus_WPF_1.Source.Define
         public int m_nDeviceIndexOnReel = 0;
         public string m_strDeviceID = "";
         public int m_nResult = -(int)ERROR_CODE.NUM_DEFECTS;
-        public VisionResultData(int nDeviceIndexOnReel = 0, string strDeviceID = "", int nResult = -(int)ERROR_CODE.NUM_DEFECTS)
+        public string m_strFullImagePath = "";
+        public VisionResultData(int nDeviceIndexOnReel = 0, string strDeviceID = "", int nResult = -(int)ERROR_CODE.NUM_DEFECTS, string strPath = "")
         {
             m_nDeviceIndexOnReel = nDeviceIndexOnReel;
             m_strDeviceID = strDeviceID;
             m_nResult = nResult;
+            m_strFullImagePath = strPath;
         }
 
         public static void SaveSequenceResultToExcel(string strLotID,int nTrack, VisionResultData data)
@@ -236,6 +238,7 @@ namespace Magnus_WPF_1.Source.Define
                 worksheet.Cells[1, ncol++].Value = "Device Index";
                 worksheet.Cells[1, ncol++].Value = "Device ID";
                 worksheet.Cells[1, ncol++].Value = "Result";
+                worksheet.Cells[1, ncol++].Value = "Image Path";
 
                 // Data
                 int row = data.m_nDeviceIndexOnReel + 2;
@@ -243,7 +246,7 @@ namespace Magnus_WPF_1.Source.Define
                 worksheet.Cells[row, ncol++].Value = data.m_nDeviceIndexOnReel;
                 worksheet.Cells[row, ncol++].Value = data.m_strDeviceID;
                 worksheet.Cells[row, ncol++].Value = data.m_nResult;
-
+                worksheet.Cells[row, ncol++].Value = data.m_strFullImagePath;
 
                 //foreach (var item in data)
                 //{
@@ -289,10 +292,19 @@ namespace Magnus_WPF_1.Source.Define
                         return;
 
                     int ncol = 1;
-                    result[row - 2].m_nDeviceIndexOnReel = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
-                    result[row - 2].m_strDeviceID = worksheet.Cells[row, ncol++].Value.ToString();
-                    result[row - 2].m_nResult = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
-                   
+                    object valueTemp = worksheet.Cells[row, ncol++].Value;
+                    if(valueTemp != null)
+                        result[row - 2].m_nDeviceIndexOnReel = Convert.ToInt32(valueTemp);
+                    valueTemp = worksheet.Cells[row, ncol++].Value;
+                    if (valueTemp != null)
+                        result[row - 2].m_strDeviceID = valueTemp.ToString();
+                    valueTemp = worksheet.Cells[row, ncol++].Value;
+                    if (valueTemp != null)
+                        result[row - 2].m_nResult = Convert.ToInt32(valueTemp);
+
+                    valueTemp = worksheet.Cells[row, ncol++].Value;
+                    if (valueTemp != null)
+                        result[row - 2].m_strFullImagePath = valueTemp.ToString();
                 }
             }
         }

@@ -10,33 +10,37 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="10.1*"></ColumnDefinition>
-            <ColumnDefinition  Width="2.1*"></ColumnDefinition>
+            <ColumnDefinition  Width="3.1*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0" x:Name="Grid_CanVas_Mapping"  SizeChanged="Grid_CanVas_Mapping_SizeChanged">
 
             <!--<GroupBox Grid.Row="0" Margin="10" Header="Mapping Result" Foreground="WhiteSmoke" FontSize="20">
                 <Grid>-->
 
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition Height="40"/>
+            <Grid.RowDefinitions>
 
-                    </Grid.RowDefinitions>
-                    <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                            <Canvas  Margin="5" x:Name="canvas_Mapping" VerticalAlignment="Top"  MouseMove="canvas_Mapping_MouseMove" HorizontalAlignment="Left" MouseLeftButtonDown="canvas_Mapping_MouseLeftButtonDown" MouseLeave="canvas_Mapping_MouseLeave">
-                                <Border x:Name="border_boundingbox_moving"></Border>
-                                <!--<Border x:Name="border_boundingbox_clicked"></Border>-->
-                            </Canvas>
-                    </ScrollViewer>
-                    <Grid  Grid.Row="1">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Background="Gray">
-                            <Button x:Name="btn_Previous_Page" Click="btn_Previous_Page_Click" Content="Previous" Width="100"></Button>
-                            <TextBlock x:Name="text_Current_Page" Text="1" FontSize="20" 
-                                       TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" Foreground="White" Background="Gray"></TextBlock>
-                            <Button x:Name="btn_Next_Page" Click="btn_Next_Page_Click"  Content="Next" Width="100"></Button>
-                        </StackPanel>
-                    </Grid>
-                </Grid>
+                <RowDefinition/>
+            <RowDefinition Height="30"/>
+
+            </Grid.RowDefinitions>
+
+            <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Canvas  Margin="5" x:Name="canvas_Mapping" VerticalAlignment="Top"  MouseMove="canvas_Mapping_MouseMove" HorizontalAlignment="Left" MouseLeftButtonDown="canvas_Mapping_MouseLeftButtonDown" MouseLeave="canvas_Mapping_MouseLeave">
+                    <Border x:Name="border_boundingbox_moving"></Border>
+                    <!--<Border x:Name="border_boundingbox_clicked"></Border>-->                                                             
+                </Canvas>
+            </ScrollViewer>
+
+            <Grid  Grid.Row="1">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Background="Gray">
+                    <Button x:Name="btn_Previous_Page" Click="btn_Previous_Page_Click" Content="-" Width="30" FontSize="18" Background="Transparent"></Button>
+                    <TextBlock x:Name="text_Current_Page" Text="1" FontSize="20" 
+                                                   TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" Foreground="White" Background="Gray"></TextBlock>
+                    <Button x:Name="btn_Next_Page" Click="btn_Next_Page_Click"  Content="+" Width="30" FontSize="18" Background="Transparent"></Button>
+                </StackPanel>
+            </Grid>
+
+        </Grid>
             <!--</GroupBox>
 
             
@@ -66,7 +70,7 @@
                                         <RowDefinition Height="50"/>
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Grid Grid.Row="0" Margin="5,5,50,5">
+                                    <Grid Grid.Row="0" Margin="5,5,20,5">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="1*" />
                                             <ColumnDefinition Width="1.5*" />
@@ -107,7 +111,7 @@
                                     </Grid>
 
 
-                                    <ListBox Grid.Row="1" Margin="5,5,50,5" Background="Transparent" Name="lboxStatistic" BorderThickness="0">
+                                    <ListBox Grid.Row="1" Margin="5,5,20,5" Background="Transparent" Name="lboxStatistic" BorderThickness="0">
                                         <ListBox.ItemContainerStyle>
                                             <Style TargetType="ListBoxItem">
                                                 <Setter Property="Template">

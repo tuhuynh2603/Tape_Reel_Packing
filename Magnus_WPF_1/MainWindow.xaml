@@ -10,8 +10,9 @@
         xmlns:view="clr-namespace:Magnus_WPF_1.UI.UserControls.View" 
         xmlns:taskmanager="clr-namespace:Magnus_WPF_1.UI.UserControls"
         mc:Ignorable="d"
-        d:DesignHeight="2000" d:DesignWidth="3333"
-        WindowState="Maximized" Closed="Window_Closed">
+        d:DesignHeight="900" d:DesignWidth="1600"
+        WindowState="Maximized" WindowStyle="None"
+        Title="MainWindow">
 
 
     <Window.Resources>
@@ -104,8 +105,8 @@
 
         <!--Background button-->
         <LinearGradientBrush x:Key="BgButton" EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-            <GradientStop Color="#FFE47F27" Offset="0.439" />
-            <GradientStop Color="#FFD06F67" Offset="0.808"/>
+            <GradientStop Color="#FF03D4F2" Offset="0.439"/>
+            <GradientStop Color="#FF17717E" Offset="0.808"/>
         </LinearGradientBrush>
         <!--Open Dialog Settings-->
         <Storyboard x:Key="sb_OpenDialogUC">
@@ -136,8 +137,8 @@
             <GradientStop Color="#FF17717E" Offset="0.808"/>
         </LinearGradientBrush>
         <LinearGradientBrush x:Key="CheckedButtonStyle" EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-            <GradientStop Color="#FFFFBA40" Offset="0.439"/>
-            <GradientStop Color="#FFBFAD5E" Offset="0.808"/>
+            <GradientStop Color="#FF03D4F2" Offset="0.439"/>
+            <GradientStop Color="#FF17717E" Offset="0.808"/>
         </LinearGradientBrush>
         <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FF322F2E"/>
         <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FF0073B9"/>
@@ -190,7 +191,7 @@
 
         <Style x:Key="ToggleButtonStyle2" TargetType="{x:Type ToggleButton}">
             <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
-            <Setter Property="Background" Value="{x:Null}"/>
+            <Setter Property="Background" Value="Transparent"/>
             <Setter Property="IsChecked" Value="False"></Setter>
             <Setter Property="Template">
                 <Setter.Value>
@@ -233,6 +234,46 @@
             </Setter>
         </Style>
 
+        <LinearGradientBrush x:Key="LightBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+            <LinearGradientBrush.GradientStops>
+                <GradientStop Color="#FF03D4F2" Offset="0.439"/>
+                <GradientStop Color="#FF17717E" Offset="0.808"/>
+                <!--<GradientStop Offset="0.4" Color="LightGoldenrodYellow"/>
+                <GradientStop Offset="0.6" Color="BurlyWood"/>-->
+            </LinearGradientBrush.GradientStops>
+        </LinearGradientBrush>
+        <!-- TabItem Style-->
+        <Style TargetType="{x:Type TabItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TabItem}">
+                        <Grid>
+                            <Border x:Name="Border1" BorderBrush="#FF0073B9" CornerRadius="5,5,0,0" >
+                                <ContentPresenter
+                                ContentSource="Header"
+                                Margin="10,2,10,2"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter TargetName="Border1" Property="Margin" Value="0,5,0,0"/>
+                                <Setter TargetName="Border1" Property="BorderThickness" Value="1" />
+                                <Setter TargetName="Border1" Property="Background" Value="SteelBlue" />
+                                <Setter Property="Panel.ZIndex" Value="1" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border1" Property="Margin" Value="-5,0,-5,0"/>
+                                <Setter TargetName="Border1" Property="BorderThickness" Value="1,1,1,0" />
+                                <Setter TargetName="Border1" Property="Background" Value="{StaticResource LightBackgroundBrush}" />
+                                <Setter Property="Panel.ZIndex" Value="2" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
         <RoutedUICommand x:Key="Routed_btn_inspect_Click"/>
         <RoutedUICommand x:Key="Routed_Btn_load_teach_image_Click"/>
         <RoutedUICommand x:Key="Routed_btn_Binarize_Click"/>
@@ -267,32 +308,326 @@
         <KeyBinding x:Name="KeyBinding_X_Shift"   Key="X" Modifiers="Shift" Command="{StaticResource Routed_btn_Clear_Comm_Click}"></KeyBinding>
         <KeyBinding x:Name="KeyBinding_O"   Key="O" Command="{StaticResource Routed_btn_ShowOverlay_Click}"></KeyBinding>
 
-        
-        
+
+
     </Window.InputBindings>
 
 
-    <Grid Background="#FF322F2E">
+    <Grid Background="#FF322F2E" Margin="0,0,0,0">
         <!--Title-->
         <!--<Grid Height="30" VerticalAlignment="Top" Background="Black">
         </Grid>-->
         <!--Tool-->
-        <Grid x:Name="controllTabPanel" Height="130" VerticalAlignment="Top" Background="#FF322F2E" Margin="0,0,0,0">
-            <StackPanel Orientation="Horizontal" >
-                <dragablz:TabablzControl x:Name="tab_controls" BorderBrush="#FF322F2E" ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionChanged="TabablzControl_SelectionChanged">
-                    <dragablz:TabablzControl.Background>
-                        <LinearGradientBrush EndPoint="0.5,0.03" 
-                                                     MappingMode="RelativeToBoundingBox" 
-                                                     StartPoint="0.5,0">
-                            <GradientStop Color="#FF342F2E" Offset="0.997"/>
-                            <GradientStop Color="#FF2662B1" Offset="0.919"/>
-                        </LinearGradientBrush>
-                    </dragablz:TabablzControl.Background>
-                    <TabItem Name="tab_vision_view" Header="INSPECTION SETTING" Background="Transparent">
-                        <StackPanel Orientation="Horizontal" 
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="140"/>
+                <RowDefinition Height="1*"/>
+
+            </Grid.RowDefinitions>
+            <Border BorderBrush="SteelBlue" BorderThickness="1">
+
+                <Border.Background>
+                    <LinearGradientBrush EndPoint="0.1,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,1">
+                        <GradientStop Color="Black" Offset="0.1139"/>
+                        <GradientStop Color="#FF352F2E"  Offset="0.8939"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Column="0">
+                        <Image  Source="Resources\Magnus.png" Width="30" Height="30"></Image>
+                        <Label Content="Tap and Reel Packing Machine" FontSize="15" FontFamily="Microsoft New Tai Lue" Foreground="WhiteSmoke"></Label>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+
+                        <StackPanel  HorizontalAlignment="Right" VerticalAlignment="Center"
+                                    Orientation="Horizontal" Height="30" MouseLeftButtonDown="StackPanel_MouseLeftButtonDown">
+
+                            <!--Manage Recipe-->
+                            <!--<Border BorderBrush="#707070" Width="380" BorderThickness="1" 
+                                                VerticalAlignment="Center"
+                                                CornerRadius="5">-->
+                            <!--Recipe ID-->
+
+
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+
+                                <TextBlock  Text="Lot ID: " Margin="0 0 0 0"
+                                                        Width="Auto" Foreground="#00BFFF"
+                                                        FontSize="20" FontWeight="Bold"
+                                                        VerticalAlignment="Center"  />
+
+                                <TextBox  x:Name="text_LotID"
+                                                            TextChanged="text_LotID_TextChanged"
+                                                            MouseLeftButtonDown="text_LotID_MouseLeftButtonDown"
+                                                            Text="{Binding Path=m_strCurrentLotID,  Mode=TwoWay, UpdateSourceTrigger= PropertyChanged}"
+                                                            Width="Auto" MinWidth="150" Foreground="WhiteSmoke"
+                                                            BorderThickness="0"
+                                                            Background="DarkSlateGray"
+                                                            FontSize="20" FontWeight="Bold"
+                                                            VerticalAlignment="Center">
+
+                                </TextBox>
+                                <!--Recipe Name-->
+                                <TextBlock Text="Recipe: "
+                                                         Margin="18,0,0,0"
+                                                         Width="Auto" Foreground="#00BFFF"
+                                                         FontSize="20" FontWeight="Bold"
+                                                         VerticalAlignment="Center">
+                                </TextBlock>
+
+                                <RibbonToggleButton x:Name="btn_LoadRecipe" 
+                                                  Style="{DynamicResource ToggleButtonStyle1}"
+                                                  Content="None"                                     
+                                                  MinWidth="80"
+                                                  FontFamily="Microsoft New Tai Lue"
+                                                  VerticalAlignment="Center"
+                                                  FontSize="20" Width="auto"
+                                                  Click="btn_LoadRecipe_Click" 
+                                                  Foreground="GhostWhite" 
+                                                  MouseOverBackground="{StaticResource BgButton}" 
+                                                  CheckedBackground="{StaticResource BgButton}"></RibbonToggleButton>
+
+
+
+                            </StackPanel>
+                            <!--</Border>-->
+
+
+                            <Label Content="Access Level:"
+                                       Foreground="#00BFFF"
+                                       VerticalAlignment="Center"
+                                       VerticalContentAlignment="Center"
+                                       FontSize="18" 
+                                       Margin="18 0 0 0"
+                                       FontFamily="Microsoft New Tai Lue"/>
+
+                            <TextBlock x:Name="acessLevel"  
+                                       Text="None"                       
+                                       MinWidth="50"
+                                       FontFamily="Microsoft New Tai Lue"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       TextAlignment="Center"
+                                       FontSize="20" 
+                                       Background="DarkSlateGray"            
+                                       Width="auto"                                   
+                                       Foreground="GhostWhite" />
+                            <!--login button-->
+                            <Label Content="User:"
+                                       Foreground="#00BFFF"
+                                       VerticalAlignment="Center"                      
+                                       FontSize="20" 
+                                       Margin="18 0 0 0" 
+                                       FontFamily="Microsoft New Tai Lue"/>
+
+                            <RibbonToggleButton x:Name="btnLogIn" 
+                                                  Style="{DynamicResource ToggleButtonStyle1}"
+                                                  Content="None"                                     
+                                                  MinWidth="80" 
+                                                  FontFamily="Microsoft New Tai Lue"
+                                                  VerticalAlignment="Center"
+                                                  FontSize="20" Width="auto"
+                                                  Checked="btn_LogIn_Checked"
+                                                  Unchecked="btn_LogIn_Unchecked"
+                                                  Foreground="GhostWhite" 
+                                                  MouseOverBackground="{StaticResource BgButton}" 
+                                                  CheckedBackground="{StaticResource BgButton}">
+                                <!--<RibbonToggleButton.Triggers>
+                                    <EventTrigger RoutedEvent="RibbonToggleButton.Checked">
+                                        <BeginStoryboard Storyboard="{StaticResource sb_OpenDialogUC}"></BeginStoryboard>
+                                    </EventTrigger>
+                                    <EventTrigger RoutedEvent="RibbonToggleButton.Unchecked">
+                                        <BeginStoryboard Storyboard="{StaticResource sb_CloseDialogUC}"></BeginStoryboard>
+                                    </EventTrigger>
+                                </RibbonToggleButton.Triggers>-->
+                            </RibbonToggleButton>
+
+                        </StackPanel>
+                        <view:TitleBar Grid.Column="1"></view:TitleBar>
+
+                    </StackPanel>
+
+                </Grid>
+
+            </Border>
+
+
+
+            <Grid x:Name="controllTabPanel" Grid.Row="1" VerticalAlignment="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition  Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" >
+                    <TabControl x:Name="tab_controls" 
+                                             BorderBrush="#FF322F2E"
+                                             SelectionChanged="TabablzControl_SelectionChanged">
+                        <TabControl.Background>
+                            <LinearGradientBrush EndPoint="0.5,0.03" 
+                                                        MappingMode="RelativeToBoundingBox" 
+                                                        StartPoint="0.5,0">
+                                <GradientStop Color="#FF342F2E" Offset="0.997"/>
+                                <GradientStop Color="Transparent" Offset="0.919"/>
+                            </LinearGradientBrush>
+                        </TabControl.Background>
+
+                        <TabItem Name="tab_Hardware_view" Header="HARDWARE">
+                            <StackPanel Orientation="Horizontal" 
+                                            IsEnabled="True" >
+                                <RibbonGroup Name="hardware_group">
+                                    <RibbonGroup.Style>
+                                        <Style TargetType="RibbonGroup">
+                                            <Setter Property="FontSize" Value="12"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Path=IsUseSmallIcon, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Value="True">
+                                                    <Setter Property="FontSize" Value="11"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </RibbonGroup.Style>
+
+                                    <RibbonGroup.Header>
+                                        <TextBlock Text="" Name="groupHardware"
+                                                        FontFamily="Microsoft New Tai Lue"
+                                                        Foreground="#FFD6F9FF" FontSize="13"
+                                                        FontWeight="Bold">
+                                            <TextBlock.Effect>
+                                                <BlurEffect Radius="0.1"/>
+                                            </TextBlock.Effect>
+                                        </TextBlock>
+                                    </RibbonGroup.Header>
+                                    
+                                    <RibbonButton Content="1" Width="0" Height="50"/>
+
+                                    <Grid Margin="0,0,0,-30">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="5*"></RowDefinition>
+                                            <RowDefinition Height="3*"></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <Grid Grid.Row="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition></ColumnDefinition>
+                                                <ColumnDefinition></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <RibbonToggleButton Name="btn_stream_camera" Grid.Column="0"
+                                                        Label="Stream Camera"
+                                                        LargeImageSource="Resources\camera-custom.png" Foreground="GhostWhite"
+                                                        Checked="btn_stream_camera_Checked"
+                                                        Unchecked="btn_stream_camera_UnChecked"
+                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
+                                                        MouseOverBackground="{StaticResource MouseOverButtonStyle}"
+                                                        Width="auto"/>
+
+                                            <RibbonToggleButton Name="btn_camera_setting" Grid.Column="1"
+                                                        Label="Camera Setting"
+                                                        LargeImageSource="Resources\camera-iris-custom.png" Foreground="GhostWhite"
+                                                        Checked="btn_Camera_Setting_Checked"
+                                                        Unchecked="btn_Camera_Setting_Unchecked"
+                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
+                                                        MouseOverBackground="{StaticResource MouseOverButtonStyle}"
+                                                        Width="auto"/>
+                                        </Grid>
+
+                                        <Label x:Name="label_Camera_Status" FontSize="15" Grid.Row="1" Content="Disconnected" 
+                                                    VerticalContentAlignment="Top"  HorizontalContentAlignment="Center" >
+                                        </Label>
+
+
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,-30">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="5*"></RowDefinition>
+                                            <RowDefinition Height="3*"></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <RibbonToggleButton x:Name="btn_Robot_Controller" Grid.Row="0"
+                                                        Label="ROBOT Controller"
+                                                        LargeImageSource="Resources/robot-industrial-custom.png"
+                                                        Foreground="White"
+                                                        Checked="btn_Robot_Controller_Checked"
+                                                        Unchecked="btn_Robot_Controller_Unchecked"
+                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
+                                                        MouseOverBackground="{StaticResource BgButton}" 
+                                                        Width="Auto"/>
+
+                                        <Label x:Name="label_Robot_Status" Margin="0,0,0,0" FontSize="15" Grid.Row="1" Content="Disconnected" VerticalContentAlignment="Top">
+                                            <Label.Foreground>
+                                                <SolidColorBrush Color="{Binding color_RobotStatus}">
+                                                </SolidColorBrush>
+                                            </Label.Foreground>
+                                        </Label>
+
+                                    </Grid>
+
+
+                                    <Grid Margin="0,0,0,-30">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="5*"></RowDefinition>
+                                            <RowDefinition Height="3*"></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <RibbonToggleButton x:Name="btn_BarCodeReader_Setting" Grid.Row="0"
+                                                        Label="Barcode Reader Setting"
+                                                        LargeImageSource="Resources/qrcode-scan-custom.png"
+                                                        Foreground="White"                          
+                                                        IsEnabled="true"
+                                                        Checked="btn_BarCodeReader_Setting_Checked"
+                                                        Unchecked="btn_BarCodeReader_Setting_Unchecked"
+                                                        IsChecked="False"
+                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
+                                                        MouseOverBackground="{StaticResource BgButton}" 
+                                                        Width="Auto">
+
+                                        </RibbonToggleButton>
+
+                                        <Label x:Name="label_Barcode_Status"  Margin="0,0,0,0" FontSize="15" Grid.Row="1" Content="Disconnected" 
+                                                    VerticalContentAlignment="Top">
+                                            <Label.Foreground>
+                                                <SolidColorBrush Color="{Binding color_barcodeReaderStatus}">
+                                                </SolidColorBrush>
+                                            </Label.Foreground>
+
+                                        </Label>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,-30">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="5*"></RowDefinition>
+                                            <RowDefinition Height="3*"></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <RibbonToggleButton x:Name="btn_PLCCOMM_Setting" Grid.Row="0"
+                                                        Label="PLC COMM Setting"
+                                                        LargeImageSource="Resources/network.png"
+                                                        Foreground="White"                          
+                                                        IsEnabled="true"
+                                                        Checked ="btn_PLCCOMM_Setting_Checked"
+                                                        Unchecked="btn_PLCCOMM_Setting_Unchecked"
+                                                        IsChecked="False"
+                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
+                                                        MouseOverBackground="{StaticResource BgButton}" 
+                                                        Width="Auto">
+
+                                        </RibbonToggleButton>
+
+                                        <Label x:Name="label_PLCCOMM_Status" FontSize="15" Grid.Row="1" 
+                                                    Content="Disconnected" VerticalContentAlignment="Top"  HorizontalContentAlignment="Center"
+                                                    >
+                                        </Label>
+                                    </Grid>
+                                </RibbonGroup>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Name="tab_vision_view" Header="INSPECTION">
+                            <StackPanel Orientation="Horizontal" 
                                             IsEnabled="True" 
-                                            Name="tabMasterView">
-                            <Border BorderBrush="#FF2662B1" BorderThickness="0,0,3,0" Margin="0,0,0,-2">
+                                            Name="tabVisionView">
                                 <RibbonGroup Name="inspection_group">
                                     <RibbonGroup.Style>
                                         <Style TargetType="RibbonGroup">
@@ -305,15 +640,17 @@
                                         </Style>
                                     </RibbonGroup.Style>
                                     <RibbonGroup.Header>
-                                        <TextBlock Text="Inspection" Name="groupInspection"
-                                                       FontFamily="Microsoft New Tai Lue"
-                                                       Foreground="#FFD6F9FF" FontSize="13"
-                                                       FontWeight="Bold">
+                                        <TextBlock Text="Inspection"
+                                                        FontFamily="Microsoft New Tai Lue"
+                                                        Foreground="#FFD6F9FF" FontSize="13"
+                                                        FontWeight="Bold">
                                             <TextBlock.Effect>
                                                 <BlurEffect Radius="0.1"/>
                                             </TextBlock.Effect>
                                         </TextBlock>
                                     </RibbonGroup.Header>
+
+                                    <RibbonButton Content="1" Width="0" Height="50"/>
 
                                     <RibbonButton Name="inspect_btn"
                                                             Label="Inspect"
@@ -323,6 +660,7 @@
                                                             PreviewMouseDown="PreviewMouseDownInspectionBtn"
                                                             Width="auto"
                                                             Click="btn_inspect_Click"/>
+                                    
                                     <RibbonToggleButton Name="debug_btn"
                                                             Label="Debug"
                                                             LargeImageSource="Resources\bug-play-custom.png"
@@ -332,6 +670,7 @@
                                                             Width="auto" 
                                                             Checked="btn_debug_Checked"
                                                             Unchecked="btn_debug_Unchecked" />
+
 
                                     <RibbonToggleButton Name="inspect_offline_btn"
                                                             Label="Offline Inspection"
@@ -354,6 +693,16 @@
                                                             MouseOverBackground="{StaticResource MouseOverButtonStyle}"
                                                             Width="auto" Click="btn_save_current_image_Click"/>
 
+                                    <RibbonToggleButton Name="btn_enable_saveimage"
+                                                            Label="Enable Saving Image"
+                                                            LargeImageSource="Resources\save-image.png"
+                                                            MouseOverBackground="{StaticResource MouseOverButtonStyle}"
+                                                            Foreground="GhostWhite"
+                                                            CheckedBackground="{StaticResource CheckedButtonStyle}"
+                                                            Width="auto" Unchecked="btn_enable_saveimage_Unchecked" 
+                                                            Checked="btn_enable_saveimage_Checked"
+                                                            IsChecked="True"/>
+
                                     <RibbonButton Name="load_teach_image_btn"
                                                             Label="Load Teach Image"
                                                             LargeImageSource="Resources\file-upload-custom.png" Foreground="GhostWhite"
@@ -366,17 +715,6 @@
                                                             MouseOverBackground="{StaticResource MouseOverButtonStyle}"
                                                             Width="auto" Click="btn_save_teach_image_Click"/>
 
-                                    <RibbonToggleButton Name="btn_enable_saveimage"
-                                                            Label="Enable Saving Image"
-                                                            LargeImageSource="Resources\save-image.png"
-                                                            MouseOverBackground="{StaticResource MouseOverButtonStyle}"
-                                                            Foreground="GhostWhite"
-                                                            CheckedBackground="{StaticResource CheckedButtonStyle}"
-                                                            Width="auto" Unchecked="btn_enable_saveimage_Unchecked" 
-                                                            Checked="btn_enable_saveimage_Checked"
-                                                            IsChecked="True"/>
-
-
                                     <RibbonToggleButton Name="teach_parameters_btn"
                                                             Label="Teach Parameter"
                                                             LargeImageSource="Resources\book-open-custom.png"
@@ -387,6 +725,89 @@
                                                             Checked="btn_teach_parameters_Checked"
                                                             Unchecked="btn_teach_parameters_Unchecked" />
 
+                                    <RibbonButton x:Name="btn_teach"
+                                                        Label="Teach"
+                                                        LargeImageSource="Resources\human-male-board-custom.png"
+                                                        Foreground="Wheat"
+                                                        Click="btn_teach_click"
+                                                        MouseOverBackground="{StaticResource BgButton}" 
+                                                        Width="68"/>
+
+                                    <RibbonButton x:Name="btn_next_teach"
+                                                        Label="Next"
+                                                        LargeImageSource="Resources/step-forward-custom.png"
+                                                        Foreground="Wheat"
+                                                        Click="btn_next_teach_click"
+                                                        IsEnabled="false"
+                                                        MouseOverBackground="{StaticResource BgButton}" 
+                                                        Width="68"/>
+
+                                    <RibbonButton x:Name="btn_abort_teach"
+                                                        Label="Abort"
+                                                        LargeImageSource="Resources/close-octagon-custom.png"
+                                                        Foreground="Wheat"
+                                                        IsEnabled="false"
+                                                        Click="btn_abort_teach_Click"
+                                                        MouseOverBackground="{StaticResource BgButton}" 
+                                                        Width="68"/>
+                                </RibbonGroup>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="TOOL VIEW" Name ="tabTool_View">
+                            <StackPanel Orientation="Horizontal"
+                                IsEnabled="True">
+                                <RibbonGroup Name="btn_Binarize_Group">
+                                    <RibbonGroup.Header>
+                                        <TextBlock Text="View" FontFamily="Microsoft New Tai Lue" 
+                                            Foreground="#FFD6F9FF" FontSize="13" FontWeight="Bold">
+                                            <TextBlock.Effect>
+                                                <BlurEffect Radius="0.1"/>
+                                            </TextBlock.Effect>
+                                        </TextBlock>
+                                    </RibbonGroup.Header>
+
+                                    <RibbonButton Content="1" Width="0" Height="50"/>
+
+                                    <RibbonToggleButton Name="btn_Binarize"
+                                            Label="Binarize" 
+                                            LargeImageSource="Resources\run-custom.png"
+                                            Foreground="GhostWhite" 
+                                            MouseOverBackground="{StaticResource BgButton}"
+                                            CheckedBackground="{StaticResource BgButton}"
+                                            MouseLeave="Binarize_MouseLeave"
+                                            MouseEnter="Binarize_MouseEnter"
+                                            Width="68" 
+                                            Click="btn_Binarize_Click"/>
+
+                                    <RibbonToggleButton Name="btn_ShowOverlay"
+                                            Label="Show Overlay" 
+                                            LargeImageSource="Resources\run-custom.png"
+                                            Foreground="GhostWhite" 
+                                            MouseOverBackground="{StaticResource BgButton}"
+                                            CheckedBackground="{StaticResource BgButton}"
+                                            Width="68" 
+                                            Click="btn_ShowOverlay_Click"/>
+
+
+                                    <RibbonButton Name="btn_Clear_Comm"
+                                            Label="Clear Comm Log"
+                                            LargeImageSource="Resources\run-custom.png"
+                                            Foreground="GhostWhite" 
+                                            Click="btn_Clear_Comm_Click"
+                                            MouseOverBackground="{StaticResource BgButton}"
+                                            Width="68"/>
+
+                                    <RibbonToggleButton Name="btn_Pixel_Ruler"
+                                                IsChecked="False"
+                                                Label="Pixel Ruler"
+                                                LargeImageSource="Resources\run-custom.png"
+                                                Foreground="GhostWhite" 
+                                                Click="btn_Pixel_Ruler_Click"
+                                                FontSize="13"
+                                                MouseOverBackground="{StaticResource BgButton}"
+                                                CheckedBackground="{StaticResource BgButton}"
+                                                Width="68">
+                                    </RibbonToggleButton>
                                     <RibbonToggleButton Name="btn_mapping_parameters"
                                                             Label="Mapping Setting"
                                                             LargeImageSource="Resources\blue-chip.png"
@@ -397,443 +818,35 @@
                                                             Checked="btn_mapping_parameters_Checked"
                                                             Unchecked="btn_mapping_parameters_Unchecked" />
 
-
-                                    <RibbonButton x:Name="btn_teach"
-                                                      Label="Teach"
-                                                      LargeImageSource="Resources\human-male-board-custom.png"
-                                                      Foreground="Wheat"
-                                                      Click="btn_teach_click"
-                                                      MouseOverBackground="{StaticResource BgButton}" 
-                                                      Width="68"/>
-
-                                    <RibbonButton x:Name="btn_next_teach"
-                                                      Label="Next"
-                                                      LargeImageSource="Resources/step-forward-custom.png"
-                                                      Foreground="Wheat"
-                                                      Click="btn_next_teach_click"
-                                                      IsEnabled="false"
-                                                      MouseOverBackground="{StaticResource BgButton}" 
-                                                      Width="68"/>
-
-                                    <RibbonButton x:Name="btn_abort_teach"
-                                                      Label="Abort"
-                                                      LargeImageSource="Resources/close-octagon-custom.png"
-                                                      Foreground="Wheat"
-                                                      IsEnabled="false"
-                                                      Click="btn_abort_teach_Click"
-                                                      MouseOverBackground="{StaticResource BgButton}" 
-                                                      Width="68"/>
                                 </RibbonGroup>
-                            </Border>
-
-                            <Border BorderBrush="GhostWhite" BorderThickness="0,0,1,0" Margin="0,0,0,0">
-                                <Grid>
-                                    <RibbonGroup Name="hardware_group">
-                                        <RibbonGroup.Style>
-                                            <Style TargetType="RibbonGroup">
-                                                <Setter Property="FontSize" Value="12"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Path=IsUseSmallIcon, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Value="True">
-                                                        <Setter Property="FontSize" Value="11"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </RibbonGroup.Style>
-                                        <RibbonGroup.Header>
-                                            <TextBlock Text="Hardware" Name="groupHardware"
-                                                        FontFamily="Microsoft New Tai Lue"
-                                                        Foreground="#FFD6F9FF" FontSize="13"
-                                                        FontWeight="Bold">
-                                                <TextBlock.Effect>
-                                                    <BlurEffect Radius="0.1"/>
-                                                </TextBlock.Effect>
-                                            </TextBlock>
-                                        </RibbonGroup.Header>
-
-
-                                        <Grid Margin="0,-30,0,0">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="3*"></RowDefinition>
-                                                <RowDefinition Height="5*"></RowDefinition>
-                                            </Grid.RowDefinitions>
-                                            <Grid Grid.Row="1">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition></ColumnDefinition>
-                                                    <ColumnDefinition></ColumnDefinition>
-                                                </Grid.ColumnDefinitions>
-                                                <RibbonToggleButton Name="btn_stream_camera" Grid.Column="0"
-                                                        Label="Stream Camera"
-                                                        LargeImageSource="Resources\camera-custom.png" Foreground="GhostWhite"
-                                                        Checked="btn_stream_camera_Checked"
-                                                        Unchecked="btn_stream_camera_UnChecked"
-                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
-                                                        MouseOverBackground="{StaticResource MouseOverButtonStyle}"
-                                                        Width="auto"/>
-
-                                                <RibbonToggleButton Name="btn_camera_setting" Grid.Column="1"
-                                                        Label="Camera Setting"
-                                                        LargeImageSource="Resources\camera-iris-custom.png" Foreground="GhostWhite"
-                                                        Checked="btn_Camera_Setting_Checked"
-                                                        Unchecked="btn_Camera_Setting_Unchecked"
-                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
-                                                        MouseOverBackground="{StaticResource MouseOverButtonStyle}"
-                                                        Width="auto"/>
-                                            </Grid>
-                    
-                                            <Label x:Name="label_Camera_Status" Margin="-9,0,0,5" FontSize="10" Grid.Row="0" Content="Disconnected" 
-                                                   VerticalContentAlignment="Top"  HorizontalContentAlignment="Center"
-                                                   BorderThickness="3,3,0,0" BorderBrush="#FF2662B1">
-                                                <!--<Label.Foreground>
-                                                    <SolidColorBrush Color="{Binding color_RobotStatus}">
-                                                    </SolidColorBrush>
-                                                </Label.Foreground>-->
-
-                                            </Label>
-
-
-                                        </Grid>
-
-                                        <Grid Margin="0,-30,0,0">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="3*"></RowDefinition>
-                                                <RowDefinition Height="5*"></RowDefinition>
-                                            </Grid.RowDefinitions>
-                                                <RibbonToggleButton x:Name="btn_Robot_Controller" Grid.Row="1"
-                                                        Label="ROBOT Controller"
-                                                        LargeImageSource="Resources/robot-industrial-custom.png"
-                                                        Foreground="White"
-                                                        Checked="btn_Robot_Controller_Checked"
-                                                        Unchecked="btn_Robot_Controller_Unchecked"
-                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
-                                                        MouseOverBackground="{StaticResource BgButton}" 
-                                                        Width="Auto"/>
-
-                                            <Label x:Name="label_Robot_Status" Margin="0,0,0,5" FontSize="10" Grid.Row="0" Content="Disconnected" VerticalContentAlignment="Top" 
-                                                   BorderThickness="3,3,0,0" BorderBrush="#FF2662B1">
-                                                <Label.Foreground>
-                                                    <SolidColorBrush Color="{Binding color_RobotStatus}">
-                                                    </SolidColorBrush>
-                                                </Label.Foreground>
-                                            </Label>
-
-                                        </Grid>
-                            
-
-                                        <Grid Margin="0,-30,0,0">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="3*"></RowDefinition>
-                                                <RowDefinition Height="5*"></RowDefinition>
-                                            </Grid.RowDefinitions>
-                                            <RibbonToggleButton x:Name="btn_BarCodeReader_Setting" Grid.Row="1"
-                                                        Label="Barcode Reader Setting"
-                                                        LargeImageSource="Resources/qrcode-scan-custom.png"
-                                                        Foreground="White"                          
-                                                        IsEnabled="true"
-                                                        Checked="btn_BarCodeReader_Setting_Checked"
-                                                        Unchecked="btn_BarCodeReader_Setting_Unchecked"
-                                                        IsChecked="False"
-                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
-                                                        MouseOverBackground="{StaticResource BgButton}" 
-                                                        Width="Auto">
-                                                
-                                            </RibbonToggleButton>
-
-                                            <Label x:Name="label_Barcode_Status"  Margin="0,0,0,5" FontSize="10" Grid.Row="0" Content="Disconnected" 
-                                                   VerticalContentAlignment="Top" BorderThickness="3,3,0,0" BorderBrush="#FF2662B1">
-                                                <Label.Foreground>
-                                                    <SolidColorBrush Color="{Binding color_barcodeReaderStatus}">
-                                                    </SolidColorBrush>
-                                                </Label.Foreground>
-
-                                            </Label>
-                                        </Grid>
-
-                                        <Grid Margin="0,-30,0,0">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="3*"></RowDefinition>
-                                                <RowDefinition Height="5*"></RowDefinition>
-                                            </Grid.RowDefinitions>
-                                            <RibbonToggleButton x:Name="btn_PLCCOMM_Setting" Grid.Row="1" Margin="8,0,0,0"
-                                                        Label="PLC COMM Setting"
-                                                        LargeImageSource="Resources/network.png"
-                                                        Foreground="White"                          
-                                                        IsEnabled="true"
-                                                        Checked ="btn_PLCCOMM_Setting_Checked"
-                                                        Unchecked="btn_PLCCOMM_Setting_Unchecked"
-                                                        IsChecked="False"
-                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
-                                                        MouseOverBackground="{StaticResource BgButton}" 
-                                                        Width="Auto">
-
-                                            </RibbonToggleButton>
-
-                                            <Label x:Name="label_PLCCOMM_Status"  Margin="0,0,-8,5" FontSize="10" Grid.Row="0" 
-                                                   Content="Disconnected" VerticalContentAlignment="Top" 
-                                                   BorderThickness="3,3,0,0" BorderBrush="#FF2662B1">
-                                            </Label>
-                                        </Grid>
-
-
-
-                                    </RibbonGroup>
-
-                                </Grid>
-                            </Border>
-                        </StackPanel>
-                    </TabItem>
-
-                    <TabItem x:Name="tabItem_View" Header="TOOL VIEW" Background="#FF6FBDDE">
-                        <TabItem.OpacityMask>
-                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FFD6CDCD" Offset="0"/>
-                                <GradientStop Color="WhiteSmoke" Offset="1"/>
-                            </LinearGradientBrush>
-                        </TabItem.OpacityMask>
-                        <StackPanel Orientation="Horizontal"
-                                IsEnabled="True"
-                                Name="tab_View">
-                            <!--Binarize group-->
-                            <RibbonGroup Name="btn_Binarize_Group">
-                                <RibbonGroup.Header>
-                                    <TextBlock Text="Binary Image" FontFamily="Microsoft New Tai Lue" 
-                                           Foreground="#FFD6F9FF" FontSize="13" FontWeight="Bold">
-                                        <TextBlock.Effect>
-                                            <BlurEffect Radius="0.1"/>
-                                        </TextBlock.Effect>
-                                    </TextBlock>
-                                </RibbonGroup.Header>
-                                <RibbonToggleButton Name="btn_Binarize"
-                                          Label="Binarize" 
-                                          LargeImageSource="Resources\run-custom.png"
-                                          Foreground="GhostWhite" 
-                                          MouseOverBackground="{StaticResource BgButton}"
-                                          CheckedBackground="{StaticResource BgButton}"
-                                          MouseLeave="Binarize_MouseLeave"
-                                          MouseEnter="Binarize_MouseEnter"
-                                          Width="68" 
-                                          Click="btn_Binarize_Click"/>
-
-                                <RibbonToggleButton Name="btn_ShowOverlay"
-                                          Label="Show Overlay" 
-                                          LargeImageSource="Resources\run-custom.png"
-                                          Foreground="GhostWhite" 
-                                          MouseOverBackground="{StaticResource BgButton}"
-                                          CheckedBackground="{StaticResource BgButton}"
-                                          Width="68" 
-                                          Click="btn_ShowOverlay_Click"/>
-
-                            </RibbonGroup>
-                            <Label Width="3" Background="#FF2662B1" Margin="0,0,0,-3"></Label>
-                                <!--Tool-->
-                            <RibbonGroup Name="rgb_Tool_Group">
-                                <RibbonGroup.Header>
-                                    <TextBlock Text="Tool" FontFamily="Microsoft New Tai Lue" 
-                                           Foreground="#FFD6F9FF" FontSize="13" FontWeight="Bold">
-                                        <TextBlock.Effect>
-                                            <BlurEffect Radius="0.1"/>
-                                        </TextBlock.Effect>
-                                    </TextBlock>
-                                </RibbonGroup.Header>
-                                <!--Save pass image Online-->
-                                <RibbonToggleButton Name="btn_Pixel_Ruler"
-                                                IsChecked="False"
-                                                Label="Pixel Ruler"
-                                                LargeImageSource="Resources\run-custom.png"
-                                                Foreground="GhostWhite" 
-                                                Click="btn_Pixel_Ruler_Click"
-                                                FontSize="13"
-                                                MouseOverBackground="{StaticResource BgButton}"
-                                                CheckedBackground="{StaticResource BgButton}"
-                                                Width="68">
-                                </RibbonToggleButton>
-                                
-                                
-                                
-
-                                <RibbonButton Name="btn_Clear_Comm"
-                                          Label="Clear Comm Log"
-                                          LargeImageSource="Resources\run-custom.png"
-                                          Foreground="GhostWhite" 
-                                          Click="btn_Clear_Comm_Click"
-                                          MouseOverBackground="{StaticResource BgButton}"
-                                          Width="68"/>
-                            </RibbonGroup>
-                        </StackPanel>
-                    </TabItem>
-
-                </dragablz:TabablzControl>
-
-                <Border Margin="-3,0,0,0" BorderBrush="#FF2662B1" BorderThickness="3,3,3,0" Height="Auto">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="25"></RowDefinition>
-                            <RowDefinition Height="5*"></RowDefinition>
-                        </Grid.RowDefinitions>
-
-                        <Border Margin="0,0,0,2"  Grid.Row="0" BorderBrush="#FF2662B1" BorderThickness="0,0,0,3"  >
-                            <StackPanel  HorizontalAlignment="Right" VerticalAlignment="Top"
-                            Orientation="Horizontal" Height="25">
-
-                                <!--Manage Recipe-->
-                                <!--<Border BorderBrush="#707070" Width="380" BorderThickness="1" 
-                                        VerticalAlignment="Center"
-                                        CornerRadius="5">-->
-                                <Border BorderBrush="#FF2662B1" BorderThickness="0,0,2,0">
-                                        <!--Recipe ID-->
-                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,-5,0,0">
-
-                                            <TextBlock  Text="Lot ID: " Margin="0 0 0 0"
-                                                Width="Auto" Foreground="#00BFFF"
-                                                FontSize="15" FontWeight="Bold"
-                                                VerticalAlignment="Center"  />
-                                            
-                                            <TextBox  x:Name="text_LotID"
-                                                    TextChanged="text_LotID_TextChanged"
-                                                    MouseLeftButtonDown="text_LotID_MouseLeftButtonDown"
-                                                    Text="{Binding Path=m_strCurrentLotID,  Mode=TwoWay, UpdateSourceTrigger= PropertyChanged}"
-                                                    Width="Auto" MinWidth="150" Foreground="WhiteSmoke"
-                                                    Background="DarkSlateGray"
-                                                    FontSize="15" FontWeight="Bold"
-                                                    Margin="0,0,0,0"
-                                                    VerticalAlignment="Center">
-                                            
-                                            </TextBox>
-                                            <!--Recipe Name-->
-                                            <TextBlock Text="Recipe: "
-                                                 Margin="18,0,0,0"
-                                                 Width="Auto" Foreground="#00BFFF"
-                                                 FontSize="15" FontWeight="Bold"
-                                                 VerticalAlignment="Center">
-                                            </TextBlock>
-                                            <!--<TextBlock x:Name="tbl_Recipe_Name"
-                                                Width="Auto" MinWidth="100" Foreground="White"
-                                                VerticalAlignment="Center"
-                                                FontSize="15"
-                                                IsMouseDirectlyOverChanged="tbl_Recipe_Name_IsMouseDirectlyOverChanged">
-                                                <TextBlock.ToolTip>
-                                                    <ToolTip Visibility="Collapsed"                                            
-                                                        Width="auto"                                          
-                                                        Margin="0,0,0,15"
-                                                        Background="WhiteSmoke">
-                                                        <WrapPanel Orientation="Horizontal" MaxWidth="900"
-                                                       Height="auto">
-                                                            <TextBlock  Name="tbl_recipe_name_tooltip"    
-                                                    
-                                                        HorizontalAlignment="Left"   
-                                                        VerticalAlignment="Center"                                                                                                                                                 
-                                                        Foreground="Black"
-                                                        FontFamily="Tahoma" 
-                                                        FontSize="15"
-                                                        TextWrapping="Wrap">
-                                                            </TextBlock>
-                                                        </WrapPanel>
-                                                    </ToolTip>
-                                                </TextBlock.ToolTip>
-                                            </TextBlock>-->
-                                            <!--<ToggleButton x:Name="btn_LoadRecipe" 
-                                                          Click="btn_LoadRecipe_Click" 
-                                                          Content="None" MinWidth="100" 
-                                                          Background="DarkSlateGray"
-                                                          Foreground="White" 
-                                                          BorderThickness="0" 
-                                                          FontSize="18">
-                                                
-                                            </ToggleButton>-->
-
-                                        <RibbonToggleButton x:Name="btn_LoadRecipe" 
-                                          Style="{DynamicResource ToggleButtonStyle1}"
-                                          Content="None"                                     
-                                          MinWidth="80"
-                                          Margin="0 -5 0 0" 
-                                          FontFamily="Microsoft New Tai Lue"
-                                          VerticalAlignment="Center"
-                                          FontSize="15" Width="auto"
-                                          Click="btn_LoadRecipe_Click" 
-                                          Foreground="GhostWhite" 
-                                          MouseOverBackground="{StaticResource BgButton}" 
-                                          CheckedBackground="{StaticResource BgButton}"></RibbonToggleButton>
-
-
-
-                                    </StackPanel>
-                                </Border>
-                                <!--</Border>-->
-
-
-                               <Label Content="Access Level:"
-                               Foreground="#00BFFF"
-                               VerticalAlignment="Center"
-                               VerticalContentAlignment="Center"
-                               FontSize="15" 
-                               Margin="8 -5 0 0"
-                               FontFamily="Microsoft New Tai Lue"/>
-                                
-                                <TextBlock x:Name="acessLevel"  
-                               Text="None"                       
-                               MinWidth="50"
-                               FontFamily="Microsoft New Tai Lue"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Center"
-                               TextAlignment="Center"
-                               FontSize="15" 
-                               Margin="0 -5 0 0"
-                               Background="DarkSlateGray"            
-                               Width="auto"                                   
-                               Foreground="GhostWhite" />
-                                <!--login button-->
-                                <Label Content="User:"
-                               Foreground="#00BFFF"
-                               VerticalAlignment="Center"                      
-                               FontSize="15" 
-                               Margin="18 -5 0 0" 
-                               FontFamily="Microsoft New Tai Lue"/>
-                                
-                                <RibbonToggleButton x:Name="btnLogIn" 
-                                          Style="{DynamicResource ToggleButtonStyle1}"
-                                          Content="None"                                     
-                                          MinWidth="80"
-                                          Margin="0 -5 0 0" 
-                                          FontFamily="Microsoft New Tai Lue"
-                                          VerticalAlignment="Center"
-                                          FontSize="15" Width="auto"
-                                          Checked="btn_LogIn_Checked"
-                                          Unchecked="btn_LogIn_Unchecked"
-                                          Foreground="GhostWhite" 
-                                          MouseOverBackground="{StaticResource BgButton}" 
-                                          CheckedBackground="{StaticResource BgButton}">
-                                    <!--<RibbonToggleButton.Triggers>
-                            <EventTrigger RoutedEvent="RibbonToggleButton.Checked">
-                                <BeginStoryboard Storyboard="{StaticResource sb_OpenDialogUC}"></BeginStoryboard>
-                            </EventTrigger>
-                            <EventTrigger RoutedEvent="RibbonToggleButton.Unchecked">
-                                <BeginStoryboard Storyboard="{StaticResource sb_CloseDialogUC}"></BeginStoryboard>
-                            </EventTrigger>
-                        </RibbonToggleButton.Triggers>-->
-                                </RibbonToggleButton>
-
+                                <!--Binarize group-->
                             </StackPanel>
+                        </TabItem>
 
+                    </TabControl>
+                </StackPanel>
 
-                        </Border>
+                <Grid Grid.Column="1">
 
-                        <StackPanel Grid.Row="1" Height="Auto" Orientation="Horizontal" HorizontalAlignment="Center">
-                            <RibbonToggleButton x:Name="btn_run_sequence" 
+                    <StackPanel  Height="Auto" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Label Background="SteelBlue" Width="1"></Label>
+                        <RibbonToggleButton x:Name="btn_run_sequence" 
                                     Content="{StaticResource runSequenceImage}"
                                     Style="{DynamicResource ToggleButtonStyle2}"
                                     MouseOverBackground="{StaticResource BgButton}" 
                                     CheckedBackground="{StaticResource BgButton}"
                                     IsChecked="False" Checked="btn_run_sequence_Checked" Unchecked="btn_run_sequence_Unchecked">
-                            </RibbonToggleButton>
+                        </RibbonToggleButton>
 
-                            <RibbonToggleButton x:Name="btn_Debug_sequence" Content="{StaticResource debugSequenceImage}"
+                        <RibbonToggleButton x:Name="btn_Debug_sequence" Content="{StaticResource debugSequenceImage}"
                                     Style="{DynamicResource ToggleButtonStyle2}"
                                     MouseOverBackground="{StaticResource BgButton}" 
                                     CheckedBackground="{StaticResource BgButton}"
-                                          IsChecked="False" Checked="btn_Debug_sequence_Checked" Unchecked="btn_Debug_sequence_Unchecked">
-                            </RibbonToggleButton>
+                                            IsChecked="False" Checked="btn_Debug_sequence_Checked" Unchecked="btn_Debug_sequence_Unchecked">
+                        </RibbonToggleButton>
 
 
-                            <RibbonToggleButton x:Name="btn_Simulate_Sequence" 
+                        <!--<RibbonToggleButton x:Name="btn_Simulate_Sequence" 
                                     Content="{StaticResource SimulateSequence}"
                                     Style="{DynamicResource ToggleButtonStyle2}"
                                     MouseOverBackground="{StaticResource BgButton}" 
@@ -847,9 +860,9 @@
                                     MouseOverBackground="{StaticResource BgButton}" 
                                     CheckedBackground="{StaticResource BgButton}"
                                     Click ="btn_Simulate_Sequence_2_Click">
-                            </RibbonToggleButton>
-                            
-                            <!--<Button x:Name="btn_Debug_sequence_PreviousStep" Content="{StaticResource debugSequencePreviousStepImage}"
+                            </RibbonToggleButton>-->
+
+                        <!--<Button x:Name="btn_Debug_sequence_PreviousStep" Content="{StaticResource debugSequencePreviousStepImage}"
                                     Margin="0,0,0,0" HorizontalAlignment ="Center"
                                     Background="Transparent" BorderThickness="0"
                                     Click ="btn_Debug_sequence_PreviousStep_Click">
@@ -862,64 +875,85 @@
                                     Click ="btn_Debug_sequence_NextStep_Click">
                             </Button>-->
 
-                            <RibbonToggleButton x:Name="btn_Imidiate_Stop" 
+                        <RibbonToggleButton x:Name="btn_Imidiate_Stop" 
                                     Content="{StaticResource ImidiateStopImage}"
                                     Style="{DynamicResource ToggleButtonStyle2}"
                                     MouseOverBackground="{StaticResource BgButton}" 
                                     CheckedBackground="{StaticResource BgButton}"
                                     IsChecked="False"
                                     Click="btn_Imidiate_Stop_Click">
-                            </RibbonToggleButton>
+                        </RibbonToggleButton>
 
-                            <RibbonToggleButton x:Name="btn_Emergency_Stop" 
+                        <RibbonToggleButton x:Name="btn_Emergency_Stop" 
                                     Content="{StaticResource EmergencyStopImage}"
                                     Style="{DynamicResource ToggleButtonStyle2}"
                                     MouseOverBackground="{StaticResource BgButton}" 
                                     CheckedBackground="{StaticResource BgButton}"
                                     IsChecked="False"
                                     Click="btn_Emergency_Stop_Click">
-                            </RibbonToggleButton>
+                        </RibbonToggleButton>
 
-                            <RibbonToggleButton x:Name="btn_Reset_Machine" 
+                        <RibbonToggleButton x:Name="btn_Reset_Machine" 
                                     Content="{StaticResource ResetImage}"
                                     Style="{DynamicResource ToggleButtonStyle2}"
                                     MouseOverBackground="{StaticResource BgButton}" 
                                     CheckedBackground="{StaticResource BgButton}"
                                     Click="btn_Reset_Machine_Click">
-                            </RibbonToggleButton>
+                        </RibbonToggleButton>
+                    </StackPanel>
+                </Grid>
 
+            </Grid>
+            <Grid x:Name="Layout1" Grid.Row="2"
+              
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Black">
 
-                        </StackPanel>
-                    </Grid>
-                </Border>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*"></RowDefinition>
+                    <!--<RowDefinition Height="1*"></RowDefinition>-->
+                </Grid.RowDefinitions>
+                <!--image view-->
+                <Grid >
+                    <!--<Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3.5*"/>
+                        -->
+                    <!--<ColumnDefinition Width="1*"/>-->
+                    <!--
+                    </Grid.ColumnDefinitions>-->
+                    <avalonDock:DockingManager x:Name="dockManager"
+                                       ActiveContentChanged="dockManager_ActiveContentChanged"                                  
+                                       AllowMixedOrientation="True" 
+                                       GridSplitterWidth="10" 
+                                       GridSplitterHeight="10"
+                                       Layout="{Binding layoutVision, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}">
+                        <avalonDock:DockingManager.Theme>
+                            <avalonDock:Vs2013DarkTheme/>
+                        </avalonDock:DockingManager.Theme>
+                        <avalonDock:DockingManager.DocumentHeaderTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
 
-            </StackPanel>
-           
+                                    <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding ContentId}" Margin="0 0 0 0" FontSize="10" FontWeight="Bold"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </avalonDock:DockingManager.DocumentHeaderTemplate>
+                    </avalonDock:DockingManager>
+                </Grid>
 
+            </Grid>
 
         </Grid>
 
 
-        <Grid  Margin="0 0 0 0" Height="130" VerticalAlignment="Top" HorizontalAlignment="Center" >
-            <Popup x:Name="popupRuler" VerticalAlignment="Top" IsOpen="False" 
-                   Margin="2"
-                   Height="auto" Width="320" 
-                   PlacementTarget="{Binding ElementName=rect}" 
-                   PopupAnimation="Slide"
-                   Panel.ZIndex="3" Placement="Right"           
-                   HorizontalAlignment="Left">
-                <taskmanager:PixelRuler x:Name="pixelRuler"></taskmanager:PixelRuler>
-            </Popup>
-        </Grid>
-
-        <Grid x:Name="grd_Dialog_Settings" 
-              Width="{Binding Path=DialogUCWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-              Panel.ZIndex="3"
-              HorizontalAlignment="Left"
-              VerticalAlignment="Top"            
-              MouseDown="grd_Dialog_Settings_MouseDown" 
-              MouseMove="grd_Dialog_Settings_MouseMove" 
-              MouseUp="grd_Dialog_Settings_MouseUp">
+        <Grid x:Name="grd_Dialog_Settings"
+                Width="{Binding Path=DialogUCWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Panel.ZIndex="3"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"            
+                MouseDown="grd_Dialog_Settings_MouseDown" 
+                MouseMove="grd_Dialog_Settings_MouseMove" 
+                MouseUp="grd_Dialog_Settings_MouseUp">
             <Grid.RenderTransform>
                 <TranslateTransform x:Name="tt_DialogSettings"/>
             </Grid.RenderTransform>
@@ -936,141 +970,11 @@
             <Grid x:Name="grd_popup_Recipe"  SizeChanged="GridSettingChangedSize"></Grid>
 
         </Grid>
-        
-        <Grid x:Name="Layout1" Margin="0 130 0 0" 
-              
-            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Black">
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="2*"></RowDefinition>
-                <!--<RowDefinition Height="1*"></RowDefinition>-->
-            </Grid.RowDefinitions>
-            <!--image view-->
-            <Grid Grid.Column="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3.5*"/>
-                    <!--<ColumnDefinition Width="1*"/>-->
-                </Grid.ColumnDefinitions>
-                <avalonDock:DockingManager x:Name="dockManager"  Grid.Column="0"
-                                       ActiveContentChanged="dockManager_ActiveContentChanged"                                  
-                                       AllowMixedOrientation="True" 
-                                       GridSplitterWidth="10" 
-                                       GridSplitterHeight="10"
-                                       Layout="{Binding layoutHPSF, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}">
-                    <avalonDock:DockingManager.Theme>
-                        <avalonDock:Vs2013DarkTheme/>
-                    </avalonDock:DockingManager.Theme>
-                    <avalonDock:DockingManager.DocumentHeaderTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-
-                                <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
-                                <TextBlock Text="{Binding ContentId}" Margin="0 0 0 0" FontSize="10" FontWeight="Bold"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </avalonDock:DockingManager.DocumentHeaderTemplate>
-                </avalonDock:DockingManager>
-
-                <!--<Grid Grid.Column="1">
-                    <avalonDock:DockingManager x:Name="OutputLogDockManager" 
-                                       AllowMixedOrientation="True" 
-                                       GridSplitterWidth="5" 
-                                       GridSplitterHeight="5"
-                                       Layout="{Binding layout_OutputLog, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}">
-                        <avalonDock:DockingManager.Theme>
-                            <avalonDock:Vs2013DarkTheme/>
-                        </avalonDock:DockingManager.Theme>
-                        <avalonDock:DockingManager.DocumentHeaderTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-
-                                    <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
-                                    <TextBlock Text="{Binding ContentId}" Margin="0 0 0 0" FontSize="10" FontWeight="Bold"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </avalonDock:DockingManager.DocumentHeaderTemplate>
-                    </avalonDock:DockingManager>
-                </Grid>-->
-
-            </Grid>
-
-            <!--<avalonDock:DockingManager x:Name="mappingDocManager"  Grid.Row="1"
-                                       AllowMixedOrientation="True" 
-                                       GridSplitterWidth="5" 
-                                       GridSplitterHeight="5"
-                                       Layout="{Binding layout_Mapping, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}">
-                <avalonDock:DockingManager.Theme>
-                    <avalonDock:Vs2013DarkTheme/>
-                </avalonDock:DockingManager.Theme>
-                <avalonDock:DockingManager.DocumentHeaderTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-
-                            <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
-                            <TextBlock Text="{Binding ContentId}" Margin="0 0 0 0" FontSize="10" FontWeight="Bold"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </avalonDock:DockingManager.DocumentHeaderTemplate>
-            </avalonDock:DockingManager>-->
-
-            <!--<Grid Grid.Column="1" Margin="0 0 0 0">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="2.1*"></RowDefinition>
-                        <RowDefinition Height="0.5*"></RowDefinition>
-                        <RowDefinition Height="1*"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0" x:Name="Grid_CanVas_Mapping"  SizeChanged="Grid_CanVas_Mapping_SizeChanged">
-                        <GroupBox Margin="10" Header="Mapping Result" Foreground="WhiteSmoke" FontSize="20">
-                            <Border  Height="auto" BorderBrush="WhiteSmoke" CornerRadius="3" BorderThickness="3"  Background="Transparent" Opacity="0.8" Margin="9,9,9,1">
-                            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                                    <Canvas  Margin="5" x:Name="canvas_Mapping" VerticalAlignment="Top"  MouseMove="canvas_Mapping_MouseMove" HorizontalAlignment="Left" MouseLeftButtonDown="canvas_Mapping_MouseLeftButtonDown" MouseLeave="canvas_Mapping_MouseLeave">
-                                        <Border x:Name="border_boundingbox_focus"></Border>
-                                        <Border x:Name="border_boundingbox_clicked"></Border>
-                                    </Canvas>
-                            </ScrollViewer>
-                        </Border>
-                    </GroupBox>
-                    </Grid>
-
-                    <Border  Grid.Row="1"  Height="auto" BorderBrush="WhiteSmoke" CornerRadius="3" BorderThickness="3"  Background="Transparent" Opacity="0.8" Margin="9,9,9,1">
-                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                            <Canvas  Margin="5" x:Name="canvas_Mapping_NextPage"  MouseMove="canvas_Mapping_NextPage_MouseMove"  HorizontalAlignment="Left" VerticalAlignment="Top" MouseLeftButtonDown="canvas_Mapping_NextPage_MouseLeftButtonDown"  MouseLeave="canvas_Mapping_NextPage_MouseLeave">
-                                <Border x:Name="border_boundingbox_NextPage_focus"></Border>
-                                <Border x:Name="border_boundingbox_NextPage_clicked"></Border>
-                            </Canvas>
-                        </ScrollViewer>
-                    </Border>
-
-                    <Grid Grid.Row="2">
-
-                        <Border Height="Auto"
-                                                    CornerRadius="8" BorderThickness="3" 
-                                                    Background="Transparent" Opacity="0.8" 
-                                                    Margin="0.2,0,0.4,0.2">
-                            <DockPanel  LastChildFill="True">
-                                <DockPanel LastChildFill="True" DockPanel.Dock="Top">
-                                    <view:StatisticView x:Name="statisticView"
-                                                DockPanel.Dock="Top">
-                                        
-                                    </view:StatisticView>
-                                </DockPanel>
-                            </DockPanel>
-                        </Border>
-                    </Grid>
-            </Grid>
-        </Grid>-->
-
-            <!--Mapping-->
-
-        </Grid>
-
-
-        <Grid x:Name="grd_Defect_Settings" 
-              Panel.ZIndex="4"
-              MouseDown="grd_Defect_Settings_MouseDown" 
-              MouseMove="grd_Defect_Settings_MouseMove" 
-              MouseUp="grd_Defect_Settings_MouseUp">
+        <Grid x:Name="grd_Defect_Settings"
+                Panel.ZIndex="4"
+                MouseDown="grd_Defect_Settings_MouseDown" 
+                MouseMove="grd_Defect_Settings_MouseMove" 
+                MouseUp="grd_Defect_Settings_MouseUp">
             <Grid.Margin>
                 <Thickness Top="190" Left="0" Right="100" Bottom="0"></Thickness>
             </Grid.Margin>
@@ -1085,12 +989,11 @@
                 <ColumnDefinition Width="0.2*"></ColumnDefinition>
                 <ColumnDefinition Width="0.2*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Grid x:Name="grd_Defect" Grid.Column="1" Grid.ColumnSpan="2" 
-                  Height="{Binding DialogDefectWidth,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+            <Grid x:Name="grd_Defect"
+                Height="{Binding DialogDefectWidth,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
             </Grid>
         </Grid>
-
-        <Popup x:Name="popup_uc" Height="auto" Width="Auto"
+        <Popup x:Name="popup_uc" Height="auto" Width="Auto"  Grid.Row="2"
                    AllowsTransparency="True"
                    HorizontalOffset="0"
                    VerticalOffset="-10">
@@ -1098,19 +1001,18 @@
                 <local:PopupUserControl x:Name="Header" Foreground="#E0FFFF"/>
             </Grid>
         </Popup>
-
-        <!--<Popup x:Name="popup_WarningMessageBox" Height="300" Width="600"
-                   AllowsTransparency="True"
-                   HorizontalOffset="0"
-                   VerticalOffset="-10"
-                    IsOpen="False"
-                    IsEnabled="False">
-            --><!--<Grid x:Name="grd_popup_WarningMessageBox"  Height="300" Width="600">
-            </Grid>-->
-            <!--<Grid>
-                <local:PopupUserControl x:Name="Header" Foreground="#E0FFFF"/>
-            </Grid>--><!--
-        </Popup>-->
+        <Grid  Margin="0 0 0 0" 
+                   VerticalAlignment="Top" HorizontalAlignment="Center" >
+            <Popup x:Name="popupRuler" VerticalAlignment="Top" IsOpen="False" 
+                Margin="2"
+                Height="auto" Width="320" 
+                PlacementTarget="{Binding ElementName=rect}" 
+                PopupAnimation="Slide"
+                Panel.ZIndex="3" Placement="Right"           
+                HorizontalAlignment="Left">
+                <taskmanager:PixelRuler x:Name="pixelRuler"></taskmanager:PixelRuler>
+            </Popup>
+        </Grid>
 
 
     </Grid>

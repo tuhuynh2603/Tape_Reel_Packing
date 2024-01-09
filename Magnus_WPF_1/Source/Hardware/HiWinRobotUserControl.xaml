@@ -437,7 +437,7 @@
                                             Binding="{Binding m_PointIndex, Mode=TwoWay}"/>
                     <DataGridTextColumn Header="Comment" 
                                             Width="auto" 
-                                            IsReadOnly="False" 
+                                            IsReadOnly="True" 
                                             CanUserResize="False"
                                             CanUserSort="False"  
                                             CanUserReorder="False" 

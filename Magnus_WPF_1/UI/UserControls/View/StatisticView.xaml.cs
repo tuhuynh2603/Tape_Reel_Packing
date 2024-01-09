@@ -454,7 +454,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             if (resultData.m_nDeviceIndexOnReel < m_nPageID * arr_imageMapping.Length || resultData.m_nDeviceIndexOnReel >= (m_nPageID + 1) * arr_imageMapping.Length)
                 return;
 
-            arr_imageMapping[nTrack][resultData.m_nResult % arr_imageMapping.Length].Source = new BitmapImage(new Uri(path, UriKind.Relative));
+            arr_imageMapping[nTrack][resultData.m_nDeviceIndexOnReel % arr_imageMapping.Length].Source = new BitmapImage(new Uri(path, UriKind.Relative));
 
         }
         public void ResetMappingResult(int nTrackID = (int)TRACK_TYPE.TRACK_CAM1)

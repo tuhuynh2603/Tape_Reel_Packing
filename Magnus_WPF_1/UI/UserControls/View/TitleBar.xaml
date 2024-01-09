@@ -1,0 +1,62 @@
+﻿<UserControl x:Class="Magnus_WPF_1.UI.UserControls.View.TitleBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Magnus_WPF_1.UI.UserControls.View"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodels="clr-namespace:Magnus_WPF_1.UI.UserControls.ViewModel"
+             mc:Ignorable="d" 
+             d:DesignHeight="0" d:DesignWidth="100">
+    
+    <UserControl.DataContext>
+        <viewmodels:TitleBarVM></viewmodels:TitleBarVM>
+    </UserControl.DataContext>
+
+    <Grid>
+
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right">
+
+            <Button Width="40" Height="30" Margin="0,0,0,2"
+                        CommandParameter="{Binding ElementName=ucTitleBarWindow}"
+                        Command="{Binding MinimizeWindowCommand}"
+                        Background="#FF403C3C"
+                        VerticalContentAlignment="Center"
+                        BorderBrush="{x:Null}">
+                <materialDesign:PackIcon Kind="WindowMinimize"
+                            Foreground="WhiteSmoke"
+                            Width="20" Height="15"
+                            HorizontalAlignment="Center"/>
+            </Button>
+
+            <Button Width="40" Height="30" Margin="0,0,0,2"
+                            CommandParameter="{Binding ElementName=ucTitleBarWindow}"
+                            Command="{Binding MaximizeWindowCommand}"
+                            Background="#FF403C3C"
+                            VerticalContentAlignment="Center"
+                            BorderBrush="{x:Null}">
+                <materialDesign:PackIcon Kind="WindowMaximize"
+                            Foreground="WhiteSmoke"
+                            Width="20" Height="15"
+                            HorizontalAlignment="Center"/>
+            </Button>
+            <Button BorderBrush="{x:Null}"
+                            Width="40" Height="30" Margin="0,0,0,2"
+                            Background="Red"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            CommandParameter="{Binding ElementName=ucTitleBarWindow}"
+                            Command="{Binding CloseWindowCommand}" >
+                <materialDesign:PackIcon Kind="Close"
+                            Foreground="WhiteSmoke"
+                            Height="15" Width="15"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"/>
+            </Button>
+        </StackPanel>
+        
+    </Grid>
+</UserControl>

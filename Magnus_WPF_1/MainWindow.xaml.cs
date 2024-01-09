@@ -47,9 +47,9 @@ namespace Magnus_WPF_1
         private LayoutDocumentPaneGroup mainPanelGroup;
         public LayoutDocumentPaneGroup oldPanelGroup = new LayoutDocumentPaneGroup();
 
-        private LayoutDocumentPaneGroup bigPanelGroup = new LayoutDocumentPaneGroup();
+        private LayoutDocumentPaneGroup zoomDocPaneGroup = new LayoutDocumentPaneGroup();
         private LayoutDocumentPane imageZoomViewPane = new LayoutDocumentPane();
-        private LayoutDocument bigDoc = new LayoutDocument();
+        private LayoutDocument zoomDoc = new LayoutDocument();
 
         private LayoutDocumentPaneGroup imagesViewPaneGroup;
         private LayoutDocumentPane[] imagesViewPane;
@@ -73,14 +73,14 @@ namespace Magnus_WPF_1
 
         private Point _startPositionDlg;
         private System.Windows.Vector _startOffsetPositionDlg;
-        private LayoutRoot _layoutHPSF;
-        public LayoutRoot layoutHPSF
+        private LayoutRoot _layoutVision;
+        public LayoutRoot layoutVision
         {
-            get { return _layoutHPSF; }
+            get { return _layoutVision; }
             set
             {
-                _layoutHPSF = value;
-                OnPropertyChanged("layoutHPSF");
+                _layoutVision = value;
+                OnPropertyChanged("layoutVision");
             }
         }
 
@@ -213,7 +213,9 @@ namespace Magnus_WPF_1
 
 
 
-        private LayoutPanel m_layoutPanel;
+        private LayoutPanel tempDefaultPanelHomeView;
+        private LayoutPanel tempPanelZoomView;
+
         public delegate void StateWindow(WindowState state);
         public static StateWindow changeStateWindow;
 
@@ -332,8 +334,16 @@ namespace Magnus_WPF_1
             Run_Sequence(activeImageDock.trackID);
 
         }
+
         public void Run_Sequence(int nTrack = (int)TRACK_TYPE.TRACK_ALL)
         {
+
+            if (master.m_bRobotSequenceStatus  && master.m_bBarcodeReaderSequenceStatus == true)
+            {
+                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Machine is running!", (int)ERROR_CODE.NO_LABEL);
+                return;
+            }
+
             btn_run_sequence.IsChecked = true;
             m_bEnableRunSequence = (bool)btn_run_sequence.IsChecked;
             inspect_offline_btn.IsEnabled = false;
@@ -342,16 +352,23 @@ namespace Magnus_WPF_1
             Application.m_strCurrentLot = Application.GetStringRegistry(Application.m_strCurrentLot_Registry, strLotID);
             //
 
+            if (!master.m_bRobotSequenceStatus)
+            {
+                master.m_bBarcodeReaderSequenceStatus = true;
+                m_staticView.ResetMappingResult(0);
+                m_staticView.ClearStatistic(0);
+                master.RunOnlineSequenceThread(0);
+                master.RobotSequenceThread();
+            }
 
-            m_staticView.ResetMappingResult(0);
-            m_staticView.ClearStatistic(0);
-            master.RunOnlineSequenceThread(0);
-            master.RobotSequenceThread();
-
-            m_staticView.ResetMappingResult(1);
-            m_staticView.ClearStatistic(1);
-            master.RunOnlineSequenceThread(1);
-            master.BarcodeReaderSequenceThread();
+            if (!master.m_bBarcodeReaderSequenceStatus)
+            {
+                master.m_bBarcodeReaderSequenceStatus = true;
+                m_staticView.ResetMappingResult(1);
+                m_staticView.ClearStatistic(1);
+                master.RunOnlineSequenceThread(1);
+                master.BarcodeReaderSequenceThread();
+            }
             //master.RunOnlineSequenceThread(0);
 
             //if (nTrack == (int)TRACK_TYPE.TRACK_ALL)
@@ -383,7 +400,7 @@ namespace Magnus_WPF_1
 
         public void InitBigDocPanel()
         {
-            bigPanelGroup.Children.Add(imageZoomViewPane);
+            zoomDocPaneGroup.Children.Add(imageZoomViewPane);
             imageZoomViewPane.DockWidth = new System.Windows.GridLength(screenWidth / 1.5);
             imageZoomViewPane.DockHeight = new System.Windows.GridLength(screenHeight / 1);
             imageZoomViewPane.DockMinHeight = screenHeight / 1;
@@ -397,10 +414,10 @@ namespace Magnus_WPF_1
             //    Title = "Output Log"
             //}));
 
-            imageZoomViewPane.Children.Add(bigDoc);
-            bigDoc.Title = "Zoom Doc Panel";
-            bigDoc.CanClose = false;
-            bigDoc.CanFloat = false;
+            imageZoomViewPane.Children.Add(zoomDoc);
+            zoomDoc.Title = "Zoom Doc Panel";
+            zoomDoc.CanClose = false;
+            zoomDoc.CanFloat = false;
         }
 
         public void InitTeachDocument()
@@ -419,7 +436,7 @@ namespace Magnus_WPF_1
 
             // InitTeachDocument();
 
-            m_layoutPanel = new LayoutPanel();
+            tempDefaultPanelHomeView = new LayoutPanel();
             mainPanelGroup = new LayoutDocumentPaneGroup();
             mainPanelGroup.Orientation = Orientation.Horizontal;
             outPutLogPaneGroup = new LayoutAnchorablePaneGroup();
@@ -439,7 +456,6 @@ namespace Magnus_WPF_1
 
             imagesViewPane = new LayoutDocumentPane[numTrack];
             imagesViewDoc = new LayoutDocument[total_doc];
-
             for (int track_index = 0; track_index < numTrack; track_index++)
             {
                 imagesViewPane[track_index] = new LayoutDocumentPane();
@@ -453,10 +469,13 @@ namespace Magnus_WPF_1
                         Content = master.m_Tracks[track_index].m_imageViews[doc_index],
                         ContentId = "N/A ",
                         CanFloat = true,
-                        CanClose = false,
+                        CanClose = false
+                        
                         //CanMove = false,
                     };
                     imagesViewPane[track_index].Children.Add(imagesViewDoc[track_index * num_Doc + doc_index]);
+                    //imagesViewPane[track_index].CanRepositionItems = false;
+
                 }
             }
             #endregion
@@ -470,7 +489,7 @@ namespace Magnus_WPF_1
             outPutLogViewDoc.ContentId = "";
 
             outPutLogViewDoc.CanClose = false;
-            outPutLogViewDoc.CanHide = true;
+            outPutLogViewDoc.CanHide = false;
             outPutLogViewDoc.AutoHideMinWidth = screenWidth / 1;
 
             outPutLogViewPane = new LayoutAnchorablePane();
@@ -495,8 +514,8 @@ namespace Magnus_WPF_1
             m_MappingViewDoc.Content = m_staticView;
             m_MappingViewDoc.ContentId = "";
 
-            m_MappingViewDoc.CanClose = false;
-            m_MappingViewDoc.CanHide = false;
+            m_MappingViewDoc.CanClose = true;
+            m_MappingViewDoc.CanHide = true;
             m_MappingViewDoc.AutoHideMinWidth = screenWidth / 1;
 
             m_MappingViewPane = new LayoutAnchorablePane();
@@ -520,13 +539,14 @@ namespace Magnus_WPF_1
             m_layout.Orientation = Orientation.Horizontal;
             m_layout.Children.Add(mainPanelGroup);
             m_layout.Children.Add(outPutLogPaneGroup);
-            
-            m_layoutPanel.Orientation = Orientation.Vertical;
-            m_layoutPanel.Children.Add(m_layout);
-            m_layoutPanel.Children.Add(m_MappingPaneGroup);
-            
-            layoutHPSF = new LayoutRoot();
-            layoutHPSF.RootPanel = m_layoutPanel;
+            tempDefaultPanelHomeView.Orientation = Orientation.Vertical;
+            tempDefaultPanelHomeView.Children.Add(m_layout);
+            tempDefaultPanelHomeView.Children.Add(m_MappingPaneGroup);
+            tempPanelZoomView = new LayoutPanel();
+            tempPanelZoomView.Children.Add(zoomDocPaneGroup);
+
+            layoutVision = new LayoutRoot();
+            layoutVision.RootPanel = tempDefaultPanelHomeView;
             #endregion
         }
         public event PropertyChangedEventHandler PropertyChanged;
@@ -573,26 +593,43 @@ namespace Magnus_WPF_1
         public void ZoomDocPanel(int trackID)
         {
 
+
             if (!isOneSpecificDocState)
             {
-                oldPanelGroup = mainPanelGroup;
-                imageZoomViewPane.ReplaceChild(bigDoc, imagesViewDoc[trackID]);
-                imagesViewDoc[trackID].CanClose = false;
-                imagesViewDoc[trackID].CanFloat = false;
-                m_layoutPanel.ReplaceChildAt(0, bigPanelGroup);
-                m_layoutPanel.RemoveChildAt(1);
-                //m_layoutPanel.Orientation = Orientation.Horizontal;
+                zoomDoc.Title = imagesViewDoc[trackID].Title;
+                zoomDoc.Content = imagesViewDoc[trackID].Content;
+                zoomDoc.ContentId = imagesViewDoc[trackID].ContentId;
+                zoomDoc.CanFloat = true;
+                zoomDoc.CanClose = true;
+                zoomDoc.CanMove = true;
+                layoutVision.ReplaceChild(tempDefaultPanelHomeView, tempPanelZoomView);
             }
             else
             {
-                mainPanelGroup = oldPanelGroup;
-                imagesViewDoc[trackID].CanClose = false;
-                imagesViewDoc[trackID].CanFloat = false;
-                imageZoomViewPane.ReplaceChild(imagesViewDoc[trackID], bigDoc);
-                imagesViewPane[trackID].Children.Add(imagesViewDoc[trackID]);
-                m_layoutPanel.ReplaceChildAt(0, m_layout);
-                m_layoutPanel.Children.Add(m_MappingPaneGroup);
+                layoutVision.ReplaceChild(tempPanelZoomView, tempDefaultPanelHomeView);
             }
+
+            //if (!isOneSpecificDocState)
+            //{
+            //    oldPanelGroup = mainPanelGroup;
+            //    imageZoomViewPane.ReplaceChild(zoomDoc, imagesViewDoc[trackID]);
+            //    imagesViewDoc[trackID].CanClose = true;
+            //    imagesViewDoc[trackID].CanFloat = true;
+            //    m_layoutPanel.ReplaceChildAt(0, bigPanelGroup);
+            //    //m_layoutPane
+            //    //m_layoutPanel.Orientation = Orientation.Horizontal;
+            //}
+            //else
+            //{
+            //    mainPanelGroup = oldPanelGroup;
+            //    imagesViewDoc[trackID].CanClose = true;
+            //    imagesViewDoc[trackID].CanFloat = true;
+            //    imageZoomViewPane.ReplaceChild(imagesViewDoc[trackID], zoomDoc);
+            //    imagesViewPane[trackID].Children.Add(imagesViewDoc[trackID]);
+            //    m_layoutPanel.ReplaceChildAt(0, m_layout);
+            //    //m_layoutPanel.Children.Add(m_MappingPaneGroup);
+            //}
+
             isOneSpecificDocState = !isOneSpecificDocState;
             child_PreviewMouseRightButtonDown(activeImageDock, null);
         }
@@ -615,7 +652,6 @@ namespace Magnus_WPF_1
 
         private void TabablzControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
         }
 
         private void Inspect_Checked(object sender, RoutedEventArgs e)
@@ -1005,28 +1041,6 @@ namespace Magnus_WPF_1
 
         }
 
-        //private void tbl_Recipe_Name_IsMouseDirectlyOverChanged(object sender, DependencyPropertyChangedEventArgs e)
-        //{
-        //    bool isMouseOver = (bool)e.NewValue;
-        //    if (!isMouseOver)
-        //        return;
-        //    TextBlock textBlock = (TextBlock)sender;
-        //    ((ToolTip)textBlock.ToolTip).Visibility =
-        //         Visibility.Visible;
-        //    string pathRecipe = Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe);
-        //    tbl_recipe_name_tooltip.Text = pathRecipe;
-        //}
-        //private void tbl_Recipe_ID_IsMouseDirectlyOverChanged(object sender, DependencyPropertyChangedEventArgs e)
-        //{
-        //    bool isMouseOver = (bool)e.NewValue;
-        //    if (!isMouseOver)
-        //        return;
-        //    TextBlock textBlock = (TextBlock)sender;
-        //    ((ToolTip)textBlock.ToolTip).Visibility =
-        //         Visibility.Visible;
-        //    string pathRecipe = Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe);
-        //}
-
 
         public static bool isRobotControllerOpen = false;
         private void btn_Clear_Comm_Click(object sender, RoutedEventArgs e)
@@ -1035,37 +1049,9 @@ namespace Magnus_WPF_1
         }
 
 
-        //private void btn_CommLog_Checked(object sender, RoutedEventArgs e)
-        //{
-        //    isRobotControllerOpen = (bool)btn_CommLog.IsChecked;
-        //    master.OpenHiwinRobotDialog(isRobotControllerOpen);
-        //}
-
-        //private void btn_CommLog_Unchecked(object sender, RoutedEventArgs e)
-        //{
-        //    isRobotControllerOpen = (bool)btn_CommLog.IsChecked;
-        //    master.OpenHiwinRobotDialog(isRobotControllerOpen);
-        //}
-
         public void btn_Online_click(object sender, RoutedEventArgs e)
         {
 
-        }
-
-        private void btn_MinimizeApplicaton_Click(object sender, RoutedEventArgs e)
-        {
-            this.WindowState = WindowState.Minimized;
-        }
-        private void btn_CloseApplication_Click(object sender, RoutedEventArgs e)
-        {
-            //for (int indextrack = 0; indextrack < Application.Application.num_track; indextrack++)
-            //{
-            //    if (master.trackSF[indextrack].isAvailable == false)
-            //        continue;
-            //    master.trackSF[indextrack].camera.ReleaseCamera();
-            //}
-            //master.ReleaseAllThread();
-            //master.applications.KillCurrentProcess();
         }
 
          public void AddLineOutputLog(string text, int nStyle = (int)ERROR_CODE.PASS)
@@ -1490,9 +1476,9 @@ namespace Magnus_WPF_1
             else
                 CleanHotKey();
 
-            tabItem_View.IsEnabled = bEnable;
+            tab_Hardware_view.IsEnabled = bEnable;
             tab_vision_view.IsEnabled = bEnable;
-
+            tabTool_View.IsEnabled = bEnable;
             inspect_btn.IsEnabled = bEnable;
             debug_btn.IsEnabled = bEnable;
             inspect_offline_btn.IsEnabled = bEnable;
@@ -1597,34 +1583,36 @@ namespace Magnus_WPF_1
             //        return;
             //    }
             //}
-            Panel.SetZIndex(Source.Application.Application.loginUser.panelLogIn, 3);
+            //Panel.SetZIndex(Source.Application.Application.loginUser.panelLogIn, 3);
             //_dialogDefectHeight = Source.Application.Application.loginUser.Height;
             //DialogUCWidth = Source.Application.Application.loginUser.Width;
             grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Center;
             grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Center;
             grd_PopupDialog.Visibility = Visibility.Visible;
             grd_Dialog_Settings.Visibility = Visibility.Visible;
-            Source.Application.Application.loginUser.userName.Focus();
+            Source.Application.Application.loginUser.InitLogInDialog();
+
+            //Source.Application.Application.loginUser.userName.Focus();
 
         }
 
        public bool bNextStepSimulateSequence = false;
-        private void btn_Simulate_Sequence_Click(object sender, RoutedEventArgs e)
-        {
-            if(bNextStepSimulateSequence == false)
-                bNextStepSimulateSequence = true;
-            btn_Simulate_Sequence.IsChecked = false;
-        }
+        //private void btn_Simulate_Sequence_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if(bNextStepSimulateSequence == false)
+        //        bNextStepSimulateSequence = true;
+        //    btn_Simulate_Sequence.IsChecked = false;
+        //}
 
 
-        public bool bNextStepSimulateSequence_2 = false;
-        private void btn_Simulate_Sequence_2_Click(object sender, RoutedEventArgs e)
-        {
-            if (bNextStepSimulateSequence_2 == false)
-                bNextStepSimulateSequence_2 = true;
-            btn_Simulate_Sequence_2.IsChecked = false;
+        //public bool bNextStepSimulateSequence_2 = false;
+        //private void btn_Simulate_Sequence_2_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (bNextStepSimulateSequence_2 == false)
+        //        bNextStepSimulateSequence_2 = true;
+        //    btn_Simulate_Sequence_2.IsChecked = false;
 
-        }
+        //}
 
         private void text_LotID_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -1636,6 +1624,12 @@ namespace Magnus_WPF_1
         private void text_LotID_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
 
+        }
+
+        private void StackPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+                DragMove();
         }
     }
 }

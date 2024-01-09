@@ -429,6 +429,10 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void dataGrid_all_robot_Positions_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            if (dataGrid_all_robot_Positions.CurrentColumn == null)
+                return;
+            if (dataGrid_all_robot_Positions.CurrentColumn.DisplayIndex > 1)
+                return;
 
             if (dataGrid_all_robot_Positions.SelectedIndex >= 0 && dataGrid_all_robot_Positions.SelectedIndex < m_List_sequencePointData.Count)
             {

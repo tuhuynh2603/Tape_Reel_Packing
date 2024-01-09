@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Magnus_WPF_1.UI.UserControls"
-             mc:Ignorable="d" Height="340" Width="600"
+             mc:Ignorable="d" Height="340" Width="550"
              d:DesignHeight="340">
     <UserControl.Resources>
         <Storyboard x:Key="ForegroundColor">
@@ -15,228 +15,236 @@
     </UserControl.Resources>
 
     <Grid x:Name="LoginGrid">
-        <Grid.Background>
+        <!--<Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="DarkGreen" Offset="0.855"/>
-                <GradientStop Color="DarkSeaGreen" Offset="0.541"/>
+                <GradientStop Color="#FF03D4F2" Offset="0.439"/>
+                <GradientStop Color="#FF17717E" Offset="0.808"/>
             </LinearGradientBrush>
-        </Grid.Background>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition></ColumnDefinition>
-            <ColumnDefinition></ColumnDefinition>
-        </Grid.ColumnDefinitions>
+        </Grid.Background>-->
+        <Image Source="..\..\Resources\Machine.png" Width="1000"></Image>
 
-        <StackPanel Grid.Column="0" VerticalAlignment="Top">
-            <StackPanel Orientation="Horizontal">
-                <!--<Image Source="/Resource/ED_LOGO_Circle.png"                 
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal">
+                    <!--<Image Source="/Resource/ED_LOGO_Circle.png"                 
             		Stretch="Uniform"
             		VerticalAlignment="Center" Height="80" Margin="15,20,0,0"/>-->
-                <TextBlock Text="WELCOME TO HD "
-            		Foreground="#FF01249C"
+                    <TextBlock Text="WELCOME TO HD "
+            		Foreground="#FFD16512"
             		FontFamily="Segoe Print"
-            		FontSize="30"
+            		FontSize="28"
             		VerticalAlignment="Center"
             		FontWeight="Bold" 
                     Margin="10 20 0 0"/>
-            </StackPanel>
-            <TextBlock Margin="0 0 0 0"></TextBlock>
-            <Border BorderThickness="0,1,0,0" BorderBrush="White" Margin="0 20 0 0">
-                <StackPanel Orientation="Horizontal" >
-                    <Label Content="User:" Padding="5,1,0,1"
+                </StackPanel>
+
+                <TextBlock Margin="0 0 0 0"></TextBlock>
+                <Border BorderThickness="0,0,0,0"  Margin="0 20 0 0">
+                    <StackPanel Orientation="Horizontal" >
+                        <Label Content="User:" Padding="5,1,0,1"
                        FontFamily="Microsoft YaHei UI" 
-                       Foreground="White"
+                       Foreground="#FFD16512"
                        FontSize="12"/>
-                    <Label x:Name="currentUser" Padding="5,1,0,1"
+                        <Label x:Name="currentUser" Padding="5,1,0,1"
                        Margin="61,0,0,0"
                            
                        FontFamily="Microsoft YaHei UI" 
-                       Foreground="Black"
+                       Foreground="#FFD16512"
                        Content="None" 
                        FontSize="12" FontWeight="SemiBold"/>
-                </StackPanel>
-            </Border>
-            <Border BorderThickness="0,0,0,1" BorderBrush="White">
-                <StackPanel Orientation="Horizontal">
-                    <Label Content="Access Level:" Padding="5,1,0,1"
-                       Foreground="White"
+                    </StackPanel>
+                </Border>
+                <Border BorderThickness="0,0,0,0" BorderBrush="White">
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Access Level:" Padding="5,1,0,1"
+                       Foreground="#FFD16512"
                        FontFamily="Microsoft YaHei UI" 
                        FontSize="12"/>
-                    <Label x:Name="currentAccesslevel"
+                        <Label x:Name="currentAccesslevel"
                        Content="None" Padding="5,1,0,1"
-                       Foreground="Black"
+                       Foreground="#FFD16512"
                        Margin="15,0,0,0"
                        FontFamily="Microsoft YaHei UI" 
                        FontSize="12" FontWeight="Bold"/>
-                </StackPanel>
-            </Border>
-        </StackPanel>
-        <StackPanel VerticalAlignment="Bottom" Margin="5,0,0,20">
-            <TextBlock Text="Log In" Margin="2" Name="tbx"
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+            <StackPanel VerticalAlignment="Bottom" Margin="5,0,0,20">
+                <TextBlock Text="Log In" Margin="2" Name="tbx"
                        HorizontalAlignment="Left"
                        TextDecorations="Underline"
                        FontSize="14" MouseDown="logInMouseDown">
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Foreground" Value="#FFE9EAF0"></Setter>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="Blue"></Setter>
-                            </Trigger>
-                            <EventTrigger RoutedEvent="MouseDown">
-                                <EventTrigger.Actions>
-                                    <BeginStoryboard Storyboard="{StaticResource ForegroundColor}"></BeginStoryboard>
-                                </EventTrigger.Actions>
-                            </EventTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
-            <TextBlock x:Name="mncs" Text="Create New User Account"
-                       HorizontalAlignment="Left" Margin="2"
-                       TextDecorations="Underline"
-                       FontSize="14" MouseDown="NewUserMouseDown" >
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Foreground" Value="#FFE9EAF0"></Setter>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="Blue"></Setter>
-                            </Trigger>
-                            <EventTrigger RoutedEvent="MouseDown">
-                                <EventTrigger.Actions>
-                                    <BeginStoryboard Storyboard="{StaticResource ForegroundColor}"></BeginStoryboard>
-                                </EventTrigger.Actions>
-                            </EventTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
-            <TextBlock Text="Change Password"
-                       HorizontalAlignment="Left" Margin="2"
-                       TextDecorations="Underline"
-                       FontSize="14" MouseDown="ChangePWMouseDown" >
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Foreground" Value="#FFE9EAF0"></Setter>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="Blue"></Setter>
-                            </Trigger>
-                            <EventTrigger RoutedEvent="MouseDown">
-                                <EventTrigger.Actions>
-                                    <BeginStoryboard Storyboard="{StaticResource ForegroundColor}"></BeginStoryboard>
-                                </EventTrigger.Actions>
-                            </EventTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
-            <TextBlock Text="Delete Current User Account"
-                       HorizontalAlignment="Left" Margin="2"
-                       FontSize="13" MouseDown="DeleteUserMouseDown" FontStyle="Italic" >
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Foreground" Value="#FFE9EAF0"></Setter>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="Blue"></Setter>
-                            </Trigger>
-                            <EventTrigger RoutedEvent="MouseDown">
-                                <EventTrigger.Actions>
-                                    <BeginStoryboard Storyboard="{StaticResource ForegroundColor}"></BeginStoryboard>
-                                </EventTrigger.Actions>
-                            </EventTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
-            <TextBlock Text="Log Out"
-                       HorizontalAlignment="Left" Margin="2"
-                       FontStyle="Italic"
-                       FontSize="13" MouseDown="LogOutMouseDown" >
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Foreground" Value="#FFE9EAF0"></Setter>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="Blue"></Setter>
-                            </Trigger>
-                            <EventTrigger RoutedEvent="MouseDown">
-                                <EventTrigger.Actions>
-                                    <BeginStoryboard Storyboard="{StaticResource ForegroundColor}"></BeginStoryboard>
-                                </EventTrigger.Actions>
-                            </EventTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
-        </StackPanel>
-        <Border x:Name="panelLogIn" Grid.Column="1" BorderBrush="#FF7A78D1"    
-                Visibility="Visible" Panel.ZIndex="2"
-                BorderThickness="2,0,0,0" RenderTransformOrigin="0.5,0.5">
-
-            <Border.Background>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#FF3B3845" Offset="0.855"/>
-                    <GradientStop Color="#FF56D4E7" Offset="0.541"/>
-                </LinearGradientBrush>
-            </Border.Background>
-            <StackPanel x:Name="PanelLogIn" VerticalAlignment="Top" Margin="0,50,0,0"
-                        HorizontalAlignment="Center">
-                <Label Content="Log In" FontSize="25" Foreground="Black"
-                       Name="lbLogin"
-                       FontWeight="Bold" FontStretch="Expanded"
-                       FontFamily="Microsoft YaHei UI" 
-                       ></Label>
-                <Label Name="sa" Content="Login to access software" Foreground="Black"/>
-                <TextBlock x:Name="NotifyLogin"
-                           Foreground="Red"
-                           Margin="11,10,0,0">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
-                            <Setter Property="Visibility" Value="Visible"/>
+                            <Setter Property="Foreground" Value="#FFD16512"></Setter>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Text}" Value="">
-                                    <Setter Property="Visibility" Value="Collapsed"></Setter>
-                                </DataTrigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Foreground" Value="Blue"></Setter>
+                                </Trigger>
+                                <EventTrigger RoutedEvent="MouseDown">
+                                    <EventTrigger.Actions>
+                                        <BeginStoryboard Storyboard="{StaticResource ForegroundColor}"></BeginStoryboard>
+                                    </EventTrigger.Actions>
+                                </EventTrigger>
                             </Style.Triggers>
                         </Style>
                     </TextBlock.Style>
                 </TextBlock>
-                <Border  Margin="0,5,0,0"
+                <TextBlock x:Name="mncs" Text="Create New User Account"
+                       HorizontalAlignment="Left" Margin="2"
+                       TextDecorations="Underline"
+                       FontSize="14" MouseDown="NewUserMouseDown" >
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="#FFD16512"></Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Foreground" Value="Blue"></Setter>
+                                </Trigger>
+                                <EventTrigger RoutedEvent="MouseDown">
+                                    <EventTrigger.Actions>
+                                        <BeginStoryboard Storyboard="{StaticResource ForegroundColor}"></BeginStoryboard>
+                                    </EventTrigger.Actions>
+                                </EventTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBlock Text="Change Password"
+                       HorizontalAlignment="Left" Margin="2"
+                       TextDecorations="Underline"
+                       FontSize="14" MouseDown="ChangePWMouseDown" >
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="#FFD16512"></Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Foreground" Value="Blue"></Setter>
+                                </Trigger>
+                                <EventTrigger RoutedEvent="MouseDown">
+                                    <EventTrigger.Actions>
+                                        <BeginStoryboard Storyboard="{StaticResource ForegroundColor}"></BeginStoryboard>
+                                    </EventTrigger.Actions>
+                                </EventTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBlock Text="Delete Current User Account"
+                       HorizontalAlignment="Left" Margin="2"
+                       FontSize="13" MouseDown="DeleteUserMouseDown" FontStyle="Italic" >
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="#FFD16512"></Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Foreground" Value="Blue"></Setter>
+                                </Trigger>
+                                <EventTrigger RoutedEvent="MouseDown">
+                                    <EventTrigger.Actions>
+                                        <BeginStoryboard Storyboard="{StaticResource ForegroundColor}"></BeginStoryboard>
+                                    </EventTrigger.Actions>
+                                </EventTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBlock Text="Log Out"
+                       HorizontalAlignment="Left" Margin="2"
+                       FontStyle="Italic"
+                       FontSize="13" MouseDown="LogOutMouseDown" >
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="#FFD16512"></Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Foreground" Value="Blue"></Setter>
+                                </Trigger>
+                                <EventTrigger RoutedEvent="MouseDown">
+                                    <EventTrigger.Actions>
+                                        <BeginStoryboard Storyboard="{StaticResource ForegroundColor}"></BeginStoryboard>
+                                    </EventTrigger.Actions>
+                                </EventTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StackPanel>
+            <Border x:Name="panelLogIn" Grid.Column="1" 
+                Visibility="Visible" Panel.ZIndex="2"
+                BorderThickness="0" RenderTransformOrigin="0.5,0.5">
+
+                <!--<Border.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FF03D4F2" Offset="0.439"/>
+                    <GradientStop Color="#FF17717E" Offset="0.808"/>
+                </LinearGradientBrush>
+            </Border.Background>-->
+                <StackPanel x:Name="PanelLogIn" VerticalAlignment="Top" Margin="0,50,0,0"
+                        HorizontalAlignment="Center">
+                    <Label Content="Log In" FontSize="25" Foreground="#FFD16512"
+                       Name="lbLogin"
+                       FontWeight="Bold" FontStretch="Expanded"
+                       FontFamily="Microsoft YaHei UI" 
+                       ></Label>
+                    <Label Name="sa" Content="Login to access software" Foreground="Wheat"/>
+                    <TextBlock x:Name="NotifyLogin"
+                           Foreground="Red"
+                           Margin="11,10,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed"></Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <Border  Margin="0,5,0,0"
                          CornerRadius="10"
                          BorderThickness="3"
                          Background="#FFF0EEDB">
-                    <TextBox x:Name="userName" 
+                        <TextBox x:Name="userName" 
+                                 
                          Foreground="Gray"
                          Text="USERNAME" Background="{x:Null}"
                          BorderBrush="{x:Null}"
                          BorderThickness="0"
                          ToolTip="Enter Username" 
+                         TabIndex="0"
+         
                          LostFocus="TextBoxLostFocus" GotFocus="TextboxGotFocus"></TextBox>
-                </Border>
-                <Border  Margin="0,15,0,0"
+                    </Border>
+                    <Border  Margin="0,15,0,0"
                          CornerRadius="10"
                          BorderThickness="3" 
                          Background="#FFF0EEDB">
-                    <PasswordBox x:Name="passWord"
+                        <PasswordBox x:Name="passWord"
+                                 TabIndex="1"   
                                  Password="1111111111"
                                  Foreground="Gray" 
                                  ToolTip="Enter Password"
                                  Background="{x:Null}" BorderBrush="{x:Null}"
                                  GotFocus="PWGotFocus" LostFocus="PWLostFoucs"></PasswordBox>
-                </Border>
-                <StackPanel Orientation="Horizontal"
+                    </Border>
+                    <StackPanel Orientation="Horizontal"
                             Margin="20">
-                    <Border CornerRadius="10"
+                        <Border CornerRadius="10"
                             BorderThickness="3" >
-                        <Border.Background>
-                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FFD16512" Offset="0"/>
-                                <GradientStop Color="#FFE58B12" Offset="0.996"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
-                        <Button x:Name="loginOk"
+                            <Border.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="#FFD16512" Offset="0"/>
+                                    <GradientStop Color="#FFE58B12" Offset="0.996"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Button x:Name="loginOk"
                                 Width="80"
                                 Height="35"
                                 FontSize="15"
@@ -246,16 +254,16 @@
                                 Background="{x:Null}" 
                                 BorderBrush="{x:Null}" 
                                 Click="Login_Click"></Button>
-                    </Border>
-                    <Border CornerRadius="10" Margin=" 10,0,0,0"
-                            BorderThickness="3" >
-                        <Border.Background>
-                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FFD16512" Offset="0"/>
-                                <GradientStop Color="#FFE58B12" Offset="0.996"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
-                        <Button x:Name="loginCancel"
+                        </Border>
+                        <Border CornerRadius="10" Margin=" 10,0,0,0"
+                            BorderThickness="0" >
+                            <Border.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="#FFD16512" Offset="0"/>
+                                    <GradientStop Color="#FFE58B12" Offset="0.996"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Button x:Name="loginCancel"
                                 Click="Cancel_Click"
                                 Width="80"
                                 Height="35"
@@ -263,212 +271,215 @@
                                 FontSize="15"
                                 FontWeight="Bold"
                                 Content="Cancel" Background="{x:Null}" BorderBrush="{x:Null}"></Button>
-                    </Border>
+                        </Border>
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
-        </Border>
-        <Border x:Name="panelCreateUser" Grid.Column="1" BorderBrush="#FF7A78D1"
+            </Border>
+            <Border x:Name="panelCreateUser" Grid.Column="1"
                 Visibility="Visible" Panel.ZIndex="2"
-                BorderThickness="2,0,0,0">
-            <Border.Background>
+                BorderThickness="0,0,0,0">
+                <!--<Border.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="DarkGreen" Offset="0.855"/>
-                    <GradientStop Color="DarkSeaGreen" Offset="0.541"/>
-                </LinearGradientBrush>
-            </Border.Background>
-            <StackPanel VerticalAlignment="Top" Margin="0,20,0,0"
+                    <GradientStop Color="#FF03D4F2" Offset="0.439"/>
+                    <GradientStop Color="#FF17717E" Offset="0.808"/>
+                </LinearGradientBrush>-->
+                <!--</Border.Background>-->
+                <StackPanel VerticalAlignment="Top" Margin="0,20,0,0"
                         HorizontalAlignment="Center">
-                <Label Content="Create New User" FontSize="25"
-            		   Foreground="#FF01249C"
+                    <Label Content="Create New User" FontSize="25"
+            		   Foreground="#FFD16512"
                        FontWeight="Bold" FontStretch="Expanded" HorizontalAlignment="Center"
                        FontFamily="Microsoft YaHei UI"
                        ></Label>
-                <TextBlock x:Name="NotifyNewUser"
+                    <TextBlock x:Name="NotifyNewUser"
                            Foreground="Red"
                            Margin="38,15,0,10">
-                    <TextBlock.Style>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="Visibility" Value="Visible"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Text}" Value="">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-                <Border  Margin="0,0,0,0"
+                        <TextBlock.Style>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <Border  Margin="0,0,0,0"
                          Width="200"
                          CornerRadius="10"
                          BorderThickness="3" 
                          Background="#FFF0EEDB">
-                    <TextBox x:Name="userNameNew" 
+                        <TextBox x:Name="userNameNew" 
                          Foreground="Gray"
                          Text="USERNAME" Background="{x:Null}"
                          ToolTip="Enter Username"
                          BorderBrush="{x:Null}" LostFocus="TextBoxLostFocus" GotFocus="TextboxGotFocus"></TextBox>
-                </Border>
-                <Border  Margin="0,15,0,0"
+                    </Border>
+                    <Border  Margin="0,15,0,0"
                          CornerRadius="10"
                          Width="200"
                          BorderThickness="3" 
                          Background="#FFF0EEDB">
-                    <PasswordBox x:Name="passWordNew"
+                        <PasswordBox x:Name="passWordNew"
                                  Password="1111111111" Foreground="Gray" 
                                  Background="{x:Null}" BorderBrush="{x:Null}"
                                  ToolTip="Enter Password"
                                  GotFocus="PWGotFocus" LostFocus="PWLostFoucs"></PasswordBox>
-                </Border>
-                <Border  Margin="0,15,0,0"
+                    </Border>
+                    <Border  Margin="0,15,0,0"
                          CornerRadius="10"
                          Width="200"
                          BorderThickness="3" 
                          Background="#FFF0EEDB">
-                    <PasswordBox x:Name="ConfirmPassWordNew"
+                        <PasswordBox x:Name="ConfirmPassWordNew"
                                  Password="1111111111" Foreground="Gray" 
                                  Background="{x:Null}" BorderBrush="{x:Null}"
                                  ToolTip="Confirm Password"
                                  GotFocus="PWGotFocus" LostFocus="PWLostFoucs"></PasswordBox>
-                </Border>
-                <StackPanel Orientation="Horizontal" 
+                    </Border>
+                    <StackPanel Orientation="Horizontal" 
                             Margin="5,15,0,0"
                             Width="200"
                             HorizontalAlignment="Center"
                             Height="20">
-                    <RadioButton Content="Engineer"
+                        <RadioButton Content="Engineer"
                                  Name="engineerLevel"
                                  VerticalAlignment="Center"
                                  IsChecked="True"
                                  Margin="0,0,7,0"
                                  Padding="0"
-                                 Width="70" FontWeight="SemiBold" HorizontalAlignment="Center"></RadioButton>
-                    <RadioButton Content="Operator" 
+                                 Width="70" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="#FFD16512"></RadioButton>
+                        <RadioButton Content="Operator" 
                                  Name="operatorLevel"
                                  VerticalAlignment="Center"
                                  Padding="0"
-                                 Width="70" FontWeight="SemiBold" Margin="0,0,7,0"></RadioButton>
-                    <RadioButton Content="User"
+                                 Width="70" FontWeight="SemiBold" Margin="0,0,7,0"  Foreground="#FFD16512"></RadioButton>
+                        <RadioButton Content="User"
                                  Padding="0"
                                  VerticalAlignment="Center"
                                  Name="userLevel"
-                                 Width="70" FontWeight="SemiBold"></RadioButton>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal"
+                                 Width="70" FontWeight="SemiBold"  Foreground="#FFD16512"></RadioButton>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Center"
                             Margin="20">
-                    <Border CornerRadius="10" Margin="0,0,40,0"
+                        <Border CornerRadius="10" Margin="0,0,40,0"
                             BorderThickness="3" >
-                        <Border.Background>
-                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="DeepSkyBlue" Offset="0"/>
-                                <GradientStop Color="Gray" Offset="0.996"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
-                        <Button x:Name="createOk"
+                            <Border.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="#FFD16512" Offset="0"/>
+                                    <GradientStop Color="#FFE58B12" Offset="0.996"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Button x:Name="createOk"
                                 Width="80"
                                 Content="Create"
                                 Click="CreateNewUser_Click"
                                 Background="{x:Null}" BorderBrush="{x:Null}"></Button>
-                    </Border>
-                    <Border CornerRadius="10" Margin=" 10,0,0,0"
+                        </Border>
+                        <Border CornerRadius="10" Margin=" 10,0,0,0"
                             HorizontalAlignment="Right"
                             BorderThickness="3" >
-                        <Border.Background>
-                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="DeepSkyBlue" Offset="0"/>
-                                <GradientStop Color="Gray" Offset="0.996"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
-                        <Button x:Name="createCancel"
+                            <Border.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="#FFD16512" Offset="0"/>
+                                    <GradientStop Color="#FFE58B12" Offset="0.996"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Button x:Name="createCancel"
                                 Width="80"
                                 Click="Cancel_Click"
                                 Content="Cancel" Background="{x:Null}" BorderBrush="{x:Null}"></Button>
-                    </Border>
+                        </Border>
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
-        </Border>
-        <Border x:Name="panelChangePassword" Grid.Column="1" BorderBrush="#FF7A78D1"
+            </Border>
+            <Border x:Name="panelChangePassword" Grid.Column="1"
                 Visibility="Visible" Panel.ZIndex="0"
-                BorderThickness="2,0,0,0">
-            <Border.Background>
+                BorderThickness="0,0,0,0">
+                <!--<Border.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#FF3B3845" Offset="0.855"/>
-                    <GradientStop Color="#FF56D4E7" Offset="0.541"/>
+                    <GradientStop Color="#FF03D4F2" Offset="0.439"/>
+                    <GradientStop Color="#FF17717E" Offset="0.808"/>
                 </LinearGradientBrush>
-            </Border.Background>
-            <StackPanel x:Name="PanelChangePassword" VerticalAlignment="Top" Margin="0,50,0,0"
+            </Border.Background>-->
+                <StackPanel x:Name="PanelChangePassword" VerticalAlignment="Top" Margin="0,50,0,0"
                         HorizontalAlignment="Center">
-                <Label Content="New Password" FontSize="25" Foreground="Black"
+                    <Label Content="New Password" FontSize="25" Foreground="#FFD16512"
                        FontWeight="Bold" FontStretch="Expanded"
                        FontFamily="Microsoft YaHei UI"
                        ></Label>
-                <TextBlock x:Name="NotifyChangePw"
+                    <TextBlock x:Name="NotifyChangePw"
                            Foreground="Red" 
                            Margin="10,20,0,0">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Visibility" Value="Visible"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Text}" Value="">
-                                    <Setter Property="Visibility" Value="Collapsed"></Setter>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-                <Border  Margin="0,0,0,0"
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed"></Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <Border  Margin="0,0,0,0"
                          CornerRadius="10"
                          BorderThickness="3" 
                          Background="#FFF0EEDB">
-                    <PasswordBox x:Name="NewPassWord"
+                        <PasswordBox x:Name="NewPassWord"
                                  Password="1111111111" Foreground="Gray" 
                                  Background="{x:Null}" BorderBrush="{x:Null}"
                                  ToolTip="Enter New Password"
                                  GotFocus="PWGotFocus" LostFocus="PWLostFoucs"></PasswordBox>
-                </Border>
+                    </Border>
 
-                <Border  Margin="0,15,0,0"
+                    <Border  Margin="0,15,0,0"
                          CornerRadius="10"
                          BorderThickness="3" 
                          Background="#FFF0EEDB">
-                    <PasswordBox x:Name="ConfirmNewPassWord"
+                        <PasswordBox x:Name="ConfirmNewPassWord"
                                  Password="1111111111" Foreground="Gray" 
                                  Background="{x:Null}" BorderBrush="{x:Null}"
                                  ToolTip="Confirm Password"
                                  GotFocus="PWGotFocus" LostFocus="PWLostFoucs"></PasswordBox>
-                </Border>
-                <StackPanel Orientation="Horizontal"
+                    </Border>
+                    <StackPanel Orientation="Horizontal"
                             Margin="20">
-                    <Border CornerRadius="10"
+                        <Border CornerRadius="10"
                             BorderThickness="3" >
-                        <Border.Background>
-                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FFD16512" Offset="0"/>
-                                <GradientStop Color="#FFE58B12" Offset="0.996"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
-                        <Button x:Name="chagneOk"
+                            <Border.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="#FFD16512" Offset="0"/>
+                                    <GradientStop Color="#FFE58B12" Offset="0.996"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Button x:Name="chagneOk"
                                 Width="80"
                                 Content="Change" 
                                 Click="ChangePW_Click"
                                 Background="{x:Null}" BorderBrush="{x:Null}"></Button>
-                    </Border>
-                    <Border CornerRadius="10" Margin=" 10,0,0,0"
+                        </Border>
+                        <Border CornerRadius="10" Margin=" 10,0,0,0"
                             BorderThickness="3" >
-                        <Border.Background>
-                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FFD16512" Offset="0"/>
-                                <GradientStop Color="#FFE58B12" Offset="0.996"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
-                        <Button x:Name="changecancel"
+                            <Border.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="#FFD16512" Offset="0"/>
+                                    <GradientStop Color="#FFE58B12" Offset="0.996"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Button x:Name="changecancel"
                                 Width="80"
                                 Content="Cancel"
                                 Click="Cancel_Click"
                                 Background="{x:Null}" BorderBrush="{x:Null}"></Button>
-                    </Border>
+                        </Border>
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
-        </Border>
+            </Border>
+
+        </Grid>
+
     </Grid>
 </UserControl>

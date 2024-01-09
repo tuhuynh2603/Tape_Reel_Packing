@@ -186,13 +186,18 @@
     <Compile Include="UI\UserControls\RecipeManageView.xaml.cs">
       <DependentUpon>RecipeManageView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\UserControls\ViewModel\BaseVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\RecipeManageVM.cs" />
+    <Compile Include="UI\UserControls\ViewModel\TitleBarVM.cs" />
     <Compile Include="UI\UserControls\View\ImageView.xaml.cs">
       <DependentUpon>ImageView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Source\UIImage\TransformImage.cs" />
     <Compile Include="UI\UserControls\View\StatisticView.xaml.cs">
       <DependentUpon>StatisticView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\UserControls\View\TitleBar.xaml.cs">
+      <DependentUpon>TitleBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\UserControls\WarningMessageBox.xaml.cs">
       <DependentUpon>WarningMessageBox.xaml</DependentUpon>
@@ -270,6 +275,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\UserControls\View\StatisticView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\UserControls\View\TitleBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -423,6 +432,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\ContinueSequenceButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Machine.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

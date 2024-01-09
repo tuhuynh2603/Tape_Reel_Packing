@@ -23,9 +23,9 @@ using EasyModbus;
     {
         public enum PLC_ADDRESS
         {
-            PLC_BARCODE_TRIGGER = 100,
-            PLC_BARCODE_CAPTURE_DONE = 101,
-            PLC_BARCODE_RESULT = 102,
+            //PLC_BARCODE_TRIGGER = 100,
+
+            //PLC_BARCODE_CAPTURE_DONE = 101,
             PLC_CURRENT_BARCODE_CHIP_COUNT = 103,
             PLC_CURRENT_ROBOT_CHIP_COUNT = 104,
             PLC_RESET_LOT = 105,
@@ -35,6 +35,7 @@ using EasyModbus;
             PLC_IMIDIATE_STATUS = 109,
             PLC_RESET_STATUS = 110,
             PLC_ROBOT_RESULT = 111,
+            PLC_BARCODE_RESULT = 112,
 
         }
 

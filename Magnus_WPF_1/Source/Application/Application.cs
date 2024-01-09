@@ -274,7 +274,8 @@ namespace Magnus_WPF_1.Source.Application
 
         public static void LoadCamSetting(int nTrack)
         {
-
+            if (nTrack != 0)
+                return;
             #region USB Camera
             string strRecipePath = Path.Combine(pathRecipe, currentRecipe);
             string pathCam = Path.Combine(strRecipePath, "camera_Track" + (nTrack + 1).ToString() + ".cam");

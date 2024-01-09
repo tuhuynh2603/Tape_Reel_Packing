@@ -447,20 +447,46 @@ namespace Magnus_WPF_1.UI.UserControls
 			//		}
 			//	}
 			//}
-			Panel.SetZIndex(panelLogIn, 2);
-			Panel.SetZIndex(panelChangePassword, 0);
-			Panel.SetZIndex(panelCreateUser, 0);
-			ResetTextBox();
-			userName.Focus();
+			InitLogInDialog();
 		}
+
+		public void InitLogInDialog()
+        {
+			panelLogIn.IsEnabled = true;
+			panelLogIn.Visibility = Visibility.Visible;
+
+			panelChangePassword.IsEnabled = false;
+			panelChangePassword.Visibility = Visibility.Collapsed;
+
+			panelCreateUser.IsEnabled = false;
+			panelCreateUser.Visibility = Visibility.Collapsed;
+
+            Panel.SetZIndex(panelLogIn, 2);
+            Panel.SetZIndex(panelChangePassword, 0);
+            Panel.SetZIndex(panelCreateUser, 0);
+            ResetTextBox();
+			userName.Focus();
+			//userName.IsTabStop = true;
+		}
+
 		private void NewUserMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
 			//main.CleanHotKey();
 			if (MainWindow.accountUser != "None")
 			{
-				Panel.SetZIndex(panelLogIn, 0);
-				Panel.SetZIndex(panelChangePassword, 0);
-				Panel.SetZIndex(panelCreateUser, 2);
+                Panel.SetZIndex(panelLogIn, 0);
+                Panel.SetZIndex(panelChangePassword, 0);
+                Panel.SetZIndex(panelCreateUser, 2);
+
+                panelLogIn.IsEnabled = false ;
+				panelLogIn.Visibility = Visibility.Collapsed;
+
+				panelChangePassword.IsEnabled = false;
+				panelChangePassword.Visibility = Visibility.Collapsed;
+
+				panelCreateUser.IsEnabled = true;
+				panelCreateUser.Visibility = Visibility.Visible;
+
 				ResetTextBox();
 				userNameNew.Focus();
 				engineerLevel.IsEnabled = true;
@@ -493,9 +519,18 @@ namespace Magnus_WPF_1.UI.UserControls
 			//main.CleanHotKey();
 			if (MainWindow.accountUser != "None")
 			{
-				Panel.SetZIndex(panelLogIn, 0);
-				Panel.SetZIndex(panelChangePassword, 2);
-				Panel.SetZIndex(panelCreateUser, 0);
+                Panel.SetZIndex(panelLogIn, 0);
+                Panel.SetZIndex(panelChangePassword, 2);
+                Panel.SetZIndex(panelCreateUser, 0);
+                panelLogIn.IsEnabled = false;
+				panelLogIn.Visibility = Visibility.Collapsed;
+
+				panelChangePassword.IsEnabled = true;
+				panelChangePassword.Visibility = Visibility.Visible;
+
+				panelCreateUser.IsEnabled = false;
+				panelCreateUser.Visibility = Visibility.Collapsed;
+
 				ResetTextBox();
 				NewPassWord.Focus();
 			}
@@ -601,7 +636,7 @@ namespace Magnus_WPF_1.UI.UserControls
 
 					currentUser.Content = "None";
 					currentAccesslevel.Content = "None";
-
+						
 					main.IsFisrtLogin = false;
 					//main.CleanHotKey();
 					MainWindow.UICurrentState = UISTate.LOGOUT_STATE;

@@ -34,14 +34,21 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         }
         public enum INPUT_IOROBOT
         {
-            PLC_READY = 1,
-            PLC_READY_2 = 2,
-            PLC_BARCODE_TRIGGER = 3,
-            AIR_PRESSURESTATUS = 4,
-
+            PLC_PACKING_PROCESS_READY = 1,
+            PLC_CHIPFOUND = 2,
+            PLC_ALLOW_TO_PLACE = 3,// Allow to place
+            PLC_BARCODE_TRIGGER = 4, //
             EMERGENCY_STATUS = 5,
-            IMIDIATE_STATUS = 6,
+            IMIDIATE_STOP_STATUS = 6,
             RESET_STATUS = 7,
+            RUNSEQUENCE_STATUS = 8,
+            PLC_CREATE_NEW_LOT = 9,
+            PLC_END_LOT = 10,
+
+
+            AIR_PRESSURESTATUS = 16, //
+
+
         }
 
         public enum OUTPUT_IOROBOT
@@ -50,10 +57,11 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             ROBOT_AIR_OFF = 2,
             ROBOT_READY_CONVEYOR_ON = 3,
             ROBOT_PLACE_DONE = 4,
-
-            EMERGENCY_STATUS = 5,
-            IMIDIATE_STATUS = 6,
-            RESET_STATUS = 7,
+            BARCODE_CAPTURE_BUSY = 5,
+            BARCODE_RESULT = 6,
+            EMERGENCY_STATUS = 8,
+            //IMIDIATE_STATUS = 6,
+            //RESET_STATUS = 7,
 
         }
 
@@ -230,7 +238,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                     foreach (var item in data)
                     {
                         ncol = 1;
-                        worksheet.Cells[row, ncol++].Value =item.m_PointIndex;
+                        worksheet.Cells[row, ncol++].Value = row - 1;
                         worksheet.Cells[row, ncol++].Value =item.m_PointComment;
                         worksheet.Cells[row, ncol++].Value =item.m_X;
                         worksheet.Cells[row, ncol++].Value =item.m_Y;
@@ -277,7 +285,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                     {
                         SequencePointData item = new SequencePointData();
                         int ncol = 1;
-                        item.m_PointIndex = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
+                        item.m_PointIndex = row - 1; ncol++;
                         item.m_PointComment = worksheet.Cells[row, ncol++].Value.ToString();
                         item.m_X = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
                         item.m_Y = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);

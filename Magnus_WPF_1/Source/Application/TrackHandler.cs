@@ -636,8 +636,8 @@ namespace Magnus_WPF_1.Source.Application
 
                     Master.InspectEvent[m_nTrackID].Reset();
                     m_bInspecting = true;
-                    if (m_CurrentSequenceDeviceID < 0 || m_CurrentSequenceDeviceID >= m_VisionResultDatas.Length)
-                        m_CurrentSequenceDeviceID = 0;
+                    //if (m_CurrentSequenceDeviceID < 0 || m_CurrentSequenceDeviceID >= m_VisionResultDatas.Length)
+                    //    m_CurrentSequenceDeviceID = 0;
 
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
@@ -733,6 +733,7 @@ namespace Magnus_WPF_1.Source.Application
 
 
         public int m_CurrentSequenceDeviceID = -1;
+        public int m_CurrentPLCRegisterDeviceID = -1;
         public int m_nCurrentClickMappingID = -1;
         public PointF m_Center_Vision = new PointF();
         public double m_dDeltaAngleInspection = 0.0;
@@ -978,8 +979,8 @@ namespace Magnus_WPF_1.Source.Application
 
                 // Update Current Device ID
                 //m_CurrentSequenceDeviceID++;
-                if (m_CurrentSequenceDeviceID >= Source.Application.Application.categoriesMappingParam.M_NumberDevicePerLot || m_CurrentSequenceDeviceID < 0)
-                    m_CurrentSequenceDeviceID = 0;
+                //if (m_CurrentSequenceDeviceID >= Source.Application.Application.categoriesMappingParam.M_NumberDevicePerLot || m_CurrentSequenceDeviceID < 0)
+                //    m_CurrentSequenceDeviceID = 0;
 
 
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
@@ -1024,11 +1025,12 @@ namespace Magnus_WPF_1.Source.Application
                     {
                         m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nDeviceIndexOnReel = m_CurrentSequenceDeviceID;
                         m_VisionResultDatas[m_CurrentSequenceDeviceID].m_strDeviceID = strBarcodeResult;
+                        m_VisionResultDatas[m_CurrentSequenceDeviceID].m_strFullImagePath = strFullPathImageOut;
+
                         VisionResultData.SaveSequenceResultToExcel(Application.m_strCurrentLot, m_nTrackID, m_VisionResultDatas[m_CurrentSequenceDeviceID]);
                     }
 
                 }
-
 
                 Master.VisionReadyEvent[m_nTrackID].Set();
 

@@ -134,7 +134,7 @@ namespace Magnus_WPF_1.Source.Hardware
 			if (bIsDownload)
 				return "";
 			bIsDownload = true;
-			string str = "";
+			string strDeviceID = "";
 			string str2 = "";
 			string strLotID = "Dummy";
 
@@ -177,25 +177,24 @@ namespace Magnus_WPF_1.Source.Hardware
 			string resp = m_reader.ExecCommand("LON,01");
 			if (resp.Length > 0)
 			{
-				str = resp.Replace("\r", "");
-				str = str.Replace(":", "");
+				strDeviceID = resp.Replace("\r", "");
+				strDeviceID = strDeviceID.Replace(":", "");
 			}
 
-			LogMessage.WriteToDebugViewer(3, "Message responsed from Barcode Bank 1: " + str2);
-			string resp2 = m_reader.ExecCommand("LON,02");
-			if (resp2.Length > 0)
-			{
-				str2 = resp2.Replace("\r", "");
-			}
+			LogMessage.WriteToDebugViewer(3, "Message responsed from Barcode Bank 1: " + strDeviceID);
+			//string resp2 = m_reader.ExecCommand("LON,02");
+			//if (resp2.Length > 0)
+			//{
+			//	str2 = resp2.Replace("\r", "");
+			//}
 			Thread.Sleep(200);
 
-			string strDeviceID = $"{str}+{str2}";
-			if((str + str2).Length < 1)
+			if((strDeviceID).Length < 1)
             {
 				strDeviceID = string.Format("Dummy {0}{1}{2}+{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
 			}
 
-			LogMessage.WriteToDebugViewer(3, $"Message responsed from Barcode Bank 2: {str}");
+			LogMessage.WriteToDebugViewer(3, $"Message responsed from Barcode Bank 2: {strDeviceID}");
 			strImageFullName = Path.Combine(strFolder,  $"{strDeviceID}_{nDeviceID}.bmp");
 			strFullPathImageOut = strImageFullName;
 			
@@ -206,7 +205,7 @@ namespace Magnus_WPF_1.Source.Hardware
 			});
 			m_reader.ExecCommand("LOFF");
 			bIsDownload = false;
-				return str + "_" + str2;
+				return strDeviceID;
 		}
 
 		void LoadInforPortNumber()

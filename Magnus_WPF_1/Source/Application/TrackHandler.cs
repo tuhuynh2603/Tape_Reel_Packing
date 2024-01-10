@@ -896,6 +896,7 @@ namespace Magnus_WPF_1.Source.Application
 
         public void func_InspectOnlineThread()
         {
+            Start_InspectionOnlineThread:
 
             CheckInspectionOnlineThread();
             int nWidth = 0, nHeight = 0;
@@ -935,7 +936,6 @@ namespace Magnus_WPF_1.Source.Application
                     {
                         return;
                     }
-
                 }
                 timeIns.Restart();
                 string strFullPathImageOut = "";
@@ -977,11 +977,6 @@ namespace Magnus_WPF_1.Source.Application
                 }
 
 
-                // Update Current Device ID
-                //m_CurrentSequenceDeviceID++;
-                //if (m_CurrentSequenceDeviceID >= Source.Application.Application.categoriesMappingParam.M_NumberDevicePerLot || m_CurrentSequenceDeviceID < 0)
-                //    m_CurrentSequenceDeviceID = 0;
-
 
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
@@ -993,7 +988,8 @@ namespace Magnus_WPF_1.Source.Application
                 // Do Inspection
                 Master.InspectDoneEvent[m_nTrackID].Reset();
                 Master.InspectEvent[m_nTrackID].Set();
-                while (!Master.InspectDoneEvent[m_nTrackID].WaitOne(10))
+                int nCountTimeOut = 0;
+                while (!Master.InspectDoneEvent[m_nTrackID].WaitOne(3))
                 {
                     if (MainWindow.mainWindow == null)
                         return;
@@ -1002,6 +998,21 @@ namespace Magnus_WPF_1.Source.Application
                     {
                         return;
                     }
+
+                    nCountTimeOut++;
+                    if(nCountTimeOut > 1000)
+                    {
+                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Vision TIME OUT!", (int)ERROR_CODE.NO_LABEL);
+
+                        });
+                        m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
+                        Master.VisionReadyEvent[m_nTrackID].Set();
+                        Master.InspectEvent[m_nTrackID].Reset();
+                        goto Start_InspectionOnlineThread;
+                    }
+
                 }
 
                 InspectionDone:
@@ -1018,7 +1029,7 @@ namespace Magnus_WPF_1.Source.Application
                     if (m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nResult != (int)ERROR_CODE.PASS)
                     {
                         string strFailImage = strFullPathImageOut.Replace("PASS IMAGE", "FAIL IMAGE");
-                        if (File.Exists(strFullPathImageOut))
+                        if (File.Exists(strFullPathImageOut) && !File.Exists(strFailImage))
                             File.Move(strFullPathImageOut, strFailImage);
                     }
                     else
@@ -1036,7 +1047,7 @@ namespace Magnus_WPF_1.Source.Application
 
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Device {m_CurrentSequenceDeviceID + 1}, Result = {m_VisionResultDatas[m_CurrentSequenceDeviceID]}  Inspection sequence time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Device {m_CurrentSequenceDeviceID + 1}, Result = {m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nResult}  Inspection sequence time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
 
                 });
                 timeIns.Restart();

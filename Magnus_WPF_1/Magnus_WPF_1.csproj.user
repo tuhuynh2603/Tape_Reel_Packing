@@ -13,7 +13,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
     <EnableSQLServerDebugging>true</EnableSQLServerDebugging>
-    <RemoteDebugEnabled>false</RemoteDebugEnabled>
+    <RemoteDebugEnabled>true</RemoteDebugEnabled>
     <RemoteDebugMachine>localhost:4024</RemoteDebugMachine>
     <AuthenticationMode>None</AuthenticationMode>
     <StartWorkingDirectory>C:\Wisely\C#\Debug\</StartWorkingDirectory>

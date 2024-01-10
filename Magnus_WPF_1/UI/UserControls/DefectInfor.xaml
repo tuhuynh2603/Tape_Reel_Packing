@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Magnus_WPF_1.UI.UserControls"
              mc:Ignorable="d" 
-             Width="Auto" Height="500"
+             Width="500" Height="500"
              UseLayoutRounding="True" Foreground="White">
     <Grid>
         <Border CornerRadius="0" BorderThickness="1" BorderBrush="#FF86D2F9" Background="#FF242526">

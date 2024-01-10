@@ -354,12 +354,12 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void button_Save_Sequence_Click(object sender, RoutedEventArgs e)
         {
-            var result = MessageBox.Show("Do you want to save All Points To Excel File ?", "", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            var result = MessageBox.Show("Would you like to save all points to Excel file ?", "", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
             {
                 HiWinRobotInterface.SequencePointData.SaveRobotPointsToExcel(m_List_sequencePointData);
                 HiWinRobotInterface.SequencePointData.ReadRobotPointsFromExcel(ref m_List_sequencePointData);
-
+                Docalibration();
             }
         }
 
@@ -984,7 +984,11 @@ namespace Magnus_WPF_1.Source.Hardware
 
             System.Drawing.PointF[] vision_points;
             System.Drawing.PointF[] robot_points = new System.Drawing.PointF[3];
-            MainWindow.mainWindow.master.m_Tracks[0].CalibrationGet3Points(out vision_points);
+            if(MainWindow.mainWindow.master.m_Tracks[0].CalibrationGet3Points(out vision_points) < 0)
+            {
+                MessageBox.Show("Calibration sequence failed to get vision points, please check the lower and higher threshold or the lighting...", "", MessageBoxButton.OKCancel);
+                return;
+            }
 
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {

@@ -799,8 +799,16 @@ namespace Magnus_WPF_1.Source.Algorithm
 
                 List<PointF> listCornerPoints = new List<PointF>();
                 List<PointF> listCenterPoints = new List<PointF>();
+
+                List<PointF> listCornerPoints_Fail = new List<PointF>();
+                List<PointF> listCenterPoints_Fail = new List<PointF>();
+
+
+
                 PointF cornerPointTemp = new PointF();
                 bool bIsChipFound = false;
+                bool bIsChipNoCornerFound = false;
+
                 while (true)
                 {
                     mat_BiggestInnerChipRegion = new CvImage();
@@ -825,35 +833,43 @@ namespace Magnus_WPF_1.Source.Algorithm
                     PushBackDebugInfors(imgSource, mat_InnerChipOpeningRegion, "Inner Chip Region after Remove Biggest region. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
                     timeIns.Restart();
                     if (Math.Abs(rotateRect_Device.Size.Width / rotateRect_Device.Size.Height - m_DeviceLocationParameter.m_L_TemplateRoi.Width / m_DeviceLocationParameter.m_L_TemplateRoi.Height) > 0.2)
-                    {
+                        continue;
 
+                    int nError =  FindNearestPoints_Debug(zoomedInImage, rotateRect_Device, ref cornerPointTemp, ref list_arrayOverlay, ref debugInfors, bEnableDebug);
+                    Point pCenterTemp = new Point((int)rotateRect_Device.Center.X, (int)rotateRect_Device.Center.Y);
+                    if (nError < 0)
+                    {
+                        bIsChipNoCornerFound = true;
+                        listCenterPoints_Fail.Add(pCenterTemp);
+                        listCornerPoints_Fail.Add(cornerPointTemp);
                         continue;
                     }
+                    else
+                    {
+                        bIsChipFound = true;
+                        listCenterPoints.Add(pCenterTemp);
+                        listCornerPoints.Add(cornerPointTemp);
+                    }
 
-                    cornerPointTemp = FindNearestPoints_Debug(zoomedInImage, rotateRect_Device, ref list_arrayOverlay, ref debugInfors, bEnableDebug);
-                    if (cornerPointTemp.X + cornerPointTemp.Y == 0)
-                        continue;
-
-                    bIsChipFound = true;
-                    Point pCenterTemp = new Point((int)rotateRect_Device.Center.X, (int)rotateRect_Device.Center.Y);
-
-                    listCenterPoints.Add(pCenterTemp);
-                    listCornerPoints.Add(cornerPointTemp);
                 }
 
-                if (!bIsChipFound)
+                //if (bIsChipFound | bIsChipNoCornerFound == false)
+                //    return -(int)ERROR_CODE.NO_PATTERN_FOUND;
+
+                if (bIsChipFound)
+                {
+                    int nIndexOut = MagnusOpenCVLib.SelectPointBased_Top_Left_Bottom_Right(ref listCenterPoints, ref pCenter, (int)POSITION._BOTTOM);
+                    p_CenterPoint_Temp = pCenter;
+                    p_CornerPoint_Temp = listCornerPoints[nIndexOut];
+                }
+                else if(bIsChipNoCornerFound)
+                {
+                    int nIndexOut = MagnusOpenCVLib.SelectPointBased_Top_Left_Bottom_Right(ref listCenterPoints_Fail, ref pCenter, (int)POSITION._BOTTOM);
+                    p_CenterPoint_Temp = pCenter;
+                    p_CornerPoint_Temp = listCornerPoints[nIndexOut];
+                }
+                else
                     return -(int)ERROR_CODE.NO_PATTERN_FOUND;
-
-
-                int nIndexOut = MagnusOpenCVLib.SelectPointBased_Top_Left_Bottom_Right(ref listCenterPoints, ref pCenter, (int)POSITION._TOP);
-                if (nIndexOut < 0)
-                    return -(int)ERROR_CODE.NO_PATTERN_FOUND;
-
-
-                p_CenterPoint_Temp = pCenter;
-
-                p_CornerPoint_Temp = listCornerPoints[nIndexOut];
-
 
             }
             else
@@ -941,16 +957,20 @@ namespace Magnus_WPF_1.Source.Algorithm
             return -(int)ERROR_CODE.PASS;
         }
 
-        public PointF FindNearestPoints_Debug(CvImage imgSourceInput, RotatedRect rotateRect_Device, ref List<ArrayOverLay> list_arrayOverlay, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug)
+        public int FindNearestPoints_Debug(CvImage imgSourceInput, RotatedRect rotateRect_Device, ref PointF pCornerOut, ref List<ArrayOverLay> list_arrayOverlay, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug)
         {
-
             Stopwatch timeIns = new Stopwatch();
             CvPointArray regionPoints = new CvPointArray();
+
+            PointF[] points = rotateRect_Device.GetVertices();
+            pCornerOut = points[0];
 
             //RotatedRect rotateRect = new RotatedRect(polygonInput[polygonInput.Count() - 1], new SizeF(rectMatchingPosition.Width - 30, rectMatchingPosition.Height - 30), -fAngleInput);
             CvImage rec_region2 = new CvImage();
             rec_region2 = CvImage.Zeros(imgSourceInput.Height, imgSourceInput.Width, DepthType.Cv8U, 1);
             MagnusOpenCVLib.GenRectangle2(rec_region2, rotateRect_Device, new MCvScalar(255), 1);
+
+
             PushBackDebugInfors(imgSourceInput, rec_region2, "Inner region after GenRectangle2. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             AddRegionOverlay(ref list_arrayOverlay, rec_region2, Colors.Yellow);
 
@@ -986,7 +1006,7 @@ namespace Magnus_WPF_1.Source.Algorithm
 
             CvInvoke.FindNonZero(mat_BiggestRegion, regionPoints);
             if (regionPoints.Size == 0)
-                return new PointF(0,0);
+                return -1;
 
             AddRegionOverlay(ref list_arrayOverlay, mat_BiggestRegion, Colors.Cyan);
 
@@ -1020,12 +1040,11 @@ namespace Magnus_WPF_1.Source.Algorithm
 
             CvInvoke.FindNonZero(mat_CornerBiggestRegion, regionPoints);
             if (regionPoints.Size == 0)
-                return new PointF(0, 0);
+                return -1;
             AddRegionOverlay(ref list_arrayOverlay, mat_CornerBiggestRegion, Colors.Blue);
 
             System.Drawing.Rectangle rect_temp = CvInvoke.BoundingRectangle(regionPoints);
             Point Center_Point = new Point(rect_temp.Left + rect_temp.Width / 2, rect_temp.Top + rect_temp.Height / 2);
-            PointF[] points = rotateRect_Device.GetVertices();
             double minDistance = 9999999;
             int nminIndex = -1;
             for (int n = 0; n < rotateRect_Device.GetVertices().Count(); n++)
@@ -1038,7 +1057,8 @@ namespace Magnus_WPF_1.Source.Algorithm
                 }
             }
 
-            return points[nminIndex];
+            pCornerOut = points[nminIndex];
+            return 0;
         }
 
 

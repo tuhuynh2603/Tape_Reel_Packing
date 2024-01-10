@@ -242,29 +242,29 @@ namespace Magnus_WPF_1
 
             ContrucUIComponent();
             MappingImageDockToAvalonDock();
-            StateChanged += delegate (object sender, EventArgs e)
-            {
-                if ((sender as Window) == null)
-                    return;
-                switch ((sender as Window).WindowState)
-                {
-                    case WindowState.Maximized:
-                        changeStateWindow?.Invoke(WindowState.Maximized);
-                        break;
-                    case WindowState.Minimized:
-                        changeStateWindow?.Invoke(WindowState.Minimized);
-                        break;
-                    case WindowState.Normal:
-                        changeStateWindow?.Invoke(WindowState.Normal);
-                        break;
-                    default:
-                        break;
-                }
-            };
-            Deactivated += delegate (object sender, EventArgs e)
-            {
+            //StateChanged += delegate (object sender, EventArgs e)
+            //{
+            //    if ((sender as Window) == null)
+            //        return;
+            //    switch ((sender as Window).WindowState)
+            //    {
+            //        case WindowState.Maximized:
+            //            changeStateWindow?.Invoke(WindowState.Maximized);
+            //            break;
+            //        case WindowState.Minimized:
+            //            changeStateWindow?.Invoke(WindowState.Minimized);
+            //            break;
+            //        case WindowState.Normal:
+            //            changeStateWindow?.Invoke(WindowState.Normal);
+            //            break;
+            //        default:
+            //            break;
+            //    }
+            //};
+            //Deactivated += delegate (object sender, EventArgs e)
+            //{
 
-            };
+            //};
 
             //master.m_Tracks[0].m_imageViews[0].resultTeach.Children.Clear();
             //master.m_Tracks[0].m_imageViews[0].ClearOverlay();
@@ -328,7 +328,7 @@ namespace Magnus_WPF_1
             bEnableOfflineInspection = (bool)inspect_offline_btn.IsChecked;
         }
 
-        public bool m_bEnableRunSequence = false;
+        public bool m_bSequenceRunning = false;
         private void btn_run_sequence_Checked(object sender, RoutedEventArgs e)
         {
             Run_Sequence(activeImageDock.trackID);
@@ -345,7 +345,7 @@ namespace Magnus_WPF_1
             }
 
             btn_run_sequence.IsChecked = true;
-            m_bEnableRunSequence = (bool)btn_run_sequence.IsChecked;
+            m_bSequenceRunning = (bool)btn_run_sequence.IsChecked;
             inspect_offline_btn.IsEnabled = false;
             //
             string strLotID = string.Format("DUMMY_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
@@ -385,7 +385,7 @@ namespace Magnus_WPF_1
         }
         public void Stop_Sequence(int nTrack = (int)TRACK_TYPE.TRACK_ALL)
         {
-            m_bEnableRunSequence = false;
+            m_bSequenceRunning = false;
             inspect_offline_btn.IsEnabled = true;
             btn_run_sequence.IsChecked = false;
         }
@@ -792,7 +792,7 @@ namespace Magnus_WPF_1
         //public bool bEnableSingleSnapImages = true;
         private void btn_inspect_Click(object sender, RoutedEventArgs e)
         {
-            if (inspect_btn.IsEnabled == false)
+            if (!inspect_btn.IsEnabled || m_bSequenceRunning || (bool)btn_run_sequence.IsChecked)
                 return;
             //if (bEnableSingleSnapImages)
             //    bEnableSingleSnapImages = false;
@@ -1496,7 +1496,7 @@ namespace Magnus_WPF_1
             //HardWare
             btn_stream_camera.IsEnabled = bEnable;
             btn_camera_setting.IsEnabled = bEnable;
-            //btn_Robot_Controller.IsEnabled = bEnable;
+            btn_Robot_Controller.IsEnabled = bEnable;
             btn_BarCodeReader_Setting.IsEnabled = bEnable;
             btn_PLCCOMM_Setting.IsEnabled = bEnable;
 

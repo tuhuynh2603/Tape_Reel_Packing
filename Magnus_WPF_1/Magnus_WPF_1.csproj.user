@@ -14,7 +14,7 @@
     <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
     <EnableSQLServerDebugging>true</EnableSQLServerDebugging>
     <RemoteDebugEnabled>false</RemoteDebugEnabled>
-    <RemoteDebugMachine>DESKTOP-J62N07U:4024</RemoteDebugMachine>
+    <RemoteDebugMachine>localhost:4024</RemoteDebugMachine>
     <AuthenticationMode>None</AuthenticationMode>
     <StartWorkingDirectory>C:\Wisely\C#\Debug\</StartWorkingDirectory>
   </PropertyGroup>

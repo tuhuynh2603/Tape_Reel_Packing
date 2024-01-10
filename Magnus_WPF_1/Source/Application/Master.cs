@@ -709,7 +709,7 @@ namespace Magnus_WPF_1.Source.Application
             while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_PACKING_PROCESS_READY) == 0)
             {
                 // Need popup Dialog if waiting too long 
-                if (!MainWindow.mainWindow.m_bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection || m_EmergencyStatus > 0)
+                if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || m_EmergencyStatus > 0)
                     return;
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, "Waiting for PLC ready Signal....");
@@ -772,7 +772,7 @@ namespace Magnus_WPF_1.Source.Application
             timeIns.Start();
 
             //int nChipCount = 0;
-            while (MainWindow.mainWindow.m_bEnableRunSequence || MainWindow.mainWindow.bEnableOfflineInspection || m_bMachineNotReadyNeedToReset)
+            while (MainWindow.mainWindow.m_bSequenceRunning || MainWindow.mainWindow.bEnableOfflineInspection || m_bMachineNotReadyNeedToReset)
             {
 
                 if (MainWindow.mainWindow == null)
@@ -789,7 +789,7 @@ namespace Magnus_WPF_1.Source.Application
                     if (MainWindow.mainWindow == null)
                         return;
 
-                    if (!MainWindow.mainWindow.m_bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection || m_bMachineNotReadyNeedToReset)
+                    if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || m_bMachineNotReadyNeedToReset)
                     {
                         return;
                     }
@@ -948,7 +948,7 @@ namespace Magnus_WPF_1.Source.Application
 
                 while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.AIR_PRESSURESTATUS) == 0)
                 {
-                    if (!MainWindow.mainWindow.m_bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
+                    if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection)
                     {
                         return;
                     }
@@ -1035,7 +1035,7 @@ namespace Magnus_WPF_1.Source.Application
 
                 while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_ALLOW_TO_PLACE) == 0)
                 {
-                    if (!MainWindow.mainWindow.m_bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection)
+                    if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection)
                     {
                         return;
                     }
@@ -1234,7 +1234,7 @@ namespace Magnus_WPF_1.Source.Application
             while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CHIPFOUND) == 0)
             {
 
-                if (!MainWindow.mainWindow.m_bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection || m_EmergencyStatus > 0)
+                if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || m_EmergencyStatus > 0)
                 {
                     return -1;
                 }
@@ -1275,7 +1275,7 @@ namespace Magnus_WPF_1.Source.Application
             while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_PACKING_PROCESS_READY) == 0)
             {
                 // Need popup Dialog if waiting too long 
-                if (!MainWindow.mainWindow.m_bEnableRunSequence && !MainWindow.mainWindow.bEnableOfflineInspection || m_EmergencyStatus > 0)
+                if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || m_EmergencyStatus > 0)
                     return;
 
                 LogMessage.LogMessage.WriteToDebugViewer(8, "Waiting for PLC ready Signal....");
@@ -1314,7 +1314,7 @@ namespace Magnus_WPF_1.Source.Application
             //(HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_PACKING_PROCESS_READY) == 0)
             m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_READY, 1);
 
-            while (MainWindow.mainWindow.m_bEnableRunSequence)
+            while (MainWindow.mainWindow.m_bSequenceRunning)
             {
                 LogMessage.LogMessage.WriteToDebugViewer(8, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 

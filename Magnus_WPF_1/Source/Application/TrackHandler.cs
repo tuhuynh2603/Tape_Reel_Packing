@@ -606,6 +606,8 @@ namespace Magnus_WPF_1.Source.Application
             Master.InspectEvent[m_nTrackID].Reset();
             PointF pCenter, pCorner;
             Stopwatch timeIns = new Stopwatch();
+            timeIns.Start();
+
             while (MainWindow.mainWindow != null)
             {
                 try
@@ -617,13 +619,15 @@ namespace Magnus_WPF_1.Source.Application
                     pCorner = new PointF(0, 0);
 
 
+                    Master.InspectEvent[m_nTrackID].WaitOne();
+                    //while (!Master.InspectEvent[m_nTrackID].WaitOne(10))
+                    //{
+                    //  if (MainWindow.mainWindow == null)
+                    //    return;
+                    //    Thread.Sleep(5);
+                    //}
+                    timeIns.Restart();
 
-                    while (!Master.InspectEvent[m_nTrackID].WaitOne(10))
-                    {
-                        if (MainWindow.mainWindow == null)
-                            return;
-                        Thread.Sleep(5);
-                    }
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                     if (m_imageViews[0].btmSource == null)
@@ -648,7 +652,6 @@ namespace Magnus_WPF_1.Source.Application
 
                     });
 
-                    timeIns.Start();
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                     m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nResult = Inspect(ref mainWindow.master.m_Tracks[m_nTrackID], out pCenter, out pCorner);
@@ -656,7 +659,7 @@ namespace Magnus_WPF_1.Source.Application
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
 
-                    if (Application.m_bEnableSavingOnlineImage && m_nTrackID == 0)
+                    if (Application.m_bEnableSavingOnlineImage && m_nTrackID == 0 && MainWindow.mainWindow.m_bSequenceRunning)
                     {
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
@@ -685,7 +688,6 @@ namespace Magnus_WPF_1.Source.Application
                     m_dDeltaAngleInspection = dDeltaAngle;
 
                     Master.InspectDoneEvent[m_nTrackID].Set();
-                    timeIns.Stop();
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, "Total inspection time: " + timeIns.ElapsedMilliseconds.ToString());
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
@@ -696,26 +698,24 @@ namespace Magnus_WPF_1.Source.Application
                         LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                         m_imageViews[0].tbl_InspectTime.Text = timeIns.ElapsedMilliseconds.ToString();
-
-                        // Update Statistics
-                        if (m_CurrentSequenceDeviceID == 0)
+                        if (MainWindow.mainWindow.m_bSequenceRunning)
                         {
+                            // Update Statistics
+                            if (m_CurrentSequenceDeviceID == 0)
+                            {
                             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                             {
                                 MainWindow.mainWindow.m_staticView.ResetMappingResult(m_nTrackID);
 
                             });
+                            }
+
+                            LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
+                            MainWindow.mainWindow.m_staticView.UpdateMappingResult(m_VisionResultDatas[m_CurrentSequenceDeviceID], m_nTrackID);
+                            LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+                            MainWindow.mainWindow.m_staticView.UpdateValueStatistic(m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nResult, m_nTrackID);
                         }
-
-                        LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-
-                        MainWindow.mainWindow.m_staticView.UpdateMappingResult( m_VisionResultDatas[m_CurrentSequenceDeviceID], m_nTrackID);
-                        LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-
-                        MainWindow.mainWindow.m_staticView.UpdateValueStatistic(m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nResult, m_nTrackID);
-
-                        LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-
                     });
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
@@ -741,7 +741,7 @@ namespace Magnus_WPF_1.Source.Application
         public void func_InspectOfflineThread(string strFolderPath)
         {
 
-            if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.m_bEnableRunSequence)
+            if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.m_bSequenceRunning)
                 return;
 
             CheckInspectionOnlineThread();
@@ -753,7 +753,7 @@ namespace Magnus_WPF_1.Source.Application
 
             // Loop through the items and print their names
 
-            while (MainWindow.mainWindow.bEnableOfflineInspection && !mainWindow.m_bEnableRunSequence)
+            while (MainWindow.mainWindow.bEnableOfflineInspection && !mainWindow.m_bSequenceRunning)
             {
                 try
                 {
@@ -762,7 +762,7 @@ namespace Magnus_WPF_1.Source.Application
                         if (MainWindow.mainWindow == null)
                             return;
 
-                        if (!MainWindow.mainWindow.bEnableOfflineInspection)
+                        if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.m_bSequenceRunning)
                             return;
 
                     }
@@ -795,7 +795,7 @@ namespace Magnus_WPF_1.Source.Application
                         if (MainWindow.mainWindow == null)
                             return;
 
-                        if (!MainWindow.mainWindow.bEnableOfflineInspection)
+                        if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.m_bSequenceRunning)
                             return;
                     }
                     Master.InspectDoneEvent[m_nTrackID].Reset();
@@ -920,7 +920,7 @@ namespace Magnus_WPF_1.Source.Application
             //m_cap.Start();
             Stopwatch timeIns = new Stopwatch();
             timeIns.Start();
-            while (MainWindow.mainWindow.m_bEnableRunSequence)
+            while (MainWindow.mainWindow.m_bSequenceRunning)
             {
 
                 if (MainWindow.mainWindow == null)
@@ -931,7 +931,7 @@ namespace Magnus_WPF_1.Source.Application
                     if (MainWindow.mainWindow == null)
                         return;
 
-                    if (!MainWindow.mainWindow.m_bEnableRunSequence)
+                    if (!MainWindow.mainWindow.m_bSequenceRunning)
                     {
                         return;
                     }
@@ -998,7 +998,7 @@ namespace Magnus_WPF_1.Source.Application
                     if (MainWindow.mainWindow == null)
                         return;
 
-                    if (!MainWindow.mainWindow.m_bEnableRunSequence)
+                    if (!MainWindow.mainWindow.m_bSequenceRunning)
                     {
                         return;
                     }

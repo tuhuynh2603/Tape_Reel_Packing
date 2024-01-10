@@ -44,9 +44,17 @@ namespace Magnus_WPF_1.UI.UserControls
                 paragraphOutputLog = new Paragraph();
                 m_MainWindow.outputLogView.outputLog.Blocks.Add(paragraphOutputLog);
             }
-
             else
             {
+
+                if (paragraphOutputLog.Inlines.Count() > 1000)
+                {
+                    paragraphOutputLog.Inlines.Remove(paragraphOutputLog.Inlines.FirstInline);
+                    //for(int n = 0; n< 10; n++)
+                    //    if (paragraphOutputLog.Inlines.Count()> 0)
+                    //        paragraphOutputLog.Inlines.Remove(paragraphOutputLog.Inlines.FirstInline);
+                }
+
                 //paragraphOutputLog.Inlines.Add(text + '\n');
                 if (nStyle == (int)ERROR_CODE.PASS)
                 {

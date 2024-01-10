@@ -231,7 +231,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             MainWindow.mainWindow.master.m_Tracks[nTrackId].m_nCurrentClickMappingID = nID + m_nPageID * MainWindow.mainWindow.m_nDeviceX * MainWindow.mainWindow.m_nDeviceY;
 
             MainWindow.mainWindow.master.m_Tracks[nTrackId].CheckInspectionOnlineThread();
-            if (MainWindow.mainWindow.m_bEnableRunSequence || MainWindow.mainWindow.bEnableOfflineInspection)
+            if (MainWindow.mainWindow.m_bSequenceRunning || MainWindow.mainWindow.bEnableOfflineInspection)
                 Master.m_OfflineTriggerSnapEvent[nTrackId].Set();
             else
                 Master.InspectEvent[nTrackId].Set();

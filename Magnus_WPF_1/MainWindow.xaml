@@ -589,10 +589,10 @@
 
                                         <Label x:Name="label_Barcode_Status"  Margin="0,0,0,0" FontSize="15" Grid.Row="1" Content="Disconnected" 
                                                     VerticalContentAlignment="Top">
-                                            <Label.Foreground>
+                                            <!--<Label.Foreground>
                                                 <SolidColorBrush Color="{Binding color_barcodeReaderStatus}">
                                                 </SolidColorBrush>
-                                            </Label.Foreground>
+                                            </Label.Foreground>-->
 
                                         </Label>
                                     </Grid>

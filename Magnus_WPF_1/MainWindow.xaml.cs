@@ -354,7 +354,7 @@ namespace Magnus_WPF_1
 
             if (!master.m_bRobotSequenceStatus)
             {
-                master.m_bBarcodeReaderSequenceStatus = true;
+                master.m_bRobotSequenceStatus = true;
                 m_staticView.ResetMappingResult(0);
                 m_staticView.ClearStatistic(0);
                 master.RunOnlineSequenceThread(0);

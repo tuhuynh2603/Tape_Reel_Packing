@@ -866,7 +866,7 @@ namespace Magnus_WPF_1.Source.Algorithm
                 {
                     int nIndexOut = MagnusOpenCVLib.SelectPointBased_Top_Left_Bottom_Right(ref listCenterPoints_Fail, ref pCenter, (int)POSITION._BOTTOM);
                     p_CenterPoint_Temp = pCenter;
-                    p_CornerPoint_Temp = listCornerPoints[nIndexOut];
+                    p_CornerPoint_Temp = listCornerPoints_Fail[nIndexOut];
                 }
                 else
                     return -(int)ERROR_CODE.NO_PATTERN_FOUND;

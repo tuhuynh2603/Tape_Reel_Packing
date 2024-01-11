@@ -622,10 +622,11 @@ namespace Magnus_WPF_1.Source.Application
                     Master.InspectEvent[m_nTrackID].WaitOne();
                     //while (!Master.InspectEvent[m_nTrackID].WaitOne(10))
                     //{
-                    //  if (MainWindow.mainWindow == null)
-                    //    return;
+                    //    if (MainWindow.mainWindow == null)
+                    //        return;
                     //    Thread.Sleep(5);
                     //}
+
                     timeIns.Restart();
 
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
@@ -989,7 +990,7 @@ namespace Magnus_WPF_1.Source.Application
                 Master.InspectDoneEvent[m_nTrackID].Reset();
                 Master.InspectEvent[m_nTrackID].Set();
                 int nCountTimeOut = 0;
-                while (!Master.InspectDoneEvent[m_nTrackID].WaitOne(3))
+                while (!Master.InspectDoneEvent[m_nTrackID].WaitOne(10))
                 {
                     if (MainWindow.mainWindow == null)
                         return;
@@ -1000,7 +1001,7 @@ namespace Magnus_WPF_1.Source.Application
                     }
 
                     nCountTimeOut++;
-                    if(nCountTimeOut > 1000)
+                    if(nCountTimeOut > 300)
                     {
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {

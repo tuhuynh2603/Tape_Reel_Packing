@@ -177,6 +177,7 @@ namespace Magnus_WPF_1.Source.Application
         public int m_ImidiateStatus = 0;
         public int m_ResetMachineStatus = 0;
         public int m_RunMachineStatus = 0;
+        public int m_DoorOpennedStatus = 0;
         public int m_EndLotStatus = 0;
         public int m_CreateNewLotStatus = 0;
 
@@ -786,7 +787,7 @@ namespace Magnus_WPF_1.Source.Application
                 timeIns.Restart();
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
-                while (!Master.VisionReadyEvent[0].WaitOne(1))
+                while (!Master.VisionReadyEvent[0].WaitOne(10))
                 {
                     if (MainWindow.mainWindow == null)
                         return;
@@ -1375,13 +1376,13 @@ namespace Magnus_WPF_1.Source.Application
                 Master.m_hardwareTriggerSnapEvent[1].Set();
                 nTimeout = 0;
                 LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Waiting for vision done.... ");
-                while (!VisionReadyEvent[1].WaitOne(1))
+                while (!VisionReadyEvent[1].WaitOne(10))
                 {
                     if (MainWindow.mainWindow == null)
                         return;
 
                     nTimeout++;
-                    if (nTimeout > 3000)
+                    if (nTimeout > 300)
                     {
                         nTimeout = 0;
                         Master.m_hardwareTriggerSnapEvent[1].Reset();
@@ -1462,6 +1463,8 @@ namespace Magnus_WPF_1.Source.Application
             int bEmergencyStatus_Backup = -1;
             int bImidiateStatus_Backup = -1;
             int bResetStatus_Backup = -1;
+            m_DoorOpennedStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_DOOR_STATUS);
+            int bDoorStatus_Backup = m_DoorOpennedStatus;
 
             int bEndLotStatus_Backup = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_END_LOT);
             int bCreateNewLotStatus_Backup = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CREATE_NEW_LOT);
@@ -1484,6 +1487,8 @@ namespace Magnus_WPF_1.Source.Application
                     m_ImidiateStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.IMIDIATE_STOP_STATUS) | m_ImidiateStatus_Simulate;
                     m_ResetMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RESET_STATUS) | m_ResetMachineStatus_Simulate;
                     m_RunMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RUNSEQUENCE_STATUS);
+                    m_DoorOpennedStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_DOOR_STATUS);
+
                     //m_EndLotStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_END_LOT);
                 }
 
@@ -1498,6 +1503,30 @@ namespace Magnus_WPF_1.Source.Application
 
                 }
 
+
+                if (m_DoorOpennedStatus > 0 && bDoorStatus_Backup != m_DoorOpennedStatus)
+                {
+                    m_ImidiateStatus = 1;
+                    m_bNeedToImidiateStop = true;
+                    string strMess = "Door is openned!";
+                    m_hiWinRobotInterface.StopMotor();
+                    HWinRobot.set_motor_state(HiWinRobotInterface.m_RobotConnectID, 0);
+                    MainWindow.mainWindow.PopupWarningMessageBox(strMess, WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
+                    //Thread.Sleep(100);
+
+                }
+                bDoorStatus_Backup = m_DoorOpennedStatus;
+                if (m_DoorOpennedStatus > 0)
+                {
+                    if(HWinRobot.get_acc_dec_ratio(m_RobotConnectID) > 10)
+                        HWinRobot.set_acc_dec_ratio(m_RobotConnectID, 10);
+
+                    if (HWinRobot.get_override_ratio(m_RobotConnectID) > 20)
+                        HWinRobot.set_override_ratio(m_RobotConnectID, 20);
+                }
+
+
+
                 if (m_EmergencyStatus > 0)
                 {
                     m_bMachineNotReadyNeedToReset = true;
@@ -1506,9 +1535,7 @@ namespace Magnus_WPF_1.Source.Application
                     string strMess = "Emergency Button clicked, please release them  then reset the sequence!";
                     MainWindow.mainWindow.PopupWarningMessageBox(strMess, WARNINGMESSAGE.MESSAGE_EMERGENCY);
                     //Thread.Sleep(100);
-
                     // Disable all motor function;
-
                 }
 
                 if(m_RunMachineStatus > 0)

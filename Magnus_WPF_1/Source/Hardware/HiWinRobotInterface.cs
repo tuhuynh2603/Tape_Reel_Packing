@@ -42,11 +42,10 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             IMIDIATE_STOP_STATUS = 6,
             RESET_STATUS = 7,
             RUNSEQUENCE_STATUS = 8,
-            PLC_CREATE_NEW_LOT = 9,
+            PLC_CREATE_NEW_LOT = 9,     
             PLC_END_LOT = 10,
-
-
-            AIR_PRESSURESTATUS = 16, //
+            PLC_DOOR_STATUS = 11,
+            AIR_PRESSURESTATUS = 16, // 
 
 
         }
@@ -383,7 +382,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 LogMessage.LogMessage.WriteToDebugViewer(1, "level:" + level);
 
                 HWinRobot.set_connection_level(m_RobotConnectID, 1);
-                HWinRobot.set_operation_mode(m_RobotConnectID, (int)ROBOT_OPERATION_MODE.MODE_AUTO);
+                HWinRobot.set_operation_mode(m_RobotConnectID, (int)ROBOT_OPERATION_MODE.MODE_MANUAL);
                 int nmode = HWinRobot.get_operation_mode(m_RobotConnectID);
                 string strMode = nmode == (int)ROBOT_OPERATION_MODE.MODE_AUTO ? "AUTO" : "MANUAL";
                 LogMessage.LogMessage.WriteToDebugViewer(1, "operation mode:" + strMode);

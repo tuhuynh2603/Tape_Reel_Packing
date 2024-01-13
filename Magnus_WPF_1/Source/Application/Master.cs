@@ -100,6 +100,7 @@ namespace Magnus_WPF_1.Source.Application
             if (m_IOStatusThread == null)
             {
                 m_IOStatusThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => func_IOStatusThread()));
+                m_IOStatusThread.IsBackground = true;
                 m_IOStatusThread.Start();
             }
 
@@ -109,6 +110,7 @@ namespace Magnus_WPF_1.Source.Application
                 if (m_SaveInspectImageThread[n] == null)
                 {
                     m_SaveInspectImageThread[n] = new System.Threading.Thread(new System.Threading.ThreadStart(() => func_RunSaveInspectImageThread(n)));
+                    m_SaveInspectImageThread[n].IsBackground = true;
                     m_SaveInspectImageThread[n].Start();
                 }
                 RunOnlineSequenceThread(n);
@@ -440,11 +442,13 @@ namespace Magnus_WPF_1.Source.Application
             if (threadInspecOffline == null)
             {
                 threadInspecOffline = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[nTrackID].func_InspectOfflineThread(m_folderPath)));
+                threadInspecOffline.IsBackground = true;
                 threadInspecOffline.Start();
             }
             else if (!threadInspecOffline.IsAlive)
             {
                 threadInspecOffline = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[nTrackID].func_InspectOfflineThread(m_folderPath)));
+                threadInspecOffline.IsBackground = true;
                 threadInspecOffline.Start();
             }
         }
@@ -459,31 +463,39 @@ namespace Magnus_WPF_1.Source.Application
             if (thread_InspectSequence[nTrack] == null)
             {
                 thread_InspectSequence[nTrack] = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[nTrack].func_InspectOnlineThread()));
+                thread_InspectSequence[nTrack].IsBackground = true;
                 thread_InspectSequence[nTrack].Start();
             }
             else if (!thread_InspectSequence[nTrack].IsAlive)
             {
                 thread_InspectSequence[nTrack] = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[nTrack].func_InspectOnlineThread()));
+                thread_InspectSequence[nTrack].IsBackground = true;
                 thread_InspectSequence[nTrack].Start();
             }
 
         }
 
 
-        internal void RobotSequenceThread()
+        internal bool RobotSequenceThread()
         {
 
             if (thread_RobotSequence == null)
             {
                 thread_RobotSequence = new System.Threading.Thread(new System.Threading.ThreadStart(() => func_RobotSequence()));
+                thread_RobotSequence.IsBackground = true;
                 thread_RobotSequence.Start();
+                return false;
             }
             else if (!thread_RobotSequence.IsAlive)
             {
                 thread_RobotSequence = new System.Threading.Thread(new System.Threading.ThreadStart(() => func_RobotSequence()));
+                thread_RobotSequence.IsBackground = true;
                 thread_RobotSequence.Start();
+                return false;
             }
+            return true;
         }
+
 
         public void func_ResetSequenceThread()
         {
@@ -729,6 +741,14 @@ namespace Magnus_WPF_1.Source.Application
         void func_RobotSequence()
         {
 
+            LogMessage.LogMessage.WriteToDebugViewer(9, "Run Robot Sequence Thread....");
+
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Reset Statistic!...", (int)ERROR_CODE.LABEL_FAIL);
+                MainWindow.mainWindow.ResetStatistic(0);
+
+            });
             while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_PACKING_PROCESS_READY) == 0)
             {
                 // Need popup Dialog if waiting too long 
@@ -777,10 +797,10 @@ namespace Magnus_WPF_1.Source.Application
 
             LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
-            VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, 0, ref m_Tracks[0].m_VisionResultDatas, ref m_Tracks[0].m_CurrentSequenceDeviceID);
+            //VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, 0, ref m_Tracks[0].m_VisionResultDatas, ref m_Tracks[0].m_CurrentSequenceDeviceID);
 
-            if (m_Tracks[0].m_CurrentSequenceDeviceID < 0 || m_Tracks[0].m_CurrentSequenceDeviceID >= Application.categoriesMappingParam.M_NumberDevicePerLot)
-                m_Tracks[0].m_CurrentSequenceDeviceID = 0;
+            //if (m_Tracks[0].m_CurrentSequenceDeviceID < 0 || m_Tracks[0].m_CurrentSequenceDeviceID >= Application.categoriesMappingParam.M_NumberDevicePerLot)
+            //    m_Tracks[0].m_CurrentSequenceDeviceID = 0;
 
             //Application.SetIntRegistry(Application.m_strCurrentDeviceID_Registry[0], m_Tracks[0].m_CurrentSequenceDeviceID);
             LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
@@ -1052,16 +1072,16 @@ namespace Magnus_WPF_1.Source.Application
                     return;
 
 
-                if (strLotID != Application.m_strCurrentLot)
-                {
-                    strLotID = Application.m_strCurrentLot;
-                    VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, 0, ref m_Tracks[0].m_VisionResultDatas, ref m_Tracks[0].m_CurrentSequenceDeviceID);
+                //if (strLotID != Application.m_strCurrentLot)
+                //{
+                //    strLotID = Application.m_strCurrentLot;
+                //    VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, 0, ref m_Tracks[0].m_VisionResultDatas, ref m_Tracks[0].m_CurrentSequenceDeviceID);
 
-                    if (m_Tracks[0].m_CurrentSequenceDeviceID < 0 || m_Tracks[0].m_CurrentSequenceDeviceID >= Application.categoriesMappingParam.M_NumberDevicePerLot)
-                        m_Tracks[0].m_CurrentSequenceDeviceID = 0;
+                //    if (m_Tracks[0].m_CurrentSequenceDeviceID < 0 || m_Tracks[0].m_CurrentSequenceDeviceID >= Application.categoriesMappingParam.M_NumberDevicePerLot)
+                //        m_Tracks[0].m_CurrentSequenceDeviceID = 0;
 
 
-                }
+                //}
 
                 //Application.SetIntRegistry(Application.m_strCurrentDeviceID_Registry[0], m_Tracks[0].m_CurrentSequenceDeviceID);
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
@@ -1069,6 +1089,7 @@ namespace Magnus_WPF_1.Source.Application
 
                 // If not yet trigger camera 1, trigger again
                 m_StartWaitPLCReadyToTriggerCameraThread[0] = new System.Threading.Thread(new System.Threading.ThreadStart(() => func_CameraTriggerThread(nCurrentSequenceStep, 0)));
+                m_StartWaitPLCReadyToTriggerCameraThread[0].IsBackground = true;
                 m_StartWaitPLCReadyToTriggerCameraThread[0].Start();
 
                 if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
@@ -1079,7 +1100,7 @@ namespace Magnus_WPF_1.Source.Application
                 if (m_bMachineNotReadyNeedToReset)
                     return;
                 // Wait For PLC 2 Ready
-                m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_ROBOT_RESULT, nCamera1InspectionResult);
+                //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_ROBOT_RESULT, nCamera1InspectionResult);
 
 
                 if (nCamera1InspectionResult == (int)ERROR_CODE.PASS)
@@ -1117,6 +1138,10 @@ namespace Magnus_WPF_1.Source.Application
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Last Chip Status: {IsLastChipStatus}");
 
+
+
+
+
                 //End 30 End sequencd if pass
 
                 if (nCamera1InspectionResult == (int)ERROR_CODE.PASS)
@@ -1135,6 +1160,23 @@ namespace Magnus_WPF_1.Source.Application
                         HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_PLACE_DONE, true);
 
                     //PLC start trigger last chip at begin 29
+                }
+
+
+                if (MainWindow.mainWindow.m_bSequenceRunning)
+                {
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+
+                        // Update Statistics
+                        //if (m_Tracks[1].m_CurrentSequenceDeviceID == 0)
+                        //    MainWindow.mainWindow.m_staticView.ResetMappingResult(1);
+
+                        LogMessage.LogMessage.WriteToDebugViewer(9, $"Robot Sequence: Update result");
+                        MainWindow.mainWindow.m_staticView.UpdateMappingResult(m_Tracks[0].m_VisionResultDatas[m_Tracks[0].m_CurrentSequenceDeviceID], 0, m_Tracks[0].m_CurrentSequenceDeviceID);
+                        MainWindow.mainWindow.m_staticView.UpdateValueStatistic(m_Tracks[0].m_VisionResultDatas[m_Tracks[0].m_CurrentSequenceDeviceID].m_nResult, 0);
+                        LogMessage.LogMessage.WriteToDebugViewer(9, $"Robot Sequence: Update result Done");
+                    });
                 }
 
 
@@ -1205,7 +1247,6 @@ namespace Magnus_WPF_1.Source.Application
                     goto Check_StepSequence;
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-
 
                 if (nCamera1InspectionResult == -(int)ERROR_CODE.PASS)
                     m_Tracks[0].m_CurrentSequenceDeviceID++;
@@ -1312,7 +1353,7 @@ namespace Magnus_WPF_1.Source.Application
                 }
                 Thread.Sleep(5);
             }
-            HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON, false);
+            HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON, false); 
 
             m_hardwareTriggerSnapEvent[0].Set();
             //LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Trigger camera  1  ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
@@ -1331,11 +1372,13 @@ namespace Magnus_WPF_1.Source.Application
             if (thread_BarcodeReaderSequence == null)
             {
                 thread_BarcodeReaderSequence = new System.Threading.Thread(new System.Threading.ThreadStart(() => func_BarcodeReaderSequence()));
+                thread_BarcodeReaderSequence.IsBackground = true;
                 thread_BarcodeReaderSequence.Start();
             }
             else if (!thread_BarcodeReaderSequence.IsAlive)
             {
                 thread_BarcodeReaderSequence = new System.Threading.Thread(new System.Threading.ThreadStart(() => func_BarcodeReaderSequence()));
+                thread_BarcodeReaderSequence.IsBackground = true;
                 thread_BarcodeReaderSequence.Start();
             }
         }
@@ -1354,6 +1397,7 @@ namespace Magnus_WPF_1.Source.Application
             //    Thread.Sleep(500);
 
             //}
+            LogMessage.LogMessage.WriteToDebugViewer(9, "Run Barcode Sequence Thread....");
 
             BarcodeReaderSequence();
             m_bBarcodeReaderSequenceStatus = false;
@@ -1369,12 +1413,12 @@ namespace Magnus_WPF_1.Source.Application
             Master.VisionReadyEvent[1].Reset();
             //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_TRIGGER, 0);
 
-            string strLotID = Application.m_strCurrentLot;
+            //string strLotID = Application.m_strCurrentLot;
 
-            VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, 1, ref m_Tracks[1].m_VisionResultDatas, ref m_Tracks[1].m_CurrentSequenceDeviceID);
+            //VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, 1, ref m_Tracks[1].m_VisionResultDatas, ref m_Tracks[1].m_CurrentSequenceDeviceID);
 
-            if (m_Tracks[1].m_CurrentSequenceDeviceID < 0 || m_Tracks[1].m_CurrentSequenceDeviceID >= Application.categoriesMappingParam.M_NumberDevicePerLot)
-                m_Tracks[1].m_CurrentSequenceDeviceID = 0;
+            //if (m_Tracks[1].m_CurrentSequenceDeviceID < 0 || m_Tracks[1].m_CurrentSequenceDeviceID >= Application.categoriesMappingParam.M_NumberDevicePerLot)
+            //    m_Tracks[1].m_CurrentSequenceDeviceID = 0;
             // PC will reset the new lot status 
             //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             //{
@@ -1408,6 +1452,9 @@ namespace Magnus_WPF_1.Source.Application
             {
                 LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Wait PLC Barcode Trigger {(int)INPUT_IOROBOT.PLC_BARCODE_TRIGGER}!");
 
+
+
+
                 while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_BARCODE_TRIGGER) != 1)
                 {
                     if (MainWindow.mainWindow == null)
@@ -1416,6 +1463,7 @@ namespace Magnus_WPF_1.Source.Application
 
                     if (m_EmergencyStatus > 0)
                     {
+
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
                             ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Emergency! Barcode Reader Sequence Ended!", (int)ERROR_CODE.LABEL_FAIL);
@@ -1427,6 +1475,22 @@ namespace Magnus_WPF_1.Source.Application
 
                     Thread.Sleep(30);
                 }
+
+                //if (strLotID != Application.m_strCurrentLot)
+                //{
+                //    strLotID = Application.m_strCurrentLot;
+
+                //    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                //    {
+                //        MainWindow.mainWindow.ResetStatistic(1);
+                //        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Barcode Reader: Change lot ID: {strLotID} ", (int)ERROR_CODE.LABEL_FAIL);
+
+                //    });
+                //    if (m_Tracks[1].m_CurrentSequenceDeviceID < 0 || m_Tracks[1].m_CurrentSequenceDeviceID >= Application.categoriesMappingParam.M_NumberDevicePerLot)
+                //        m_Tracks[1].m_CurrentSequenceDeviceID = 0;
+                //}
+
+
 
                 if (m_EmergencyStatus > 0)
                 {
@@ -1441,32 +1505,6 @@ namespace Magnus_WPF_1.Source.Application
 
                 LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Set BARCODE_CAPTURE_BUSY {(int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY} ON ");
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY, true);
-
-
-                if (strLotID != Application.m_strCurrentLot)
-                {
-                    //m_Tracks[1].m_CurrentPLCRegisterDeviceID = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_CURRENT_BARCODE_CHIP_COUNT);
-                    //if (m_Tracks[1].m_CurrentPLCRegisterDeviceID < 0 || m_Tracks[1].m_CurrentPLCRegisterDeviceID >= Application.categoriesMappingParam.M_NumberDevicePerLot)
-                    //    m_Tracks[1].m_CurrentSequenceDeviceID = 0;
-                    //else
-                    //    m_Tracks[1].m_CurrentSequenceDeviceID = m_Tracks[1].m_CurrentPLCRegisterDeviceID;
-
-                    strLotID = Application.m_strCurrentLot;
-                    //Application.SetIntRegistry(Application.m_strCurrentDeviceID_Registry[1], m_Tracks[1].m_CurrentSequenceDeviceID);
-
-                    VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, 1, ref m_Tracks[1].m_VisionResultDatas, ref m_Tracks[1].m_CurrentSequenceDeviceID);
-
-                    if (m_Tracks[1].m_CurrentSequenceDeviceID < 0 || m_Tracks[1].m_CurrentSequenceDeviceID >= Application.categoriesMappingParam.M_NumberDevicePerLot)
-                        m_Tracks[1].m_CurrentSequenceDeviceID = 0;
-
-                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Barcode Reader: Change lot ID: {strLotID} ", (int)ERROR_CODE.LABEL_FAIL);
-
-                    });
-
-                }
-
                 VisionReadyEvent[1].Reset();
 
                 m_hardwareTriggerSnapEvent[1].Set();
@@ -1524,10 +1562,25 @@ namespace Magnus_WPF_1.Source.Application
                 LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Send result to PLC Done {(int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_RESULT}  . Result: {bFailSendToPLC} ");
 
                 //LogMessage.LogMessage.WriteToDebugViewer(8, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+                if (MainWindow.mainWindow.m_bSequenceRunning)
+                {
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
 
-                if (m_Tracks[1].m_SequenceVisionResult == (int)ERROR_CODE.PASS)
-                    m_Tracks[1].m_CurrentSequenceDeviceID++;
+                            // Update Statistics
+                            //if (m_Tracks[1].m_CurrentSequenceDeviceID == 0)
+                            //    MainWindow.mainWindow.m_staticView.ResetMappingResult(1);
 
+                            LogMessage.LogMessage.WriteToDebugViewer(8, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+                            MainWindow.mainWindow.m_staticView.UpdateMappingResult(m_Tracks[1].m_VisionResultDatas[m_Tracks[1].m_CurrentSequenceDeviceID], 1, m_Tracks[1].m_CurrentSequenceDeviceID);
+                            LogMessage.LogMessage.WriteToDebugViewer(8, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+                            MainWindow.mainWindow.m_staticView.UpdateValueStatistic(m_Tracks[1].m_VisionResultDatas[m_Tracks[1].m_CurrentSequenceDeviceID].m_nResult, 1);
+
+                    });
+
+                    if (m_Tracks[1].m_SequenceVisionResult == (int)ERROR_CODE.PASS)
+                        m_Tracks[1].m_CurrentSequenceDeviceID++;
+                }
                 //LogMessage.LogMessage.WriteToDebugViewer(8, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
                 //m_Tracks[1].m_CurrentPLCRegisterDeviceID = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_CURRENT_BARCODE_CHIP_COUNT);
                 //if (m_Tracks[1].m_CurrentPLCRegisterDeviceID < 0 || m_Tracks[1].m_CurrentPLCRegisterDeviceID >= Application.categoriesMappingParam.M_NumberDevicePerLot)
@@ -1535,7 +1588,7 @@ namespace Magnus_WPF_1.Source.Application
                 //else
                 //    m_Tracks[1].m_CurrentSequenceDeviceID = m_Tracks[1].m_CurrentPLCRegisterDeviceID;
 
-                LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Read Chip Count from PLC {(int)PLCCOMM.PLC_ADDRESS.PLC_CURRENT_BARCODE_CHIP_COUNT}  . Number: {m_Tracks[1].m_CurrentPLCRegisterDeviceID } ");
+                //LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Read Chip Count from PLC {(int)PLCCOMM.PLC_ADDRESS.PLC_CURRENT_BARCODE_CHIP_COUNT}  . Number: {m_Tracks[1].m_CurrentPLCRegisterDeviceID } ");
                 //Application.SetIntRegistry(Application.m_strCurrentDeviceID_Registry[1], m_Tracks[1].m_CurrentSequenceDeviceID);
                 LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Scan Done!");
 
@@ -1563,7 +1616,6 @@ namespace Magnus_WPF_1.Source.Application
                     m_ImidiateStatus = m_ImidiateStatus_Simulate;
                     m_ResetMachineStatus = m_ResetMachineStatus_Simulate;
                 }
-
                 else
                 {
                     m_PLC_Ready_Status = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_PACKING_PROCESS_READY);
@@ -1689,21 +1741,37 @@ namespace Magnus_WPF_1.Source.Application
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
                         ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Reset Lot", (int)ERROR_CODE.LABEL_FAIL);
+                        Application.m_strCurrentLot = string.Format("{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+                        Application.SetStringRegistry(Application.m_strCurrentLot_Registry, Application.m_strCurrentLot);
+                        MainWindow.mainWindow.m_staticView.ClearStatistic();
+                        lock (MainWindow.mainWindow.master.m_Tracks[0])
+                        {
+
+                            Thread.Sleep(500);
+                            MainWindow.mainWindow.ResetStatistic(0);
+                            Thread.Sleep(500);
+                        }
+
+                        lock (MainWindow.mainWindow.master.m_Tracks[1])
+                        {
+                            Thread.Sleep(500);
+                            MainWindow.mainWindow.ResetStatistic(1);
+                            Thread.Sleep(500);
+                        }
+
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Create New Lot ID: {Application.m_strCurrentLot} ", (int)ERROR_CODE.LABEL_FAIL);
+
+                        if (true)
+                        {
+                            MainWindow.mainWindow.m_strCurrentLotID = Application.m_strCurrentLot;
+                        }
+
+                        else
+                        {
+
+                            MessageBox.Show("Please KeyIn the Lot ID (on the top) then press Continue");
+                        }
                     });
-
-                    Application.m_strCurrentLot = string.Format("{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
-                    Application.SetStringRegistry(Application.m_strCurrentLot_Registry, Application.m_strCurrentLot);
-                    if (true)
-                    {
-                        MainWindow.mainWindow.m_strCurrentLotID = Application.m_strCurrentLot;
-                    }
-
-                    else
-                    {
-
-                        MessageBox.Show("Please KeyIn the Lot ID (on the top) then press Continue");
-                    }
-                    Thread.Sleep(1000);
                     //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT, 0);
 
                     //m_CreateNewLotStatus = 0;
@@ -1740,6 +1808,7 @@ namespace Magnus_WPF_1.Source.Application
                     string strPassFolder = Path.Combine(Application.pathImageSave, "PASS IMAGE", "Camera", data.strLotID);
                     if (!Directory.Exists(strPassFolder))
                         Directory.CreateDirectory(strPassFolder);
+                    string path_image = Path.Combine(strPassFolder, $"Device_{data.nDeviceID + 1}" + ".bmp");
 
                     string strFailFolder = Path.Combine(Application.pathImageSave, "FAIL IMAGE", "Camera", data.strLotID);
                     if (!Directory.Exists(strFailFolder))
@@ -1752,29 +1821,26 @@ namespace Magnus_WPF_1.Source.Application
                     //    nFailCount = 0;
                     //}
 
-                    string strDeviceIDTime = string.Format("{0}{1}{2}+{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+                    //string strDeviceIDTime = string.Format("{0}{1}{2}+{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
 
                     //string strPassFail = "PASS";
                     //m_FailstrLotIDFolder = strPassFolder;
-                    string path_image = Path.Combine(strPassFolder, $"Device_{data.nDeviceID + 1}" + ".bmp");
 
 
                     if (data.nResult != -(int)ERROR_CODE.PASS)
                     {
                         //nFailCount++;
-                        path_image = Path.Combine(strFailFolder, $"{strDeviceIDTime}_{data.nDeviceID + 1}" + ".bmp");
+                        path_image = Path.Combine(strFailFolder, $"Device_{data.nDeviceID + 1}" + ".bmp");
 
 
                     }
 
-                    string pathTemp = path_image;
-                    strDeviceIDTime =  string.Format("{0}{1}{2}+{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
-                    if (File.Exists(pathTemp))
-                        pathTemp.Replace($"_{data.nDeviceID + 1}", $"{strDeviceIDTime}_{data.nDeviceID + 1}");
+                    //string pathTemp = path_image;
+                    //strDeviceIDTime =  string.Format("{0}{1}{2}+{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+                    //if (File.Exists(pathTemp))
+                    //    pathTemp.Replace($"_{data.nDeviceID + 1}", $"{strDeviceIDTime}_{data.nDeviceID + 1}");
 
                     CvInvoke.Imwrite(path_image, data.imageSave);
-
-                    VisionResultData.SaveSequenceResultToExcel(Application.m_strCurrentLot, nTrack, new VisionResultData(data.nDeviceID, strDeviceIDTime, data.nResult, path_image));
                 }
                 catch (Exception)
                 {
@@ -1797,6 +1863,7 @@ namespace Magnus_WPF_1.Source.Application
                 m_TeachThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].func_TeachSequence(MainWindow.activeImageDock.trackID)));
                 m_TeachThread.SetApartmentState(ApartmentState.STA);
             }
+            m_TeachThread.IsBackground = true;
             m_TeachThread.Start();
 
 

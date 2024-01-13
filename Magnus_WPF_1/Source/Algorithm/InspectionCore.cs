@@ -325,11 +325,11 @@ namespace Magnus_WPF_1.Source.Algorithm
             nError = FindDeviceLocation_Zoom(ref InspectImage.Gray,
                                              ref list_arrayOverlay, ref pCenter, ref pCorner, ref  debugInfors, bEnableDebug);
 
-            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Inspection time: " + timeIns.ElapsedMilliseconds.ToString(), nError);
+            //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            //{
+            //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Inspection time: " + timeIns.ElapsedMilliseconds.ToString(), nError);
 
-            });
+            //});
             timeIns.Restart();
 
             return nError;

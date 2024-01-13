@@ -7,7 +7,7 @@ namespace Magnus_WPF_1.Source.LogMessage
     public static class LogMessage
     {
 
-        [DllImport("DebugMessage.dll")]
+        [DllImport("MagmusLogMessage.dll")]
         static extern void OutputDebugLogTo(int tab, bool timestamp, StringBuilder messageText);
 
         public static void DebugMessageTo(int tab, bool timestamp, string messageText)
@@ -39,7 +39,7 @@ namespace Magnus_WPF_1.Source.LogMessage
         public static void WriteToDebugViewer(int tab, string messageText)
         {
             DateTime time = DateTime.Now;
-            messageText = string.Format("{0}: {1}", time.ToString("HH:mm:ss.fff"), messageText);
+            //messageText = string.Format("{0}: {1}", time.ToString("HH:mm:ss.fff"), messageText);
             //MessageBox.Show(messageText);
             try
             {

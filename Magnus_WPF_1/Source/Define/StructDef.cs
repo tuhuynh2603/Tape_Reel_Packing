@@ -201,8 +201,13 @@ namespace Magnus_WPF_1.Source.Define
             {
                 string[] strTrackName = { "Camera", "Barcode" };
                 string strRecipePath = Path.Combine(Application.Application.pathStatistics, Application.Application.currentRecipe, strTrackName[nTrack]);
+
+                LogMessage.LogMessage.WriteToDebugViewer(7+ nTrack, "Save 1!");
+
                 if (!Directory.Exists(strRecipePath))
                     Directory.CreateDirectory(strRecipePath);
+
+                LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, "Save 2!");
 
                 string fullpath = Path.Combine(strRecipePath, $"{strLotID}.xlsx");
 
@@ -219,6 +224,7 @@ namespace Magnus_WPF_1.Source.Define
                     file.Create();
 
                 //file.CopyTo(backup_fullpath);
+                LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, "Save 3!");
 
                 using (ExcelPackage package = new ExcelPackage(file))
                 {
@@ -231,8 +237,12 @@ namespace Magnus_WPF_1.Source.Define
                             break;
                         }
 
+                    LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, "Save 4!");
+
                     if (!bCreated)
                         package.Workbook.Worksheets.Add("Lot Result");
+
+                    LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, "Save 5!");
 
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
                     worksheet.DefaultColWidth = 35;
@@ -243,6 +253,7 @@ namespace Magnus_WPF_1.Source.Define
                     worksheet.Cells[1, ncol++].Value = "Device ID";
                     worksheet.Cells[1, ncol++].Value = "Result";
                     worksheet.Cells[1, ncol++].Value = "Image Path";
+                    LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, "Save 6!");
 
                     // Data
                     int row = data.m_nDeviceIndexOnReel + 2;
@@ -259,7 +270,12 @@ namespace Magnus_WPF_1.Source.Define
                     //    worksheet.Cells[row, ncol++].Value = item.m_PointComment;
                     //    row++;
                     //}
+                    LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, "Save 8!");
+
                     package.Save();
+                    LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, "Save 9!");
+                    package.Dispose();
+
                 }
             }
             catch(Exception e)
@@ -300,7 +316,7 @@ namespace Magnus_WPF_1.Source.Define
                 for (int row = 2; row <= rowCount; row++)
                 {
 
-                    result[row - 2] = new VisionResultData(row - 1, "", 0);
+                    result[row - 2] = new VisionResultData();
 
                     if (row - 2 >= result.Length)
                         return;
@@ -326,6 +342,8 @@ namespace Magnus_WPF_1.Source.Define
                 }
 
                 nCurrentDeviceID = nSequenceDeviceTemp;
+
+                package.Dispose();
             }
         }
     }

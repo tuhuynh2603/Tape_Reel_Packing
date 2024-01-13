@@ -235,7 +235,10 @@ namespace Magnus_WPF_1
             master = new Master(this);
             outputLogView = new OutputLogView(this);
             m_staticView = new StatisticView(this);
-            ResetStatistic();
+            m_staticView.ClearStatistic();
+            ResetStatistic(0);
+            ResetStatistic(1);
+
             //master.m_SaveInspectImageThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread(true)));
 
             btn_enable_saveimage.IsChecked = Source.Application.Application.m_bEnableSavingOnlineImage;
@@ -339,11 +342,8 @@ namespace Magnus_WPF_1
 
         }
 
-        public void ResetStatistic()
+        public void ResetStatistic(int nT)
         {
-            m_staticView.ClearStatistic(0);
-            for (int nT = 0; nT < Application.m_nTrack; nT++)
-            {
 
                 for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)
                 {
@@ -361,53 +361,23 @@ namespace Magnus_WPF_1
                     m_staticView.UpdateValueStatistic(master.m_Tracks[nT].m_VisionResultDatas[n].m_nResult, nT);
 
                 }
-            }
         }
         public void Run_Sequence(int nTrack = (int)TRACK_TYPE.TRACK_ALL)
         {
 
+            m_staticView.ClearStatistic();
+            master.BarcodeReaderSequenceThread();
+            master.m_bRobotSequenceStatus = master.RobotSequenceThread();
+
             if (master.m_bRobotSequenceStatus)
             {
-                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Machine is running!", (int)ERROR_CODE.LABEL_FAIL);
+                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Machine is running. Please Stop it and try again!", (int)ERROR_CODE.LABEL_FAIL);
                 return;
             }
 
             btn_run_sequence.IsChecked = true;
             m_bSequenceRunning = (bool)btn_run_sequence.IsChecked;
             inspect_offline_btn.IsEnabled = false;
-
-
-            ResetStatistic();
-
-            //
-            //string strLotIDTemp = string.Format("DUMMY_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
-            //strLotID = Application.GetStringRegistry(Application.m_strCurrentLot_Registry, strLotIDTemp);
-            //
-            if (!master.m_bRobotSequenceStatus)
-            {
-                master.m_bRobotSequenceStatus = true;
-                master.RobotSequenceThread();
-            }
-
-            //if (!master.m_bBarcodeReaderSequenceStatus)
-            //{
-            //    master.m_bBarcodeReaderSequenceStatus = true;
-            //    master.RunOnlineSequenceThread(1);
-            //    master.BarcodeReaderSequenceThread();
-            //}
-            //master.RunOnlineSequenceThread(0);
-
-            //if (nTrack == (int)TRACK_TYPE.TRACK_ALL)
-            //{
-            //    for (int n = 0; n < Application.m_nTrack; n++)
-            //    {
-            //        master.RunOnlineSequenceThread(n);
-            //    }
-            //}
-            //else
-            //    master.RunOnlineSequenceThread(nTrack);
-
-            //Master.commHIKRobot.CreateAndSendMessageToHIKRobot(SignalFromVision.Vision_Ready);
         }
         public void Stop_Sequence(int nTrack = (int)TRACK_TYPE.TRACK_ALL)
         {
@@ -693,11 +663,13 @@ namespace Magnus_WPF_1
             if (master.thread_StreamCamera[activeImageDock.trackID] == null)
             {
                 master.thread_StreamCamera[activeImageDock.trackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.func_GrabImageThread()));
+                master.thread_StreamCamera[activeImageDock.trackID].IsBackground = true;
                 master.thread_StreamCamera[activeImageDock.trackID].Start();
             }
             else if (!master.thread_StreamCamera[activeImageDock.trackID].IsAlive)
             {
                 master.thread_StreamCamera[activeImageDock.trackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.func_GrabImageThread()));
+                master.thread_StreamCamera[activeImageDock.trackID].IsBackground = true;
                 master.thread_StreamCamera[activeImageDock.trackID].Start();
             }
         }
@@ -1366,11 +1338,13 @@ namespace Magnus_WPF_1
             if (master.thread_RobotSequence == null)
             {
                 master.thread_RobotSequence = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.ResetSequence()));
+                master.thread_RobotSequence.IsBackground = true;
                 master.thread_RobotSequence.Start();
             }
             else if (!master.thread_RobotSequence.IsAlive)
             {
                 master.thread_RobotSequence = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.ResetSequence()));
+                master.thread_RobotSequence.IsBackground = true;
                 master.thread_RobotSequence.Start();
             }
 

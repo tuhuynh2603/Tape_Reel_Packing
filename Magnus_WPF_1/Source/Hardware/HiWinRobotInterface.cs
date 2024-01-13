@@ -330,6 +330,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             m_hiWinRobotUserControl = new HiWinRobotUserControl(m_strRobotIPAddress);
             InitDataGridview(m_RobotConnectID, true);
             m_hikThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => Thread_function()));
+            m_hikThread.IsBackground = true;
             m_hikThread.Start();
             //dispatcherTimer.Tick += dispatcherTimer_Tick;
             //dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 200);
@@ -613,7 +614,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 switch (rlt)
                 {
                     case 4030:
-                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] HRSS alarm notify: " + info_p);
+                         //LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] HRSS alarm notify: " + info_p);
 
                         break;
                     case 4145:

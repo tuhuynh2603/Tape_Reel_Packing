@@ -40,12 +40,14 @@ namespace Magnus_WPF_1.UI.UserControls.View
         }
         public void UpdateValueStatistic(int result, int nTrack)
         {
+            if (result == -(int)ERROR_CODE.NOT_INSPECTED)
+                return;
             if (nTrack == 0)
             {
                 listSummary[0].valueSummary_Camera1 += 1;
                 if (result == 0)
                     listSummary[1].valueSummary_Camera1 += 1;
-                else if(result != -(int)ERROR_CODE.NOT_INSPECTED)
+                else 
                       listSummary[2].valueSummary_Camera1 += 1;
 
                 listSummary[3].valueSummary_Camera1 = Math.Round((listSummary[1].valueSummary_Camera1 / listSummary[0].valueSummary_Camera1) * 100, 2);
@@ -56,7 +58,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
                 listSummary[0].valueSummary_Camera2 += 1;
                 if (result == 0)
                     listSummary[1].valueSummary_Camera2 += 1;
-                else if (result != -(int)ERROR_CODE.NOT_INSPECTED)
+                else
                     listSummary[2].valueSummary_Camera2 += 1;
 
                 listSummary[3].valueSummary_Camera2 = Math.Round((listSummary[1].valueSummary_Camera2 / listSummary[0].valueSummary_Camera2) * 100, 2);
@@ -64,7 +66,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             }
             lboxStatistic.ItemsSource = null; lboxStatistic.ItemsSource = listSummary;
         }
-        public void ClearStatistic(int nTrackID)
+        public void ClearStatistic()
         {
             foreach (var def in listSummary)
             {

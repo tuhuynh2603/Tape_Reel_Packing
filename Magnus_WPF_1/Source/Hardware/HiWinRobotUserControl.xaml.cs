@@ -443,6 +443,7 @@ namespace Magnus_WPF_1.Source.Hardware
                     double[] dpos = new double[6];
                     m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex].GetXYZPoint(ref dpos);
                     m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => HWinRobot.ptp_pos(HiWinRobotInterface.m_RobotConnectID, 0, dpos)));
+                    m_Thread.IsBackground = true;
                     m_Thread.Start();
                 }
 
@@ -451,6 +452,7 @@ namespace Magnus_WPF_1.Source.Hardware
                     double[] dpos = new double[6];
                     m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex].GetJointPoint(ref dpos);
                     m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => HWinRobot.ptp_axis(HiWinRobotInterface.m_RobotConnectID, 0, dpos)));
+                    m_Thread.IsBackground = true;
                     m_Thread.Start();
                 }
 
@@ -468,6 +470,7 @@ namespace Magnus_WPF_1.Source.Hardware
         {
             int nIndex = combo_MoveTypes.SelectedIndex;
             m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MoveMotor(0, nIndex, -1)));
+            m_Thread.IsBackground = true;
             m_Thread.Start();
         }
 
@@ -475,6 +478,7 @@ namespace Magnus_WPF_1.Source.Hardware
         {
             int nIndex = combo_MoveTypes.SelectedIndex;
             m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MoveMotor(0, nIndex, 1)));
+            m_Thread.IsBackground = true;
             m_Thread.Start();
         }
 
@@ -482,6 +486,7 @@ namespace Magnus_WPF_1.Source.Hardware
         {
             int nIndex = combo_MoveTypes.SelectedIndex;
             m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MoveMotor(1, nIndex, -1)));
+            m_Thread.IsBackground = true;
             m_Thread.Start();
         }
 
@@ -489,6 +494,7 @@ namespace Magnus_WPF_1.Source.Hardware
         {
             int nIndex = combo_MoveTypes.SelectedIndex;
             m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MoveMotor(1, nIndex, 1)));
+            m_Thread.IsBackground = true;
             m_Thread.Start();
         }
 
@@ -497,6 +503,7 @@ namespace Magnus_WPF_1.Source.Hardware
         {
             int nIndex = combo_MoveTypes.SelectedIndex;
             m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MoveMotor(2, nIndex, -1)));
+            m_Thread.IsBackground = true;
             m_Thread.Start();
         }
 
@@ -504,6 +511,7 @@ namespace Magnus_WPF_1.Source.Hardware
         {
             int nIndex = combo_MoveTypes.SelectedIndex;
             m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MoveMotor(2, nIndex, 1)));
+            m_Thread.IsBackground = true;
             m_Thread.Start();
         }
 
@@ -511,6 +519,7 @@ namespace Magnus_WPF_1.Source.Hardware
         {
             int nIndex = combo_MoveTypes.SelectedIndex;
             m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MoveMotor(5, nIndex, -1)));
+            m_Thread.IsBackground = true;
             m_Thread.Start();
         }
 
@@ -518,6 +527,7 @@ namespace Magnus_WPF_1.Source.Hardware
         {
             int nIndex = combo_MoveTypes.SelectedIndex;
             m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MoveMotor(5, nIndex, 1)));
+            m_Thread.IsBackground = true;
             m_Thread.Start();
         }
 
@@ -632,6 +642,7 @@ namespace Magnus_WPF_1.Source.Hardware
         {
             //int nIndex = combo_MoveTypes.SelectedIndex;
             m_Thread = new System.Threading.Thread(new System.Threading.ThreadStart(() => HiWinRobotInterface.HomeMove()));
+            m_Thread.IsBackground = true;
             m_Thread.Start();
 
         }
@@ -942,6 +953,7 @@ namespace Magnus_WPF_1.Source.Hardware
 
             label_Alarm.Text = "Start Calibration";
             m_NextStepCalibration.Reset();
+            m_CalibrationThread.IsBackground = true;
             m_CalibrationThread.Start();
         }
 

@@ -61,9 +61,9 @@ namespace Magnus_WPF_1.UI.UserControls.ViewModel
                                                                             MainWindow.mainWindow.master.m_BarcodeReader.CloseConnection();
                                                                             MainWindow.mainWindow.master.m_hiWinRobotInterface.CloseConnection();
 
-                                                                            MainWindow.mainWindow.master = null;
+                                                                            //MainWindow.mainWindow.master = null;
                                                                             MainWindow.mainWindow.Close();
-                                                                            MainWindow.mainWindow = null;
+                                                                            //MainWindow.mainWindow = null;
                                                                             System.Windows.Application.Current.Shutdown();
                                                                         }
                                                                     });

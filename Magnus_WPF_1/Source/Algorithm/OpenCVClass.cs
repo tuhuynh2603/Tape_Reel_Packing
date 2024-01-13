@@ -567,6 +567,40 @@ namespace Magnus_WPF_1.Source.Algorithm
             return true;
         }
 
+
+        public static bool Check2PointIndex(ref PointF P1, ref PointF P2, int position)
+        {
+
+            switch (position)
+            {
+                case (int)POSITION._LEFT:
+                    if (P1.X <= P2.X)
+                    {
+                        return false;
+                    }
+                    break;
+                case (int)POSITION._RIGHT:
+                    if (P1.X >= P2.X)
+                    {
+                        return false;
+                    }
+                    break;
+                case (int)POSITION._TOP:
+                    if (P1.Y <= P2.Y)
+                    {
+                        return false;
+                    }
+                    break;
+                case (int)POSITION._BOTTOM:
+                    if (P1.Y >= P2.Y)
+                    {
+                        return false;
+                    }
+                    break;
+            }
+            return true;
+        }
+
         public static int SelectPointBased_Top_Left_Bottom_Right(ref List<PointF> source, ref PointF result, int position)
         {
             result = new PointF(0, 0);

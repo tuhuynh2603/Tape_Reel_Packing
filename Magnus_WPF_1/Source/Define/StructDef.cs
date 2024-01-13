@@ -145,9 +145,10 @@ namespace Magnus_WPF_1.Source.Define
         PASS,
         NO_PATTERN_FOUND,
         OPPOSITE_CHIP,
-        NO_LABEL,
+        LABEL_FAIL,
         CAPTURE_FAIL,
         PROCESS_ERROR,
+        NOT_INSPECTED,
         NUM_DEFECTS
     };
 
@@ -183,9 +184,9 @@ namespace Magnus_WPF_1.Source.Define
     {
         public int m_nDeviceIndexOnReel = 0;
         public string m_strDeviceID = "";
-        public int m_nResult = -(int)ERROR_CODE.NUM_DEFECTS;
+        public int m_nResult = -(int)ERROR_CODE.NOT_INSPECTED;
         public string m_strFullImagePath = "";
-        public VisionResultData(int nDeviceIndexOnReel = 0, string strDeviceID = "", int nResult = -(int)ERROR_CODE.NUM_DEFECTS, string strPath = "")
+        public VisionResultData(int nDeviceIndexOnReel = 0, string strDeviceID = "", int nResult = -(int)ERROR_CODE.NOT_INSPECTED, string strPath = "")
         {
             m_nDeviceIndexOnReel = nDeviceIndexOnReel;
             m_strDeviceID = strDeviceID;
@@ -195,71 +196,83 @@ namespace Magnus_WPF_1.Source.Define
 
         public static void SaveSequenceResultToExcel(string strLotID,int nTrack, VisionResultData data)
         {
-            string[] strTrackName = {"Camera", "Barcode" };
-            string strRecipePath = Path.Combine(Application.Application.pathStatistics, Application.Application.currentRecipe, strTrackName[nTrack]);
-            if (!Directory.Exists(strRecipePath))
-                Directory.CreateDirectory(strRecipePath);
 
-            string fullpath = Path.Combine(strRecipePath, $"{strLotID}.xlsx");
-
-            //string strDateTime = string.Format("({0}.{1}.{2}_{3}.{4}.{5})", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
-            //string backup_path = Path.Combine(strRecipePath, "Backup_Robot Points");
-            //if (!Directory.Exists(backup_path))
-            //    Directory.CreateDirectory(backup_path);
-
-            //string backup_fullpath = Path.Combine(backup_path, $"Robot Points {strDateTime}" + ".cfg");
-
-            FileInfo file = new FileInfo(fullpath);
-
-            if (!file.Exists)
-                file.Create();
-
-            //file.CopyTo(backup_fullpath);
-
-            using (ExcelPackage package = new ExcelPackage(file))
+            try
             {
+                string[] strTrackName = { "Camera", "Barcode" };
+                string strRecipePath = Path.Combine(Application.Application.pathStatistics, Application.Application.currentRecipe, strTrackName[nTrack]);
+                if (!Directory.Exists(strRecipePath))
+                    Directory.CreateDirectory(strRecipePath);
 
-                bool bCreated = false;
-                for (int n = 0; n < package.Workbook.Worksheets.Count; n++)
-                    if (package.Workbook.Worksheets[n].Name == "Lot Result")
-                    {
-                        bCreated = true;
-                        break;
-                    }
+                string fullpath = Path.Combine(strRecipePath, $"{strLotID}.xlsx");
 
-                if (!bCreated)
-                    package.Workbook.Worksheets.Add("Lot Result");
+                //string strDateTime = string.Format("({0}.{1}.{2}_{3}.{4}.{5})", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+                //string backup_path = Path.Combine(strRecipePath, "Backup_Robot Points");
+                //if (!Directory.Exists(backup_path))
+                //    Directory.CreateDirectory(backup_path);
 
-                ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
-                worksheet.DefaultColWidth = 35;
-                worksheet.DefaultRowHeight = 35;
-                // Header
-                int ncol = 1;
-                worksheet.Cells[1, ncol++].Value = "Device Index";
-                worksheet.Cells[1, ncol++].Value = "Device ID";
-                worksheet.Cells[1, ncol++].Value = "Result";
-                worksheet.Cells[1, ncol++].Value = "Image Path";
+                //string backup_fullpath = Path.Combine(backup_path, $"Robot Points {strDateTime}" + ".cfg");
 
-                // Data
-                int row = data.m_nDeviceIndexOnReel + 2;
-                ncol = 1;
-                worksheet.Cells[row, ncol++].Value = data.m_nDeviceIndexOnReel;
-                worksheet.Cells[row, ncol++].Value = data.m_strDeviceID;
-                worksheet.Cells[row, ncol++].Value = data.m_nResult;
-                worksheet.Cells[row, ncol++].Value = data.m_strFullImagePath;
+                FileInfo file = new FileInfo(fullpath);
 
-                //foreach (var item in data)
-                //{
-                //    ncol = 1;
-                //    worksheet.Cells[row, ncol++].Value = item.m_PointIndex;
-                //    worksheet.Cells[row, ncol++].Value = item.m_PointComment;
-                //    row++;
-                //}
-                package.Save();
+                if (!file.Exists)
+                    file.Create();
+
+                //file.CopyTo(backup_fullpath);
+
+                using (ExcelPackage package = new ExcelPackage(file))
+                {
+
+                    bool bCreated = false;
+                    for (int n = 0; n < package.Workbook.Worksheets.Count; n++)
+                        if (package.Workbook.Worksheets[n].Name == "Lot Result")
+                        {
+                            bCreated = true;
+                            break;
+                        }
+
+                    if (!bCreated)
+                        package.Workbook.Worksheets.Add("Lot Result");
+
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                    worksheet.DefaultColWidth = 35;
+                    worksheet.DefaultRowHeight = 35;
+                    // Header
+                    int ncol = 1;
+                    worksheet.Cells[1, ncol++].Value = "Device Index";
+                    worksheet.Cells[1, ncol++].Value = "Device ID";
+                    worksheet.Cells[1, ncol++].Value = "Result";
+                    worksheet.Cells[1, ncol++].Value = "Image Path";
+
+                    // Data
+                    int row = data.m_nDeviceIndexOnReel + 2;
+                    ncol = 1;
+                    worksheet.Cells[row, ncol++].Value = data.m_nDeviceIndexOnReel;
+                    worksheet.Cells[row, ncol++].Value = data.m_strDeviceID;
+                    worksheet.Cells[row, ncol++].Value = data.m_nResult;
+                    worksheet.Cells[row, ncol++].Value = data.m_strFullImagePath;
+
+                    //foreach (var item in data)
+                    //{
+                    //    ncol = 1;
+                    //    worksheet.Cells[row, ncol++].Value = item.m_PointIndex;
+                    //    worksheet.Cells[row, ncol++].Value = item.m_PointComment;
+                    //    row++;
+                    //}
+                    package.Save();
+                }
+            }
+            catch(Exception e)
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Track{nTrack} Save To Excel Fail {e}!.", (int)ERROR_CODE.LABEL_FAIL);
+                });
             }
         }
 
-        public static void ReadLotResultFromExcel(string strLotID, int nTrack, ref VisionResultData[] result)
+        public static void ReadLotResultFromExcel(string strLotID, int nTrack, ref VisionResultData[] result, ref int nCurrentDeviceID)
         {
             string[] strTrackName = { "Camera", "Barcode" };
             string strRecipePath = Path.Combine(Application.Application.pathStatistics, Application.Application.currentRecipe, strTrackName[nTrack]);
@@ -283,6 +296,7 @@ namespace Magnus_WPF_1.Source.Define
 
                 int rowCount = worksheet.Dimension.Rows;
 
+                int nSequenceDeviceTemp = 0;
                 for (int row = 2; row <= rowCount; row++)
                 {
 
@@ -293,8 +307,12 @@ namespace Magnus_WPF_1.Source.Define
 
                     int ncol = 1;
                     object valueTemp = worksheet.Cells[row, ncol++].Value;
-                    if(valueTemp != null)
+                    if (valueTemp != null)
+                    {
                         result[row - 2].m_nDeviceIndexOnReel = Convert.ToInt32(valueTemp);
+                        if (nSequenceDeviceTemp < result[row - 2].m_nDeviceIndexOnReel)
+                            nSequenceDeviceTemp = result[row - 2].m_nDeviceIndexOnReel;
+                    }
                     valueTemp = worksheet.Cells[row, ncol++].Value;
                     if (valueTemp != null)
                         result[row - 2].m_strDeviceID = valueTemp.ToString();
@@ -306,6 +324,8 @@ namespace Magnus_WPF_1.Source.Define
                     if (valueTemp != null)
                         result[row - 2].m_strFullImagePath = valueTemp.ToString();
                 }
+
+                nCurrentDeviceID = nSequenceDeviceTemp;
             }
         }
     }

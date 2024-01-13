@@ -115,10 +115,9 @@ namespace Magnus_WPF_1.Source.Application
             //// Load lot ID
 
 
-            m_strCurrentLot = GetStringRegistry(m_strCurrentLot_Registry, "");
+            string strLotTemp = string.Format("{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+            m_strCurrentLot = GetStringRegistry(m_strCurrentLot_Registry, strLotTemp);
             MainWindow.mainWindow.m_strCurrentLotID = m_strCurrentLot;
-
-
 
             #region Load Folder Save Image
             pathImageSave = GetStringRegistry("Folder: Image Save", "C:\\SemiConductor Images");

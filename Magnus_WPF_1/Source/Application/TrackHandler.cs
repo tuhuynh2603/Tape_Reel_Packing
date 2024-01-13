@@ -34,6 +34,7 @@ namespace Magnus_WPF_1.Source.Application
         public ImageView[] m_imageViews;
 
         public VisionResultData[] m_VisionResultDatas;
+        public int m_SequenceVisionResult = 0;
         public int m_nTrackID;
         public HIKControlCameraView m_hIKControlCameraView;
         public string m_strSeriCamera = "";
@@ -54,9 +55,7 @@ namespace Magnus_WPF_1.Source.Application
             for (int n = 0; n < m_VisionResultDatas.Length; n++)
                 m_VisionResultDatas[n] = new VisionResultData();
 
-            VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, indexTrack, ref m_VisionResultDatas);
-
-
+            VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, indexTrack, ref m_VisionResultDatas, ref m_CurrentSequenceDeviceID);
 
             m_Width = width;
             m_Height = height;
@@ -91,7 +90,7 @@ namespace Magnus_WPF_1.Source.Application
             //InspectionCore.Initialize();
 
             CheckInspectionOnlineThread();
-            m_CurrentSequenceDeviceID = Application.GetIntRegistry(Application.m_strCurrentDeviceID_Registry[indexTrack], 0);
+            //m_CurrentSequenceDeviceID = Application.GetIntRegistry(Application.m_strCurrentDeviceID_Registry[indexTrack], 0);
 
         }
 
@@ -432,7 +431,7 @@ namespace Magnus_WPF_1.Source.Application
             }
             LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
-            color = new SolidColorBrush(Colors.Yellow);
+            color = new SolidColorBrush(Colors.Blue);
             m_imageViews[0].DrawStringOverlay("(X, Y, Angle) = (" + pCenter.X.ToString() + ", " + pCenter.Y.ToString() + ", " + ((int)dAngle).ToString() + ")", (int)pCenter.X + 10, (int)pCenter.Y, color, 20);
 
             LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
@@ -462,8 +461,8 @@ namespace Magnus_WPF_1.Source.Application
 
                         break;
 
-                    case -(int)ERROR_CODE.NO_LABEL:
-                        m_imageViews[0].DrawString("No Label ", 10, 10, color, 31);
+                    case -(int)ERROR_CODE.LABEL_FAIL:
+                        m_imageViews[0].DrawString("Label failed ", 10, 10, color, 31);
 
                         break;
                     case -(int)ERROR_CODE.PROCESS_ERROR:
@@ -603,10 +602,13 @@ namespace Magnus_WPF_1.Source.Application
 
         private void InspectThread()
         {
+            LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"Start Vision Inspect Thread Track {m_nTrackID}");
+
             Master.InspectEvent[m_nTrackID].Reset();
             PointF pCenter, pCorner;
             Stopwatch timeIns = new Stopwatch();
             timeIns.Start();
+            int nDeviceID = m_CurrentSequenceDeviceID;
 
             while (MainWindow.mainWindow != null)
             {
@@ -619,21 +621,27 @@ namespace Magnus_WPF_1.Source.Application
                     pCorner = new PointF(0, 0);
 
 
-                    Master.InspectEvent[m_nTrackID].WaitOne();
-                    //while (!Master.InspectEvent[m_nTrackID].WaitOne(10))
-                    //{
-                    //    if (MainWindow.mainWindow == null)
-                    //        return;
-                    //    Thread.Sleep(5);
-                    //}
-
+                    //Master.InspectEvent[m_nTrackID].WaitOne();
+                    while (!Master.InspectEvent[m_nTrackID].WaitOne(10))
+                    {
+                        if (MainWindow.mainWindow == null)
+                            return;
+                        Thread.Sleep(5);
+                    }
+                    nDeviceID = m_CurrentSequenceDeviceID;
                     timeIns.Restart();
 
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                     if (m_imageViews[0].btmSource == null)
                     {
-                        m_VisionResultDatas[m_CurrentSequenceDeviceID] = new VisionResultData(m_CurrentSequenceDeviceID, "", -(int)ERROR_CODE.CAPTURE_FAIL);
+
+                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($" {m_nTrackID} Capture Failed!", (int)ERROR_CODE.LABEL_FAIL);
+
+                        });
+                        m_VisionResultDatas[nDeviceID] = new VisionResultData(nDeviceID, "", -(int)ERROR_CODE.CAPTURE_FAIL);
                         goto InspectionDone;
                     }
 
@@ -647,7 +655,7 @@ namespace Magnus_WPF_1.Source.Application
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($" {m_nTrackID} Load image to Inspection Core!", (int)ERROR_CODE.NO_LABEL);
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($" {m_nTrackID} Load image to Inspection Core!");
 
                     });
 
@@ -662,25 +670,25 @@ namespace Magnus_WPF_1.Source.Application
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($" {m_nTrackID}  Load image to Inspection Core Done!", (int)ERROR_CODE.NO_LABEL);
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($" {m_nTrackID}  Load image to Inspection Core Done!");
 
                     });
 
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"  {m_nTrackID}  Inspect", (int)ERROR_CODE.NO_LABEL);
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"  {m_nTrackID}  Inspect");
 
                     });
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"  { m_nTrackID }  Inspect");
 
-                    m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nResult = Inspect(ref mainWindow.master.m_Tracks[m_nTrackID], out pCenter, out pCorner);
-
+                    m_SequenceVisionResult = Inspect(ref mainWindow.master.m_Tracks[m_nTrackID], out pCenter, out pCorner);
+                    m_VisionResultDatas[nDeviceID].m_nResult = m_SequenceVisionResult;
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"  {m_nTrackID}  Inspect Done", (int)ERROR_CODE.NO_LABEL);
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"  {m_nTrackID}  Inspect Done");
 
                     });
 
@@ -691,10 +699,10 @@ namespace Magnus_WPF_1.Source.Application
                             LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                             ImageSaveData imageSaveData = new ImageSaveData();
-                            imageSaveData.nDeviceID = m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nDeviceIndexOnReel;
+                            imageSaveData.nDeviceID = nDeviceID;
                             imageSaveData.strLotID = Application.m_strCurrentLot == null ? "DUMMY" : Application.m_strCurrentLot;
                             imageSaveData.nTrackID = m_nTrackID;
-                            imageSaveData.nResult = m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nResult;
+                            imageSaveData.nResult = m_VisionResultDatas[nDeviceID].m_nResult;
                             imageSaveData.imageSave = BitmapSourceConvert.ToMat(m_imageViews[0].btmSource).Clone();
                             lock (Master.m_SaveInspectImageQueue)
                             {
@@ -719,14 +727,14 @@ namespace Magnus_WPF_1.Source.Application
                     {
                         LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
-                        DrawInspectionResult(ref m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nResult, ref pCenter, ref dDeltaAngle);
+                        DrawInspectionResult(ref m_SequenceVisionResult, ref pCenter, ref dDeltaAngle);
                         LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                         m_imageViews[0].tbl_InspectTime.Text = timeIns.ElapsedMilliseconds.ToString();
                         if (MainWindow.mainWindow.m_bSequenceRunning)
                         {
                             // Update Statistics
-                            if (m_CurrentSequenceDeviceID == 0)
+                            if (nDeviceID == 0)
                             {
                                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                                 {
@@ -737,9 +745,9 @@ namespace Magnus_WPF_1.Source.Application
 
                             LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
-                            MainWindow.mainWindow.m_staticView.UpdateMappingResult(m_VisionResultDatas[m_CurrentSequenceDeviceID], m_nTrackID);
+                            MainWindow.mainWindow.m_staticView.UpdateMappingResult(m_VisionResultDatas[nDeviceID], m_nTrackID, nDeviceID);
                             LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-                            MainWindow.mainWindow.m_staticView.UpdateValueStatistic(m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nResult, m_nTrackID);
+                            MainWindow.mainWindow.m_staticView.UpdateValueStatistic(m_VisionResultDatas[nDeviceID].m_nResult, m_nTrackID);
                         }
                     });
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
@@ -752,11 +760,11 @@ namespace Magnus_WPF_1.Source.Application
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"  {m_nTrackID} Inspection Thread PROCESS ERROR", (int)ERROR_CODE.NO_LABEL);
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"  {m_nTrackID} Inspection Thread PROCESS ERROR", (int)ERROR_CODE.LABEL_FAIL);
 
                     });
-
-                    m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nResult = -(int)ERROR_CODE.CAPTURE_FAIL;
+                    m_VisionResultDatas[nDeviceID].m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
+                    m_SequenceVisionResult = m_VisionResultDatas[nDeviceID].m_nResult;
                     Master.InspectDoneEvent[m_nTrackID].Set();
                     continue;
                 }
@@ -776,7 +784,7 @@ namespace Magnus_WPF_1.Source.Application
             if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.m_bSequenceRunning)
                 return;
 
-            CheckInspectionOnlineThread();
+            //CheckInspectionOnlineThread();
 
             DirectoryInfo folder = new DirectoryInfo(strFolderPath);
 
@@ -929,6 +937,7 @@ namespace Magnus_WPF_1.Source.Application
         public void func_InspectOnlineThread()
         {
         Start_InspectionOnlineThread:
+            LogMessage.WriteToDebugViewer(7 + m_nTrackID, $"Start Inspection Online thread Track {m_nTrackID}" );
 
             CheckInspectionOnlineThread();
             int nWidth = 0, nHeight = 0;
@@ -953,171 +962,187 @@ namespace Magnus_WPF_1.Source.Application
             //m_cap.Start();
             Stopwatch timeIns = new Stopwatch();
             timeIns.Start();
-            while (MainWindow.mainWindow.m_bSequenceRunning)
+            int nDeviceID = m_CurrentSequenceDeviceID;
+            while (true/*MainWindow.mainWindow.m_bSequenceRunning*/)
             {
 
                 if (MainWindow.mainWindow == null)
                     return;
 
-                while (!Master.m_hardwareTriggerSnapEvent[m_nTrackID].WaitOne(10))
-                {
-                    if (MainWindow.mainWindow == null)
-                        return;
+                LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Get event HarTrigger ");
+                Master.m_hardwareTriggerSnapEvent[m_nTrackID].WaitOne();
+                LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Get event HarTrigger done ");
 
-                    if (!MainWindow.mainWindow.m_bSequenceRunning)
-                    {
-                        return;
-                    }
-                }
+                nDeviceID = m_CurrentSequenceDeviceID;
                 timeIns.Restart();
                 string strFullPathImageOut = "";
                 string strBarcodeResult = "";
-                if (m_nTrackID == 0)
-                {
-                    //Snap camera
-                    int nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_SetCommandValue_NET("TriggerSoftware");
-                    if (MyCamera.MV_OK != nRet)
+
+                try {
+                    if (m_nTrackID == 0)
                     {
-                        nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
-                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        //Snap camera
+                        int nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_SetCommandValue_NET("TriggerSoftware");
+                        if (MyCamera.MV_OK != nRet)
                         {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Trigger Software Failed!.", (int)ERROR_CODE.NO_LABEL);
+                            nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+                            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Trigger Software Failed!.", (int)ERROR_CODE.LABEL_FAIL);
 
-                        });
-                        m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
-                        goto InspectionDone;
-                    }
+                            });
+                            m_VisionResultDatas[nDeviceID].m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
+                            m_SequenceVisionResult = m_VisionResultDatas[nDeviceID].m_nResult;
 
-                    m_hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);
-                    if (MyCamera.MV_OK != nRet)
-                    {
-                        nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
-                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                            goto InspectionDone;
+                        }
+
+                        m_hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);
+                        if (MyCamera.MV_OK != nRet)
                         {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Capture and Get Image buffer Failed!.", (int)ERROR_CODE.NO_LABEL);
+                            nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+                            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Capture and Get Image buffer Failed!.", (int)ERROR_CODE.LABEL_FAIL);
 
-                        });
-                        m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
-                        goto InspectionDone;
-                    }
-                    m_imageViews[0].UpdateSourceImageMono();
-                }
-                else
-                {
-                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Begin!", (int)ERROR_CODE.NO_LABEL);
+                            });
+                            m_VisionResultDatas[nDeviceID].m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
+                            m_SequenceVisionResult = m_VisionResultDatas[nDeviceID].m_nResult;
 
-                    });
-                    //Scan Barcode
-                    strBarcodeResult = MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut, m_CurrentSequenceDeviceID);
-                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Done!", (int)ERROR_CODE.NO_LABEL);
-
-                    });
-
-                }
-
-
-
-                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                {
-
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Capture and update Image time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
-
-                });
-
-
-                // Do Inspection
-                Master.InspectDoneEvent[m_nTrackID].Reset();
-                Master.InspectEvent[m_nTrackID].Set();
-                int nCountTimeOut = 0;
-                while (!Master.InspectDoneEvent[m_nTrackID].WaitOne(10))
-                {
-                    if (MainWindow.mainWindow == null)
-                        return;
-
-                    if (!MainWindow.mainWindow.m_bSequenceRunning)
-                    {
-                        return;
-                    }
-
-                    nCountTimeOut++;
-                    if (nCountTimeOut > 300)
-                    {
-                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                        {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Vision TIME OUT!", (int)ERROR_CODE.NO_LABEL);
-
-                        });
-                        m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
-                        Master.VisionReadyEvent[m_nTrackID].Set();
-                        Master.InspectEvent[m_nTrackID].Reset();
-                        goto Start_InspectionOnlineThread;
-                    }
-
-                }
-
-            InspectionDone:
-
-                //      Barcode
-                if (m_nTrackID == 1)
-                {
-                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode InspectionDone!", (int)ERROR_CODE.NO_LABEL);
-
-                    });
-                    //device id characters always > 5
-                    if (strBarcodeResult.Length < 5)
-                    {
-                        m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nResult = -(int)ERROR_CODE.NO_LABEL;
-                    }
-
-                    if (m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nResult != (int)ERROR_CODE.PASS)
-                    {
-                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                        {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Save image!", (int)ERROR_CODE.NO_LABEL);
-
-                        });
-                        string strFailImage = strFullPathImageOut.Replace("PASS IMAGE", "FAIL IMAGE");
-                        if (File.Exists(strFullPathImageOut) && !File.Exists(strFailImage))
-                            File.Move(strFullPathImageOut, strFailImage);
-
-
-                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                        {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Save image Done!", (int)ERROR_CODE.NO_LABEL);
-
-                        });
+                            goto InspectionDone;
+                        }
+                        m_imageViews[0].UpdateSourceImageMono();
                     }
                     else
                     {
-                        m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nDeviceIndexOnReel = m_CurrentSequenceDeviceID;
-                        m_VisionResultDatas[m_CurrentSequenceDeviceID].m_strDeviceID = strBarcodeResult;
-                        m_VisionResultDatas[m_CurrentSequenceDeviceID].m_strFullImagePath = strFullPathImageOut;
+                        //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        //{
+                        //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Begin!", (int)ERROR_CODE.NO_LABEL);
 
-                        VisionResultData.SaveSequenceResultToExcel(Application.m_strCurrentLot, m_nTrackID, m_VisionResultDatas[m_CurrentSequenceDeviceID]);
+                        //});
+                        //Scan Barcode
+                        LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Get barcode ");
+
+                        strBarcodeResult = MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut, nDeviceID);
+                        LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Get barcode Done ");
+
+                        //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        //{
+                        //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Done!", (int)ERROR_CODE.NO_LABEL);
+
+                        //});
+
                     }
+
+
+                    LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Capture and update Image time: " + timeIns.ElapsedMilliseconds.ToString());
+
+                    //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    //{
+
+                    //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Capture and update Image time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
+
+                    //});
+
+
+                    // Do Inspection
+                    Master.InspectDoneEvent[m_nTrackID].Reset();
+                    Master.InspectEvent[m_nTrackID].Set();
+                    if (!Master.InspectDoneEvent[m_nTrackID].WaitOne(1500))
+                    {
+                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Vision TIME OUT!", (int)ERROR_CODE.LABEL_FAIL);
+
+                        });
+                        m_SequenceVisionResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
+                        m_VisionResultDatas[nDeviceID].m_nResult = m_SequenceVisionResult;
+                        Master.VisionReadyEvent[m_nTrackID].Set();
+                        //Master.InspectEvent[m_nTrackID].Reset();
+                        goto Start_InspectionOnlineThread;
+                    }
+
+                InspectionDone:
+
+                    //      Barcode
+                    if (m_nTrackID == 1)
+                    {
+                        LogMessage.WriteToDebugViewer(8, "Barcode InspectionDone!");
+
+                        //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        //{
+                        //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode InspectionDone!");
+
+                        //});
+                        //device id characters always > 5
+                        if (strBarcodeResult.Contains("Dummy"))
+                        {
+                            m_SequenceVisionResult = -(int)ERROR_CODE.LABEL_FAIL;
+                            m_VisionResultDatas[nDeviceID].m_nResult = m_SequenceVisionResult;
+                        }
+
+                        if (m_VisionResultDatas[nDeviceID].m_nResult != (int)ERROR_CODE.PASS)
+                        {
+
+                            LogMessage.WriteToDebugViewer(8, "Barcode Save Image!");
+
+                            //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                            //{
+                            //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Save image!");
+
+                            //});
+                            string strFailImage = strFullPathImageOut.Replace("PASS IMAGE", "FAIL IMAGE");
+                            if (File.Exists(strFullPathImageOut) && !File.Exists(strFailImage))
+                                File.Move(strFullPathImageOut, strFailImage);
+
+                            LogMessage.WriteToDebugViewer(8, "Barcode Save Image Done!");
+
+                            //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                            //{
+                            //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Save image Done!");
+
+                            //});
+                        }
+                        else
+                        {
+                            m_VisionResultDatas[nDeviceID].m_nDeviceIndexOnReel = nDeviceID;
+                            m_VisionResultDatas[nDeviceID].m_strDeviceID = strBarcodeResult;
+                            m_VisionResultDatas[nDeviceID].m_strFullImagePath = strFullPathImageOut;
+
+                            LogMessage.WriteToDebugViewer(8, "Barcode Save Excel!");
+
+                            VisionResultData.SaveSequenceResultToExcel(Application.m_strCurrentLot, m_nTrackID, m_VisionResultDatas[nDeviceID]);
+                            LogMessage.WriteToDebugViewer(8, "Barcode Save Excel Done!");
+
+                        }
+
+                        //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        //{
+                        //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Save Excel Done!");
+
+                        //});
+
+                    }
+
+                    Master.VisionReadyEvent[m_nTrackID].Set();
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Save Excel!", (int)ERROR_CODE.NO_LABEL);
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Device {nDeviceID + 1}, Result = {m_SequenceVisionResult}  Inspection sequence time: " + timeIns.ElapsedMilliseconds.ToString(), m_SequenceVisionResult);
 
                     });
+                    timeIns.Restart();
+                }
+              catch(Exception e)
+                {
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Function_Inspection Online Thread FAILED!", (int)ERROR_CODE.LABEL_FAIL);
+                    });
+
+                    goto Start_InspectionOnlineThread;
 
                 }
-
-                Master.VisionReadyEvent[m_nTrackID].Set();
-
-                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                {
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Device {m_CurrentSequenceDeviceID + 1}, Result = {m_VisionResultDatas[m_CurrentSequenceDeviceID].m_nResult}  Inspection sequence time: " + timeIns.ElapsedMilliseconds.ToString(), (int)ERROR_CODE.NO_LABEL);
-
-                });
-                timeIns.Restart();
 
             }
         }

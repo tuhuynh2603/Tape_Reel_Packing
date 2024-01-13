@@ -36,6 +36,7 @@ using EasyModbus;
             PLC_RESET_STATUS = 110,
             PLC_ROBOT_RESULT = 111,
             PLC_BARCODE_RESULT = 112,
+            PLC_AIR_PRESS_RESULT = 113
 
         }
 

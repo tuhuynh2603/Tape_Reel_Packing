@@ -187,14 +187,14 @@ namespace Magnus_WPF_1.Source.Hardware
 			//{
 			//	str2 = resp2.Replace("\r", "");
 			//}
-			Thread.Sleep(200);
+			Thread.Sleep(300);
 
 			if((strDeviceID).Length < 1)
             {
 				strDeviceID = string.Format("Dummy {0}{1}{2}+{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
 			}
 
-			LogMessage.WriteToDebugViewer(3, $"Message responsed from Barcode Bank 2: {strDeviceID}");
+			//LogMessage.WriteToDebugViewer(3, $"Message responsed from Barcode Bank 2: {strDeviceID}");
 			strImageFullName = Path.Combine(strFolder,  $"{strDeviceID}_{nDeviceID}.bmp");
 			strFullPathImageOut = strImageFullName;
 			
@@ -203,7 +203,7 @@ namespace Magnus_WPF_1.Source.Hardware
 				m_liveviewForm.DownloadRecentImage(strImageFullName);
 				MainWindow.mainWindow.master.m_Tracks[1].m_imageViews[0].UpdateNewImageMono(strImageFullName);
 			});
-			m_reader.ExecCommand("LOFF");
+			//m_reader.ExecCommand("LOFF");
 			bIsDownload = false;
 				return strDeviceID;
 		}
@@ -223,5 +223,10 @@ namespace Magnus_WPF_1.Source.Hardware
 			else
 				return (string)registerPreferences.GetValue(key);
 		}
+
+		public void CloseConnection()
+        {
+			m_reader.Disconnect();
+        }
 	}
 }

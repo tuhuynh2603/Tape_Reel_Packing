@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Application = Magnus_WPF_1.Source.Application.Application;
 using Brushes = System.Windows.Media.Brushes;
 using Image = System.Windows.Controls.Image;
 using Label = System.Windows.Controls.Label;
@@ -35,6 +36,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             lboxStatistic.ItemsSource = listSummary;
             InitCanvasMapping();
 
+
         }
         public void UpdateValueStatistic(int result, int nTrack)
         {
@@ -43,8 +45,8 @@ namespace Magnus_WPF_1.UI.UserControls.View
                 listSummary[0].valueSummary_Camera1 += 1;
                 if (result == 0)
                     listSummary[1].valueSummary_Camera1 += 1;
-                else
-                    listSummary[2].valueSummary_Camera1 += 1;
+                else if(result != -(int)ERROR_CODE.NOT_INSPECTED)
+                      listSummary[2].valueSummary_Camera1 += 1;
 
                 listSummary[3].valueSummary_Camera1 = Math.Round((listSummary[1].valueSummary_Camera1 / listSummary[0].valueSummary_Camera1) * 100, 2);
 
@@ -54,7 +56,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
                 listSummary[0].valueSummary_Camera2 += 1;
                 if (result == 0)
                     listSummary[1].valueSummary_Camera2 += 1;
-                else
+                else if (result != -(int)ERROR_CODE.NOT_INSPECTED)
                     listSummary[2].valueSummary_Camera2 += 1;
 
                 listSummary[3].valueSummary_Camera2 = Math.Round((listSummary[1].valueSummary_Camera2 / listSummary[0].valueSummary_Camera2) * 100, 2);
@@ -418,11 +420,11 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
                     switch (nResultTotal)
                     {
-                        case (int)ERROR_CODE.NUM_DEFECTS:
+                        case -(int)ERROR_CODE.NOT_INSPECTED:
                             arr_imageMapping[nTrack][nID].Source = new BitmapImage(new Uri(path, UriKind.Relative));
                             break;
 
-                        case (int)ERROR_CODE.PASS:
+                        case -(int)ERROR_CODE.PASS:
                             arr_imageMapping[nTrack][nID].Source = new BitmapImage(new Uri(pathPass, UriKind.Relative));
                             break;
                         default:
@@ -436,6 +438,8 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
             }
 
+            text_Current_Page.Text = m_nPageID.ToString();
+
         }
 
         //private void canvas_Mapping_NextPage_MouseLeave(object sender, MouseEventArgs e)
@@ -445,16 +449,16 @@ namespace Magnus_WPF_1.UI.UserControls.View
         //}
 
 
-        public void UpdateMappingResult(VisionResultData resultData, int nTrack)
+        public void UpdateMappingResult(VisionResultData resultData, int nTrack, int nDeviceID)
         {
             string path = @"/Resources/green-chip.png";
 
             if (resultData.m_nResult < 0)
                 path = @"/Resources/red-chip.png";
-            if (resultData.m_nDeviceIndexOnReel < m_nPageID * arr_imageMapping.Length || resultData.m_nDeviceIndexOnReel >= (m_nPageID + 1) * arr_imageMapping.Length)
-                return;
-
-            arr_imageMapping[nTrack][resultData.m_nDeviceIndexOnReel % arr_imageMapping.Length].Source = new BitmapImage(new Uri(path, UriKind.Relative));
+            if (nDeviceID < m_nPageID * arr_imageMapping.Length || nDeviceID >= (m_nPageID + 1) * arr_imageMapping.Length)
+                UpdateMappingResultPage();
+            else
+                arr_imageMapping[nTrack][nDeviceID % arr_imageMapping.Length].Source = new BitmapImage(new Uri(path, UriKind.Relative));
 
         }
         public void ResetMappingResult(int nTrackID = (int)TRACK_TYPE.TRACK_CAM1)

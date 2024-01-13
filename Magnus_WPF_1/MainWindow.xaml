@@ -364,17 +364,16 @@
                                                         FontSize="20" FontWeight="Bold"
                                                         VerticalAlignment="Center"  />
 
-                                <TextBox  x:Name="text_LotID"
-                                                            TextChanged="text_LotID_TextChanged"
+                                <TextBlock  x:Name="text_LotID"
+                                                          
                                                             MouseLeftButtonDown="text_LotID_MouseLeftButtonDown"
                                                             Text="{Binding Path=m_strCurrentLotID,  Mode=TwoWay, UpdateSourceTrigger= PropertyChanged}"
                                                             Width="Auto" MinWidth="150" Foreground="WhiteSmoke"
-                                                            BorderThickness="0"
                                                             Background="DarkSlateGray"
                                                             FontSize="20" FontWeight="Bold"
                                                             VerticalAlignment="Center">
 
-                                </TextBox>
+                                </TextBlock>
                                 <!--Recipe Name-->
                                 <TextBlock Text="Recipe: "
                                                          Margin="18,0,0,0"

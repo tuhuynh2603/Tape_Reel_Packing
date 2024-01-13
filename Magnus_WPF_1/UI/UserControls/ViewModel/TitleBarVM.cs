@@ -55,6 +55,12 @@ namespace Magnus_WPF_1.UI.UserControls.ViewModel
                                                                             //if (w == null)
                                                                             //    return;
                                                                             //CloseWindow(MainWindow.mainWindow);
+                                                                            MainWindow.mainWindow.master.m_Tracks[0].m_hIKControlCameraView.m_MyCamera.MV_CC_ClearImageBuffer_NET();
+                                                                            MainWindow.mainWindow.master.m_Tracks[0].m_hIKControlCameraView.m_MyCamera.MV_CC_CloseDevice_NET();
+                                                                            MainWindow.mainWindow.master.m_Tracks[0].m_hIKControlCameraView.m_MyCamera.MV_CC_DestroyDevice_NET();
+                                                                            MainWindow.mainWindow.master.m_BarcodeReader.CloseConnection();
+                                                                            MainWindow.mainWindow.master.m_hiWinRobotInterface.CloseConnection();
+
                                                                             MainWindow.mainWindow.master = null;
                                                                             MainWindow.mainWindow.Close();
                                                                             MainWindow.mainWindow = null;

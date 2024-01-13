@@ -235,6 +235,7 @@ namespace Magnus_WPF_1
             master = new Master(this);
             outputLogView = new OutputLogView(this);
             m_staticView = new StatisticView(this);
+            ResetStatistic();
             //master.m_SaveInspectImageThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread(true)));
 
             btn_enable_saveimage.IsChecked = Source.Application.Application.m_bEnableSavingOnlineImage;
@@ -274,6 +275,9 @@ namespace Magnus_WPF_1
 
             for (int n = 0; n < InputBindings.Count; n++)
                 hotkey.Add((KeyBinding)InputBindings[n]);
+
+
+
 
         }
 
@@ -335,40 +339,62 @@ namespace Magnus_WPF_1
 
         }
 
+        public void ResetStatistic()
+        {
+            m_staticView.ClearStatistic(0);
+            for (int nT = 0; nT < Application.m_nTrack; nT++)
+            {
+
+                for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)
+                {
+                    master.m_Tracks[nT].m_VisionResultDatas[n] = new VisionResultData();
+
+                }
+
+                VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, nT, ref master.m_Tracks[nT].m_VisionResultDatas, ref master.m_Tracks[nT].m_CurrentSequenceDeviceID);
+
+                m_staticView.ResetMappingResult(nT);
+
+                for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)
+                {
+                    m_staticView.UpdateMappingResult(master.m_Tracks[nT].m_VisionResultDatas[n], nT, n);
+                    m_staticView.UpdateValueStatistic(master.m_Tracks[nT].m_VisionResultDatas[n].m_nResult, nT);
+
+                }
+            }
+        }
         public void Run_Sequence(int nTrack = (int)TRACK_TYPE.TRACK_ALL)
         {
 
-            if (master.m_bRobotSequenceStatus  && master.m_bBarcodeReaderSequenceStatus == true)
+            if (master.m_bRobotSequenceStatus)
             {
-                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Machine is running!", (int)ERROR_CODE.NO_LABEL);
+                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Machine is running!", (int)ERROR_CODE.LABEL_FAIL);
                 return;
             }
 
             btn_run_sequence.IsChecked = true;
             m_bSequenceRunning = (bool)btn_run_sequence.IsChecked;
             inspect_offline_btn.IsEnabled = false;
-            //
-            string strLotID = string.Format("DUMMY_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
-            Application.m_strCurrentLot = Application.GetStringRegistry(Application.m_strCurrentLot_Registry, strLotID);
-            //
 
+
+            ResetStatistic();
+
+            //
+            //string strLotIDTemp = string.Format("DUMMY_{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+            //strLotID = Application.GetStringRegistry(Application.m_strCurrentLot_Registry, strLotIDTemp);
+            //
             if (!master.m_bRobotSequenceStatus)
             {
                 master.m_bRobotSequenceStatus = true;
-                m_staticView.ResetMappingResult(0);
-                m_staticView.ClearStatistic(0);
-                master.RunOnlineSequenceThread(0);
                 master.RobotSequenceThread();
             }
 
-            if (!master.m_bBarcodeReaderSequenceStatus)
-            {
-                master.m_bBarcodeReaderSequenceStatus = true;
-                m_staticView.ResetMappingResult(1);
-                m_staticView.ClearStatistic(1);
-                master.RunOnlineSequenceThread(1);
-                master.BarcodeReaderSequenceThread();
-            }
+            //if (!master.m_bBarcodeReaderSequenceStatus)
+            //{
+            //    master.m_bBarcodeReaderSequenceStatus = true;
+            //    master.RunOnlineSequenceThread(1);
+            //    master.BarcodeReaderSequenceThread();
+            //}
             //master.RunOnlineSequenceThread(0);
 
             //if (nTrack == (int)TRACK_TYPE.TRACK_ALL)
@@ -1617,7 +1643,7 @@ namespace Magnus_WPF_1
         private void text_LotID_TextChanged(object sender, TextChangedEventArgs e)
         {
              //text_LotID.IsEnabled = !m_bEnableRunSequence;
-            //if (m_bEnableRunSequence)
+            //if (m_bEnableRunSequence
             //    m_strCurrentLotID = Application.m_strCurrentLot;
         }
 

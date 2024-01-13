@@ -44,7 +44,8 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             RUNSEQUENCE_STATUS = 8,
             PLC_CREATE_NEW_LOT = 9,     
             PLC_END_LOT = 10,
-            PLC_DOOR_STATUS = 11,
+            PLC_LAST_CHIP = 12,
+            PLC_DOOR_STATUS = 15,
             AIR_PRESSURESTATUS = 16, // 
 
 
@@ -817,37 +818,43 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             while (MainWindow.mainWindow != null)
             {
                 //Connect button
-                if (m_hiWinRobotUserControl.b_button_RobotConnect == true)
+                if (MainWindow.isRobotControllerOpen)
                 {
-                    if (m_RobotConnectID < 0)
+
+
+
+                    if (m_hiWinRobotUserControl.b_button_RobotConnect == true)
                     {
-                        ReconnectToHIKRobot();
-                        Thread.Sleep(1000);
+                        if (m_RobotConnectID < 0)
+                        {
+                            ReconnectToHIKRobot();
+                            Thread.Sleep(1000);
+
+                        }
+                        else
+                        {
+                            InitDataGridview(m_RobotConnectID);
+
+                        }
+
+                        // Change mode during using software
+                        if (HWinRobot.get_hrss_mode(m_RobotConnectID) != 3 && m_RobotConnectID >= 0)
+                        {
+                            HWinRobot.disconnect(m_RobotConnectID);
+                            m_RobotConnectID = -1;
+
+                        }
+                    }
+                    //Disconnect button
+                    else
+                    {
+                        if (m_RobotConnectID >= 0)
+                        {
+                            HWinRobot.disconnect(m_RobotConnectID);
+                            m_RobotConnectID = -1;
+                        }
 
                     }
-                    else if (MainWindow.isRobotControllerOpen)
-                    {
-                        InitDataGridview(m_RobotConnectID);
-
-                    }
-
-                    // Change mode during using software
-                    if (HWinRobot.get_hrss_mode(m_RobotConnectID) != 3 && m_RobotConnectID >= 0)
-                    {
-                        HWinRobot.disconnect(m_RobotConnectID);
-                        m_RobotConnectID = -1;
-
-                    }
-                }
-                //Disconnect button
-                else
-                {
-                    if (m_RobotConnectID >= 0)
-                    {
-                        HWinRobot.disconnect(m_RobotConnectID);
-                        m_RobotConnectID = -1;
-                    }
-                        
                 }
 
                 if (System.Windows.Application.Current == null)
@@ -1109,7 +1116,10 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
             HWinRobot.jog_home(m_RobotConnectID);
         }
-
+        public void CloseConnection()
+        {
+            HWinRobot.disconnect(m_RobotConnectID);
+        }
         //public static void EventFun(UInt16 cmd, UInt16 rlt, ref UInt16 Msg, int len)
         //{
         //    Console.WriteLine("Command: " + cmd + " Resault: " + rlt);

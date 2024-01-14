@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\App.xaml
-171921694121
+19-2133759089
 
-43624825787
-491801730342
-MainWindow.xaml;MappingSetingUC.xaml;PopupUserControl.xaml;ResourceControl.xaml;Source\Hardware\BarCodeReaderView.xaml;Source\Hardware\HIKControlCameraView.xaml;Source\Hardware\HiWinRobotUserControl.xaml;Source\Hardware\PLCCOMM.xaml;TeachParametersUC.xaml;UI\UserControls\DefectInfor.xaml;UI\UserControls\LoginUser.xaml;UI\UserControls\OutputLogView.xaml;UI\UserControls\PixelRuler.xaml;UI\UserControls\RecipeManageView.xaml;UI\UserControls\View\ImageView.xaml;UI\UserControls\View\StatisticView.xaml;UI\UserControls\WarningMessageBox.xaml;
+49-637371497
+501967658746
+MainWindow.xaml;MappingSetingUC.xaml;PopupUserControl.xaml;ResourceControl.xaml;Source\Hardware\BarCodeReaderView.xaml;Source\Hardware\ETHERNETIP_View.xaml;Source\Hardware\HIKControlCameraView.xaml;Source\Hardware\HiWinRobotUserControl.xaml;Source\Hardware\PLCCOMM.xaml;TeachParametersUC.xaml;UI\UserControls\DefectInfor.xaml;UI\UserControls\LoginUser.xaml;UI\UserControls\OutputLogView.xaml;UI\UserControls\PixelRuler.xaml;UI\UserControls\RecipeManageView.xaml;UI\UserControls\View\ImageView.xaml;UI\UserControls\View\StatisticView.xaml;UI\UserControls\View\TitleBar.xaml;UI\UserControls\WarningMessageBox.xaml;
 
-False
+True
 

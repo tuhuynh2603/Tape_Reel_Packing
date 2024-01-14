@@ -4,6 +4,7 @@ FC:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\MainWindow.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\MappingSetingUC.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\PopupUserControl.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\ResourceControl.xaml;;
+FC:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\Source\Hardware\ETHERNETIP_View.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\Source\Hardware\HIKControlCameraView.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\Source\Hardware\HiWinRobotUserControl.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\Source\Hardware\PLCCOMM.xaml;;
@@ -15,5 +16,6 @@ FC:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\UI\UserControls\PixelRuler.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\UI\UserControls\RecipeManageView.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\UI\UserControls\View\ImageView.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\UI\UserControls\View\StatisticView.xaml;;
+FC:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\UI\UserControls\View\TitleBar.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\Magnus_WPF_1\UI\UserControls\WarningMessageBox.xaml;;
 

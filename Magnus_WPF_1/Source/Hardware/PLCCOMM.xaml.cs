@@ -70,6 +70,10 @@ using EasyModbus;
 
         private void M_modbusClient_ConnectedChanged(object sender)
         {
+            if (System.Windows.Application.Current == null)
+                return;
+
+
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
                 if (m_modbusClient.Connected)

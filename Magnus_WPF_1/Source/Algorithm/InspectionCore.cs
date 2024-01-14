@@ -63,13 +63,13 @@ namespace Magnus_WPF_1.Source.Algorithm
 
         public class DeviceLocationResult
         {
-           public PointF m_dCenterDevicePoint = new PointF(0, 0);
+            public PointF m_dCenterDevicePoint = new PointF(0, 0);
             public PointF m_dCornerDevicePoint = new PointF(0, 0);
-           public double m_dAngleOxDevice = 0.0;
+            public double m_dAngleOxDevice = 0.0;
         }
 
 
-        public  class BlackChipParameter
+        public class BlackChipParameter
         {
             public/* static*/ bool m_OC_EnableCheck = true;
             public/* static*/ int m_OC_lowerThreshold = 0;
@@ -195,7 +195,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             m_DeviceLocationParameter.m_L_LocationEnable = Source.Application.Application.categoriesTeachParam.L_LocationEnable;
             m_DeviceLocationParameter.m_L_ObjectColor = Source.Application.Application.categoriesTeachParam.L_ObjectColor;
 
-            
+
             m_DeviceLocationParameter.m_L_lowerThreshold = Source.Application.Application.categoriesTeachParam.L_lowerThreshold;
             m_DeviceLocationParameter.m_L_upperThreshold = Source.Application.Application.categoriesTeachParam.L_upperThreshold;
 
@@ -204,9 +204,9 @@ namespace Magnus_WPF_1.Source.Algorithm
 
 
             if (Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.Width > globalImageSize.Width
-                ||Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.TopLeft.X >= globalImageSize.Width
+                || Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.TopLeft.X >= globalImageSize.Width
                 || Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.TopLeft.Y >= globalImageSize.Height)
-                Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi = new Rectangles(new System.Windows.Point(globalImageSize.Width / 2, globalImageSize.Height / 2), 300,300);
+                Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi = new Rectangles(new System.Windows.Point(globalImageSize.Width / 2, globalImageSize.Height / 2), 300, 300);
 
             m_DeviceLocationParameter.m_L_DeviceLocationRoi = Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi;
 
@@ -230,10 +230,10 @@ namespace Magnus_WPF_1.Source.Algorithm
 
 
 
-            m_blackChipParameter.m_OC_EnableCheck    = Source.Application.Application.categoriesTeachParam.OC_EnableCheck   ;
+            m_blackChipParameter.m_OC_EnableCheck = Source.Application.Application.categoriesTeachParam.OC_EnableCheck;
             m_blackChipParameter.m_OC_lowerThreshold = Source.Application.Application.categoriesTeachParam.OC_lowerThreshold;
             m_blackChipParameter.m_OC_upperThreshold = Source.Application.Application.categoriesTeachParam.OC_upperThreshold;
-            m_blackChipParameter.m_OC_OpeningMask    = Source.Application.Application.categoriesTeachParam.OC_OpeningMask;
+            m_blackChipParameter.m_OC_OpeningMask = Source.Application.Application.categoriesTeachParam.OC_OpeningMask;
             m_blackChipParameter.m_OC_DilationMask = Source.Application.Application.categoriesTeachParam.OC_DilationMask;
             m_blackChipParameter.m_OC_MinWidthDevice = Source.Application.Application.categoriesTeachParam.OC_MinWidthDevice;
             m_blackChipParameter.m_OC_MinHeightDevice = Source.Application.Application.categoriesTeachParam.OC_MinHeightDevice;
@@ -249,12 +249,12 @@ namespace Magnus_WPF_1.Source.Algorithm
                 if (Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea].Width > globalImageSize.Width ||
                     Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea].TopLeft.X >= globalImageSize.Width
                     || Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea].TopLeft.Y >= globalImageSize.Height)
-                        Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea] = new Rectangles(new System.Windows.Point(globalImageSize.Width/2, globalImageSize.Height/2), 300, 300);
+                    Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea] = new Rectangles(new System.Windows.Point(globalImageSize.Width / 2, globalImageSize.Height / 2), 300, 300);
 
                 m_SurfaceDefectParameter[nArea].m_DR_DefectROILocations = Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea];
                 //m_SurfaceDefectParameter.m_LD_NumberROILocation = Source.Application.Application.categoriesTeachParam.LD_NumberROILocation;
 
-            }     
+            }
             return true;
         }
 
@@ -268,7 +268,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             m_SurfaceDefectParameter[nArea].m_LD_OpeningMask = Source.Application.Application.categoriesTeachParam.LD_OpeningMask;
             m_SurfaceDefectParameter[nArea].m_LD_DilationMask = Source.Application.Application.categoriesTeachParam.LD_DilationMask;
             m_SurfaceDefectParameter[nArea].m_LD_ObjectCoverPercent = Source.Application.Application.categoriesTeachParam.LD_ObjectCoverPercent;
-            
+
             return true;
         }
 
@@ -276,8 +276,8 @@ namespace Magnus_WPF_1.Source.Algorithm
         {
             try
             {
-                m_SourceImage.Gray =   CvInvoke.Imread(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_Track" + (nTrack +1).ToString() + ".bmp"), Emgu.CV.CvEnum.ImreadModes.Grayscale);
-                m_TeachImage.Gray =    CvInvoke.Imread(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_Track" + (nTrack + 1).ToString() + ".bmp"), Emgu.CV.CvEnum.ImreadModes.Grayscale);
+                m_SourceImage.Gray = CvInvoke.Imread(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_Track" + (nTrack + 1).ToString() + ".bmp"), Emgu.CV.CvEnum.ImreadModes.Grayscale);
+                m_TeachImage.Gray = CvInvoke.Imread(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_Track" + (nTrack + 1).ToString() + ".bmp"), Emgu.CV.CvEnum.ImreadModes.Grayscale);
                 m_TemplateImage.Gray = CvInvoke.Imread(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "templateImage_Track" + (nTrack + 1).ToString() + ".bmp"), Emgu.CV.CvEnum.ImreadModes.Grayscale);
 
             }
@@ -323,7 +323,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             timeIns.Start();
             //double dScale = 3;
             nError = FindDeviceLocation_Zoom(ref InspectImage.Gray,
-                                             ref list_arrayOverlay, ref pCenter, ref pCorner, ref  debugInfors, bEnableDebug);
+                                             ref list_arrayOverlay, ref pCenter, ref pCorner, ref debugInfors, bEnableDebug);
 
             //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             //{
@@ -351,7 +351,7 @@ namespace Magnus_WPF_1.Source.Algorithm
 
         public void SaveCurrentSourceImage(string strFullFileName, int nType = 0)
         {
-            if(nType == 0)
+            if (nType == 0)
             {
                 CvInvoke.Imwrite(strFullFileName, m_SourceImage.Gray);
             }
@@ -689,7 +689,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             timeIns.Start();
 
             CvImage zoomedInImage = new CvImage((int)(imgSource.Height * m_DeviceLocationParameter.m_L_ScaleImageRatio), (int)(imgSource.Width * m_DeviceLocationParameter.m_L_ScaleImageRatio), DepthType.Cv8U, 3);
-            CvInvoke.Resize(imgSource, zoomedInImage, new System.Drawing.Size(zoomedInImage.Width, zoomedInImage.Height));        
+            CvInvoke.Resize(imgSource, zoomedInImage, new System.Drawing.Size(zoomedInImage.Width, zoomedInImage.Height));
             CvImage zoomedInImage_Scale = new CvImage((int)(imgSource.Height * m_DeviceLocationParameter.m_L_ScaleImageRatio), (int)(imgSource.Width * m_DeviceLocationParameter.m_L_ScaleImageRatio), DepthType.Cv8U, 3);
             CvImage img_thresholdRegion = new CvImage();
             CvImage img_BiggestRegion = new CvImage();
@@ -734,6 +734,10 @@ namespace Magnus_WPF_1.Source.Algorithm
             PointF p_CornerPoint_Temp = new PointF();
             PointF p_CenterPoint_Temp = new PointF();
             RotatedRect rotateRect_Device = new RotatedRect();
+
+            bool bIsChipFound = false;
+            bool bIsChipNoCornerFound = false;
+
             if (m_DeviceLocationParameter.m_L_LocationEnable)
             {
 
@@ -796,9 +800,6 @@ namespace Magnus_WPF_1.Source.Algorithm
 
 
                 PointF cornerPointTemp = new PointF();
-                bool bIsChipFound = false;
-                bool bIsChipNoCornerFound = false;
-
                 while (true)
                 {
                     mat_BiggestInnerChipRegion = new CvImage();
@@ -825,7 +826,7 @@ namespace Magnus_WPF_1.Source.Algorithm
                     if (Math.Abs(rotateRect_Device.Size.Width / rotateRect_Device.Size.Height - m_DeviceLocationParameter.m_L_TemplateRoi.Width / m_DeviceLocationParameter.m_L_TemplateRoi.Height) > 0.2)
                         continue;
 
-                    int nError =  FindNearestPoints_Debug(zoomedInImage, rotateRect_Device, ref cornerPointTemp, ref list_arrayOverlay, ref debugInfors, bEnableDebug);
+                    int nError = FindNearestPoints_Debug(zoomedInImage, rotateRect_Device, ref cornerPointTemp, ref list_arrayOverlay, ref debugInfors, bEnableDebug);
                     Point pCenterTemp = new Point((int)rotateRect_Device.Center.X, (int)rotateRect_Device.Center.Y);
                     if (nError < 0)
                     {
@@ -852,7 +853,7 @@ namespace Magnus_WPF_1.Source.Algorithm
                     p_CenterPoint_Temp = pCenter;
                     p_CornerPoint_Temp = listCornerPoints[nIndexOut];
                 }
-                else if(bIsChipNoCornerFound)
+                else if (bIsChipNoCornerFound)
                 {
                     int nIndexOut = MagnusOpenCVLib.SelectPointBased_Top_Left_Bottom_Right(ref listCenterPoints_Fail, ref pCenter, (int)POSITION._BOTTOM);
                     p_CenterPoint_Temp = pCenter;
@@ -907,10 +908,11 @@ namespace Magnus_WPF_1.Source.Algorithm
                     }
                 }
                 //p_CornerPoint_Temp = FindNearestPoints_Debug(zoomedInImage, rotateRect_Device, ref list_arrayOverlay, ref debugInfors, bEnableDebug);
-                if (p_CornerPoint_Temp.X + p_CornerPoint_Temp.Y == 0)
-                    return -(int)ERROR_CODE.LABEL_FAIL;
+                //if (p_CornerPoint_Temp.X + p_CornerPoint_Temp.Y == 0)
+                //    return -(int)ERROR_CODE.LABEL_FAIL;
 
                 p_CenterPoint_Temp = new Point((int)rotateRect_Device.Center.X, (int)rotateRect_Device.Center.Y);
+                bIsChipFound = true;
             }
 
 
@@ -946,8 +948,13 @@ namespace Magnus_WPF_1.Source.Algorithm
             //CvInvoke.WaitKey(0);
             timeIns.Restart();
 
+
+            if (!bIsChipFound && !bIsChipNoCornerFound && nErrorBlackChip == -(int)ERROR_CODE.PASS)
+                return -(int)ERROR_CODE.NO_PATTERN_FOUND;
+
+
             //Check whether need to pick the black chip or the normal chip
-            if ( nErrorBlackChip != -(int)ERROR_CODE.PASS)
+            if (nErrorBlackChip != -(int)ERROR_CODE.PASS)
             {
                 if (MagnusOpenCVLib.Check2PointIndex(ref pCenter, ref pCenterBlackChip, (int)POSITION._BOTTOM))
                 {
@@ -1044,7 +1051,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             timeIns.Restart();
 
             CvImage mat_openingCornerRegion = new CvImage();
-            MagnusOpenCVLib.OpeningCircle(ref mat_CornerChipRegion, ref mat_openingCornerRegion, (int)(m_DeviceLocationParameter.m_L_OpeningMask * m_DeviceLocationParameter.m_L_ScaleImageRatio/ 2 + 1));
+            MagnusOpenCVLib.OpeningCircle(ref mat_CornerChipRegion, ref mat_openingCornerRegion, (int)(m_DeviceLocationParameter.m_L_OpeningMask * m_DeviceLocationParameter.m_L_ScaleImageRatio / 2 + 1));
             PushBackDebugInfors(imgSourceInput, mat_openingCornerRegion, "Corner Chip Region after OpeningCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
 
@@ -1086,8 +1093,8 @@ namespace Magnus_WPF_1.Source.Algorithm
 
             System.Drawing.Rectangle rectPVIArea = new System.Drawing.Rectangle((int)(m_SurfaceDefectParameter[nPVIAreaIndex].m_DR_DefectROILocations.TopLeft.X * dScale),
                                                                                 (int)(m_SurfaceDefectParameter[nPVIAreaIndex].m_DR_DefectROILocations.TopLeft.Y * dScale),
-                                                                                (int)(m_SurfaceDefectParameter[nPVIAreaIndex].m_DR_DefectROILocations.Width     * dScale),
-                                                                                (int)(m_SurfaceDefectParameter[nPVIAreaIndex].m_DR_DefectROILocations.Height    * dScale));
+                                                                                (int)(m_SurfaceDefectParameter[nPVIAreaIndex].m_DR_DefectROILocations.Width * dScale),
+                                                                                (int)(m_SurfaceDefectParameter[nPVIAreaIndex].m_DR_DefectROILocations.Height * dScale));
             CvImage region_PVIArea = new CvImage();
             region_PVIArea = CvImage.Zeros(imgSourceInput.Height, imgSourceInput.Width, DepthType.Cv8U, 1);
             CvInvoke.Rectangle(region_PVIArea, rectPVIArea, new MCvScalar(255), -1);
@@ -1154,7 +1161,7 @@ namespace Magnus_WPF_1.Source.Algorithm
 
             timeIns.Stop();
             int nBoxSize = (int)(m_SurfaceDefectParameter[nPVIAreaIndex].m_DR_DefectROILocations.Width * dScale * m_SurfaceDefectParameter[nPVIAreaIndex].m_DR_DefectROILocations.Height * dScale);
-            if (nArea <  nBoxSize * m_SurfaceDefectParameter[nPVIAreaIndex].m_LD_ObjectCoverPercent / 100.0 )
+            if (nArea < nBoxSize * m_SurfaceDefectParameter[nPVIAreaIndex].m_LD_ObjectCoverPercent / 100.0)
                 nResultOutput = -(int)ERROR_CODE.LABEL_FAIL;
             else
                 nResultOutput = -(int)ERROR_CODE.PASS;
@@ -1195,7 +1202,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             MagnusOpenCVLib.GenRectangle2(rec_region2, rotateRect_Device, new MCvScalar(255), 1);
             CvImage rec_regionFillup = new CvImage();
 
-            MagnusOpenCVLib.FillUp(ref rec_region2, ref  rec_regionFillup);
+            MagnusOpenCVLib.FillUp(ref rec_region2, ref rec_regionFillup);
 
             AddRegionOverlay(ref list_arrayOverlay, rec_regionFillup, Colors.YellowGreen);
             return 0;

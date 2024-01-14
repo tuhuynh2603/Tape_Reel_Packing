@@ -197,10 +197,17 @@ namespace Magnus_WPF_1.Source.Hardware
 			//LogMessage.WriteToDebugViewer(3, $"Message responsed from Barcode Bank 2: {strDeviceID}");
 			strImageFullName = Path.Combine(strFolder,  $"{strDeviceID}_{nDeviceID}.bmp");
 			strFullPathImageOut = strImageFullName;
-			
+			while (!m_liveviewForm.IsHandleCreated)
+				Thread.Sleep(50);
+
+
+			while (!m_liveviewForm.IsHandleCreated)
+				Thread.Sleep(50);
+
 			System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
 			{
 				m_liveviewForm.DownloadRecentImage(strImageFullName);
+
 				MainWindow.mainWindow.master.m_Tracks[1].m_imageViews[0].UpdateNewImageMono(strImageFullName);
 			});
 			//m_reader.ExecCommand("LOFF");

@@ -236,8 +236,8 @@ namespace Magnus_WPF_1
             outputLogView = new OutputLogView(this);
             m_staticView = new StatisticView(this);
             m_staticView.ClearStatistic();
-            ResetStatistic(0);
-            ResetStatistic(1);
+            LoadStatistic(0);
+            LoadStatistic(1);
 
             //master.m_SaveInspectImageThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread(true)));
 
@@ -342,7 +342,7 @@ namespace Magnus_WPF_1
 
         }
 
-        public void ResetStatistic(int nT)
+        public void LoadStatistic(int nT)
         {
 
                 for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)

@@ -13,9 +13,9 @@ using LicenseContext = OfficeOpenXml.LicenseContext;
 
 namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 {
-    public class HiWinRobotInterface 
+    public class HiWinRobotInterface
     {
-        public const int NUMBER_AXIS  = 4;
+        public const int NUMBER_AXIS = 4;
         public enum ROBOT_OPERATION_MODE
         {
             MODE_MANUAL = 0,
@@ -42,7 +42,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             IMIDIATE_STOP_STATUS = 6,
             RESET_STATUS = 7,
             RUNSEQUENCE_STATUS = 8,
-            PLC_CREATE_NEW_LOT = 9,     
+            PLC_CREATE_NEW_LOT = 9,
             PLC_END_LOT = 10,
             PLC_LAST_CHIP = 12,
             PLC_DOOR_STATUS = 15,
@@ -97,9 +97,9 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             public double m_Ry { get; set; }
             public double m_Rz { get; set; }
 
-            public double m_Joint1{ get; set; }
-            public double m_Joint2{ get; set; }
-            public double m_Joint3{ get; set; }
+            public double m_Joint1 { get; set; }
+            public double m_Joint2 { get; set; }
+            public double m_Joint3 { get; set; }
             public double m_Joint4 { get; set; }
             public double m_Joint5 { get; set; }
             public double m_Joint6 { get; set; }
@@ -117,9 +117,9 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                     return;
                 m_PointIndex = pointIdex;
                 m_PointComment = PointComment;
-                m_X =  d_XYZvalue[0];
-                m_Y =  d_XYZvalue[1];
-                m_Z =  d_XYZvalue[2];
+                m_X = d_XYZvalue[0];
+                m_Y = d_XYZvalue[1];
+                m_Z = d_XYZvalue[2];
                 m_Rx = d_XYZvalue[3];
                 m_Ry = d_XYZvalue[4];
                 m_Rz = d_XYZvalue[5];
@@ -138,9 +138,9 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             }
             public void GetXYZPoint(ref double[] dpos)
             {
-                dpos[0] = m_X ;
-                dpos[1] = m_Y ;
-                dpos[2] = m_Z ;
+                dpos[0] = m_X;
+                dpos[1] = m_Y;
+                dpos[2] = m_Z;
                 dpos[3] = m_Rx;
                 dpos[4] = m_Ry;
                 dpos[5] = m_Rz;
@@ -148,12 +148,12 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
             public void SetXYZPoint(double[] dpos)
             {
-               m_X  = dpos[0];
-               m_Y  = dpos[1];
-               m_Z  = dpos[2];
-               m_Rx = dpos[3];
-               m_Ry = dpos[4];
-               m_Rz = dpos[5];
+                m_X = dpos[0];
+                m_Y = dpos[1];
+                m_Z = dpos[2];
+                m_Rx = dpos[3];
+                m_Ry = dpos[4];
+                m_Rz = dpos[5];
             }
 
             public void GetJointPoint(ref double[] npos)
@@ -168,12 +168,12 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
             public void SetJointPoint(double[] npos)
             {
-               m_Joint1 = npos[0];
-               m_Joint2 = npos[1];
-               m_Joint3 = npos[2];
-               m_Joint4 = npos[3];
-               m_Joint5 = npos[4];
-               m_Joint6 = npos[5];
+                m_Joint1 = npos[0];
+                m_Joint2 = npos[1];
+                m_Joint3 = npos[2];
+                m_Joint4 = npos[3];
+                m_Joint5 = npos[4];
+                m_Joint6 = npos[5];
             }
 
 
@@ -186,7 +186,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 string backup_path = Path.Combine(strRecipePath, "Backup_Robot Points");
                 if (!Directory.Exists(backup_path))
                     Directory.CreateDirectory(backup_path);
-                
+
                 string backup_fullpath = Path.Combine(backup_path, $"Robot Points {strDateTime}" + ".cfg");
 
                 FileInfo file = new FileInfo(fullpath);
@@ -240,25 +240,25 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                     {
                         ncol = 1;
                         worksheet.Cells[row, ncol++].Value = row - 1;
-                        worksheet.Cells[row, ncol++].Value =item.m_PointComment;
-                        worksheet.Cells[row, ncol++].Value =item.m_X;
-                        worksheet.Cells[row, ncol++].Value =item.m_Y;
-                        worksheet.Cells[row, ncol++].Value =item.m_Z;
-                        worksheet.Cells[row, ncol++].Value =item.m_Rx;
-                        worksheet.Cells[row, ncol++].Value =item.m_Ry;
-                        worksheet.Cells[row, ncol++].Value =item.m_Rz;
-                        worksheet.Cells[row, ncol++].Value =item.m_Joint1;
-                        worksheet.Cells[row, ncol++].Value =item.m_Joint2;
-                        worksheet.Cells[row, ncol++].Value =item.m_Joint3;
-                        worksheet.Cells[row, ncol++].Value =item.m_Joint4;
-                        worksheet.Cells[row, ncol++].Value =item.m_Joint5;
-                        worksheet.Cells[row, ncol++].Value =item.m_Joint6;
-                        worksheet.Cells[row, ncol++].Value =item.m_Base;
-                        worksheet.Cells[row, ncol++].Value =item.m_Tool;
-                        worksheet.Cells[row, ncol++].Value =item.m_AccRatio;
-                        worksheet.Cells[row, ncol++].Value =item.m_PTPSpeed;
-                        worksheet.Cells[row, ncol++].Value =item.m_LinearSpeed;
-                        worksheet.Cells[row, ncol++].Value =item.m_Override;
+                        worksheet.Cells[row, ncol++].Value = item.m_PointComment;
+                        worksheet.Cells[row, ncol++].Value = item.m_X;
+                        worksheet.Cells[row, ncol++].Value = item.m_Y;
+                        worksheet.Cells[row, ncol++].Value = item.m_Z;
+                        worksheet.Cells[row, ncol++].Value = item.m_Rx;
+                        worksheet.Cells[row, ncol++].Value = item.m_Ry;
+                        worksheet.Cells[row, ncol++].Value = item.m_Rz;
+                        worksheet.Cells[row, ncol++].Value = item.m_Joint1;
+                        worksheet.Cells[row, ncol++].Value = item.m_Joint2;
+                        worksheet.Cells[row, ncol++].Value = item.m_Joint3;
+                        worksheet.Cells[row, ncol++].Value = item.m_Joint4;
+                        worksheet.Cells[row, ncol++].Value = item.m_Joint5;
+                        worksheet.Cells[row, ncol++].Value = item.m_Joint6;
+                        worksheet.Cells[row, ncol++].Value = item.m_Base;
+                        worksheet.Cells[row, ncol++].Value = item.m_Tool;
+                        worksheet.Cells[row, ncol++].Value = item.m_AccRatio;
+                        worksheet.Cells[row, ncol++].Value = item.m_PTPSpeed;
+                        worksheet.Cells[row, ncol++].Value = item.m_LinearSpeed;
+                        worksheet.Cells[row, ncol++].Value = item.m_Override;
                         row++;
                     }
                     package.Save();
@@ -294,11 +294,11 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                         item.m_Rx = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
                         item.m_Ry = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
                         item.m_Rz = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
-                        item.m_Joint1  = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
-                        item.m_Joint2  = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
-                        item.m_Joint3  = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
-                        item.m_Joint4  = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
-                        item.m_Joint5  = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
+                        item.m_Joint1 = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
+                        item.m_Joint2 = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
+                        item.m_Joint3 = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
+                        item.m_Joint4 = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
+                        item.m_Joint5 = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
                         item.m_Joint6 = Convert.ToDouble(worksheet.Cells[row, ncol++].Value);
                         item.m_Base = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
                         item.m_Tool = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
@@ -308,7 +308,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                         item.m_Override = Convert.ToInt32(worksheet.Cells[row, ncol++].Value);
 
                         int nIndexTemp = HiWinRobotUserControl.CheckPointExistOnList(ref result, item.m_PointComment);
-                        if(nIndexTemp >=0)
+                        if (nIndexTemp >= 0)
                         {
                             result[nIndexTemp] = item;
                         }
@@ -408,7 +408,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             //dispatcherTimer.Stop();
             try
             {
-                HWinRobot.disconnect(m_RobotConnectID);               
+                HWinRobot.disconnect(m_RobotConnectID);
                 m_RobotConnectID = HWinRobot.open_connection(m_strRobotIPAddress, 1, callback);
 
             }
@@ -524,10 +524,10 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                     if (m_ListPositionData[n + 6].m_value != d_Jointvalue[n])
                         bEnableUpddate[0] = true;
 
-                m_ListPositionData[6].m_value =  d_Jointvalue[0];
-                m_ListPositionData[7].m_value =  d_Jointvalue[1];
-                m_ListPositionData[8].m_value =  d_Jointvalue[2];
-                m_ListPositionData[9].m_value =  d_Jointvalue[3];
+                m_ListPositionData[6].m_value = d_Jointvalue[0];
+                m_ListPositionData[7].m_value = d_Jointvalue[1];
+                m_ListPositionData[8].m_value = d_Jointvalue[2];
+                m_ListPositionData[9].m_value = d_Jointvalue[3];
                 m_ListPositionData[10].m_value = d_Jointvalue[4];
                 m_ListPositionData[11].m_value = d_Jointvalue[5];
 
@@ -556,7 +556,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
                 if (MainWindow.mainWindow == null)
-                    return; 
+                    return;
                 if (MainWindow.mainWindow.master == null)
                     return;
                 if (bEnableUpddate[0] || m_hiWinRobotUserControl.dataGrid_robot_Position.ItemsSource == null)
@@ -576,14 +576,14 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 }
 
 
-                if(HiWinRobotUserControl.m_strAlarmMessage.Length >0)
+                if (HiWinRobotUserControl.m_strAlarmMessage.Length > 0)
                 {
                     lock (m_hiWinRobotUserControl.label_Alarm)
                     {
                         m_hiWinRobotUserControl.label_Alarm.Text = HiWinRobotUserControl.m_strAlarmMessage;
 
                     }
-                }    
+                }
             });
 
         }
@@ -615,14 +615,14 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 switch (rlt)
                 {
                     case 4030:
-                         //LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] HRSS alarm notify: " + info_p);
+                        //LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] HRSS alarm notify: " + info_p);
 
                         break;
                     case 4145:
                         LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] System Output" + info[0] + " : " + info[1]);
                         break;
                     case 4702:
-                             //LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] Robot Information");
+                        //LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] Robot Information");
 
                         //Todo: Need to move to Main thread to prevent crash on Child 
 
@@ -662,69 +662,69 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                         //}
                         break;
                     case 4703:
-                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Timer {0}: {1} ", Int32.Parse(info[0]) + 1, info[1]));
+                        LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Timer {0}: {1} ", Int32.Parse(info[0]) + 1, info[1]));
                         break;
                     case 4704:
-                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Counter {0}: {1}", Int32.Parse(info[0]) + 1, info[1]));
+                        LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Counter {0}: {1}", Int32.Parse(info[0]) + 1, info[1]));
                         break;
                     case 4705:
-                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] MI {0}: {1}", Int32.Parse(info[0]) + 1, info[1]));
+                        LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] MI {0}: {1}", Int32.Parse(info[0]) + 1, info[1]));
                         break;
                     case 4706:
-                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] MO {0}: {1}", Int32.Parse(info[0]) + 1, info[1]));
+                        LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] MO {0}: {1}", Int32.Parse(info[0]) + 1, info[1]));
                         break;
                     case 4707:
-                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] SI {0}: {1}", Int32.Parse(info[0]) + 1, info[1]));
+                        LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] SI {0}: {1}", Int32.Parse(info[0]) + 1, info[1]));
                         break;
                     case 4708:
-                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] SO {0}: {1}", Int32.Parse(info[0]) + 1, info[1]));
+                        LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] SO {0}: {1}", Int32.Parse(info[0]) + 1, info[1]));
                         break;
                     case 4710:
                         ShowPRNotification(info);
                         break;
                     case 4711:
-                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] DI {0}: {1}", Int32.Parse(info[0]), info[1]));
+                        LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] DI {0}: {1}", Int32.Parse(info[0]), info[1]));
                         break;
                     case 4712:
-                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] DO {0}: {1}", Int32.Parse(info[0]), info[1]));
+                        LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] DO {0}: {1}", Int32.Parse(info[0]), info[1]));
                         break;
                     case 4714:
-                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Utilization start notify: " + info_p));
+                        LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Utilization start notify: " + info_p));
                         break;
                     case 4715:
-                         LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Utilization end notify: " + info_p));
+                        LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] Utilization end notify: " + info_p));
                         break;
                 }
             }
             else if (cmd == 13)
             {
-                 LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] HRSS Disconnected!");
+                LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] HRSS Disconnected!");
             }
             else if (cmd == 1450)
             {
                 switch (rlt)
                 {
                     case 4028:
-                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] HRSS start clear alarm");
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] HRSS start clear alarm");
                         break;
                     case 4029:
-                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] HRSS finish clear alarm");
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] HRSS finish clear alarm");
                         break;
                 }
             }
             else if (cmd == 1456)
             {
-                 LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] SET_SPEED_LIMIT: " + Msg);
+                LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] SET_SPEED_LIMIT: " + Msg);
             }
             else if (cmd == 2161)
             {
                 switch (rlt)
                 {
                     case 0:
-                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] DOWNLOAD_LOG_FILE: " + Msg);
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] DOWNLOAD_LOG_FILE: " + Msg);
                         break;
                     case 201:
-                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] FILE_IS_NOT_EXIST: " + Msg);
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] FILE_IS_NOT_EXIST: " + Msg);
                         break;
                 }
             }
@@ -733,10 +733,10 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 switch (rlt)
                 {
                     case 0:
-                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] run ext task start cmd: ");
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] run ext task start cmd: ");
                         break;
                     case 201:
-                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] ext task already exist.");
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] ext task already exist.");
                         break;
                 }
             }
@@ -745,16 +745,16 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 switch (rlt)
                 {
                     case 2006:
-                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] task start motion already exist.");
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] task start motion already exist.");
                         break;
                     case 4012:
-                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] task start file name error.");
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] task start file name error.");
                         break;
                     case 4013:
-                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] task start already exist.");
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] task start already exist.");
                         break;
                     case 4014:
-                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] task start Run.");
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] task start Run.");
                         break;
                 }
 
@@ -764,7 +764,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 switch (rlt)
                 {
                     case 4018:
-                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] task abort finish.");
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] task abort finish.");
                         break;
                 }
             }
@@ -773,28 +773,28 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 switch (rlt)
                 {
                     case 0:
-                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] Download file.");
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Download file.");
                         break;
                     case 201:
-                         LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] File is not exist.");
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] File is not exist.");
                         break;
                 }
             }
             else if (cmd == 4010)
             {
-                 LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] Send file.");
+                LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Send file.");
             }
             else if (cmd == 4018)
             {
-                 LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] SAVE_DATABASE");
+                LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] SAVE_DATABASE");
             }
             else if (cmd == 4019)
             {
-                 LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] LOAD_DATABASE");
+                LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] LOAD_DATABASE");
             }
             else if (cmd == 4709)
             {
-                 LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] Save module IO.");
+                LogMessage.LogMessage.WriteToDebugViewer(1, "[Notify] Save module IO.");
             }
 
             void ShowPRNotification(string[] info)
@@ -806,10 +806,10 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 {
                     pr_num = Convert.ToInt32(info[1 + 11 * i]);
                     pr_type = Convert.ToInt32(info[2 + 11 * i]);
-                     LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] PR {0}: {1} \n" +
-                                       "Pos: {2}, {3}, {4}, {5}, {6}, {7} Ext: {8}, {9}, {10}", pr_num, pr_type, // Type  1:Degree  2:Cartesian
-                                       info[3 + 11 * i], info[4 + 11 * i], info[5 + 11 * i], info[6 + 11 * i], info[7 + 11 * i], info[8 + 11 * i],
-                                       info[9 + 11 * i], info[10 + 11 * i], info[11 + 11 * i]));
+                    LogMessage.LogMessage.WriteToDebugViewer(1, String.Format("[Notify] PR {0}: {1} \n" +
+                                      "Pos: {2}, {3}, {4}, {5}, {6}, {7} Ext: {8}, {9}, {10}", pr_num, pr_type, // Type  1:Degree  2:Cartesian
+                                      info[3 + 11 * i], info[4 + 11 * i], info[5 + 11 * i], info[6 + 11 * i], info[7 + 11 * i], info[8 + 11 * i],
+                                      info[9 + 11 * i], info[10 + 11 * i], info[11 + 11 * i]));
                 }
             }
         }
@@ -976,7 +976,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             //    m_bIsStop = false;
             //}
             int nState = HWinRobot.get_motion_state(HiWinRobotInterface.m_RobotConnectID);
-            while (nState !=1)
+            while (nState != 1)
             {
                 //robot connection changed => return false
                 int conn = HWinRobot.get_connection_level(HiWinRobotInterface.m_RobotConnectID);
@@ -1024,7 +1024,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             double[] low_limit = new double[6];
             double[] high_limit = new double[6];
 
-            double [] dMovingPoint = new double[6];
+            double[] dMovingPoint = new double[6];
             sequencePointData.GetXYZPoint(ref dMovingPoint);
             HWinRobot.get_cart_soft_limit_config(nDevice_id, ref re_bool, low_limit, high_limit);
 
@@ -1036,7 +1036,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             return 0;
         }
 
-        public static void GetSoftLimit (int device_id, int nMode, ref bool re_bool, ref double[] low_limit, ref double[] high_limit)
+        public static void GetSoftLimit(int device_id, int nMode, ref bool re_bool, ref double[] low_limit, ref double[] high_limit)
         {
             if (nMode == (int)JOG_TYPE.JOG_XYZ)
                 HWinRobot.get_cart_soft_limit_config(device_id, ref re_bool, low_limit, high_limit);
@@ -1047,18 +1047,18 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         {
             if (nMode == (int)JOG_TYPE.JOG_XYZ)
                 HWinRobot.set_cart_soft_limit(device_id, low_limit, high_limit);
-            else if(nMode == (int)JOG_TYPE.JOG_JOINT)
+            else if (nMode == (int)JOG_TYPE.JOG_JOINT)
                 HWinRobot.set_joint_soft_limit(device_id, low_limit, high_limit);
         }
 
         public static bool SendTaskToRobotController(int device_id, string taskPath, string taskName)
         {
 
-            if(taskName.Split('.').Length <=1)
+            if (taskName.Split('.').Length <= 1)
                 taskName = taskName + ".hrb";
 
 
-            if (!Directory.Exists(taskPath))           
+            if (!Directory.Exists(taskPath))
             {
                 Directory.CreateDirectory(taskPath);
             }
@@ -1095,9 +1095,9 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             //m_List_sequencePointData.Add(sequenceData);
 
             return new SequencePointData(nIndex, d_XYZvalue, d_Jointvalue,
-                                                                    HWinRobot.get_acc_dec_ratio(device_id), 
-                                                                    HWinRobot.get_ptp_speed(device_id), 
-                                                                    HWinRobot.get_lin_speed(device_id), 
+                                                                    HWinRobot.get_acc_dec_ratio(device_id),
+                                                                    HWinRobot.get_ptp_speed(device_id),
+                                                                    HWinRobot.get_lin_speed(device_id),
                                                                     HWinRobot.get_override_ratio(device_id), strComment);
         }
 
@@ -1122,6 +1122,39 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
         {
             HWinRobot.disconnect(m_RobotConnectID);
         }
+
+        public static int GetOperationMode()
+        {
+            if (m_RobotConnectID < 0)
+                return -1;
+
+            return HWinRobot.get_operation_mode(m_RobotConnectID);
+        }
+
+        public static void SetOperationMode(int nMode)
+        {
+            if (m_RobotConnectID < 0)
+                return;
+
+            HWinRobot.set_operation_mode(m_RobotConnectID, nMode);
+        }
+
+        public static void SetMotorState (int nMode)
+        {
+            if (m_RobotConnectID < 0)
+                return;
+            HWinRobot.set_motor_state(m_RobotConnectID, nMode);
+        }
+
+        public static int GetMotorState()
+        {
+            if (m_RobotConnectID < 0)
+                return -1;
+
+           return HWinRobot.get_motor_state(m_RobotConnectID);
+        }
+
+
         //public static void EventFun(UInt16 cmd, UInt16 rlt, ref UInt16 Msg, int len)
         //{
         //    Console.WriteLine("Command: " + cmd + " Resault: " + rlt);

@@ -107,13 +107,13 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
 
 
-            m_nWidthMappingRect = (int)(nWidthgrid / nMaxDeviceStep / 2.2);
+            m_nWidthMappingRect = (int)(nWidthgrid / nMaxDeviceStep / 2.3);
             if (m_nWidthMappingRect > 100)
                 m_nWidthMappingRect = 100;
-            if (m_nWidthMappingRect < 30)
-                m_nWidthMappingRect = 30;
+            if (m_nWidthMappingRect < 35)
+                m_nWidthMappingRect = 35;
 
-            m_nStepMappingRect = m_nWidthMappingRect + 3;
+            m_nStepMappingRect = m_nWidthMappingRect + 1;
             string path = @"/Resources/gray-chip.png";
 
             if (canvas_Mapping.Children != null)
@@ -142,11 +142,11 @@ namespace Magnus_WPF_1.UI.UserControls.View
                         arr_textBlockMapping[nTrack][nID].MinWidth = 0.95 * m_nWidthMappingRect;
                         arr_textBlockMapping[nTrack][nID].Foreground = new SolidColorBrush(Colors.Yellow);
                         arr_textBlockMapping[nTrack][nID].HorizontalContentAlignment = HorizontalAlignment.Center;
-                        Canvas.SetLeft(arr_imageMapping[nTrack][nID], m_nStepMappingRect * nDeviceX + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1));
+                        Canvas.SetLeft(arr_imageMapping[nTrack][nID], m_nStepMappingRect * nDeviceX + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2));
                         Canvas.SetTop(arr_imageMapping[nTrack][nID], m_nStepMappingRect * nDeviceY);
                         canvas_Mapping.Children.Add(arr_imageMapping[nTrack][nID]);
 
-                        Canvas.SetLeft(arr_textBlockMapping[nTrack][nID], m_nStepMappingRect * nDeviceX + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1));
+                        Canvas.SetLeft(arr_textBlockMapping[nTrack][nID], m_nStepMappingRect * nDeviceX + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2));
                         Canvas.SetTop(arr_textBlockMapping[nTrack][nID], m_nStepMappingRect * nDeviceY + arr_textBlockMapping[nTrack][nID].FontSize / 3);                    
                         canvas_Mapping.Children.Add(arr_textBlockMapping[nTrack][nID]);
 
@@ -158,9 +158,18 @@ namespace Magnus_WPF_1.UI.UserControls.View
                 border_boundingbox_clicked[nTrack].Height = m_nWidthMappingRect;
                 border_boundingbox_clicked[nTrack].BorderThickness = new Thickness(0);
                 border_boundingbox_clicked[nTrack].BorderBrush = new SolidColorBrush(Colors.Yellow);
-                Canvas.SetLeft(border_boundingbox_clicked[nTrack], 0 + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1));
+                Canvas.SetLeft(border_boundingbox_clicked[nTrack], 0 + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2));
                 Canvas.SetTop(border_boundingbox_clicked[nTrack], 0);
                 canvas_Mapping.Children.Add(border_boundingbox_clicked[nTrack]);
+
+                Border borderTemp = new Border();
+                borderTemp.Width = (m_nStepMappingRect) * MainWindow.mainWindow.m_nDeviceX;
+                borderTemp.Height = (m_nStepMappingRect) * MainWindow.mainWindow.m_nDeviceY;
+                borderTemp.BorderThickness = new Thickness(1);
+                borderTemp.BorderBrush = new SolidColorBrush(Colors.Yellow);
+                Canvas.SetLeft(borderTemp, 0 + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2));
+                Canvas.SetTop(borderTemp, 0);
+                canvas_Mapping.Children.Add(borderTemp);
 
                 //canvas_Mapping[nTrack].MouseLeftButtonDown += StatisticView_MouseLeftButtonDown;
             }
@@ -175,7 +184,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
 
 
-            canvas_Mapping.Width = m_nStepMappingRect * MainWindow.mainWindow.m_nDeviceX + m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1);
+            canvas_Mapping.Width = m_nStepMappingRect * MainWindow.mainWindow.m_nDeviceX + m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2);
             canvas_Mapping.Height = m_nStepMappingRect * MainWindow.mainWindow.m_nDeviceY;
 
             //Canvas.SetTop(canvas_Mapping_NextPage, canvas_Mapping.Height);
@@ -193,10 +202,10 @@ namespace Magnus_WPF_1.UI.UserControls.View
         {
 
             nTrackID = 0;
-            if (cur_point.X >= m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1))
+            if (cur_point.X >= m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2))
                 nTrackID = 1;
 
-            int nIDX = (int)((cur_point.X - (nTrackID * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1))) / m_nStepMappingRect);
+            int nIDX = (int)((cur_point.X - (nTrackID * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2))) / m_nStepMappingRect);
             int nIDY = (int)(cur_point.Y / m_nStepMappingRect);
 
             if (nDeviceID != nIDX + nIDY * MainWindow.mainWindow.m_nDeviceX || bIsclicked)
@@ -204,7 +213,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
                 nDeviceID = nIDX + nIDY * MainWindow.mainWindow.m_nDeviceX;
                 if (nIDX < MainWindow.mainWindow.m_nDeviceX && nIDY < MainWindow.mainWindow.m_nDeviceY)
                 {
-                    Canvas.SetLeft(border_boundingbox_moving, m_nStepMappingRect * nIDX +  nTrackID * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1));
+                    Canvas.SetLeft(border_boundingbox_moving, m_nStepMappingRect * nIDX +  nTrackID * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2));
                     Canvas.SetTop(border_boundingbox_moving, m_nStepMappingRect * nIDY);
                     border_boundingbox_moving.BorderThickness = new Thickness(2);
                 }
@@ -218,7 +227,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
             if (bIsclicked)
             {
-                Canvas.SetLeft(border_boundingbox_clicked[nTrackID], m_nStepMappingRect * nIDX + nTrackID * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1));
+                Canvas.SetLeft(border_boundingbox_clicked[nTrackID], m_nStepMappingRect * nIDX + nTrackID * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2));
                 Canvas.SetTop(border_boundingbox_clicked[nTrackID], m_nStepMappingRect * nIDY);
                 border_boundingbox_clicked[nTrackID].BorderThickness = new Thickness(2);
             }

@@ -215,7 +215,8 @@ namespace Magnus_WPF_1.Source.Application
         public int m_ResetMachineStatus_Simulate = 0;
         public bool m_bMachineNotReadyNeedToReset = true;
         public bool m_bNeedToImidiateStop = false;
-
+        public bool m_IsDoorOpennedAction = false;
+        public bool m_bIsReleasePopupMessage = false;
         private void ContructorDocComponent()
         {
             m_Tracks = new Track[Application.m_nTrack];
@@ -476,27 +477,6 @@ namespace Magnus_WPF_1.Source.Application
         }
 
 
-        internal bool RobotSequenceThread()
-        {
-
-            if (thread_RobotSequence == null)
-            {
-                thread_RobotSequence = new System.Threading.Thread(new System.Threading.ThreadStart(() => func_RobotSequence()));
-                thread_RobotSequence.IsBackground = true;
-                thread_RobotSequence.Start();
-                return false;
-            }
-            else if (!thread_RobotSequence.IsAlive)
-            {
-                thread_RobotSequence = new System.Threading.Thread(new System.Threading.ThreadStart(() => func_RobotSequence()));
-                thread_RobotSequence.IsBackground = true;
-                thread_RobotSequence.Start();
-                return false;
-            }
-            return true;
-        }
-
-
         public void func_ResetSequenceThread()
         {
             if (ResetSequence() < 0)
@@ -653,14 +633,200 @@ namespace Magnus_WPF_1.Source.Application
             SEQUENCE_GOBACK = 2,
             SEQUENCE_RETRY = 3
         }
+        private void func_IOStatusThread()
+        {
+            int bEmergencyStatus_Backup = -1;
+            int bImidiateStatus_Backup = -1;
+            int bResetStatus_Backup = -1;
+            int bDoorStatus_Backup = m_DoorOpennedStatus;// HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_DOOR_STATUS);
+            int bEndLotStatus_Backup = m_EndLotStatus;// HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_END_LOT);
+            int bCreateNewLotStatus_Backup = m_CreateNewLotStatus;// HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CREATE_NEW_LOT);
+            while (MainWindow.mainWindow != null)
+            {
+
+                Thread.Sleep(10);
+                if (HiWinRobotInterface.m_RobotConnectID < 0 || m_hiWinRobotInterface == null)
+                {
+
+                    m_EmergencyStatus = m_EmergencyStatus_Simulate;
+                    m_ImidiateStatus = m_ImidiateStatus_Simulate;
+                    m_ResetMachineStatus = m_ResetMachineStatus_Simulate;
+                }
+                else
+                {
+                    m_PLC_Ready_Status = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_PACKING_PROCESS_READY);
+                    m_EmergencyStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.EMERGENCY_STATUS) | m_EmergencyStatus_Simulate;
+                    m_ImidiateStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.IMIDIATE_STOP_STATUS) | m_ImidiateStatus_Simulate;
+                    m_ResetMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RESET_STATUS) | m_ResetMachineStatus_Simulate;
+                    m_RunMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RUNSEQUENCE_STATUS);
+                    m_DoorOpennedStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_DOOR_STATUS);
+                    m_CreateNewLotStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CREATE_NEW_LOT);
+                    m_EndLotStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_END_LOT);
+                }
+
+                if (m_ImidiateStatus > 0)
+                {
+                    m_bNeedToImidiateStop = true;
+                    string strMess = "Imidiate Stop Button clicked!";
+                    m_hiWinRobotInterface.StopMotor();
+                    HiWinRobotInterface.SetMotorState(0);
+                    MainWindow.mainWindow.PopupWarningMessageBox(strMess, WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
+                    //Thread.Sleep(100);
+
+                }
+
+
+                if (m_DoorOpennedStatus > 0 && bDoorStatus_Backup != m_DoorOpennedStatus)
+                {
+                    m_IsDoorOpennedAction = true;
+                    string strMess = "Door is openned!";
+                    m_hiWinRobotInterface.StopMotor();
+                    HiWinRobotInterface.SetMotorState(0);
+                    MainWindow.mainWindow.PopupWarningMessageBox(strMess, WARNINGMESSAGE.MESSAGE_EMERGENCY);
+                    //Thread.Sleep(100);
+                }
+
+                bDoorStatus_Backup = m_DoorOpennedStatus;
+                if (m_DoorOpennedStatus > 0)
+                {
+                    if (HiWinRobotInterface.GetOperationMode() != (int)ROBOT_OPERATION_MODE.MODE_MANUAL)
+                        HiWinRobotInterface.SetOperationMode((int)ROBOT_OPERATION_MODE.MODE_MANUAL);
+                }
+                
+                
+                if (m_ResetMachineStatus > 0 && m_DoorOpennedStatus + m_EmergencyStatus + m_ImidiateStatus == 0)
+                {
+
+                    HiWinRobotInterface.SetMotorState(1);
+                    if (HiWinRobotInterface.GetOperationMode() != (int)ROBOT_OPERATION_MODE.MODE_AUTO)
+                        HiWinRobotInterface.SetOperationMode((int)ROBOT_OPERATION_MODE.MODE_AUTO);
+                }
+
+
+
+                if (m_EmergencyStatus > 0)
+                {
+                    m_bMachineNotReadyNeedToReset = true;
+                    m_hiWinRobotInterface.StopMotor();
+                    HiWinRobotInterface.SetMotorState(0);
+                    string strMess = "Emergency Button clicked, please release them  then reset the sequence!";
+                    MainWindow.mainWindow.PopupWarningMessageBox(strMess, WARNINGMESSAGE.MESSAGE_EMERGENCY);
+                    //Thread.Sleep(100);
+                    // Disable all motor function;
+                }
+
+                if (m_RunMachineStatus > 0)
+                {
+                    Thread.Sleep(1000);
+                    m_RunMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RUNSEQUENCE_STATUS);
+                    if (m_RunMachineStatus > 0)
+                    {
+                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+                            MainWindow.mainWindow.Run_Sequence();
+                        });
+                    }
+                }
+
+                if (m_plcComm == null)
+                    continue;
+
+                if (!m_plcComm.m_modbusClient.Connected)
+                    continue;
+
+                if (bEmergencyStatus_Backup != m_EmergencyStatus)
+                {
+                    //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_EMERGENCY_STATUS, m_EmergencyStatus);
+                    bEmergencyStatus_Backup = m_EmergencyStatus;
+                    LogMessage.LogMessage.WriteToDebugViewer(9, $"Emergency Status changed Status = {m_EmergencyStatus}!");
+
+                    if (System.Windows.Application.Current == null)
+                        return;
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Emergency Status changed Status = {m_EmergencyStatus}!", (int)ERROR_CODE.LABEL_FAIL);
+                    });
+                }
+
+                if (bImidiateStatus_Backup != m_ImidiateStatus)
+                {
+                    //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_IMIDIATE_STATUS, m_ImidiateStatus);
+                    bImidiateStatus_Backup = m_ImidiateStatus;
+
+                    LogMessage.LogMessage.WriteToDebugViewer(9, $"Imidiate button Status changed Status = {m_ImidiateStatus}!");
+
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Imidiate button Status changed Status = {m_ImidiateStatus}!", (int)ERROR_CODE.LABEL_FAIL);
+                    });
+
+                }
+                if (bResetStatus_Backup != m_ResetMachineStatus)
+                {
+                    //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_STATUS, m_ResetMachineStatus);
+                    bResetStatus_Backup = m_ResetMachineStatus;
+
+                    LogMessage.LogMessage.WriteToDebugViewer(9, $"Reset button Status changed Status = {m_ResetMachineStatus}!");
+
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Reset button Status changed Status = {m_ResetMachineStatus}!", (int)ERROR_CODE.LABEL_FAIL);
+                    });
+
+                }
+
+                //m_CreateNewLotStatus = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT); //  HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CREATE_NEW_LOT);
+                //m_CreateNewLotStatus = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT);
+                if (m_CreateNewLotStatus > 0 && bCreateNewLotStatus_Backup != m_CreateNewLotStatus)  /*(m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT) > 0)*/
+                {
+                    LogMessage.LogMessage.WriteToDebugViewer(9, $"Reset Lot");
+
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Reset Lot", (int)ERROR_CODE.LABEL_FAIL);
+                        Application.m_strCurrentLot = string.Format("{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+                        Application.SetStringRegistry(Application.m_strCurrentLot_Registry, Application.m_strCurrentLot);
+                        //MainWindow.mainWindow.m_staticView.ClearStatistic();
+                        lock (MainWindow.mainWindow.master.m_Tracks[0])
+                        {
+                            Thread.Sleep(250);
+                            MainWindow.mainWindow.LoadStatistic(0);
+                            Thread.Sleep(250);
+                        }
+
+                        lock (MainWindow.mainWindow.master.m_Tracks[1])
+                        {
+                            Thread.Sleep(250);
+                            MainWindow.mainWindow.LoadStatistic(1);
+                            Thread.Sleep(250);
+                        }
+
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Create New Lot ID: {Application.m_strCurrentLot} ", (int)ERROR_CODE.LABEL_FAIL);
+
+                        if (true)
+                        {
+                            MainWindow.mainWindow.m_strCurrentLotID = Application.m_strCurrentLot;
+                        }
+
+                        else
+                        {
+
+                            MessageBox.Show("Please KeyIn the Lot ID (on the top) then press Continue");
+                        }
+                    });
+                    //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT, 0);
+
+                    //m_CreateNewLotStatus = 0;
+                }
+                bCreateNewLotStatus_Backup = m_CreateNewLotStatus;
+
+
+            }
+        }
+
+
         public int WaitForNextStepSequenceEvent(string strDebugMessage = "", bool bPopUpInformation = false, int nTimeout = 0)
         {
-            //if (strDebugMessage == "")
-            //{
-            //    MainWindow.mainWindow.PopupWarningMessageBox(strDebugMessage, false, m_bMachineNotReadyNeedToReset, false);
-            //    return (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
-            //}
-            //m_EmergencyStopSequenceEvent.Reset();
             m_NextStepSequenceEvent.Reset();
             m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
             if (m_EmergencyStatus > 0)
@@ -668,11 +834,7 @@ namespace Magnus_WPF_1.Source.Application
 
             if (m_bNeedToImidiateStop)
             {
-                LogMessage.LogMessage.WriteToDebugViewer(7, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-
-                MainWindow.mainWindow.PopupWarningMessageBox(strDebugMessage, WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
-                LogMessage.LogMessage.WriteToDebugViewer(7, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-
+                //MainWindow.mainWindow.PopupWarningMessageBox(strDebugMessage, WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
                 while (!m_NextStepSequenceEvent.WaitOne(10))
                 {
                     if (MainWindow.mainWindow == null)
@@ -680,64 +842,87 @@ namespace Magnus_WPF_1.Source.Application
 
                     if (m_EmergencyStatus > 0)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
-                }
-                if (m_bNextStepSequence == (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE)
-                    HWinRobot.set_motor_state(HiWinRobotInterface.m_RobotConnectID, 1);
+                }                
                 //Show Dialog
             }
-            else if (MainWindow.mainWindow.m_bEnableDebugSequence)
+            else if (m_IsDoorOpennedAction)
             {
-                m_NextStepSequenceEvent.Reset();
-                LogMessage.LogMessage.WriteToDebugViewer(7, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-
-                MainWindow.mainWindow.PopupWarningMessageBox(strDebugMessage, WARNINGMESSAGE.MESSAGE_STEPDEBUG);
-                LogMessage.LogMessage.WriteToDebugViewer(7, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-
+                m_IsDoorOpennedAction = false;
+                //MainWindow.mainWindow.PopupWarningMessageBox("Door Is Openning, Continue will run with manual mode (Low Speed)", WARNINGMESSAGE.MESSAGE_EMERGENCY);
                 while (!m_NextStepSequenceEvent.WaitOne(10))
                 {
                     if (MainWindow.mainWindow == null)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
 
-                    //if (!MainWindow.mainWindow.bEnableRunSequence)
-                    //    return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
-
                     if (m_EmergencyStatus > 0)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
 
+                    if (m_ResetMachineStatus > 0 && m_DoorOpennedStatus == 0)
+                    {
+                        m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE;
+                        break;
+                    }
+                }
+
+                if (m_bNextStepSequence == (int)SEQUENCE_OPTION.SEQUENCE_ABORT)
+                    return m_bNextStepSequence;
+
+                //Show Dialog
+            }
+
+            else if (MainWindow.mainWindow.m_bEnableDebugSequence)
+            {
+                MainWindow.mainWindow.PopupWarningMessageBox(strDebugMessage, WARNINGMESSAGE.MESSAGE_STEPDEBUG);
+                while (!m_NextStepSequenceEvent.WaitOne(10))
+                {
+                    if (MainWindow.mainWindow == null)
+                        return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
+
+                    if (m_EmergencyStatus > 0 || m_ImidiateStatus > 0)
+                        return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
                 }
 
             }
             else if (bPopUpInformation)
             {
-                m_NextStepSequenceEvent.Reset();
-                LogMessage.LogMessage.WriteToDebugViewer(7, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
                 MainWindow.mainWindow.PopupWarningMessageBox(strDebugMessage, WARNINGMESSAGE.MESSAGE_INFORMATION);
-                LogMessage.LogMessage.WriteToDebugViewer(7, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-
-
                 while (!m_NextStepSequenceEvent.WaitOne(10))
                 {
                     if (MainWindow.mainWindow == null)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
 
-                    //if (!MainWindow.mainWindow.bEnableRunSequence)
-                    //    return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
-
-
-                    if (m_EmergencyStatus > 0)
+                    if (m_EmergencyStatus > 0 || m_ImidiateStatus > 0)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
-
                 }
-
+                return m_bNextStepSequence;
             }
-
-            //MainWindow.mainWindow.PopupWarningMessageBox(strDebugMessage, WARNINGMESSAGE.MESSAGE_INFORMATION, false);
 
             return m_bNextStepSequence;
         }
 
 
         public bool m_bRobotSequenceStatus = false;
+
+        internal bool RobotSequenceThread()
+        {
+
+            if (thread_RobotSequence == null)
+            {
+                thread_RobotSequence = new System.Threading.Thread(new System.Threading.ThreadStart(() => func_RobotSequence()));
+                thread_RobotSequence.IsBackground = true;
+                thread_RobotSequence.Start();
+                return false;
+            }
+            else if (!thread_RobotSequence.IsAlive)
+            {
+                thread_RobotSequence = new System.Threading.Thread(new System.Threading.ThreadStart(() => func_RobotSequence()));
+                thread_RobotSequence.IsBackground = true;
+                thread_RobotSequence.Start();
+                return false;
+            }
+            return true;
+        }
+
         void func_RobotSequence()
         {
 
@@ -745,8 +930,8 @@ namespace Magnus_WPF_1.Source.Application
 
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Reset Statistic!...", (int)ERROR_CODE.LABEL_FAIL);
-                MainWindow.mainWindow.ResetStatistic(0);
+                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Run Sequence Thead...", (int)ERROR_CODE.LABEL_FAIL);
+                MainWindow.mainWindow.LoadStatistic(0);
 
             });
             while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_PACKING_PROCESS_READY) == 0)
@@ -762,6 +947,12 @@ namespace Magnus_WPF_1.Source.Application
 
             RobotSequence();
             m_bRobotSequenceStatus = false;
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                MainWindow.mainWindow.btn_run_sequence.IsChecked = false;
+                MainWindow.mainWindow.m_bSequenceRunning = false;
+            });
+
         }
 
         void RobotSequence()
@@ -795,19 +986,11 @@ namespace Magnus_WPF_1.Source.Application
                 return;
 
 
-            LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-
-            //VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, 0, ref m_Tracks[0].m_VisionResultDatas, ref m_Tracks[0].m_CurrentSequenceDeviceID);
-
-            //if (m_Tracks[0].m_CurrentSequenceDeviceID < 0 || m_Tracks[0].m_CurrentSequenceDeviceID >= Application.categoriesMappingParam.M_NumberDevicePerLot)
-            //    m_Tracks[0].m_CurrentSequenceDeviceID = 0;
 
             //Application.SetIntRegistry(Application.m_strCurrentDeviceID_Registry[0], m_Tracks[0].m_CurrentSequenceDeviceID);
-            LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
 
             func_CameraTriggerThread();
-            LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
 
             //m_hardwareTriggerSnapEvent[0].Set();
@@ -1131,7 +1314,7 @@ namespace Magnus_WPF_1.Source.Application
                 /////////////////Step 9: put device to the tray (turn off vaccum)
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, true);
-                Thread.Sleep(30);
+                Thread.Sleep(50);
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
 
@@ -1249,22 +1432,6 @@ namespace Magnus_WPF_1.Source.Application
                 if (nCamera1InspectionResult == -(int)ERROR_CODE.PASS)
                     m_Tracks[0].m_CurrentSequenceDeviceID++;
 
-
-                //Application.SetIntRegistry(Application.m_strCurrentDeviceID_Registry[0], m_Tracks[0].m_CurrentSequenceDeviceID);
-
-                //int nErrorPLC = m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_CURRENT_ROBOT_CHIP_COUNT, m_Tracks[0].m_CurrentSequenceDeviceID);
-                //if (nErrorPLC < 0)
-                //{
-                //    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                //    {
-                //        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"PLC connection failed.");
-                //    });
-
-
-                //    WaitForNextStepSequenceEvent("Write to PLC Failed. PLC connection timeout.");
-                //    return;
-                //}
-
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
                     ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Current Pass Count {m_Tracks[0].m_CurrentSequenceDeviceID} Full sequence. Total time {timeIns_fullSequence.ElapsedMilliseconds} (ms): ");
@@ -1339,6 +1506,7 @@ namespace Magnus_WPF_1.Source.Application
         public int func_CameraTriggerThread(int nCurrentSequenceStep = -1, int nTrack = 0)
         {
             //int nError;
+            LogMessage.LogMessage.WriteToDebugViewer(9, $"Waiting for Chip found Signal from PLC");
             VisionReadyEvent[0].Reset();
             m_hardwareTriggerSnapEvent[0].Reset();
 
@@ -1351,14 +1519,10 @@ namespace Magnus_WPF_1.Source.Application
                 }
                 Thread.Sleep(5);
             }
-            HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON, false); 
-
+            LogMessage.LogMessage.WriteToDebugViewer(9, $"Set PLC Conveyor ({ (int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON} ON");
+            HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON, false);
+            LogMessage.LogMessage.WriteToDebugViewer(9, $"Set Camera Trigger Event ");
             m_hardwareTriggerSnapEvent[0].Set();
-            //LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Trigger camera  1  ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
-            //nError = WaitForNextStepSequenceEvent("Press Next to wait for plc ready signal");
-            //if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
-            //    goto Check_StepSequence;
-
             return 0;
         }
 
@@ -1406,7 +1570,7 @@ namespace Magnus_WPF_1.Source.Application
         //startBarcodeSequence:
             HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_PASS, false);
             HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_FAIL, false);
-            int nTimeout = 0;
+            //int nTimeout = 0;
             Master.m_hardwareTriggerSnapEvent[1].Reset();
             Master.VisionReadyEvent[1].Reset();
             //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_TRIGGER, 0);
@@ -1602,195 +1766,6 @@ namespace Magnus_WPF_1.Source.Application
                 //LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Read Chip Count from PLC {(int)PLCCOMM.PLC_ADDRESS.PLC_CURRENT_BARCODE_CHIP_COUNT}  . Number: {m_Tracks[1].m_CurrentPLCRegisterDeviceID } ");
                 //Application.SetIntRegistry(Application.m_strCurrentDeviceID_Registry[1], m_Tracks[1].m_CurrentSequenceDeviceID);
                 LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Scan Done!");
-
-            }
-        }
-
-        private void func_IOStatusThread()
-        {
-            int bEmergencyStatus_Backup = -1;
-            int bImidiateStatus_Backup = -1;
-            int bResetStatus_Backup = -1;
-            m_DoorOpennedStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_DOOR_STATUS);
-            int bDoorStatus_Backup = m_DoorOpennedStatus;
-
-            int bEndLotStatus_Backup = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_END_LOT);
-            int bCreateNewLotStatus_Backup = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CREATE_NEW_LOT);
-            while (MainWindow.mainWindow != null)
-            {
-
-                Thread.Sleep(10);
-                if (HiWinRobotInterface.m_RobotConnectID < 0 || m_hiWinRobotInterface == null)
-                {
-
-                    m_EmergencyStatus = m_EmergencyStatus_Simulate;
-                    m_ImidiateStatus = m_ImidiateStatus_Simulate;
-                    m_ResetMachineStatus = m_ResetMachineStatus_Simulate;
-                }
-                else
-                {
-                    m_PLC_Ready_Status = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_PACKING_PROCESS_READY);
-                    m_EmergencyStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.EMERGENCY_STATUS) | m_EmergencyStatus_Simulate;
-                    m_ImidiateStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.IMIDIATE_STOP_STATUS) | m_ImidiateStatus_Simulate;
-                    m_ResetMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RESET_STATUS) | m_ResetMachineStatus_Simulate;
-                    m_RunMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RUNSEQUENCE_STATUS);
-                    m_DoorOpennedStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_DOOR_STATUS);
-                    m_CreateNewLotStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CREATE_NEW_LOT);
-                    m_EndLotStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_END_LOT);
-                }
-
-                if (m_ImidiateStatus > 0)
-                {
-                    m_bNeedToImidiateStop = true;
-                    string strMess = "Imidiate Stop Button clicked!";
-                    m_hiWinRobotInterface.StopMotor();
-                    HWinRobot.set_motor_state(HiWinRobotInterface.m_RobotConnectID, 0);
-                    MainWindow.mainWindow.PopupWarningMessageBox(strMess, WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
-                    //Thread.Sleep(100);
-
-                }
-
-
-                if (m_DoorOpennedStatus > 0 && bDoorStatus_Backup != m_DoorOpennedStatus)
-                {
-                    m_ImidiateStatus = 1;
-                    m_bNeedToImidiateStop = true;
-                    string strMess = "Door is openned!";
-                    m_hiWinRobotInterface.StopMotor();
-                    HWinRobot.set_motor_state(HiWinRobotInterface.m_RobotConnectID, 0);
-                    MainWindow.mainWindow.PopupWarningMessageBox(strMess, WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
-                    //Thread.Sleep(100);
-
-                }
-                bDoorStatus_Backup = m_DoorOpennedStatus;
-                if (m_DoorOpennedStatus > 0)
-                {
-                    if (HWinRobot.get_acc_dec_ratio(m_RobotConnectID) > 10)
-                        HWinRobot.set_acc_dec_ratio(m_RobotConnectID, 10);
-
-                    if (HWinRobot.get_override_ratio(m_RobotConnectID) > 20)
-                        HWinRobot.set_override_ratio(m_RobotConnectID, 20);
-                }
-
-
-
-                if (m_EmergencyStatus > 0)
-                {
-                    m_bMachineNotReadyNeedToReset = true;
-                    m_hiWinRobotInterface.StopMotor();
-                    HWinRobot.set_motor_state(HiWinRobotInterface.m_RobotConnectID, 0);
-                    string strMess = "Emergency Button clicked, please release them  then reset the sequence!";
-                    MainWindow.mainWindow.PopupWarningMessageBox(strMess, WARNINGMESSAGE.MESSAGE_EMERGENCY);
-                    //Thread.Sleep(100);
-                    // Disable all motor function;
-                }
-
-                if (m_RunMachineStatus > 0)
-                {
-                    Thread.Sleep(1000);
-                    m_RunMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RUNSEQUENCE_STATUS);
-                    if (m_RunMachineStatus > 0)
-                    {
-                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                        {
-                            MainWindow.mainWindow.Run_Sequence();
-                        });
-                    }
-                }
-
-                if (m_plcComm == null)
-                    continue;
-
-                if (!m_plcComm.m_modbusClient.Connected)
-                    continue;
-
-                if (bEmergencyStatus_Backup != m_EmergencyStatus)
-                {
-                    m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_EMERGENCY_STATUS, m_EmergencyStatus);
-                    bEmergencyStatus_Backup = m_EmergencyStatus;
-                    LogMessage.LogMessage.WriteToDebugViewer(9, $"Emergency Status changed Status = {m_EmergencyStatus}!");
-
-                    if (System.Windows.Application.Current == null)
-                        return;
-                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Emergency Status changed Status = {m_EmergencyStatus}!", (int)ERROR_CODE.LABEL_FAIL);
-                    });
-                }
-
-                if (bImidiateStatus_Backup != m_ImidiateStatus)
-                {
-                    m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_IMIDIATE_STATUS, m_ImidiateStatus);
-                    bImidiateStatus_Backup = m_ImidiateStatus;
-
-                    LogMessage.LogMessage.WriteToDebugViewer(9, $"Imidiate button Status changed Status = {m_ImidiateStatus}!");
-
-                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Imidiate button Status changed Status = {m_ImidiateStatus}!", (int)ERROR_CODE.LABEL_FAIL);
-                    });
-
-                }
-                if (bResetStatus_Backup != m_ResetMachineStatus)
-                {
-                    m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_STATUS, m_ResetMachineStatus);
-                    bResetStatus_Backup = m_ResetMachineStatus;
-
-                    LogMessage.LogMessage.WriteToDebugViewer(9, $"Reset button Status changed Status = {m_ResetMachineStatus}!");
-
-                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Reset button Status changed Status = {m_ResetMachineStatus}!", (int)ERROR_CODE.LABEL_FAIL);
-                    });
-
-                }
-
-                //m_CreateNewLotStatus = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT); //  HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CREATE_NEW_LOT);
-                //m_CreateNewLotStatus = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT);
-                if (m_CreateNewLotStatus > 0 && bCreateNewLotStatus_Backup != m_CreateNewLotStatus)  /*(m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT) > 0)*/
-                {
-                    LogMessage.LogMessage.WriteToDebugViewer(9, $"Reset Lot");
-
-                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Reset Lot", (int)ERROR_CODE.LABEL_FAIL);
-                        Application.m_strCurrentLot = string.Format("{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
-                        Application.SetStringRegistry(Application.m_strCurrentLot_Registry, Application.m_strCurrentLot);
-                        MainWindow.mainWindow.m_staticView.ClearStatistic();
-                        lock (MainWindow.mainWindow.master.m_Tracks[0])
-                        {
-
-                            Thread.Sleep(500);
-                            MainWindow.mainWindow.ResetStatistic(0);
-                            Thread.Sleep(500);
-                        }
-
-                        lock (MainWindow.mainWindow.master.m_Tracks[1])
-                        {
-                            Thread.Sleep(500);
-                            MainWindow.mainWindow.ResetStatistic(1);
-                            Thread.Sleep(500);
-                        }
-
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Create New Lot ID: {Application.m_strCurrentLot} ", (int)ERROR_CODE.LABEL_FAIL);
-
-                        if (true)
-                        {
-                            MainWindow.mainWindow.m_strCurrentLotID = Application.m_strCurrentLot;
-                        }
-
-                        else
-                        {
-
-                            MessageBox.Show("Please KeyIn the Lot ID (on the top) then press Continue");
-                        }
-                    });
-                    //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT, 0);
-
-                    //m_CreateNewLotStatus = 0;
-                }
-                bCreateNewLotStatus_Backup = m_CreateNewLotStatus;
-
 
             }
         }

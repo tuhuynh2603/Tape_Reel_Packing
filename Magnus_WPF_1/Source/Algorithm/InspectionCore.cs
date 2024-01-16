@@ -682,7 +682,7 @@ namespace Magnus_WPF_1.Source.Algorithm
         public /*static*/ int FindDeviceLocation_Zoom(ref CvImage imgSource, ref List<ArrayOverLay> list_arrayOverlay, ref PointF pCenter, ref PointF pCorner, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug = false)
         {
             Stopwatch timeIns = new Stopwatch();
-            int nErrorTemp = -(int)ERROR_CODE.PASS;
+            int nErrorTemp = -(int)ERROR_CODE.NO_PATTERN_FOUND;
 
             //if (m_TemplateImage.Gray == null)
             //    return -99;
@@ -858,7 +858,6 @@ namespace Magnus_WPF_1.Source.Algorithm
                     int nIndexOut = MagnusOpenCVLib.SelectPointBased_Top_Left_Bottom_Right(ref listCenterPoints_Fail, ref pCenter, (int)POSITION._BOTTOM);
                     p_CenterPoint_Temp = pCenter;
                     p_CornerPoint_Temp = listCornerPoints_Fail[nIndexOut];
-                    nErrorTemp = -(int)ERROR_CODE.LABEL_FAIL;
                 }
 
             }
@@ -918,52 +917,61 @@ namespace Magnus_WPF_1.Source.Algorithm
 
 
             //////////////////////
-
-            int[] nResult = new int[m_DeviceLocationParameter.m_DR_NumberROILocation];
-            for (int nPVIAreaIndex = 0; nPVIAreaIndex < m_DeviceLocationParameter.m_DR_NumberROILocation; nPVIAreaIndex++)
+            if (bIsChipFound)
             {
-                nResult[nPVIAreaIndex] = 0;
-                LabelMarking_Inspection(zoomedInImage, nPVIAreaIndex, p_CenterPoint_Temp, p_CornerPoint_Temp, ref nResult[nPVIAreaIndex], ref list_arrayOverlay, ref debugInfors, bEnableDebug);
-                if (nResult[nPVIAreaIndex] < 0)
-                    nErrorTemp = nResult[nPVIAreaIndex];
-            }
-
-            pCenter.X = (int)(p_CenterPoint_Temp.X / m_DeviceLocationParameter.m_L_ScaleImageRatio);
-            pCenter.Y = (int)(p_CenterPoint_Temp.Y / m_DeviceLocationParameter.m_L_ScaleImageRatio);
-            pCorner.X = (int)(p_CornerPoint_Temp.X / m_DeviceLocationParameter.m_L_ScaleImageRatio);
-            pCorner.Y = (int)(p_CornerPoint_Temp.Y / m_DeviceLocationParameter.m_L_ScaleImageRatio);
-
-
-
-            // Black Chip
-            PointF pCenterBlackChip = new PointF(0, 0);
-            int nErrorBlackChip = -(int)ERROR_CODE.PASS;
-            if (m_blackChipParameter.m_OC_EnableCheck)
-            {
-                nErrorBlackChip = FindBlackChip(ref zoomedInImage, ref region_SearchDeviceLocation, ref pCenterBlackChip, ref list_arrayOverlay, ref debugInfors, bEnableDebug);
-                //if (nErrorBlackChip < (int)ERROR_CODE.PASS)
-                //    return nErrorBlackChip;
-            }
-
-            //CvInvoke.WaitKey(0);
-            timeIns.Restart();
-
-
-            if (!bIsChipFound && !bIsChipNoCornerFound && nErrorBlackChip == -(int)ERROR_CODE.PASS)
-                return -(int)ERROR_CODE.NO_PATTERN_FOUND;
-
-
-            //Check whether need to pick the black chip or the normal chip
-            if (nErrorBlackChip != -(int)ERROR_CODE.PASS)
-            {
-                if (MagnusOpenCVLib.Check2PointIndex(ref pCenter, ref pCenterBlackChip, (int)POSITION._BOTTOM))
+                nErrorTemp = -(int)ERROR_CODE.PASS;
+                int[] nResult = new int[m_DeviceLocationParameter.m_DR_NumberROILocation];
+                for (int nPVIAreaIndex = 0; nPVIAreaIndex < m_DeviceLocationParameter.m_DR_NumberROILocation; nPVIAreaIndex++)
                 {
-                    pCenter = pCenterBlackChip;
-                    nErrorTemp = -(int)ERROR_CODE.OPPOSITE_CHIP;
+                    nResult[nPVIAreaIndex] = 0;
+                    LabelMarking_Inspection(zoomedInImage, nPVIAreaIndex, p_CenterPoint_Temp, p_CornerPoint_Temp, ref nResult[nPVIAreaIndex], ref list_arrayOverlay, ref debugInfors, bEnableDebug);
+                    if (nResult[nPVIAreaIndex] < 0)
+                    {
+                        nErrorTemp = nResult[nPVIAreaIndex];
+                        break;
+                    }
+                }
+
+                pCenter.X = (int)(p_CenterPoint_Temp.X / m_DeviceLocationParameter.m_L_ScaleImageRatio);
+                pCenter.Y = (int)(p_CenterPoint_Temp.Y / m_DeviceLocationParameter.m_L_ScaleImageRatio);
+                pCorner.X = (int)(p_CornerPoint_Temp.X / m_DeviceLocationParameter.m_L_ScaleImageRatio);
+                pCorner.Y = (int)(p_CornerPoint_Temp.Y / m_DeviceLocationParameter.m_L_ScaleImageRatio);
+            }
+            else if (bIsChipNoCornerFound)
+            {
+                nErrorTemp = -(int)ERROR_CODE.LABEL_FAIL;
+                pCenter.X = (int)(p_CenterPoint_Temp.X / m_DeviceLocationParameter.m_L_ScaleImageRatio);
+                pCenter.Y = (int)(p_CenterPoint_Temp.Y / m_DeviceLocationParameter.m_L_ScaleImageRatio);
+                pCorner.X = (int)(p_CornerPoint_Temp.X / m_DeviceLocationParameter.m_L_ScaleImageRatio);
+                pCorner.Y = (int)(p_CornerPoint_Temp.Y / m_DeviceLocationParameter.m_L_ScaleImageRatio);
+            }
+
+            if ((nErrorTemp != -(int)ERROR_CODE.PASS) && m_blackChipParameter.m_OC_EnableCheck)
+            { 
+                // Black Chip
+                PointF pCenterBlackChip = new PointF(0, 0);
+                int nErrorBlackChip = -(int)ERROR_CODE.PASS;
+                nErrorBlackChip = FindBlackChip(ref zoomedInImage, ref region_SearchDeviceLocation, ref pCenterBlackChip, ref list_arrayOverlay, ref debugInfors, bEnableDebug);
+
+                //CvInvoke.WaitKey(0);
+                timeIns.Restart();
+
+
+                if (nErrorBlackChip == -(int)ERROR_CODE.PASS && nErrorTemp == -(int)ERROR_CODE.NO_PATTERN_FOUND)
+                    return -(int)ERROR_CODE.NO_PATTERN_FOUND;
+
+
+                //Check whether need to pick the black chip or the normal chip
+                if (nErrorBlackChip != -(int)ERROR_CODE.PASS && nErrorTemp != -(int)ERROR_CODE.NO_PATTERN_FOUND)
+                {
+                    if (MagnusOpenCVLib.Check2PointIndex(ref pCenter, ref pCenterBlackChip, (int)POSITION._BOTTOM))
+                    {
+                        pCenter = pCenterBlackChip;
+                        nErrorTemp = -(int)ERROR_CODE.OPPOSITE_CHIP;
+                    }
                 }
 
             }
-
 
             CvImage mat_point = new CvImage();
             mat_point = CvImage.Zeros(zoomedInImage.Height, zoomedInImage.Width, DepthType.Cv8U, 1);
@@ -976,7 +984,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             CvInvoke.Rectangle(mat_point, rect_center, new MCvScalar(255), -1);
             PushBackDebugInfors(imgSource, mat_point, "Center Chip Region . (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
-            AddRegionOverlay(ref list_arrayOverlay, mat_point, Colors.Yellow);
+            AddRegionOverlay(ref list_arrayOverlay, mat_point, Colors.Blue);
 
             return nErrorTemp;
         }

@@ -135,7 +135,7 @@ namespace Magnus_WPF_1.Source.Hardware
 				return "";
 			bIsDownload = true;
 			string strDeviceID = "";
-			string str2 = "";
+			//string str2 = "";
 			string strLotID = "Dummy";
 
 			if (MainWindow.mainWindow.master != null)
@@ -195,14 +195,8 @@ namespace Magnus_WPF_1.Source.Hardware
 			}
 
 			//LogMessage.WriteToDebugViewer(3, $"Message responsed from Barcode Bank 2: {strDeviceID}");
-			strImageFullName = Path.Combine(strFolder,  $"{strDeviceID}_{nDeviceID}.bmp");
+			strImageFullName = Path.Combine(strFolder,  $"{strDeviceID}_{nDeviceID + 1}.bmp");
 			strFullPathImageOut = strImageFullName;
-			while (!m_liveviewForm.IsHandleCreated)
-				Thread.Sleep(50);
-
-
-			while (!m_liveviewForm.IsHandleCreated)
-				Thread.Sleep(50);
 
 			System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
 			{

@@ -121,6 +121,7 @@ namespace Magnus_WPF_1.UI.UserControls
             if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
                 return;
 
+            Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
             Master.m_NextStepSequenceEvent.Set();
             if (_m_warningMessage == WARNINGMESSAGE.MESSAGE_IMIDIATESTOP)
             {
@@ -129,6 +130,7 @@ namespace Magnus_WPF_1.UI.UserControls
             }
             else
                 MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
+
 
             MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
 
@@ -151,6 +153,7 @@ namespace Magnus_WPF_1.UI.UserControls
             if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
                 return;
 
+            Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
             MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_GOBACK;
             Master.m_NextStepSequenceEvent.Set();
 
@@ -163,6 +166,7 @@ namespace Magnus_WPF_1.UI.UserControls
             if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
                 return;
 
+            Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
             MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
             Master.m_NextStepSequenceEvent.Set();
 

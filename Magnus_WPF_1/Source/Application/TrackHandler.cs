@@ -198,7 +198,13 @@ namespace Magnus_WPF_1.Source.Application
                 }
             }
 
-            nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+            //nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
+
+            //m_hIKControlCameraView.m_MyCamera.MV_CC_SetEnumValue_NET("AcquisitionMode", (uint)MyCamera.MV_CAM_ACQUISITION_MODE.MV_ACQ_MODE_CONTINUOUS);
+            //m_hIKControlCameraView.m_MyCamera.MV_CC_SetEnumValue_NET("TriggerMode", (uint)MyCamera.MV_CAM_TRIGGER_MODE.MV_TRIGGER_MODE_ON);
+            //m_hIKControlCameraView.m_MyCamera.MV_CC_SetEnumValue_NET("TriggerSource", (uint)MyCamera.MV_CAM_TRIGGER_SOURCE.MV_TRIGGER_SOURCE_SOFTWARE);
+
+
             return 0;
         }
 
@@ -433,7 +439,7 @@ namespace Magnus_WPF_1.Source.Application
             LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
             color = new SolidColorBrush(Colors.Blue);
-            m_imageViews[0].DrawStringOverlay("(X, Y, Angle) = (" + pCenter.X.ToString() + ", " + pCenter.Y.ToString() + ", " + ((int)dAngle).ToString() + ")", (int)pCenter.X + 10, (int)pCenter.Y, color, 20);
+            m_imageViews[0].DrawStringOverlay("(" + pCenter.X.ToString() + ", " + pCenter.Y.ToString() + ", " + ((int)dAngle).ToString() + ")", (int)pCenter.X + 10, (int)pCenter.Y, color, 15);
 
             LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
@@ -714,7 +720,6 @@ namespace Magnus_WPF_1.Source.Application
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
                         LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-
                         DrawInspectionResult(ref m_CurrentVisionResultData.m_nResult, ref pCenter, ref dDeltaAngle);
                         LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 

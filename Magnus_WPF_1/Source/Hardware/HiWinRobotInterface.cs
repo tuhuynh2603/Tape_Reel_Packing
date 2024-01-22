@@ -914,8 +914,15 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             LogMessage.LogMessage.WriteToDebugViewer(2, $"Move to {SequencePointData.PRE_PICK_POSITION} (X Y Z Angle) = " + dValue[0].ToString() + ", " + dValue[1].ToString() + ", " + dValue[2].ToString() + ", " + dValue[5].ToString());
 
             return HWinRobot.ptp_pos(HiWinRobotInterface.m_RobotConnectID, nmode, dValue);
-
             //return wait_for_stop_motion(ndeviceid);
+        }
+        public int checkDiffPosition(double[] dDestination, double[] dCurrentPosition)
+        {
+            if (Math.Abs(dDestination[0] - dCurrentPosition[0]) > 1000 ||
+                Math.Abs(dDestination[1] - dCurrentPosition[1]) > 1000)
+                return -1;
+            else
+                return 0;
         }
 
         public int MoveTo_PICK_POSITION(System.Drawing.PointF robotPoint, double dDeltaAngle, bool bSetSpeed = false, int nmode = 0)

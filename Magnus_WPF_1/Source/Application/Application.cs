@@ -32,6 +32,7 @@ namespace Magnus_WPF_1.Source.Application
         public static string pathRecipe;// = "C:\\Wisely\\C#\\Magnus_WPF_1\\Config";
         public static string currentRecipe;// = "Recipe1";
         public static string m_strCurrentLot = "";
+        public static string m_strStartLotDay = "";
         public const string  m_strCurrentLot_Registry = "Lot ID";
         public static string[] m_strCurrentDeviceID_Registry = { "Current Device ID 1", "Current Device ID 2" };
 

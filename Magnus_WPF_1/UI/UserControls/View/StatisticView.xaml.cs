@@ -84,7 +84,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
         //int m_nWidthMappingPageRect = 100;
         //int m_nStepMappingPageRect = 102;
         public Point m_CanvasMovePagePoint = new Point(0, 0);
-        int m_nPageID = 0;
+        int[] m_nPageID = {0,0 };
 
         Image[][] arr_imageMapping = new Image[2][];
         Label[][] arr_textBlockMapping = new Label[2][];
@@ -107,7 +107,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
 
 
-            m_nWidthMappingRect = (int)(nWidthgrid / nMaxDeviceStep / 2.3);
+            m_nWidthMappingRect = (int)(nWidthgrid / nMaxDeviceStep / 2.2);
             if (m_nWidthMappingRect > 100)
                 m_nWidthMappingRect = 100;
             if (m_nWidthMappingRect < 35)
@@ -142,11 +142,11 @@ namespace Magnus_WPF_1.UI.UserControls.View
                         arr_textBlockMapping[nTrack][nID].MinWidth = 0.95 * m_nWidthMappingRect;
                         arr_textBlockMapping[nTrack][nID].Foreground = new SolidColorBrush(Colors.Yellow);
                         arr_textBlockMapping[nTrack][nID].HorizontalContentAlignment = HorizontalAlignment.Center;
-                        Canvas.SetLeft(arr_imageMapping[nTrack][nID], m_nStepMappingRect * nDeviceX + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2));
+                        Canvas.SetLeft(arr_imageMapping[nTrack][nID], m_nStepMappingRect * nDeviceX + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1));
                         Canvas.SetTop(arr_imageMapping[nTrack][nID], m_nStepMappingRect * nDeviceY);
                         canvas_Mapping.Children.Add(arr_imageMapping[nTrack][nID]);
 
-                        Canvas.SetLeft(arr_textBlockMapping[nTrack][nID], m_nStepMappingRect * nDeviceX + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2));
+                        Canvas.SetLeft(arr_textBlockMapping[nTrack][nID], m_nStepMappingRect * nDeviceX + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1));
                         Canvas.SetTop(arr_textBlockMapping[nTrack][nID], m_nStepMappingRect * nDeviceY + arr_textBlockMapping[nTrack][nID].FontSize / 3);                    
                         canvas_Mapping.Children.Add(arr_textBlockMapping[nTrack][nID]);
 
@@ -158,7 +158,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
                 border_boundingbox_clicked[nTrack].Height = m_nWidthMappingRect;
                 border_boundingbox_clicked[nTrack].BorderThickness = new Thickness(0);
                 border_boundingbox_clicked[nTrack].BorderBrush = new SolidColorBrush(Colors.Yellow);
-                Canvas.SetLeft(border_boundingbox_clicked[nTrack], 0 + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2));
+                Canvas.SetLeft(border_boundingbox_clicked[nTrack], 0 + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1));
                 Canvas.SetTop(border_boundingbox_clicked[nTrack], 0);
                 canvas_Mapping.Children.Add(border_boundingbox_clicked[nTrack]);
 
@@ -167,7 +167,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
                 borderTemp.Height = (m_nStepMappingRect) * MainWindow.mainWindow.m_nDeviceY;
                 borderTemp.BorderThickness = new Thickness(1);
                 borderTemp.BorderBrush = new SolidColorBrush(Colors.Yellow);
-                Canvas.SetLeft(borderTemp, 0 + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2));
+                Canvas.SetLeft(borderTemp, 0 + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1));
                 Canvas.SetTop(borderTemp, 0);
                 canvas_Mapping.Children.Add(borderTemp);
 
@@ -184,7 +184,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
 
 
-            canvas_Mapping.Width = m_nStepMappingRect * MainWindow.mainWindow.m_nDeviceX + m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2);
+            canvas_Mapping.Width = m_nStepMappingRect * MainWindow.mainWindow.m_nDeviceX + m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1);
             canvas_Mapping.Height = m_nStepMappingRect * MainWindow.mainWindow.m_nDeviceY;
 
             //Canvas.SetTop(canvas_Mapping_NextPage, canvas_Mapping.Height);
@@ -202,7 +202,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
         {
 
             nTrackID = 0;
-            if (cur_point.X >= m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2))
+            if (cur_point.X >= m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1))
                 nTrackID = 1;
 
             int nIDX = (int)((cur_point.X - (nTrackID * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2))) / m_nStepMappingRect);
@@ -213,7 +213,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
                 nDeviceID = nIDX + nIDY * MainWindow.mainWindow.m_nDeviceX;
                 if (nIDX < MainWindow.mainWindow.m_nDeviceX && nIDY < MainWindow.mainWindow.m_nDeviceY)
                 {
-                    Canvas.SetLeft(border_boundingbox_moving, m_nStepMappingRect * nIDX +  nTrackID * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2));
+                    Canvas.SetLeft(border_boundingbox_moving, m_nStepMappingRect * nIDX +  nTrackID * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1));
                     Canvas.SetTop(border_boundingbox_moving, m_nStepMappingRect * nIDY);
                     border_boundingbox_moving.BorderThickness = new Thickness(2);
                 }
@@ -227,7 +227,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
             if (bIsclicked)
             {
-                Canvas.SetLeft(border_boundingbox_clicked[nTrackID], m_nStepMappingRect * nIDX + nTrackID * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2));
+                Canvas.SetLeft(border_boundingbox_clicked[nTrackID], m_nStepMappingRect * nIDX + nTrackID * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1));
                 Canvas.SetTop(border_boundingbox_clicked[nTrackID], m_nStepMappingRect * nIDY);
                 border_boundingbox_clicked[nTrackID].BorderThickness = new Thickness(2);
             }
@@ -241,7 +241,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             int nTrackId = 0;
             m_CanvasMovePoint = e.GetPosition(canvas_Mapping);
             int nID = Check_mapping_Cursor_ID(m_CanvasMovePoint, true, ref nTrackId);
-            MainWindow.mainWindow.master.m_Tracks[nTrackId].m_nCurrentClickMappingID = nID + m_nPageID * MainWindow.mainWindow.m_nDeviceX * MainWindow.mainWindow.m_nDeviceY;
+            MainWindow.mainWindow.master.m_Tracks[nTrackId].m_nCurrentClickMappingID = nID + m_nPageID[nTrackId] * MainWindow.mainWindow.m_nDeviceX * MainWindow.mainWindow.m_nDeviceY;
 
             MainWindow.mainWindow.master.m_Tracks[nTrackId].CheckInspectionOnlineThread();
             if (MainWindow.mainWindow.m_bSequenceRunning || MainWindow.mainWindow.bEnableOfflineInspection)
@@ -391,43 +391,71 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
         private void btn_Previous_Page_Click(object sender, RoutedEventArgs e)
         {
-            m_nPageID--;
-            if (m_nPageID < 0)
-            {
-                m_nPageID = 0;
-                return;
-            }
-                
-            text_Current_Page.Text = (m_nPageID + 1).ToString();
-            UpdateMappingResultPage();
+            previousPage(0);
         }
 
         private void btn_Next_Page_Click(object sender, RoutedEventArgs e)
         {
-            m_nPageID++;
-            if (m_nPageID >= m_nNumberMappingPage)
-            {
-                m_nPageID = m_nNumberMappingPage - 1;
-                return;
-            }
-            text_Current_Page.Text = (m_nPageID+1).ToString();
-            UpdateMappingResultPage();
 
+            NextPage(0);
         }
 
+        private void btn_Previous_Page2_Click(object sender, RoutedEventArgs e)
+        {
+            previousPage(1);
+        }
 
-        public void UpdateMappingResultPage()
+        private void btn_Next_Page2_Click(object sender, RoutedEventArgs e)
+        {
+
+            NextPage(1);
+        }
+
+        public void previousPage(int nTrack)
+        {
+            m_nPageID[nTrack]--;
+            if (m_nPageID[nTrack] < 0)
+            {
+                m_nPageID[nTrack] = 0;
+                return;
+            }
+
+            if(nTrack == 0)
+                text_Current_Page.Text = (m_nPageID[nTrack] + 1).ToString();
+            else
+                text_Current_Page2.Text = (m_nPageID[nTrack] + 1).ToString();
+
+            UpdateMappingResultPage(nTrack);
+        }
+
+        public void NextPage(int nTrack)
+        {
+            m_nPageID[nTrack]++;
+            if (m_nPageID[nTrack] >= m_nNumberMappingPage)
+            {
+                m_nPageID[nTrack] = m_nNumberMappingPage - 1;
+                return;
+            }
+            if (nTrack == 0)
+                text_Current_Page.Text = (m_nPageID[nTrack] + 1).ToString();
+            else
+                text_Current_Page2.Text = (m_nPageID[nTrack] + 1).ToString();
+
+            UpdateMappingResultPage(nTrack);
+        }
+
+        public void UpdateMappingResultPage(int nTrack)
         {
             string path = @"/Resources/gray-chip.png";
             string pathFail = @"/Resources/red-chip.png";
             string pathPass = @"/Resources/green-chip.png";
 
             int nResultTotal;
-            for(int nTrack = 0; nTrack < 2; nTrack++)
-            {
+            //for(int nTrack = 0; nTrack < 2; nTrack++)
+            //{
                 for (int nID = 0; nID < arr_imageMapping[nTrack].Length; nID++)
                 {
-                    nResultTotal = MainWindow.mainWindow.master.m_Tracks[nTrack].m_VisionResultDatas[nID + m_nPageID * arr_imageMapping[nTrack].Length].m_nResult;
+                    nResultTotal = MainWindow.mainWindow.master.m_Tracks[nTrack].m_VisionResultDatas[nID + m_nPageID[nTrack] * arr_imageMapping[nTrack].Length].m_nResult;
 
                     switch (nResultTotal)
                     {
@@ -443,13 +471,17 @@ namespace Magnus_WPF_1.UI.UserControls.View
                             break;
                     }
 
-                    arr_textBlockMapping[nTrack][nID].Content = (nID + m_nPageID * arr_imageMapping[nTrack].Length + 1).ToString();
+                    arr_textBlockMapping[nTrack][nID].Content = (nID + m_nPageID[nTrack] * arr_imageMapping[nTrack].Length + 1).ToString();
 
                 }
 
-            }
+            //}
 
-            text_Current_Page.Text = m_nPageID.ToString();
+            if(nTrack == 0)
+                text_Current_Page.Text = (m_nPageID[nTrack] + 1).ToString();
+            else
+                text_Current_Page2.Text = (m_nPageID[nTrack] + 1).ToString();
+
 
         }
 
@@ -462,20 +494,45 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
         public void UpdateMappingResult(VisionResultData resultData, int nTrack, int nDeviceID)
         {
-            string path = @"/Resources/green-chip.png";
+            string path = @"/Resources/gray-chip.png";
+            switch (resultData.m_nResult)
+            {
+                case -(int)ERROR_CODE.NOT_INSPECTED:
+                    path = @"/Resources/gray-chip.png";
+                    break;
 
-            if (resultData.m_nResult < 0)
-                path = @"/Resources/red-chip.png";
-            if (nDeviceID < m_nPageID * arr_imageMapping.Length || nDeviceID >= (m_nPageID + 1) * arr_imageMapping.Length)
-                UpdateMappingResultPage();
-            else
-                arr_imageMapping[nTrack][nDeviceID % arr_imageMapping.Length].Source = new BitmapImage(new Uri(path, UriKind.Relative));
+                case -(int)ERROR_CODE.PASS:
+                    path = @"/Resources/green-chip.png";
+                    break;
+                default:
+                    path = @"/Resources/red-chip.png";
+                    break;
+            }
+
+
+            //if (resultData.m_nResult < 0)
+            //    path = @"/Resources/red-chip.png";
+
+            if (nDeviceID >= (m_nPageID[nTrack] + 1) * arr_imageMapping[nTrack].Length)
+            {
+                return;
+
+                m_nPageID[nTrack] = (int)Math.Round((float)nDeviceID / arr_imageMapping[nTrack].Length);
+                //m_nPageID[nTrack]++;
+                //UpdateMappingResultPage(nTrack);
+                if (nTrack == 0)
+                    text_Current_Page.Text = (m_nPageID[nTrack] + 1).ToString();
+                else
+                    text_Current_Page2.Text = (m_nPageID[nTrack] + 1).ToString();
+            } 
+
+            arr_imageMapping[nTrack][nDeviceID % arr_imageMapping[nTrack].Length].Source = new BitmapImage(new Uri(path, UriKind.Relative));
 
         }
         public void ResetMappingResult(int nTrackID = (int)TRACK_TYPE.TRACK_CAM1)
         {
             string path = @"/Resources/gray-chip.png";
-            for (int nID = 0; nID < arr_imageMapping.Length; nID++)
+            for (int nID = 0; nID < arr_imageMapping[nTrackID].Length; nID++)
                 arr_imageMapping[nTrackID][nID].Source = new BitmapImage(new Uri(path, UriKind.Relative));
         }
 

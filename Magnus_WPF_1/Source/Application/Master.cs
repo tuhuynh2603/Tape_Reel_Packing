@@ -17,6 +17,7 @@ namespace Magnus_WPF_1.Source.Application
     using static HiWinRobotInterface;
     using static Magnus_WPF_1.Source.Application.Track;
     using static Magnus_WPF_1.Source.Hardware.SDKHrobot.Global;
+    using static OfficeOpenXml.ExcelErrorValue;
 
     public class Master
     {
@@ -199,24 +200,6 @@ namespace Magnus_WPF_1.Source.Application
         #endregion
 
         #region ContructorDocComponent
-
-        public int m_PLC_Ready_Status = 0;
-
-        public int m_EmergencyStatus = 0;
-        public int m_ImidiateStatus = 0;
-        public int m_ResetMachineStatus = 0;
-        public int m_RunMachineStatus = 0;
-        public int m_DoorOpennedStatus = 0;
-        public int m_EndLotStatus = 0;
-        public int m_CreateNewLotStatus = 0;
-
-        public int m_EmergencyStatus_Simulate = 0;
-        public int m_ImidiateStatus_Simulate = 0;
-        public int m_ResetMachineStatus_Simulate = 0;
-        public bool m_bMachineNotReadyNeedToReset = true;
-        public bool m_bNeedToImidiateStop = false;
-        public bool m_IsDoorOpennedAction = false;
-        public bool m_bIsReleasePopupMessage = false;
         private void ContructorDocComponent()
         {
             m_Tracks = new Track[Application.m_nTrack];
@@ -233,7 +216,7 @@ namespace Magnus_WPF_1.Source.Application
             thread_InspectSequence = new Thread[Application.m_nTrack];
             thread_StreamCamera = new Thread[Application.m_nTrack];
             list_arrayOverlay = new List<ArrayOverLay>[Application.m_nTrack];
-            
+
 
             m_hiWinRobotInterface = new HiWinRobotInterface();
             m_plcComm = new PLCCOMM();
@@ -633,6 +616,25 @@ namespace Magnus_WPF_1.Source.Application
             SEQUENCE_GOBACK = 2,
             SEQUENCE_RETRY = 3
         }
+
+
+        public int m_PLC_Ready_Status = 0;
+        public int m_EmergencyStatus = 0;
+        public int m_ImidiateStatus = 0;
+        public int m_ResetMachineStatus = 0;
+        public int m_RunMachineStatus = 0;
+        public int m_DoorOpennedStatus = 0;
+        public int m_EndLotStatus = 0;
+        public int m_CreateNewLotStatus = 0;
+
+        public int m_EmergencyStatus_Simulate = 0;
+        public int m_ImidiateStatus_Simulate = 0;
+        public int m_ResetMachineStatus_Simulate = 0;
+        public bool m_bMachineNotReadyNeedToReset = true;
+        public bool m_bNeedToImidiateStop = false;
+        public bool m_IsDoorOpennedAction = false;
+        public bool m_bIsReleasePopupMessage = false;
+
         private void func_IOStatusThread()
         {
             int bEmergencyStatus_Backup = -1;
@@ -664,7 +666,7 @@ namespace Magnus_WPF_1.Source.Application
                     m_EndLotStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_END_LOT);
                 }
 
-                if (m_ImidiateStatus > 0)
+                if (m_ImidiateStatus == 1)
                 {
                     m_bNeedToImidiateStop = true;
                     string strMess = "Imidiate Stop Button clicked!";
@@ -672,39 +674,29 @@ namespace Magnus_WPF_1.Source.Application
                     HiWinRobotInterface.SetMotorState(0);
                     MainWindow.mainWindow.PopupWarningMessageBox(strMess, WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
                     //Thread.Sleep(100);
-
                 }
 
-
-                if (m_DoorOpennedStatus > 0 && bDoorStatus_Backup != m_DoorOpennedStatus)
+                if (!MainWindow.mainWindow.m_bEnableDebugSequence)
                 {
-                    m_IsDoorOpennedAction = true;
-                    string strMess = "Door is openned!";
-                    m_hiWinRobotInterface.StopMotor();
-                    HiWinRobotInterface.SetMotorState(0);
-                    MainWindow.mainWindow.PopupWarningMessageBox(strMess, WARNINGMESSAGE.MESSAGE_EMERGENCY);
-                    //Thread.Sleep(100);
+                    if (m_DoorOpennedStatus == 1 && bDoorStatus_Backup != m_DoorOpennedStatus)
+                    {
+                        //m_IsDoorOpennedAction = true;
+
+                        if (MainWindow.mainWindow.m_bSequenceRunning)
+                        {
+                            m_bNeedToImidiateStop = true;
+                            Thread.Sleep(1000);
+                            //MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+                            string strMess = "Door is openned!";
+                            m_hiWinRobotInterface.StopMotor();
+                            HiWinRobotInterface.SetMotorState(0);
+                            MainWindow.mainWindow.PopupWarningMessageBox(strMess, WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
+                        }
+                    }
+                    //bDoorStatus_Backup = m_DoorOpennedStatus;
                 }
 
-                bDoorStatus_Backup = m_DoorOpennedStatus;
-                if (m_DoorOpennedStatus > 0)
-                {
-                    if (HiWinRobotInterface.GetOperationMode() != (int)ROBOT_OPERATION_MODE.MODE_MANUAL)
-                        HiWinRobotInterface.SetOperationMode((int)ROBOT_OPERATION_MODE.MODE_MANUAL);
-                }
-                
-                
-                if (m_ResetMachineStatus > 0 && m_DoorOpennedStatus + m_EmergencyStatus + m_ImidiateStatus == 0)
-                {
-
-                    HiWinRobotInterface.SetMotorState(1);
-                    if (HiWinRobotInterface.GetOperationMode() != (int)ROBOT_OPERATION_MODE.MODE_AUTO)
-                        HiWinRobotInterface.SetOperationMode((int)ROBOT_OPERATION_MODE.MODE_AUTO);
-                }
-
-
-
-                if (m_EmergencyStatus > 0)
+                if (m_EmergencyStatus == 1)
                 {
                     m_bMachineNotReadyNeedToReset = true;
                     m_hiWinRobotInterface.StopMotor();
@@ -715,11 +707,11 @@ namespace Magnus_WPF_1.Source.Application
                     // Disable all motor function;
                 }
 
-                if (m_RunMachineStatus > 0)
+                if (m_RunMachineStatus == 1)
                 {
                     Thread.Sleep(1000);
                     m_RunMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RUNSEQUENCE_STATUS);
-                    if (m_RunMachineStatus > 0)
+                    if (m_RunMachineStatus == 1)
                     {
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
@@ -764,7 +756,11 @@ namespace Magnus_WPF_1.Source.Application
                 if (bResetStatus_Backup != m_ResetMachineStatus)
                 {
                     //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_STATUS, m_ResetMachineStatus);
-                    bResetStatus_Backup = m_ResetMachineStatus;
+
+                    if (m_ResetMachineStatus == 1)
+                    {
+                        MainWindow.mainWindow.m_WarningMessageBoxUC.ContinueSequenceButtonClicked(WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
+                    }
 
                     LogMessage.LogMessage.WriteToDebugViewer(9, $"Reset button Status changed Status = {m_ResetMachineStatus}!");
 
@@ -774,32 +770,34 @@ namespace Magnus_WPF_1.Source.Application
                     });
 
                 }
+                bResetStatus_Backup = m_ResetMachineStatus;
+
 
                 //m_CreateNewLotStatus = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT); //  HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CREATE_NEW_LOT);
                 //m_CreateNewLotStatus = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT);
-                if (m_CreateNewLotStatus > 0 && bCreateNewLotStatus_Backup != m_CreateNewLotStatus)  /*(m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT) > 0)*/
+                if (m_CreateNewLotStatus == 1 && bCreateNewLotStatus_Backup != m_CreateNewLotStatus)  /*(m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT) > 0)*/
                 {
                     LogMessage.LogMessage.WriteToDebugViewer(9, $"Reset Lot");
-
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
                         ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Reset Lot", (int)ERROR_CODE.LABEL_FAIL);
                         Application.m_strCurrentLot = string.Format("{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+                        Application.m_strStartLotDay = Application.m_strCurrentLot.Split('_')[0];
+
                         Application.SetStringRegistry(Application.m_strCurrentLot_Registry, Application.m_strCurrentLot);
                         //MainWindow.mainWindow.m_staticView.ClearStatistic();
+                        Thread.Sleep(250);
                         lock (MainWindow.mainWindow.master.m_Tracks[0])
                         {
-                            Thread.Sleep(250);
                             MainWindow.mainWindow.LoadStatistic(0);
-                            Thread.Sleep(250);
                         }
+                        Thread.Sleep(250);
 
                         lock (MainWindow.mainWindow.master.m_Tracks[1])
                         {
-                            Thread.Sleep(250);
                             MainWindow.mainWindow.LoadStatistic(1);
-                            Thread.Sleep(250);
                         }
+                        Thread.Sleep(250);
 
                         ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Create New Lot ID: {Application.m_strCurrentLot} ", (int)ERROR_CODE.LABEL_FAIL);
 
@@ -815,6 +813,7 @@ namespace Magnus_WPF_1.Source.Application
                         }
                     });
                     //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT, 0);
+                    Thread.Sleep(250);
 
                     //m_CreateNewLotStatus = 0;
                 }
@@ -840,36 +839,11 @@ namespace Magnus_WPF_1.Source.Application
                     if (MainWindow.mainWindow == null)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
 
-                    if (m_EmergencyStatus > 0)
+                    if (m_EmergencyStatus == 1)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
-                }                
-                //Show Dialog
-            }
-            else if (m_IsDoorOpennedAction)
-            {
-                m_IsDoorOpennedAction = false;
-                //MainWindow.mainWindow.PopupWarningMessageBox("Door Is Openning, Continue will run with manual mode (Low Speed)", WARNINGMESSAGE.MESSAGE_EMERGENCY);
-                while (!m_NextStepSequenceEvent.WaitOne(10))
-                {
-                    if (MainWindow.mainWindow == null)
-                        return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
-
-                    if (m_EmergencyStatus > 0)
-                        return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
-
-                    if (m_ResetMachineStatus > 0 && m_DoorOpennedStatus == 0)
-                    {
-                        m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE;
-                        break;
-                    }
                 }
-
-                if (m_bNextStepSequence == (int)SEQUENCE_OPTION.SEQUENCE_ABORT)
-                    return m_bNextStepSequence;
-
                 //Show Dialog
             }
-
             else if (MainWindow.mainWindow.m_bEnableDebugSequence)
             {
                 MainWindow.mainWindow.PopupWarningMessageBox(strDebugMessage, WARNINGMESSAGE.MESSAGE_STEPDEBUG);
@@ -878,7 +852,7 @@ namespace Magnus_WPF_1.Source.Application
                     if (MainWindow.mainWindow == null)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
 
-                    if (m_EmergencyStatus > 0 || m_ImidiateStatus > 0)
+                    if (m_EmergencyStatus == 1 || m_ImidiateStatus == 1)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
                 }
 
@@ -891,7 +865,7 @@ namespace Magnus_WPF_1.Source.Application
                     if (MainWindow.mainWindow == null)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
 
-                    if (m_EmergencyStatus > 0 || m_ImidiateStatus > 0)
+                    if (m_EmergencyStatus == 1 || m_ImidiateStatus == 1)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
                 }
                 return m_bNextStepSequence;
@@ -925,7 +899,6 @@ namespace Magnus_WPF_1.Source.Application
 
         void func_RobotSequence()
         {
-
             LogMessage.LogMessage.WriteToDebugViewer(9, "Run Robot Sequence Thread....");
 
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
@@ -934,16 +907,7 @@ namespace Magnus_WPF_1.Source.Application
                 MainWindow.mainWindow.LoadStatistic(0);
 
             });
-            while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_PACKING_PROCESS_READY) == 0)
-            {
-                // Need popup Dialog if waiting too long 
-                if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || m_EmergencyStatus > 0)
-                    return;
 
-                LogMessage.LogMessage.WriteToDebugViewer(9, "Waiting for PLC ready Signal....");
-                Thread.Sleep(500);
-
-            }
 
             RobotSequence();
             m_bRobotSequenceStatus = false;
@@ -953,18 +917,22 @@ namespace Magnus_WPF_1.Source.Application
                 MainWindow.mainWindow.m_bSequenceRunning = false;
             });
 
+            m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_ROBOT_RUNNING_STATUS, -1);
+
         }
-
         void RobotSequence()
-
         {
 
+        _Start_Lot:
+            int nCamera1InspectionResult = -(int)ERROR_CODE.NOT_INSPECTED;
+            VisionResultData visionResultDataTemp = m_Tracks[0].m_SequenceThreadVisionResult;
+            m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_ROBOT_RUNNING_STATUS, 1);
             int IsLastChipStatus = 0;
             int nCurrentSequenceStep = 0;
             string strLotID = Application.m_strCurrentLot;
             System.Drawing.PointF robotPoint = new System.Drawing.PointF(0, 0);
+        // feedback running to plc
 
-        _Step_0:
 
             int nError = 0;
 
@@ -975,14 +943,26 @@ namespace Magnus_WPF_1.Source.Application
                 return;
             }
 
+            while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_PACKING_PROCESS_READY) == 0)
+            {
+                // Need popup Dialog if waiting too long 
+                if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || m_EmergencyStatus > 0 || m_EndLotStatus > 0)
+                    return;
+
+                LogMessage.LogMessage.WriteToDebugViewer(9, "Waiting for PLC ready Signal....");
+                Thread.Sleep(500);
+            }
+
+            int nRetry = 0;
         StartSequence:
-            
+            m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_ROBOT_RESULT, 0);
+
             HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON, true);
             //Wait for Signal from PLC when they ready for new Lot so we can create new lot ID
             //HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON, false);
 
             nError = WaitForNextStepSequenceEvent("Begin Sequence: Press Next to trigger camera 1");
-            if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
+            if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE || m_EndLotStatus > 0)
                 return;
 
 
@@ -990,7 +970,10 @@ namespace Magnus_WPF_1.Source.Application
             //Application.SetIntRegistry(Application.m_strCurrentDeviceID_Registry[0], m_Tracks[0].m_CurrentSequenceDeviceID);
 
 
-            func_CameraTriggerThread();
+            if (func_CameraTriggerThread() < 0 || m_EndLotStatus > 0)
+            {
+                return;
+            }
 
 
             //m_hardwareTriggerSnapEvent[0].Set();
@@ -1004,7 +987,7 @@ namespace Magnus_WPF_1.Source.Application
             while (MainWindow.mainWindow.m_bSequenceRunning || MainWindow.mainWindow.bEnableOfflineInspection || m_bMachineNotReadyNeedToReset)
             {
 
-                if (MainWindow.mainWindow == null)
+                if (MainWindow.mainWindow == null || m_EndLotStatus > 0)
                     return;
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, "Begin Sequence");
@@ -1012,47 +995,73 @@ namespace Magnus_WPF_1.Source.Application
                 // Step 1: wait for station 1 inspection
                 timeIns.Restart();
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+                nCamera1InspectionResult = -(int)ERROR_CODE.NOT_INSPECTED;
+
 
                 while (!Master.VisionReadyEvent[0].WaitOne(10))
                 {
                     if (MainWindow.mainWindow == null)
                         return;
 
-                    if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || m_bMachineNotReadyNeedToReset)
+                    if ((!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection) || m_bMachineNotReadyNeedToReset || m_EndLotStatus > 0)
                     {
                         return;
                     }
+
+                    if (m_RunMachineStatus == 1)
+                    {
+
+                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+
+                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("PLC Button Run is pressed. Restarting the sequence....", (int)ERROR_CODE.LABEL_FAIL);
+                        });
+                        Thread.Sleep(3000);
+                        goto _Start_Lot;
+                    }
+
                 }
 
-                LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+                if (m_RunMachineStatus == 1)
+                {
 
-                int nCamera1InspectionResult = m_Tracks[0].m_CurrentVisionResultData.m_nResult;
-                VisionResultData visionResultDataTemp = m_Tracks[0].m_CurrentVisionResultData;
-                LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("PLC Button Run is pressed. Restarting the sequence....", (int)ERROR_CODE.LABEL_FAIL);
+                    });
+                    Thread.Sleep(3000);
+                    goto _Start_Lot;
+                }
+
+
+                LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Station 1 inspection No Device Found ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
+                Thread.Sleep(10);
+                nCamera1InspectionResult = m_Tracks[0].m_SequenceVisionResult;
 
                 if (nCamera1InspectionResult == -(int)ERROR_CODE.NO_PATTERN_FOUND) // If no pattern found, popup Error 
                 {
-                    m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_ROBOT_RESULT, -1);
-
-                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
-                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
-
-                    nError = WaitForNextStepSequenceEvent("Inspection Failed (Device Not found)! Restart the Sequence.", true);
-
-                    if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT)
-                        break;
+                    nRetry++;
 
                     LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Station 1 inspection No Device Found ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
-                    //Master.VisionReadyEvent[0].Reset();
-                    //m_hardwareTriggerSnapEvent[0].Set();
-                    LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
 
                         ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Device not Found. Image processing Failed!.", (int)ERROR_CODE.LABEL_FAIL);
                     });
 
+
+                    if (nRetry < 1)
+                        goto StartSequence;
+
+                    nRetry = 0;
+                    m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_ROBOT_RESULT, -1);
+                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
+                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
+
+                    nError = WaitForNextStepSequenceEvent("Inspection Failed (Device Not found)! Please press 'RUN' on UI or PLC  to restart the sequence!", true);
+                    if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT || m_EndLotStatus > 0)
+                        return;
                     goto StartSequence;
                     //return;
                 }
@@ -1066,21 +1075,31 @@ namespace Magnus_WPF_1.Source.Application
 
                 _Step_1:
                 nCurrentSequenceStep = 1;
-                if (m_bMachineNotReadyNeedToReset)
+
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
+                });
+
+                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus > 0)
                     return;
+
                 // Transform point from camera position to robot position
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+
+                visionResultDataTemp = m_Tracks[0].m_SequenceThreadVisionResult;
 
                 robotPoint = MagnusMatrix.ApplyTransformation(MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.m_MatCameraRobotTransform, m_Tracks[0].m_Center_Vision);
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Transform point from camera position to robot position ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
 
                 // Move to Pre Pick position
-                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection) != 0)
-                {
-                    nError = WaitForNextStepSequenceEvent($"Step {nCurrentSequenceStep} FAILED when move motor");
-                    if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
-                        goto Check_StepSequence;
-                }
+                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection);
+                //{
+                //    nError = WaitForNextStepSequenceEvent($"Step {nCurrentSequenceStep} FAILED when move motor");
+                //    if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
+                //        goto Check_StepSequence;
+                //}
+
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                 if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion() != 0)
@@ -1090,8 +1109,6 @@ namespace Magnus_WPF_1.Source.Application
                         goto Check_StepSequence;
                 }
 
-                LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Move to Pre Pick position ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
                 nError = WaitForNextStepSequenceEvent("Move to Pre Pick position done. Press Next to turn on vaccum");
                 if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
@@ -1100,16 +1117,21 @@ namespace Magnus_WPF_1.Source.Application
 
                 _Step_2:
                 nCurrentSequenceStep = 2;
-                if (m_bMachineNotReadyNeedToReset)
+
+
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
+                });
+
+
+                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus > 0)
                     return;
                 // Turn on vaccum
-                LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, true);
-                LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
-                LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Turn on vaccum ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
                 nError = WaitForNextStepSequenceEvent("Press Next to Pick the device");
@@ -1120,17 +1142,24 @@ namespace Magnus_WPF_1.Source.Application
 
                 _Step_3:
                 nCurrentSequenceStep = 3;
-                if (m_bMachineNotReadyNeedToReset)
+
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
+                });
+
+                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus > 0)
                     return;
                 // Move to Pick position (move Down Z motor)
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
-                if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection) != 0)
-                {
-                    nError = WaitForNextStepSequenceEvent($"Step {nCurrentSequenceStep} FAILED when move motor");
-                    if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
-                        goto Check_StepSequence;
-                }
+                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection);
+                //if(MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection) != 0)
+                //{
+                //    nError = WaitForNextStepSequenceEvent($"Step {nCurrentSequenceStep} FAILED when move motor");
+                //    if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
+                //        goto Check_StepSequence;
+                //}
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                 if (MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion() != 0)
@@ -1139,7 +1168,6 @@ namespace Magnus_WPF_1.Source.Application
                     if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
                         goto Check_StepSequence;
                 }
-                LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Move to Pick position (move Down Z motor) ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
 
                 // Move to  Pre pick  position again (move Up Z motor)
@@ -1153,7 +1181,12 @@ namespace Magnus_WPF_1.Source.Application
 
             _Step_4:
                 nCurrentSequenceStep = 4;
-                if (m_bMachineNotReadyNeedToReset)
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
+                });
+
+                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus > 0)
                     return;
                 MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection);
 
@@ -1179,16 +1212,11 @@ namespace Magnus_WPF_1.Source.Application
 
                 while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.AIR_PRESSURESTATUS) == 0)
                 {
-                    if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection)
+                    if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || m_EndLotStatus > 0)
                     {
                         return;
                     }
 
-                    if (MainWindow.mainWindow.bNextStepSimulateSequence)
-                    {
-                        MainWindow.mainWindow.bNextStepSimulateSequence = false;
-                        break;
-                    }
                     nCountSleep++;
                     if (nCountSleep > 300)
                     {
@@ -1196,10 +1224,15 @@ namespace Magnus_WPF_1.Source.Application
                         m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_AIR_PRESS_RESULT, -1);
                         HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
                         HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
-                        WaitForNextStepSequenceEvent("Air Pressure got problem. End Sequence...",true);
 
+                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+
+                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Air Pressure got problem!", (int)ERROR_CODE.LABEL_FAIL);
+                        });
+
+                        //WaitForNextStepSequenceEvent("Air Pressure got problem!",true);
                         return;
-
                     }
                     Thread.Sleep(10);
                 }
@@ -1213,14 +1246,20 @@ namespace Magnus_WPF_1.Source.Application
 
             _Step_5:
                 nCurrentSequenceStep = 5;
-                if (m_bMachineNotReadyNeedToReset)
+
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
+                });
+
+                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus > 0)
                     return;
                 // Move To Pass fail position
                 //nCamera1InspectionResult = (int)ERROR_CODE.PASS;
                 string strPrePosition;
                 if (nCamera1InspectionResult == -(int)ERROR_CODE.PASS)
                     strPrePosition = SequencePointData.PRE_PASS_PLACE_POSITION;
-                else if(nCamera1InspectionResult == -(int)ERROR_CODE.OPPOSITE_CHIP)
+                else if (nCamera1InspectionResult == -(int)ERROR_CODE.OPPOSITE_CHIP)
                     strPrePosition = SequencePointData.PRE_FAILED_BLACK_PLACE_POSITION;
                 else
                     strPrePosition = SequencePointData.PRE_FAILED_PLACE_POSITION;
@@ -1229,7 +1268,6 @@ namespace Magnus_WPF_1.Source.Application
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Move To Pass fail position ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
 
                 MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(strPrePosition);
-                LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
                 // Sleep 200ms to make sure the robot outside of camera region
                 //Thread.Sleep(200);
@@ -1251,7 +1289,13 @@ namespace Magnus_WPF_1.Source.Application
 
             _Step_6:
                 nCurrentSequenceStep = 6;
-                if (m_bMachineNotReadyNeedToReset)
+
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
+                });
+
+                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus > 0)
                     return;
 
 
@@ -1280,21 +1324,39 @@ namespace Magnus_WPF_1.Source.Application
 
                 _Step_7:
                 nCurrentSequenceStep = 7;
-                if (m_bMachineNotReadyNeedToReset)
+
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
+                });
+
+                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus > 0)
                     return;
                 // Wait For PLC 2 Ready
                 //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_ROBOT_RESULT, nCamera1InspectionResult);
 
 
-                if (nCamera1InspectionResult == (int)ERROR_CODE.PASS)
+                if (nCamera1InspectionResult == -(int)ERROR_CODE.PASS)
                 {
                     HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_PLACE_DONE, false);
                     LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
                     while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_ALLOW_TO_PLACE) == 0)
                     {
-                        if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection)
+                        if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || m_EndLotStatus > 0)
                         {
                             return;
+                        }
+
+                        if (m_RunMachineStatus == 1)
+                        {
+
+                            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+
+                                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("PLC Button Run is pressed. Restarting the sequence....", (int)ERROR_CODE.LABEL_FAIL);
+                            });
+                            Thread.Sleep(3000);
+                            goto _Start_Lot;
                         }
                     }
                 }
@@ -1309,7 +1371,12 @@ namespace Magnus_WPF_1.Source.Application
                 _Step_8:
                 nCurrentSequenceStep = 8;
 
-                if (m_bMachineNotReadyNeedToReset)
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
+                });
+
+                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus > 0)
                     return;
                 /////////////////Step 9: put device to the tray (turn off vaccum)
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
@@ -1317,17 +1384,10 @@ namespace Magnus_WPF_1.Source.Application
                 Thread.Sleep(50);
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
-
-
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Last Chip Status: {IsLastChipStatus}");
-
-
-
-
-
                 //End 30 End sequencd if pass
 
-                if (nCamera1InspectionResult == (int)ERROR_CODE.PASS)
+                if (nCamera1InspectionResult == -(int)ERROR_CODE.PASS)
                 {
                     if (IsLastChipStatus > 0)
                     {
@@ -1335,12 +1395,29 @@ namespace Magnus_WPF_1.Source.Application
                         LogMessage.LogMessage.WriteToDebugViewer(9, $" Check Last Chip Status to Move or wait: {IsLastChipStatus}");
                         HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_PLACE_DONE, true);
 
-                        return;
+                        if (MainWindow.mainWindow.m_bSequenceRunning)
+                        {
+                            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+
+                                // Update Statistics
+                                //if (m_Tracks[1].m_CurrentSequenceDeviceID == 0)
+                                //    MainWindow.mainWindow.m_staticView.ResetMappingResult(1);
+
+                                LogMessage.LogMessage.WriteToDebugViewer(9, $"Robot Sequence: Update result");
+                                visionResultDataTemp.m_nResult = nCamera1InspectionResult;
+                                MainWindow.mainWindow.m_staticView.UpdateMappingResult(m_Tracks[0].m_InspectionOnlineThreadVisionResult, 0, m_Tracks[0].m_CurrentSequenceDeviceID);
+                                MainWindow.mainWindow.m_staticView.UpdateValueStatistic(nCamera1InspectionResult, 0);
+                                LogMessage.LogMessage.WriteToDebugViewer(9, $"Robot Sequence: Update result Done. Device {m_Tracks[0].m_CurrentSequenceDeviceID + 1}");
+                            });
+                        }
+
+                        goto _Start_Lot;
                     }
 
                     //get Chip signal at end 29
-                        IsLastChipStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_LAST_CHIP);
-                        HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_PLACE_DONE, true);
+                    IsLastChipStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_LAST_CHIP);
+                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_PLACE_DONE, true);
 
                     //PLC start trigger last chip at begin 29
                 }
@@ -1361,14 +1438,25 @@ namespace Magnus_WPF_1.Source.Application
                 _Step_9:
                 nCurrentSequenceStep = 9;
 
-                if (m_bMachineNotReadyNeedToReset)
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
+                });
+
+                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus > 0)
                     return;
 
 
 
                 _Step_10:
                 nCurrentSequenceStep = 10;
-                if (m_bMachineNotReadyNeedToReset)
+
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
+                });
+
+                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus > 0)
                     return;
                 // Move to ready position and turn off vaccum
 
@@ -1391,6 +1479,11 @@ namespace Magnus_WPF_1.Source.Application
             _Step_11:
                 nCurrentSequenceStep = 11;
 
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
+                });
+
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
 
@@ -1407,9 +1500,9 @@ namespace Magnus_WPF_1.Source.Application
 
                         LogMessage.LogMessage.WriteToDebugViewer(9, $"Robot Sequence: Update result");
                         visionResultDataTemp.m_nResult = nCamera1InspectionResult;
-                        MainWindow.mainWindow.m_staticView.UpdateMappingResult(m_Tracks[0].m_CurrentVisionResultData, 0, m_Tracks[0].m_CurrentSequenceDeviceID);
+                        MainWindow.mainWindow.m_staticView.UpdateMappingResult(m_Tracks[0].m_InspectionOnlineThreadVisionResult, 0, m_Tracks[0].m_CurrentSequenceDeviceID);
                         MainWindow.mainWindow.m_staticView.UpdateValueStatistic(nCamera1InspectionResult, 0);
-                        LogMessage.LogMessage.WriteToDebugViewer(9, $"Robot Sequence: Update result Done");
+                        LogMessage.LogMessage.WriteToDebugViewer(9, $"Robot Sequence: Update result Done. Device {m_Tracks[0].m_CurrentSequenceDeviceID + 1}");
                     });
                 }
 
@@ -1447,6 +1540,10 @@ namespace Magnus_WPF_1.Source.Application
                     switch (nError)
                     {
                         case (int)SEQUENCE_OPTION.SEQUENCE_ABORT:
+                            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
+                            });
                             return;
 
                         case (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE:
@@ -1468,10 +1565,16 @@ namespace Magnus_WPF_1.Source.Application
                             break;
                     }
 
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
+                    });
+
+
                     switch (nCurrentSequenceStep)
                     {
                         case 0:
-                            goto _Step_0;
+                            goto _Step_1;
                         case 1:
                             goto _Step_1;
                         case 2:
@@ -1501,8 +1604,6 @@ namespace Magnus_WPF_1.Source.Application
             }
 
         }
-
-
         public int func_CameraTriggerThread(int nCurrentSequenceStep = -1, int nTrack = 0)
         {
             //int nError;
@@ -1525,8 +1626,6 @@ namespace Magnus_WPF_1.Source.Application
             m_hardwareTriggerSnapEvent[0].Set();
             return 0;
         }
-
-
         internal void BarcodeReaderSequenceThread()
         {
 
@@ -1567,7 +1666,7 @@ namespace Magnus_WPF_1.Source.Application
 
         void BarcodeReaderSequence()
         {
-        //startBarcodeSequence:
+            //startBarcodeSequence:
             HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_PASS, false);
             HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_FAIL, false);
             //int nTimeout = 0;
@@ -1637,7 +1736,7 @@ namespace Magnus_WPF_1.Source.Application
 
                     });
                     Thread.Sleep(100);
-                    continue ;
+                    continue;
 
                 }
 
@@ -1676,30 +1775,30 @@ namespace Magnus_WPF_1.Source.Application
 
                 m_hardwareTriggerSnapEvent[1].Set();
                 LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Waiting for vision done.... ");
-                int nVisionResult = m_Tracks[1].m_CurrentVisionResultData.m_nResult;
+                int nVisionResult = m_Tracks[1].m_SequenceThreadVisionResult.m_nResult;
                 if (!VisionReadyEvent[1].WaitOne(1500))
                 {
                     if (MainWindow.mainWindow == null)
                         return;
-                        m_hardwareTriggerSnapEvent[1].Reset();
-                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                        {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Reader: TIME OUT!", (int)ERROR_CODE.LABEL_FAIL);
+                    m_hardwareTriggerSnapEvent[1].Reset();
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Reader: TIME OUT!", (int)ERROR_CODE.LABEL_FAIL);
 
-                        });
-                        //VisionReadyEvent[1].Reset();
-                        //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_RESULT, -1);
-                        //HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT, true);
-                        //Thread.Sleep(1000);
-                        //HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY, false);
-                        RunOnlineSequenceThread(1);
+                    });
+                    //VisionReadyEvent[1].Reset();
+                    //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_RESULT, -1);
+                    //HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT, true);
+                    //Thread.Sleep(1000);
+                    //HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY, false);
+                    RunOnlineSequenceThread(1);
                     //goto startBarcodeSequence;
                     nVisionResult = -(int)ERROR_CODE.CAPTURE_FAIL;
                 }
                 else
-                    nVisionResult = m_Tracks[1].m_CurrentVisionResultData.m_nResult;
+                    nVisionResult = m_Tracks[1].m_InspectionOnlineThreadVisionResult.m_nResult;
 
-                m_Tracks[1].m_VisionResultDatas[nDeviceID] = m_Tracks[1].m_CurrentVisionResultData;
+                m_Tracks[1].m_VisionResultDatas[nDeviceID] = m_Tracks[1].m_InspectionOnlineThreadVisionResult;
                 m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = nVisionResult;
                 if (m_EmergencyStatus > 0)
                 {
@@ -1743,28 +1842,19 @@ namespace Magnus_WPF_1.Source.Application
                         // Update Statistics
                         //if (m_Tracks[1].m_CurrentSequenceDeviceID == 0)
                         //    MainWindow.mainWindow.m_staticView.ResetMappingResult(1);
-                        m_Tracks[1].m_VisionResultDatas[nDeviceID] = m_Tracks[1].m_CurrentVisionResultData;
+                        m_Tracks[1].m_VisionResultDatas[nDeviceID] = m_Tracks[1].m_InspectionOnlineThreadVisionResult;
                         m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = nVisionResult;
 
                         LogMessage.LogMessage.WriteToDebugViewer(8, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-                            MainWindow.mainWindow.m_staticView.UpdateMappingResult(m_Tracks[1].m_VisionResultDatas[nDeviceID], 1, nDeviceID);
-                            LogMessage.LogMessage.WriteToDebugViewer(8, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-                            MainWindow.mainWindow.m_staticView.UpdateValueStatistic(nVisionResult, 1);
+                        MainWindow.mainWindow.m_staticView.UpdateMappingResult(m_Tracks[1].m_VisionResultDatas[nDeviceID], 1, nDeviceID);
+                        LogMessage.LogMessage.WriteToDebugViewer(8, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+                        MainWindow.mainWindow.m_staticView.UpdateValueStatistic(nVisionResult, 1);
 
                     });
 
                     if (nVisionResult == (int)ERROR_CODE.PASS)
                         m_Tracks[1].m_CurrentSequenceDeviceID++;
                 }
-                //LogMessage.LogMessage.WriteToDebugViewer(8, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-                //m_Tracks[1].m_CurrentPLCRegisterDeviceID = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_CURRENT_BARCODE_CHIP_COUNT);
-                //if (m_Tracks[1].m_CurrentPLCRegisterDeviceID < 0 || m_Tracks[1].m_CurrentPLCRegisterDeviceID >= Application.categoriesMappingParam.M_NumberDevicePerLot)
-                //    m_Tracks[1].m_CurrentSequenceDeviceID++;
-                //else
-                //    m_Tracks[1].m_CurrentSequenceDeviceID = m_Tracks[1].m_CurrentPLCRegisterDeviceID;
-
-                //LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Read Chip Count from PLC {(int)PLCCOMM.PLC_ADDRESS.PLC_CURRENT_BARCODE_CHIP_COUNT}  . Number: {m_Tracks[1].m_CurrentPLCRegisterDeviceID } ");
-                //Application.SetIntRegistry(Application.m_strCurrentDeviceID_Registry[1], m_Tracks[1].m_CurrentSequenceDeviceID);
                 LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Scan Done!");
 
             }
@@ -1790,26 +1880,26 @@ namespace Magnus_WPF_1.Source.Application
                     if (data.imageSave == null)
                         continue;
 
+                    string strDeviceIDTime = string.Format("{0}{1}{2}+{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
 
                     //string strLotIDFolder = Path.Combine(Application.pathImageSave, data.strLotID + "\\");
-
-                    string strPassFolder = Path.Combine(Application.pathImageSave, "PASS IMAGE", "Camera", data.strLotID);
+                    string strDay = string.Format("{0}{1}{2}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"));
+                    string strPassFolder = Path.Combine(Application.pathImageSave,"Camera",Application.currentRecipe, strDay, data.strLotID, "PASS IMAGE");
                     if (!Directory.Exists(strPassFolder))
                         Directory.CreateDirectory(strPassFolder);
-                    string path_image = Path.Combine(strPassFolder, $"Device_{data.nDeviceID + 1}" + ".bmp");
+                    string path_image = Path.Combine(strPassFolder, $"{strDeviceIDTime}_{data.nDeviceID + 1}" + ".bmp");
 
-                    string strFailFolder = Path.Combine(Application.pathImageSave, "FAIL IMAGE", "Camera", data.strLotID);
+                    string strFailFolder = Path.Combine(Application.pathImageSave, "Camera", Application.currentRecipe, strDay, data.strLotID, "FAIL IMAGE");
                     if (!Directory.Exists(strFailFolder))
                         Directory.CreateDirectory(strFailFolder);
 
 
 
-                    //if (m_FailstrLotIDFolder != strLotIDFolder)
-                    //{
-                    //    nFailCount = 0;
-                    //}
+                    if (m_FailstrLotIDFolder != strPassFolder)
+                    {
+                        nFailCount = 0;
+                    }
 
-                    //string strDeviceIDTime = string.Format("{0}{1}{2}+{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
 
                     //string strPassFail = "PASS";
                     //m_FailstrLotIDFolder = strPassFolder;
@@ -1818,9 +1908,7 @@ namespace Magnus_WPF_1.Source.Application
                     if (data.nResult != -(int)ERROR_CODE.PASS)
                     {
                         //nFailCount++;
-                        path_image = Path.Combine(strFailFolder, $"Device_{data.nDeviceID + 1}" + ".bmp");
-
-
+                        path_image = Path.Combine(strFailFolder, $"{strDeviceIDTime}_{nFailCount + 1}" + ".bmp");
                     }
 
                     //string pathTemp = path_image;

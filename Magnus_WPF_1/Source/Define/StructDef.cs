@@ -4,6 +4,7 @@ using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 
@@ -199,8 +200,15 @@ namespace Magnus_WPF_1.Source.Define
 
             try
             {
+                string strDay = Application.Application.m_strStartLotDay;
+
                 string[] strTrackName = { "Camera", "Barcode" };
-                string strRecipePath = Path.Combine(Application.Application.pathStatistics, Application.Application.currentRecipe, strTrackName[nTrack]);
+                string strRecipePath = Path.Combine(
+                    Application.Application.pathStatistics,  
+                    Application.Application.currentRecipe,
+                    Application.Application.m_strStartLotDay,                  
+                    strTrackName[nTrack]);
+
 
                 LogMessage.LogMessage.WriteToDebugViewer(7+ nTrack, "Save 1!");
 
@@ -208,20 +216,16 @@ namespace Magnus_WPF_1.Source.Define
                     Directory.CreateDirectory(strRecipePath);
 
                 LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, "Save 2!");
-
                 string fullpath = Path.Combine(strRecipePath, $"{strLotID}.xlsx");
 
-                //string strDateTime = string.Format("({0}.{1}.{2}_{3}.{4}.{5})", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
-                //string backup_path = Path.Combine(strRecipePath, "Backup_Robot Points");
-                //if (!Directory.Exists(backup_path))
-                //    Directory.CreateDirectory(backup_path);
-
-                //string backup_fullpath = Path.Combine(backup_path, $"Robot Points {strDateTime}" + ".cfg");
 
                 FileInfo file = new FileInfo(fullpath);
 
                 if (!file.Exists)
+                {
                     file.Create();
+                    Thread.Sleep(200);
+                }
 
                 //file.CopyTo(backup_fullpath);
                 LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, "Save 3!");
@@ -290,6 +294,7 @@ namespace Magnus_WPF_1.Source.Define
 
         public static void ReadLotResultFromExcel(string strLotID, int nTrack, ref VisionResultData[] result, ref int nCurrentDeviceID)
         {
+            nCurrentDeviceID = 0;
             string[] strTrackName = { "Camera", "Barcode" };
             string strRecipePath = Path.Combine(Application.Application.pathStatistics, Application.Application.currentRecipe, strTrackName[nTrack]);
             if (!Directory.Exists(strRecipePath))
@@ -299,13 +304,20 @@ namespace Magnus_WPF_1.Source.Define
 
             FileInfo file = new FileInfo(fullpath);
             if (!file.Exists)
+            {
                 file.Create();
+            }
+
 
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Use NonCommercial license if applicable
             using (ExcelPackage package = new ExcelPackage(file))
             {
                 if (package.Workbook.Worksheets.Count == 0)
+                {
+                    package.Dispose();
                     return;
+                }
+                
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
                 worksheet.DefaultColWidth = 35;
                 worksheet.DefaultRowHeight = 35;

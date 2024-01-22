@@ -70,7 +70,8 @@ namespace Magnus_WPF_1.UI.UserControls
             btn_Sequence_Previous.Visibility = Visibility.Collapsed;
             btn_Sequence_Next.Visibility = Visibility.Collapsed;
 
-
+            btn_Retry_Current_Step.Visibility = Visibility.Collapsed;
+            btn_Retry_Current_Step.IsEnabled = false;
 
             switch (warningtype)
                 {
@@ -90,13 +91,18 @@ namespace Magnus_WPF_1.UI.UserControls
 
                     btn_Sequence_Abort.IsEnabled = true;
                     btn_Sequence_Abort.Visibility = Visibility.Visible;
+
+                    btn_Retry_Current_Step.Visibility = Visibility.Visible;
+                    btn_Retry_Current_Step.IsEnabled = true;
+
+
                     break;
 
                 case WARNINGMESSAGE.MESSAGE_STEPDEBUG:
-                    btn_Sequence_Previous.IsEnabled = true;
+                    //btn_Sequence_Previous.IsEnabled = true;
                     btn_Sequence_Next.IsEnabled = true;
 
-                    btn_Sequence_Previous.Visibility = Visibility.Visible;
+                    //btn_Sequence_Previous.Visibility = Visibility.Visible;
                     btn_Sequence_Next.Visibility = Visibility.Visible;
 
                     btn_Sequence_Abort.IsEnabled = true;
@@ -108,6 +114,10 @@ namespace Magnus_WPF_1.UI.UserControls
 
                     btn_Sequence_Continue.IsEnabled = true;
                     btn_Sequence_Continue.Visibility = Visibility.Visible;
+
+                    btn_Sequence_Abort.IsEnabled = true;
+                    btn_Sequence_Abort.Visibility = Visibility.Visible;
+
                     break;
 
 
@@ -118,21 +128,39 @@ namespace Magnus_WPF_1.UI.UserControls
         private void btn_Sequence_Continue_Click(object sender, RoutedEventArgs e)
         {
 
+            ContinueSequenceButtonClicked(_m_warningMessage);
+
+        }
+
+        public void ContinueSequenceButtonClicked(WARNINGMESSAGE nWarningMessges)
+        {
+
             if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
                 return;
 
+            MainWindow.mainWindow.master.m_bNeedToImidiateStop = false;
             Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
-            Master.m_NextStepSequenceEvent.Set();
-            if (_m_warningMessage == WARNINGMESSAGE.MESSAGE_IMIDIATESTOP)
-            {
-                MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE;
-                MainWindow.mainWindow.master.m_bNeedToImidiateStop = false;
-            }
-            else
-                MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
 
+            MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
+            Master.m_NextStepSequenceEvent.Set();
 
             MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
+
+            //if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
+            //    return;
+
+            //Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
+            //if (nWarningMessges == WARNINGMESSAGE.MESSAGE_IMIDIATESTOP)
+            //{
+            //    MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE;
+            //    MainWindow.mainWindow.master.m_bNeedToImidiateStop = false;
+            //}
+            //else
+            //    MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
+
+
+            //MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
+            //Master.m_NextStepSequenceEvent.Set();
 
         }
 
@@ -179,7 +207,10 @@ namespace Magnus_WPF_1.UI.UserControls
             if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
                 return;
 
-            MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_RETRY;
+            MainWindow.mainWindow.master.m_bNeedToImidiateStop = false;
+            Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
+
+            MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
             Master.m_NextStepSequenceEvent.Set();
 
             MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);

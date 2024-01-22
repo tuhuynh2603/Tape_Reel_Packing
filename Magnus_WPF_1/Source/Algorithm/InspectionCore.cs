@@ -690,6 +690,11 @@ namespace Magnus_WPF_1.Source.Algorithm
 
             CvImage zoomedInImage = new CvImage((int)(imgSource.Height * m_DeviceLocationParameter.m_L_ScaleImageRatio), (int)(imgSource.Width * m_DeviceLocationParameter.m_L_ScaleImageRatio), DepthType.Cv8U, 3);
             CvInvoke.Resize(imgSource, zoomedInImage, new System.Drawing.Size(zoomedInImage.Width, zoomedInImage.Height));
+
+            CvImage blurredImage = new CvImage();
+            CvInvoke.GaussianBlur(zoomedInImage, blurredImage, new Size(5, 5), 0);
+
+
             CvImage zoomedInImage_Scale = new CvImage((int)(imgSource.Height * m_DeviceLocationParameter.m_L_ScaleImageRatio), (int)(imgSource.Width * m_DeviceLocationParameter.m_L_ScaleImageRatio), DepthType.Cv8U, 3);
             CvImage img_thresholdRegion = new CvImage();
             CvImage img_BiggestRegion = new CvImage();
@@ -713,7 +718,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             if (m_DeviceLocationParameter.m_L_ThresholdType.GetHashCode() == (int)THRESHOLD_TYPE.BINARY_THRESHOLD)
             {
 
-                MagnusOpenCVLib.Threshold2(ref zoomedInImage, ref img_thresholdRegion, m_DeviceLocationParameter.m_L_lowerThreshold, m_DeviceLocationParameter.m_L_upperThreshold);
+                MagnusOpenCVLib.Threshold2(ref blurredImage, ref img_thresholdRegion, m_DeviceLocationParameter.m_L_lowerThreshold, m_DeviceLocationParameter.m_L_upperThreshold);
                 PushBackDebugInfors(imgSource, img_thresholdRegion, "img_thresholdRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
                 timeIns.Restart();
 
@@ -725,7 +730,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             else//if (m_DeviceLocationParameter.m_L_ThresholdType.GetHashCode() == (int)THRESHOLD_TYPE.VAR_THRESHOLD)
             {
                 //CvImage region_VarThreshold = new CvImage();
-                MagnusOpenCVLib.VarThresholding(ref zoomedInImage, ref img_thresholdRegion, (int)m_DeviceLocationParameter.m_L_ObjectColor, 2 * ((int)(m_DeviceLocationParameter.m_L_MinWidthDevice / 10)) + 3, ref region_SearchDeviceLocation, m_DeviceLocationParameter.m_L_upperThreshold);
+                MagnusOpenCVLib.VarThresholding(ref blurredImage, ref img_thresholdRegion, (int)m_DeviceLocationParameter.m_L_ObjectColor, 2 * ((int)(m_DeviceLocationParameter.m_L_MinWidthDevice / 10)) + 3, ref region_SearchDeviceLocation, m_DeviceLocationParameter.m_L_upperThreshold);
                 PushBackDebugInfors(imgSource, img_thresholdRegion, "VarThresholding. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
                 timeIns.Restart();
             }
@@ -768,6 +773,14 @@ namespace Magnus_WPF_1.Source.Algorithm
                 PushBackDebugInfors(imgSource, mat_FillUpBlackRegion, "Outer region after FillUp Select Region. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
                 timeIns.Restart();
 
+                // Add offset Outer = 3
+                int nInnerOffset = 5;
+                CvImage mat_OffsetOuterRegion = new CvImage();
+                MagnusOpenCVLib.ErosionCircle(ref mat_FillUpBlackRegion, ref mat_OffsetOuterRegion, nInnerOffset);
+                PushBackDebugInfors(imgSource, mat_OffsetOuterRegion, "Outer region after offset. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                timeIns.Restart();
+
+
                 //////////////////////////////////////////////////
                 ////  segment single chip region
                 CvImage img_thresholdInnerRegion = new CvImage();
@@ -775,7 +788,7 @@ namespace Magnus_WPF_1.Source.Algorithm
                 PushBackDebugInfors(imgSource, img_thresholdInnerRegion, "Inner threshold Region. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
                 timeIns.Restart();
                 CvImage mat_InnerChipRegion = new CvImage();
-                CvInvoke.BitwiseAnd(img_thresholdInnerRegion, mat_FillUpBlackRegion, mat_InnerChipRegion);
+                CvInvoke.BitwiseAnd(img_thresholdInnerRegion, mat_OffsetOuterRegion, mat_InnerChipRegion);
                 PushBackDebugInfors(imgSource, mat_InnerChipRegion, "Inner threshold region after Intersection with Black FillUp Region (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
                 timeIns.Restart();
 
@@ -947,7 +960,7 @@ namespace Magnus_WPF_1.Source.Algorithm
             }
 
             if ((nErrorTemp != -(int)ERROR_CODE.PASS) && m_blackChipParameter.m_OC_EnableCheck)
-            { 
+            {
                 // Black Chip
                 PointF pCenterBlackChip = new PointF(0, 0);
                 int nErrorBlackChip = -(int)ERROR_CODE.PASS;
@@ -970,7 +983,12 @@ namespace Magnus_WPF_1.Source.Algorithm
                         nErrorTemp = -(int)ERROR_CODE.OPPOSITE_CHIP;
                     }
                 }
+                else if (nErrorBlackChip == -(int)ERROR_CODE.OPPOSITE_CHIP)
+                {
+                    pCenter = pCenterBlackChip;
+                    nErrorTemp = -(int)ERROR_CODE.OPPOSITE_CHIP;
 
+                }
             }
 
             CvImage mat_point = new CvImage();
@@ -1050,8 +1068,14 @@ namespace Magnus_WPF_1.Source.Algorithm
             PushBackDebugInfors(imgSourceInput, mat_CornerChipRegion, "Corner Chip Region after sub inner region and inner rect. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
 
+            // Need add Offset Inner
+            int nInnerOffset = -3;
             CvImage rec_regionChipFillup_Offset = new CvImage();
-            MagnusOpenCVLib.ErodeRectangle(ref rec_regionChipFillup, ref rec_regionChipFillup_Offset, 5, 5);
+            if(nInnerOffset > 0)
+                MagnusOpenCVLib.ErodeRectangle(ref rec_regionChipFillup, ref rec_regionChipFillup_Offset, Math.Abs(nInnerOffset), Math.Abs(nInnerOffset));
+            else
+                MagnusOpenCVLib.DilationRectangle(ref rec_regionChipFillup, ref rec_regionChipFillup_Offset, Math.Abs(nInnerOffset), Math.Abs(nInnerOffset));
+
             PushBackDebugInfors(imgSourceInput, rec_regionChipFillup_Offset, "Rectangle Chip after offset 5 pixel. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
             timeIns.Restart();
             CvInvoke.BitwiseAnd(rec_regionChipFillup_Offset, mat_CornerChipRegion, mat_CornerChipRegion);
@@ -1164,15 +1188,22 @@ namespace Magnus_WPF_1.Source.Algorithm
 
 
 
-            AddRegionOverlay(ref list_arrayOverlay, shiftRegion, Colors.DarkCyan);
 
 
             timeIns.Stop();
             int nBoxSize = (int)(m_SurfaceDefectParameter[nPVIAreaIndex].m_DR_DefectROILocations.Width * dScale * m_SurfaceDefectParameter[nPVIAreaIndex].m_DR_DefectROILocations.Height * dScale);
             if (nArea < nBoxSize * m_SurfaceDefectParameter[nPVIAreaIndex].m_LD_ObjectCoverPercent / 100.0)
+            {
                 nResultOutput = -(int)ERROR_CODE.LABEL_FAIL;
+                AddRegionOverlay(ref list_arrayOverlay, shiftRegion, Colors.Red);
+
+            }
             else
+            {
                 nResultOutput = -(int)ERROR_CODE.PASS;
+                AddRegionOverlay(ref list_arrayOverlay, shiftRegion, Colors.Green);
+            }
+                
 
         }
         public int Calibration_Get3Points(CvImage imgSourceInput, out PointF[] points, ref List<ArrayOverLay> list_arrayOverlay)

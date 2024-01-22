@@ -32,11 +32,22 @@
             </ScrollViewer>
 
             <Grid  Grid.Row="1">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Background="Gray">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center" Background="Gray">
                     <Button x:Name="btn_Previous_Page" Click="btn_Previous_Page_Click" Content="-" Width="30" FontSize="18" Background="Transparent"></Button>
                     <TextBlock x:Name="text_Current_Page" Text="1" FontSize="20" 
                                                    TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" Foreground="White" Background="Gray"></TextBlock>
                     <Button x:Name="btn_Next_Page" Click="btn_Next_Page_Click"  Content="+" Width="30" FontSize="18" Background="Transparent"></Button>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Background="Gray">
+                    <Button x:Name="btn_Previous_Page2" Click="btn_Previous_Page2_Click"  Content="-" Width="30" FontSize="18" Background="Transparent"></Button>
+                    <TextBlock x:Name="text_Current_Page2" Text="1" FontSize="20" 
+                                                   TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" Foreground="White" Background="Gray"></TextBlock>
+                    <Button x:Name="btn_Next_Page2" Click="btn_Next_Page2_Click"  Content="+" Width="30" FontSize="18" Background="Transparent"></Button>
                 </StackPanel>
             </Grid>
 
@@ -104,7 +115,7 @@
                                                 HorizontalAlignment="Right"
                                                 TextAlignment="Right"
                                                 VerticalAlignment="Center"
-                                                Text="Camera2"
+                                                Text="Barcode"
                                                 TextWrapping="Wrap"
                                                 Foreground="White">
                                         </TextBlock>

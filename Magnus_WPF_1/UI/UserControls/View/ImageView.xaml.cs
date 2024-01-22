@@ -826,7 +826,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
             byte red = bufferImage[index < 0 ? 0 : index > size - 1 ? 0 : index];   // index overside
             ((MainWindow)(System.Windows.Application.Current.MainWindow)).UpdateGrayValue(trackID,
-                                                                            "[" + diX.ToString() + ", " + diY.ToString() + "]" + " Robot[" + robotPoint.X.ToString() + ", " + robotPoint.Y.ToString() + "]" ,
+                                                                            "[" + diX.ToString() + ", " + diY.ToString() + "]" + " Robot[" + ((int)robotPoint.X).ToString() + ", " + ((int)robotPoint.Y).ToString() + "]" ,
                                                                             "[" + red.ToString() + "]");
             //}
         }

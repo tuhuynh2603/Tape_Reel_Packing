@@ -359,13 +359,11 @@ namespace Magnus_WPF_1
                 {
                     m_staticView.UpdateMappingResult(master.m_Tracks[nT].m_VisionResultDatas[n], nT, n);
                     m_staticView.UpdateValueStatistic(master.m_Tracks[nT].m_VisionResultDatas[n].m_nResult, nT);
-
                 }
         }
         public void Run_Sequence(int nTrack = (int)TRACK_TYPE.TRACK_ALL)
         {
 
-            m_staticView.ClearStatistic();
             master.BarcodeReaderSequenceThread();
             master.m_bRobotSequenceStatus = master.RobotSequenceThread();
 
@@ -374,6 +372,7 @@ namespace Magnus_WPF_1
                 ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Machine is running. Please Stop it and try again!", (int)ERROR_CODE.LABEL_FAIL);
                 return;
             }
+            m_staticView.ClearStatistic();
 
             btn_run_sequence.IsChecked = true;
             m_bSequenceRunning = (bool)btn_run_sequence.IsChecked;
@@ -602,6 +601,7 @@ namespace Magnus_WPF_1
             }
             else
             {
+
                 layoutVision.ReplaceChild(tempPanelZoomView, tempDefaultPanelHomeView);
             }
 
@@ -687,21 +687,14 @@ namespace Magnus_WPF_1
             int currentTabIndex = tab_controls.SelectedIndex;
             //tt_DialogSettings.X = 0;
             //tt_DialogSettings.Y = 0;
+            grd_Dialog_Settings.Margin = new Thickness(0, 160, 0, 0);
+            grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Top;
+            grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Left;
 
             grd_PopupDialog.Children.Clear();
             if(master.m_Tracks[0].m_hIKControlCameraView != null)
                 grd_PopupDialog.Children.Add(master.m_Tracks[0].m_hIKControlCameraView);
 
-            grd_Dialog_Settings.Margin = new Thickness(0, 160, 0, 0);
-            grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Top;
-            grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Left;
-            //master.teachParameter.Width = 300;
-            //master.teachParameter.Height = 600;
-            //master.m_Tracks[0].m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autofocus, 1);
-
-            //grd_PopupDialog.Children.Add(master.teachParameter);
-            //grd_PopupDialog.Children.Add(master.m_Tracks[]);
-            //tab_controls.SelectedIndex = currentTabIndex;
             grd_PopupDialog.Visibility = Visibility.Visible;
             grd_Dialog_Settings.Visibility = Visibility.Visible;
 
@@ -733,13 +726,13 @@ namespace Magnus_WPF_1
         public void UpdateGrayValue(int trackID, string pos, string valueGray)
         {
             master.m_Tracks[trackID].m_imageViews[0].tbl_Pos.Text = pos;
-            master.m_Tracks[trackID].m_imageViews[0].tbl_Value.Text = "[None]";
+            //master.m_Tracks[trackID].m_imageViews[0].tbl_Value.Text = "[None]";
             master.m_Tracks[trackID].m_imageViews[0].tbl_Value_gray.Text = valueGray;
         }
         public void UpdateRGBValue(string pos, string valueRGB, string valueGray)
         {
             master.m_Tracks[0].m_imageViews[0].tbl_Pos.Text = pos;
-            master.m_Tracks[0].m_imageViews[0].tbl_Value.Text = valueRGB;
+            //master.m_Tracks[0].m_imageViews[0].tbl_Value.Text = valueRGB;
             master.m_Tracks[0].m_imageViews[0].tbl_Value_gray.Text = valueGray;
         }
         private void btn_save_current_image_Click(object sender, RoutedEventArgs e)
@@ -1294,7 +1287,7 @@ namespace Magnus_WPF_1
             grd_Dialog_Settings.Width = master.m_plcComm.Width;
             grd_Dialog_Settings.Height = master.m_plcComm.Height;
 
-            m_nPLCGridViewIndex = grd_PopupDialog.Children.Count;
+            //m_nPLCGridViewIndex = grd_PopupDialog.Children.Count;
             grd_PopupDialog.Children.Clear();
             grd_PopupDialog.Children.Add(master.m_plcComm);
             grd_PopupDialog.Visibility = Visibility.Visible;
@@ -1377,7 +1370,7 @@ namespace Magnus_WPF_1
             {
                 if (bShow)
                 {
-                    int nResult = master.m_Tracks[trackID].m_CurrentVisionResultData.m_nResult;
+                    int nResult = master.m_Tracks[trackID].m_InspectionOnlineThreadVisionResult.m_nResult;
                     master.m_Tracks[trackID].DrawInspectionResult(ref nResult, ref master.m_Tracks[trackID].m_Center_Vision, ref master.m_Tracks[trackID].m_dDeltaAngleInspection);
                 }
                 else

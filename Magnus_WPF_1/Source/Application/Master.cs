@@ -62,7 +62,7 @@ namespace Magnus_WPF_1.Source.Application
         public Thread m_TeachThread;
         public Thread[] m_SaveInspectImageThread;
         public Thread[] m_StartWaitPLCReadyToTriggerCameraThread;
-
+        public Thread m_UpdateMappingUIThread;
         public Thread m_IOStatusThread;
 
         public static List<ArrayOverLay>[] list_arrayOverlay;
@@ -789,13 +789,13 @@ namespace Magnus_WPF_1.Source.Application
                         Thread.Sleep(250);
                         lock (MainWindow.mainWindow.master.m_Tracks[0])
                         {
-                            MainWindow.mainWindow.LoadStatistic(0);
+                            MainWindow.mainWindow.LoadStatistic(0,true);
                         }
                         Thread.Sleep(250);
 
                         lock (MainWindow.mainWindow.master.m_Tracks[1])
                         {
-                            MainWindow.mainWindow.LoadStatistic(1);
+                            MainWindow.mainWindow.LoadStatistic(1,true);
                         }
                         Thread.Sleep(250);
 
@@ -902,8 +902,7 @@ namespace Magnus_WPF_1.Source.Application
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
                 ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Run Sequence Thead...", (int)ERROR_CODE.LABEL_FAIL);
-                MainWindow.mainWindow.LoadStatistic(0);
-
+                //MainWindow.mainWindow.LoadStatistic(0,true);
             });
 
 

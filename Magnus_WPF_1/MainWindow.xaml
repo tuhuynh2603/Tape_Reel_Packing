@@ -965,7 +965,6 @@
 
             <Grid x:Name="grd_PopupDialog" SizeChanged="GridSettingChangedSize"></Grid>
             <Grid x:Name="grd_CameraPopupDialog" SizeChanged="GridSettingChangedSize"></Grid>
-            <Grid x:Name="grd_popup_WarningMessageBox"  SizeChanged="GridSettingChangedSize"></Grid>
             <Grid x:Name="grd_popup_Recipe"  SizeChanged="GridSettingChangedSize"></Grid>
 
         </Grid>
@@ -991,6 +990,8 @@
             <Grid x:Name="grd_Defect"
                 Height="{Binding DialogDefectWidth,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
             </Grid>
+
+
         </Grid>
         <Popup x:Name="popup_uc" Height="auto" Width="Auto"  Grid.Row="2"
                    AllowsTransparency="True"

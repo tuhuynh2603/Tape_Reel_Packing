@@ -205,7 +205,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
             if (cur_point.X >= m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1))
                 nTrackID = 1;
 
-            int nIDX = (int)((cur_point.X - (nTrackID * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 2))) / m_nStepMappingRect);
+            int nIDX = (int)((cur_point.X - (nTrackID * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1))) / m_nStepMappingRect);
             int nIDY = (int)(cur_point.Y / m_nStepMappingRect);
 
             if (nDeviceID != nIDX + nIDY * MainWindow.mainWindow.m_nDeviceX || bIsclicked)
@@ -539,6 +539,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
         private void Grid_CanVas_Mapping_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             InitCanvasMapping();
+            MainWindow.mainWindow.loadAllStatistic(false);
         }
     }
 

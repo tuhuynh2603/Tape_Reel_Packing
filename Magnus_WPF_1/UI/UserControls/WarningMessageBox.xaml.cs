@@ -142,7 +142,7 @@ namespace Magnus_WPF_1.UI.UserControls
             Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
             MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
 
-            MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
+            MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE;
             MainWindow.mainWindow.master.m_bNeedToImidiateStop = false;
             Thread.Sleep(500);
             Master.m_NextStepSequenceEvent.Set();

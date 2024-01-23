@@ -225,8 +225,6 @@ namespace Magnus_WPF_1
         {
             InitializeComponent();
             DataContext = this;
-            //ButtonNameFCN = "123";
-            //LogMessage.LogDebugMessage(1, "Start Application");
             LogMessage.WriteToDebugViewer(0, string.Format("Start Application...."));
 
             enableButton(false);
@@ -235,9 +233,7 @@ namespace Magnus_WPF_1
             master = new Master(this);
             outputLogView = new OutputLogView(this);
             m_staticView = new StatisticView(this);
-            m_staticView.ClearStatistic();
-            LoadStatistic(0);
-            LoadStatistic(1);
+
 
             //master.m_SaveInspectImageThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread(true)));
 
@@ -280,8 +276,7 @@ namespace Magnus_WPF_1
                 hotkey.Add((KeyBinding)InputBindings[n]);
 
 
-
-
+            loadAllStatistic(true);
         }
 
 
@@ -342,24 +337,60 @@ namespace Magnus_WPF_1
 
         }
 
-        public void LoadStatistic(int nT)
+
+        public void loadAllStatistic(bool bResetSummary)
+        {
+            if (master.m_UpdateMappingUIThread == null)
+            {
+                master.m_UpdateMappingUIThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => func_loadAllStatistic(bResetSummary)));
+                //master.m_UpdateMappingUIThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MainWindow.mainWindow.LoadStatistic(1)));
+                master.m_UpdateMappingUIThread.Start();
+            }
+            else if (!master.m_UpdateMappingUIThread.IsAlive)
+            {
+                master.m_UpdateMappingUIThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => func_loadAllStatistic(bResetSummary)));
+                //master.m_UpdateMappingUIThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => MainWindow.mainWindow.LoadStatistic(1)));
+                master.m_UpdateMappingUIThread.Start();
+
+            }
+        }
+        public void func_loadAllStatistic(bool bResetSummary)
+        {
+            for(int nT = 0; nT < 2; nT++)
+            {
+                LoadStatistic(nT, bResetSummary);
+            }
+        }
+
+        public void LoadStatistic(int nT, bool bResetSummary)
         {
 
+            if (bResetSummary)
+            {
                 for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)
                 {
                     master.m_Tracks[nT].m_VisionResultDatas[n] = new VisionResultData();
-
                 }
 
                 VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, nT, ref master.m_Tracks[nT].m_VisionResultDatas, ref master.m_Tracks[nT].m_CurrentSequenceDeviceID);
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)
+                    {
+                        m_staticView.UpdateValueStatistic(master.m_Tracks[nT].m_VisionResultDatas[n].m_nResult, nT);
+                    }
+                });
+            }
 
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            {
                 m_staticView.ResetMappingResult(nT);
-
                 for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)
                 {
                     m_staticView.UpdateMappingResult(master.m_Tracks[nT].m_VisionResultDatas[n], nT, n);
-                    m_staticView.UpdateValueStatistic(master.m_Tracks[nT].m_VisionResultDatas[n].m_nResult, nT);
                 }
+            });
+
         }
         public void Run_Sequence(int nTrack = (int)TRACK_TYPE.TRACK_ALL)
         {
@@ -372,7 +403,7 @@ namespace Magnus_WPF_1
                 ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Machine is running. Please Stop it and try again!", (int)ERROR_CODE.LABEL_FAIL);
                 return;
             }
-            m_staticView.ClearStatistic();
+            //m_staticView.ClearStatistic();
 
             btn_run_sequence.IsChecked = true;
             m_bSequenceRunning = (bool)btn_run_sequence.IsChecked;
@@ -672,6 +703,8 @@ namespace Magnus_WPF_1
                 master.thread_StreamCamera[activeImageDock.trackID].IsBackground = true;
                 master.thread_StreamCamera[activeImageDock.trackID].Start();
             }
+
+
         }
 
         private void btn_stream_camera_UnChecked(object sender, RoutedEventArgs e)
@@ -1389,25 +1422,29 @@ namespace Magnus_WPF_1
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
 
-                grd_Dialog_Settings.Margin = new Thickness(0, 160, 0, 0);
-                grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Center;
-                grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Center;
-                grd_Dialog_Settings.Width = 600;
-                grd_Dialog_Settings.Height = 300;
+                grd_Defect_Settings.Margin = new Thickness(0, 160, 0, 0);
+                grd_Defect_Settings.VerticalAlignment = VerticalAlignment.Center;
+                grd_Defect_Settings.HorizontalAlignment = HorizontalAlignment.Center;
+                m_WarningMessageBoxUC.Width = 800;
+                m_WarningMessageBoxUC.Height = 400;
+
 
                 if (bIsPopup)
                 {
-                    grd_popup_WarningMessageBox.Children.Clear();
+                    grd_Defect.Children.Clear();
                     m_WarningMessageBoxUC.updateMessageString(strDebugMessage, warningtype);
-                    grd_popup_WarningMessageBox.Children.Add(m_WarningMessageBoxUC);
-                    grd_popup_WarningMessageBox.Visibility = Visibility.Visible;
-                    grd_Dialog_Settings.Visibility = Visibility.Visible;
+                    grd_Defect.Width = m_WarningMessageBoxUC.Width;
+                    grd_Defect.Height = m_WarningMessageBoxUC.Height;
+                    grd_Defect.Children.Add(m_WarningMessageBoxUC);
+
+                    grd_Defect.Visibility = Visibility.Visible;
+                    grd_Defect_Settings.Visibility = Visibility.Visible;
                 }
                 else
                 {
-                    grd_popup_WarningMessageBox.Children.Clear();
-                    grd_popup_WarningMessageBox.Visibility = Visibility.Collapsed;
-                    grd_Dialog_Settings.Visibility = Visibility.Collapsed;
+                    grd_Defect.Children.Clear();
+                    grd_Defect.Visibility = Visibility.Collapsed;
+                    grd_Defect_Settings.Visibility = Visibility.Collapsed;
 
                 }
             });

@@ -992,22 +992,11 @@ namespace Magnus_WPF_1.Source.Application
                     }
                     else
                     {
-                        //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                        //{
-                        //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Begin!", (int)ERROR_CODE.NO_LABEL);
-
-                        //});
                         //Scan Barcode
                         LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Get barcode ");
 
                         strBarcodeResult = MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut, nDeviceID);
                         LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Get barcode Done ");
-
-                        //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                        //{
-                        //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Done!", (int)ERROR_CODE.NO_LABEL);
-
-                        //});
 
                     }
 
@@ -1042,6 +1031,18 @@ namespace Magnus_WPF_1.Source.Application
                         m_SequenceThreadVisionResult.m_nDeviceIndexOnReel = nDeviceID;
                         Master.VisionReadyEvent[m_nTrackID].Set();
 
+
+                        if (MainWindow.mainWindow.m_bSequenceRunning)
+                        {
+                            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+
+                                LogMessage.WriteToDebugViewer(7, $" Update result");
+                                MainWindow.mainWindow.m_staticView.UpdateMappingResult(m_InspectionOnlineThreadVisionResult, m_nTrackID, m_CurrentSequenceDeviceID);
+                                MainWindow.mainWindow.m_staticView.UpdateValueStatistic(m_InspectionOnlineThreadVisionResult.m_nResult, m_nTrackID);
+                                LogMessage.WriteToDebugViewer(9, $" Update result Done. Device {m_CurrentSequenceDeviceID + 1}");
+                            });
+                        }
                         if (Application.m_bEnableSavingOnlineImage)
                         {
 
@@ -1081,23 +1082,12 @@ namespace Magnus_WPF_1.Source.Application
                         {
 
                             LogMessage.WriteToDebugViewer(8, "Barcode Save Image!");
-
-                            //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                            //{
-                            //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Save image!");
-
-                            //});
                             string strFailImage = strFullPathImageOut.Replace("PASS IMAGE", "FAIL IMAGE");
                             if (File.Exists(strFullPathImageOut) && !File.Exists(strFailImage))
                                 File.Move(strFullPathImageOut, strFailImage);
 
                             LogMessage.WriteToDebugViewer(8, "Barcode Save Image Done!");
 
-                            //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                            //{
-                            //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Save image Done!");
-
-                            //});
                         }
                         else
                         {

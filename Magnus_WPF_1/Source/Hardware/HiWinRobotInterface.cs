@@ -983,12 +983,15 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             //    m_bIsStop = false;
             //}
             int nState = HWinRobot.get_motion_state(HiWinRobotInterface.m_RobotConnectID);
+
+            int conn = HWinRobot.get_connection_level(HiWinRobotInterface.m_RobotConnectID);
+            if (conn < 0)
+                return -1;
+
             while (nState != 1)
             {
                 //robot connection changed => return false
-                int conn = HWinRobot.get_connection_level(HiWinRobotInterface.m_RobotConnectID);
-                if (conn < 0)
-                    return -1;
+
                 //if (m_bIsStop)
                 //{
 
@@ -1002,11 +1005,11 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 //LogMessage.LogMessage.WriteToDebugViewer(3, $"{nState} ");
 
                 //}
-                if (MainWindow.mainWindow.master.m_EmergencyStatus > 0 || MainWindow.mainWindow.master.m_bNeedToImidiateStop)
+                if (MainWindow.mainWindow.master.m_EmergencyStatus > 0 || MainWindow.mainWindow.master.m_bNeedToImidiateStop || HWinRobot.get_motor_state(HiWinRobotInterface.m_RobotConnectID) < 1)
+                {
+                    Thread.Sleep(500);
                     return 0;
-
-                if (HWinRobot.get_motor_state(HiWinRobotInterface.m_RobotConnectID) < 1)
-                    return 0;
+                }
 
                 Thread.Sleep(5);
             }

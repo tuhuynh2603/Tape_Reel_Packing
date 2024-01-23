@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -92,8 +93,8 @@ namespace Magnus_WPF_1.UI.UserControls
                     btn_Sequence_Abort.IsEnabled = true;
                     btn_Sequence_Abort.Visibility = Visibility.Visible;
 
-                    btn_Retry_Current_Step.Visibility = Visibility.Visible;
-                    btn_Retry_Current_Step.IsEnabled = true;
+                    //btn_Retry_Current_Step.Visibility = Visibility.Visible;
+                    //btn_Retry_Current_Step.IsEnabled = true;
 
 
                     break;
@@ -138,13 +139,14 @@ namespace Magnus_WPF_1.UI.UserControls
             if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
                 return;
 
-            MainWindow.mainWindow.master.m_bNeedToImidiateStop = false;
             Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
+            MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
 
             MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
+            MainWindow.mainWindow.master.m_bNeedToImidiateStop = false;
+            Thread.Sleep(500);
             Master.m_NextStepSequenceEvent.Set();
 
-            MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
 
             //if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
             //    return;
@@ -170,22 +172,24 @@ namespace Magnus_WPF_1.UI.UserControls
                 return;
 
             MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
-                Master.m_NextStepSequenceEvent.Set();
+
 
             MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
-
+            Thread.Sleep(500);
+            Master.m_NextStepSequenceEvent.Set();
         }
 
         private void btn_Sequence_Previous_Click(object sender, RoutedEventArgs e)
         {
-            if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
-                return;
+            //if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
+            //    return;
 
-            Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
-            MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_GOBACK;
-            Master.m_NextStepSequenceEvent.Set();
+            //Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
+            //MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_GOBACK;
 
-            MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
+            //MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
+            //Thread.Sleep(500);
+            //Master.m_NextStepSequenceEvent.Set();
 
         }
 
@@ -196,24 +200,27 @@ namespace Magnus_WPF_1.UI.UserControls
 
             Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
             MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
-            Master.m_NextStepSequenceEvent.Set();
 
             MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
+            Thread.Sleep(500);
+            Master.m_NextStepSequenceEvent.Set();
 
         }
 
         private void btn_Retry_Current_Step_Click(object sender, RoutedEventArgs e)
         {
-            if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
-                return;
+            //if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
+            //    return;
 
-            MainWindow.mainWindow.master.m_bNeedToImidiateStop = false;
-            Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
+            //MainWindow.mainWindow.master.m_bNeedToImidiateStop = false;
+            //Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
 
-            MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
-            Master.m_NextStepSequenceEvent.Set();
+            //MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
 
-            MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
+            //MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
+            //Thread.Sleep(500);
+            //Master.m_NextStepSequenceEvent.Set();
+
         }
     }
 }

@@ -187,17 +187,18 @@ namespace Magnus_WPF_1.Source.Hardware
 			//{
 			//	str2 = resp2.Replace("\r", "");
 			//}
-			Thread.Sleep(300);
-
+			Thread.Sleep(250);
+			int nResult = -(int)ERROR_CODE.PASS;
 			if((strDeviceID).Length < 1)
             {
-				strDeviceID = string.Format("Dummy {0}{1}{2}+{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+				nResult = -(int)ERROR_CODE.PROCESS_ERROR;
 			}
 
-			//LogMessage.WriteToDebugViewer(3, $"Message responsed from Barcode Bank 2: {strDeviceID}");
-			strImageFullName = Path.Combine(strFolder,  $"{strDeviceID}_{nDeviceID + 1}.bmp");
+			////LogMessage.WriteToDebugViewer(3, $"Message responsed from Barcode Bank 2: {strDeviceID}");
+			//strImageFullName = Path.Combine(strFolder,  $"{strDeviceID}_{nDeviceID + 1}.bmp");
+			//strFullPathImageOut = strImageFullName;
+			strImageFullName = MainWindow.mainWindow.master.createImageFilePathToSave(nDeviceID, nResult, "Barcode", strDeviceID);
 			strFullPathImageOut = strImageFullName;
-
 			System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
 			{
 				m_liveviewForm.DownloadRecentImage(strImageFullName);

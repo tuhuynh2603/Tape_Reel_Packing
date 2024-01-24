@@ -1537,6 +1537,97 @@ namespace Magnus_WPF_1.Source.Algorithm
         }
 
         // Dilation Circle
+
+        public static void DilationCircle_Magnus(ref CvImage source, ref CvImage result, int radius, int iter = 1)
+        {
+            if (radius < 6)
+            {
+                CvImage kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(2 * radius + 1, 2 * radius + 1), new Point(radius, radius));
+                CvInvoke.MorphologyEx(source, result, MorphOp.Dilate, kernel, new Point(-1, -1), iter, BorderType.Constant, CvInvoke.MorphologyDefaultBorderValue);
+            }
+            else
+            {
+                int nSmallRadius = 3;
+                int nLastRadiusSize = radius % nSmallRadius;
+                int nTime = (radius - nLastRadiusSize) / nSmallRadius;
+                result = source.Clone();
+                CvImage kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(2 * nSmallRadius + 1, 2 * nSmallRadius + 1), new Point(nSmallRadius, nSmallRadius));
+                CvInvoke.MorphologyEx(result, result, MorphOp.Dilate, kernel, new Point(-1, -1), iter * nTime, BorderType.Constant, CvInvoke.MorphologyDefaultBorderValue);
+
+                //for (int n = 0; n < nTime; n++)
+                //{
+                //    CvInvoke.MorphologyEx(result, result, MorphOp.Dilate, kernel, new Point(-1, -1), iter, BorderType.Constant, CvInvoke.MorphologyDefaultBorderValue);
+                //}
+
+                if (nLastRadiusSize > 0)
+                {
+                    kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(2 * nSmallRadius + 1, 2 * nSmallRadius + 1), new Point(nSmallRadius, nSmallRadius));
+                    CvInvoke.MorphologyEx(result, result, MorphOp.Dilate, kernel, new Point(-1, -1), iter, BorderType.Constant, CvInvoke.MorphologyDefaultBorderValue);
+                }
+            }
+        }
+        public static void ErodeCircle_Magnus(ref CvImage source, ref CvImage result, int radius, int iter = 1)
+        {
+            if (radius < 6)
+            {
+                CvImage kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(2 * radius + 1, 2 * radius + 1), new Point(radius, radius));
+                CvInvoke.MorphologyEx(source, result, MorphOp.Erode, kernel, new Point(-1, -1), iter, BorderType.Constant, CvInvoke.MorphologyDefaultBorderValue);
+            }
+            else
+            {
+                int nSmallRadius = 3;
+                int nLastRadiusSize = radius % nSmallRadius;
+                int nTime = (radius - nLastRadiusSize) / nSmallRadius;
+                result = source.Clone();
+                CvImage kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(2 * nSmallRadius + 1, 2 * nSmallRadius + 1), new Point(nSmallRadius, nSmallRadius));
+                CvInvoke.MorphologyEx(result, result, MorphOp.Erode, kernel, new Point(-1, -1), iter* nTime, BorderType.Constant, CvInvoke.MorphologyDefaultBorderValue);
+
+                //for (int n = 0; n < nTime; n++)
+                //{
+                //    CvInvoke.MorphologyEx(result, result, MorphOp.Erode, kernel, new Point(-1, -1), iter, BorderType.Constant, CvInvoke.MorphologyDefaultBorderValue);
+                //}
+                if (nLastRadiusSize > 0)
+                {
+                    kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(2 * nSmallRadius + 1, 2 * nSmallRadius + 1), new Point(nSmallRadius, nSmallRadius));
+                    CvInvoke.MorphologyEx(result, result, MorphOp.Erode, kernel, new Point(-1, -1), iter, BorderType.Constant, CvInvoke.MorphologyDefaultBorderValue);
+                }
+            }
+        }
+
+        public static void ClosingCircle_Magnus(ref CvImage source, ref CvImage result, int radius, int iter = 1)
+        {
+            if (radius < 6)
+            {
+                CvImage kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(2 * radius + 1, 2 * radius + 1), new Point(radius, radius));
+                CvInvoke.MorphologyEx(source, result, MorphOp.Close, kernel, new Point(-1, -1), iter, BorderType.Constant, CvInvoke.MorphologyDefaultBorderValue);
+            }
+            else
+            {
+                CvImage img_MophoRegion = new CvImage();
+                DilationCircle_Magnus(ref source, ref img_MophoRegion, radius, iter);
+                ErodeCircle_Magnus(ref img_MophoRegion, ref result, radius, iter);
+            }
+
+        }
+
+        public static void OpenningCircle_Magnus(ref CvImage source, ref CvImage result, int radius, int iter = 1)
+        {
+            if (radius < 6)
+            {
+                CvImage kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(2 * radius + 1, 2 * radius + 1), new Point(radius, radius));
+                CvInvoke.MorphologyEx(source, result, MorphOp.Open, kernel, new Point(-1, -1), iter, BorderType.Constant, CvInvoke.MorphologyDefaultBorderValue);
+            }
+            else
+            {
+                CvImage img_MophoRegion = new CvImage();
+                ErodeCircle_Magnus(ref source, ref img_MophoRegion, radius, iter);
+                DilationCircle_Magnus(ref img_MophoRegion, ref result, radius, iter);
+            }
+
+        }
+
+
+
         public static bool DilationCircle(ref CvImage source, ref CvImage result, int radius, int iter = 1)
         {
             CvImage kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(2 * radius + 1, 2 * radius + 1), new Point(radius, radius));

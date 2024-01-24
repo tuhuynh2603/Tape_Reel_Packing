@@ -817,8 +817,11 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
 
         public void Thread_function()
         {
-            while (MainWindow.mainWindow != null)
+            int nRobotIDBackup = -999;
+            while (true)
             {
+                if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
+                    break;
                 //Connect button
                 if (MainWindow.isRobotControllerOpen)
                 {
@@ -859,31 +862,35 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                     }
                 }
 
-                if (System.Windows.Application.Current == null)
-                    return;
 
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                if (nRobotIDBackup != m_RobotConnectID)
                 {
-                    if (m_RobotConnectID >= 0)
-                    {
-                        m_hiWinRobotUserControl.button_RobotConnect.Content = "Connected";
-                        m_hiWinRobotUserControl.button_RobotConnect.Background = new SolidColorBrush(Colors.Green);
-                        MainWindow.mainWindow.label_Robot_Status.Background = new SolidColorBrush(Colors.Green);
-                        MainWindow.mainWindow.label_Robot_Status.Content = m_strRobotIPAddress;
-                        MainWindow.mainWindow.color_RobotStatus = "Black";
-                    }
-                    else
-                    {
-                        m_hiWinRobotUserControl.button_RobotConnect.Content = "Disconnected";
-                        m_hiWinRobotUserControl.button_RobotConnect.Background = new SolidColorBrush(Colors.Gray);
-                        MainWindow.mainWindow.color_RobotStatus = "Black";
-                        MainWindow.mainWindow.label_Robot_Status.Content = m_strRobotIPAddress;
-                        MainWindow.mainWindow.label_Robot_Status.Background = new SolidColorBrush(Colors.Gray);
-                    }
-                });
+                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                  {
+                      if (m_RobotConnectID >= 0)
+                      {
+                          m_hiWinRobotUserControl.button_RobotConnect.Content = "Connected";
+                          m_hiWinRobotUserControl.button_RobotConnect.Background = new SolidColorBrush(Colors.Green);
+                          MainWindow.mainWindow.label_Robot_Status.Background = new SolidColorBrush(Colors.Green);
+                          MainWindow.mainWindow.label_Robot_Status.Content = m_strRobotIPAddress;
+                          MainWindow.mainWindow.color_RobotStatus = "Black";
+                      }
+                      else
+                      {
+                          m_hiWinRobotUserControl.button_RobotConnect.Content = "Disconnected";
+                          m_hiWinRobotUserControl.button_RobotConnect.Background = new SolidColorBrush(Colors.Gray);
+                          MainWindow.mainWindow.color_RobotStatus = "Black";
+                          MainWindow.mainWindow.label_Robot_Status.Content = m_strRobotIPAddress;
+                          MainWindow.mainWindow.label_Robot_Status.Background = new SolidColorBrush(Colors.Gray);
+                      }
+                  });
+                }
+                nRobotIDBackup = m_RobotConnectID;
                 Thread.Sleep(100);
             }
             HWinRobot.disconnect(m_RobotConnectID);
+
+            LogMessage.LogMessage.WriteToDebugViewer(1, $"HWinRobotInterface Thread_Function Thread Released.");
             return;
         }
 

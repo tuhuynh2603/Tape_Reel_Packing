@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -31,6 +32,7 @@ namespace Magnus_WPF_1
         public bool Logout = false;
 
         public static MainWindow mainWindow;
+        public static bool m_IsWindowOpen = true;
         public OutputLogView outputLogView;
         public StatisticView m_staticView;
         public int m_nDeviceX = 5;
@@ -385,10 +387,11 @@ namespace Magnus_WPF_1
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
                 m_staticView.ResetMappingResult(nT);
-                for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)
-                {
-                    m_staticView.UpdateMappingResult(master.m_Tracks[nT].m_VisionResultDatas[n], nT, n);
-                }
+                m_staticView.UpdateMappingResultPage(nT);
+                //for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)
+                //{
+                //    m_staticView.UpdateMappingResult(master.m_Tracks[nT].m_VisionResultDatas[n], nT, n);
+                //}
             });
 
         }
@@ -694,13 +697,13 @@ namespace Magnus_WPF_1
             if (master.thread_StreamCamera[activeImageDock.trackID] == null)
             {
                 master.thread_StreamCamera[activeImageDock.trackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.func_GrabImageThread()));
-                master.thread_StreamCamera[activeImageDock.trackID].IsBackground = true;
+                //master.thread_StreamCamera[activeImageDock.trackID].IsBackground = true;
                 master.thread_StreamCamera[activeImageDock.trackID].Start();
             }
             else if (!master.thread_StreamCamera[activeImageDock.trackID].IsAlive)
             {
                 master.thread_StreamCamera[activeImageDock.trackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.func_GrabImageThread()));
-                master.thread_StreamCamera[activeImageDock.trackID].IsBackground = true;
+                //master.thread_StreamCamera[activeImageDock.trackID].IsBackground = true;
                 master.thread_StreamCamera[activeImageDock.trackID].Start();
             }
 
@@ -1364,13 +1367,13 @@ namespace Magnus_WPF_1
             if (master.thread_RobotSequence == null)
             {
                 master.thread_RobotSequence = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.ResetSequence()));
-                master.thread_RobotSequence.IsBackground = true;
+                //master.thread_RobotSequence.IsBackground = true;
                 master.thread_RobotSequence.Start();
             }
             else if (!master.thread_RobotSequence.IsAlive)
             {
                 master.thread_RobotSequence = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.ResetSequence()));
-                master.thread_RobotSequence.IsBackground = true;
+                //master.thread_RobotSequence.IsBackground = true;
                 master.thread_RobotSequence.Start();
             }
 

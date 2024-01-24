@@ -237,11 +237,11 @@ namespace Magnus_WPF_1.UI.UserControls.View
                 int iw = 0;
                 int ih = 0;
                 int stride = 0;
-                bufferImage = ReadBufferFromFile(pathImage, ref iw, ref ih, ref stride);
+                //bufferImage = ReadBufferFromFile(pathImage, ref iw, ref ih, ref stride);
 
-                //CvImage matTemp = CvInvoke.Imread(pathImage, Emgu.CV.CvEnum.ImreadModes.Grayscale);
+                CvImage matTemp = CvInvoke.Imread(pathImage, Emgu.CV.CvEnum.ImreadModes.Grayscale);
+                bufferImage = ConvertMonoMatToByteArray(matTemp);
 
-                //bufferImage = ConvertMonoMatToByteArray(matTemp);
                 //UpdateUIImageMono(bufferImage);
                 UpdateSourceImageMono();
                 return true;

@@ -366,7 +366,7 @@ namespace Magnus_WPF_1
 
         public void LoadStatistic(int nT, bool bResetSummary)
         {
-
+                
             if (bResetSummary)
             {
                 for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)
@@ -383,6 +383,8 @@ namespace Magnus_WPF_1
                     }
                 });
             }
+            //else if (!MainWindow.mainWindow.m_bSequenceRunning)
+            //    VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, nT, ref master.m_Tracks[nT].m_VisionResultDatas, ref master.m_Tracks[nT].m_CurrentSequenceDeviceID);
 
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
@@ -1337,9 +1339,7 @@ namespace Magnus_WPF_1
             grd_PopupDialog.Children.Clear();
             grd_PopupDialog.Visibility = Visibility.Collapsed;
             grd_Dialog_Settings.Visibility = Visibility.Collapsed;
-
             //grd_Defect_Settings.Visibility = Visibility.Collapsed;
-
         }
 
 

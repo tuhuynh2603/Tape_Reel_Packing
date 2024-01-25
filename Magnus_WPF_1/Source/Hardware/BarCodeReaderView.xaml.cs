@@ -144,8 +144,8 @@ namespace Magnus_WPF_1.Source.Hardware
 
         private void combo_commandSendToBarCode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-           string strFullPathImageOut = "";
-           MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut);
+           //string strFullPathImageOut = "";
+           //MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut);
         }
 
         private void button_Clear_Click(object sender, RoutedEventArgs e)
@@ -153,10 +153,19 @@ namespace Magnus_WPF_1.Source.Hardware
             label_DataReceived.Content = "";
         }
 
+        int nDeviceIDTemp = 0;
+        string strLot = string.Format("{0}{1}{2}+{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
         private void button_Trigger_Click(object sender, RoutedEventArgs e)
         {
             string strFullPathImageOut;
-            label_DataReceived.Content =  MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut);
+            nDeviceIDTemp++;
+            if (nDeviceIDTemp > Application.Application.categoriesMappingParam.M_NumberDevicePerLot)
+            {
+                nDeviceIDTemp = 0;
+                strLot = string.Format("{0}{1}{2}+{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+            }
+
+            label_DataReceived.Content =  MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut, nDeviceIDTemp, strLot);
         }
 
 

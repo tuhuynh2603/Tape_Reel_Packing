@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Application = Magnus_WPF_1.Source.Application.Application;
 
 namespace Magnus_WPF_1.UI.UserControls.ViewModel
 {
@@ -65,6 +66,7 @@ namespace Magnus_WPF_1.UI.UserControls.ViewModel
                                                                             MainWindow.mainWindow.Close();
                                                                             //MainWindow.mainWindow = null;
                                                                             System.Windows.Application.Current.Shutdown();
+                                                                            MainWindow.mainWindow.master.applications.KillCurrentProcess();
                                                                         }
                                                                     });
 

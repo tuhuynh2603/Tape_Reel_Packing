@@ -39,7 +39,7 @@ namespace Magnus_WPF_1.Source.Application
         public VisionResultData m_InspectionOnlineThreadVisionResult = new VisionResultData();
         public VisionResultData m_SequenceThreadVisionResult = new VisionResultData();
 
-        
+
         public int m_nTrackID;
         public HIKControlCameraView m_hIKControlCameraView;
         public string m_strSeriCamera = "";
@@ -444,7 +444,7 @@ namespace Magnus_WPF_1.Source.Application
             }
             else if (m_ArrayOverLay.Count > 0)
             {
-                
+
                 SolidColorBrush c = new SolidColorBrush(m_ArrayOverLay[m_ArrayOverLay.Count - 1]._color);
                 m_imageViews[0].DrawRegionOverlay(m_ArrayOverLay[m_ArrayOverLay.Count - 1].mat_Region, c);
             }
@@ -456,7 +456,7 @@ namespace Magnus_WPF_1.Source.Application
             if (nResult == (int)ERROR_CODE.PASS)
             {
                 color = new SolidColorBrush(Colors.Green);
-                m_imageViews[0].DrawString( "Good", 10, 10, color, 31);
+                m_imageViews[0].DrawString("Good", 10, 10, color, 31);
                 color = new SolidColorBrush(Colors.Yellow);
 
             }
@@ -618,6 +618,7 @@ namespace Magnus_WPF_1.Source.Application
             Stopwatch timeIns = new Stopwatch();
             timeIns.Start();
             int nDeviceID = m_CurrentSequenceDeviceID;
+            int nDeviceIDFail = 0;
 
             while (true)
             {
@@ -628,7 +629,7 @@ namespace Magnus_WPF_1.Source.Application
                 {
                     Master.InspectEvent[m_nTrackID].Reset();
                     m_bInspecting = false;
-                    LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+                    LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{Application.LineNumber()}: {Application.PrintCallerName()}");
                     pCenter = new PointF(0, 0);
                     pCorner = new PointF(0, 0);
 
@@ -641,6 +642,8 @@ namespace Magnus_WPF_1.Source.Application
                     //    Thread.Sleep(5);
                     //}
                     Master.InspectEvent[m_nTrackID].WaitOne();
+                    Master.InspectEvent[m_nTrackID].Reset();
+
                     if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
                         break;
 
@@ -660,7 +663,7 @@ namespace Magnus_WPF_1.Source.Application
                         goto InspectionDone;
                     }
 
-                    Master.InspectEvent[m_nTrackID].Reset();
+                    //Master.InspectEvent[m_nTrackID].Reset();
                     m_bInspecting = true;
                     //if (m_CurrentSequenceDeviceID < 0 || m_CurrentSequenceDeviceID >= m_VisionResultDatas.Length)
                     //    m_CurrentSequenceDeviceID = 0;
@@ -683,7 +686,11 @@ namespace Magnus_WPF_1.Source.Application
                     m_Center_Vision = pCenter;
                     m_dDeltaAngleInspection = MagnusMatrix.CalculateShiftXYAngle(m_Center_Vision, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint);
                     m_InspectionOnlineThreadVisionResult.m_nResult = m_SequenceVisionResult;
-                    m_InspectionOnlineThreadVisionResult.m_strFullImagePath = mainWindow.master.createImageFilePathToSave(nDeviceID, m_SequenceVisionResult, "Camera");
+                    if (m_SequenceVisionResult != -(int)ERROR_CODE.PASS)
+                        m_InspectionOnlineThreadVisionResult.m_strFullImagePath = mainWindow.master.createImageFilePathToSave(nDeviceID, m_SequenceVisionResult, "Camera", Application.m_strCurrentLot);
+                    else
+                        m_InspectionOnlineThreadVisionResult.m_strFullImagePath = mainWindow.master.createImageFilePathToSave(nDeviceIDFail++, m_SequenceVisionResult, "Camera", Application.m_strCurrentLot);
+
                     Master.InspectDoneEvent[m_nTrackID].Set();
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, "Total inspection time: " + timeIns.ElapsedMilliseconds.ToString());
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
@@ -919,7 +926,7 @@ namespace Magnus_WPF_1.Source.Application
             string[] strCameraName = { "Camera", "BarCode" };
 
         Start_InspectionOnlineThread:
-            LogMessage.WriteToDebugViewer(7 + m_nTrackID, $"Start Inspection Online thread {strCameraName[m_nTrackID]}" );
+            LogMessage.WriteToDebugViewer(7 + m_nTrackID, $"Start Inspection Online thread {strCameraName[m_nTrackID]}");
 
             CheckInspectionOnlineThread();
             int nWidth = 0, nHeight = 0;
@@ -964,7 +971,8 @@ namespace Magnus_WPF_1.Source.Application
                 string strFullPathImageOut = "";
                 string strBarcodeResult = "";
 
-                try {
+                try
+                {
                     if (m_nTrackID == 0)
                     {
                         //Snap camera
@@ -1002,7 +1010,7 @@ namespace Magnus_WPF_1.Source.Application
                         //Scan Barcode
                         LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Get barcode ");
 
-                        strBarcodeResult = MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut, nDeviceID);
+                        strBarcodeResult = MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut, nDeviceID, Application.m_strCurrentLot);
                         LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Get barcode Done ");
 
                     }
@@ -1014,7 +1022,7 @@ namespace Magnus_WPF_1.Source.Application
                     // Do Inspection
                     Master.InspectDoneEvent[m_nTrackID].Reset();
                     Master.InspectEvent[m_nTrackID].Set();
-                    if (!Master.InspectDoneEvent[m_nTrackID].WaitOne(2500))
+                    if (!Master.InspectDoneEvent[m_nTrackID].WaitOne(1500))
                     {
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
@@ -1040,8 +1048,7 @@ namespace Magnus_WPF_1.Source.Application
                         m_SequenceThreadVisionResult.m_nDeviceIndexOnReel = nDeviceID;
                         m_VisionResultDatas[m_CurrentSequenceDeviceID] = m_SequenceThreadVisionResult;
 
-                        if (m_SequenceThreadVisionResult.m_nResult == -(int)ERROR_CODE.PASS)
-                            m_CurrentSequenceDeviceID++;
+
                         Master.m_EventInspectionOnlineThreadDone[m_nTrackID].Set();
 
                         LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Get Inspection Result Done. Total Inspection Time: " + timeIns.ElapsedMilliseconds.ToString());
@@ -1057,6 +1064,11 @@ namespace Magnus_WPF_1.Source.Application
                                 LogMessage.WriteToDebugViewer(9, $"{strCameraName[m_nTrackID]}:  Update result Done. Device {m_CurrentSequenceDeviceID + 1}");
                             });
                         }
+
+                        VisionResultData.SaveSequenceResultToExcel(Application.m_strCurrentLot, m_nTrackID, m_InspectionOnlineThreadVisionResult);
+
+                        if (m_SequenceThreadVisionResult.m_nResult == -(int)ERROR_CODE.PASS)
+                            m_CurrentSequenceDeviceID++;
                         //if (Application.m_bEnableSavingOnlineImage)
                         //{
 
@@ -1072,16 +1084,13 @@ namespace Magnus_WPF_1.Source.Application
 
                         //}
 
-                        VisionResultData.SaveSequenceResultToExcel(Application.m_strCurrentLot, m_nTrackID, m_InspectionOnlineThreadVisionResult);
-
-
                     }
                     //      Barcode
                     else if (m_nTrackID == 1)
                     {
                         LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Barcode InspectionDone!");
                         //device id characters always > 5
-                        if (strBarcodeResult.Contains("Dummy"))
+                        if (strBarcodeResult.Contains("Dummy") || strBarcodeResult.Length < 1)
                         {
                             m_InspectionOnlineThreadVisionResult.m_nResult = -(int)ERROR_CODE.LABEL_FAIL;
                         }
@@ -1107,7 +1116,8 @@ namespace Magnus_WPF_1.Source.Application
 
                             LogMessage.WriteToDebugViewer(8, "Barcode Save Excel!");
 
-                            lock(MainWindow.mainWindow.master.m_Tracks[m_nTrackID]){
+                            lock (MainWindow.mainWindow.master.m_Tracks[m_nTrackID])
+                            {
                                 VisionResultData.SaveSequenceResultToExcel(Application.m_strCurrentLot, m_nTrackID, m_InspectionOnlineThreadVisionResult);
                             }
                             LogMessage.WriteToDebugViewer(8, "Barcode Save Excel Done!");
@@ -1130,7 +1140,7 @@ namespace Magnus_WPF_1.Source.Application
                     });
                     timeIns.Restart();
                 }
-              catch(Exception e)
+                catch (Exception e)
                 {
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {

@@ -84,7 +84,7 @@ namespace Magnus_WPF_1.UI.UserControls.View
         //int m_nWidthMappingPageRect = 100;
         //int m_nStepMappingPageRect = 102;
         public Point m_CanvasMovePagePoint = new Point(0, 0);
-        int[] m_nPageID = {0,0 };
+        public int[] m_nPageID = {0,0 };
 
         Image[][] arr_imageMapping = new Image[2][];
         Label[][] arr_textBlockMapping = new Label[2][];
@@ -494,6 +494,12 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
         public void UpdateMappingResult(VisionResultData resultData, int nTrack, int nDeviceID)
         {
+            if(nDeviceID >= (m_nPageID[nTrack] + 1) * arr_imageMapping[nTrack].Length)
+            {
+                m_nPageID[nTrack]++;
+                UpdateMappingResultPage(nTrack);
+            }
+
             string path = @"/Resources/gray-chip.png";
             switch (resultData.m_nResult)
             {
@@ -516,14 +522,6 @@ namespace Magnus_WPF_1.UI.UserControls.View
             if (nDeviceID >= (m_nPageID[nTrack] + 1) * arr_imageMapping[nTrack].Length)
             {
                 return;
-
-                m_nPageID[nTrack] = (int)Math.Round((float)nDeviceID / arr_imageMapping[nTrack].Length);
-                //m_nPageID[nTrack]++;
-                //UpdateMappingResultPage(nTrack);
-                if (nTrack == 0)
-                    text_Current_Page.Text = (m_nPageID[nTrack] + 1).ToString();
-                else
-                    text_Current_Page2.Text = (m_nPageID[nTrack] + 1).ToString();
             } 
 
             arr_imageMapping[nTrack][nDeviceID % arr_imageMapping[nTrack].Length].Source = new BitmapImage(new Uri(path, UriKind.Relative));

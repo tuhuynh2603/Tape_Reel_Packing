@@ -126,8 +126,8 @@ namespace Magnus_WPF_1.Source.Hardware
 		bool bIsDownload = false;
 
 		int nDeviceID = 0;
-		string nstrFolderBackup = "";
-		public string GetBarCodeStringAndImage(out string strFullPathImageOut, int nID = -1)
+		string nstrFolderBackup = "Trigger";
+		public string GetBarCodeStringAndImage(out string strFullPathImageOut,  int nID, string strCurrentLot)
 		{
 			strFullPathImageOut = "";
 
@@ -136,43 +136,9 @@ namespace Magnus_WPF_1.Source.Hardware
 			bIsDownload = true;
 			string strDeviceID = "";
 			//string str2 = "";
-			string strLotID = "Dummy";
-
-			if (MainWindow.mainWindow.master != null)
-			{
-				if (Application.Application.m_strCurrentLot != null && Application.Application.m_strCurrentLot != "")
-					strLotID = Application.Application.m_strCurrentLot;
-
-			}
-	
-
-			string strFolder = Path.Combine(Application.Application.pathImageSave, "PASS IMAGE", "Barcode", strLotID);
-			if (!Directory.Exists(strFolder))
-				Directory.CreateDirectory(strFolder);
-
-			string strFailFolder = Path.Combine(Application.Application.pathImageSave, "FAIL IMAGE", "Barcode", strLotID);
-			if (!Directory.Exists(strFailFolder))
-				Directory.CreateDirectory(strFailFolder);
-
-
-			if (nstrFolderBackup != strFolder)
-			{
-				nstrFolderBackup = strFolder;
-				nDeviceID = 0;
-			}
-
 
 			string strImageFullName;
-			if (nID < 0)
-			{
-				nDeviceID++;
-			}
-			else
-				nDeviceID = nID;
 
-
-
-			//strDeviceID = string.Format("{0}{1}{2}+{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
 
 			string resp = m_reader.ExecCommand("LON,01");
 			if (resp.Length > 0)
@@ -194,10 +160,7 @@ namespace Magnus_WPF_1.Source.Hardware
 				nResult = -(int)ERROR_CODE.PROCESS_ERROR;
 			}
 
-			////LogMessage.WriteToDebugViewer(3, $"Message responsed from Barcode Bank 2: {strDeviceID}");
-			//strImageFullName = Path.Combine(strFolder,  $"{strDeviceID}_{nDeviceID + 1}.bmp");
-			//strFullPathImageOut = strImageFullName;
-			strImageFullName = MainWindow.mainWindow.master.createImageFilePathToSave(nDeviceID, nResult, "Barcode", strDeviceID);
+			strImageFullName = MainWindow.mainWindow.master.createImageFilePathToSave(nID, nResult, "Barcode", strCurrentLot, strDeviceID);
 			strFullPathImageOut = strImageFullName;
 			System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
 			{
@@ -207,7 +170,7 @@ namespace Magnus_WPF_1.Source.Hardware
 			});
 			//m_reader.ExecCommand("LOFF");
 			bIsDownload = false;
-				return strDeviceID;
+			return strDeviceID;
 		}
 
 		void LoadInforPortNumber()

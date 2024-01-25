@@ -9,6 +9,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Windows;
 using System.Windows.Media;
 
 namespace Magnus_WPF_1.Source.Application
@@ -45,6 +46,35 @@ namespace Magnus_WPF_1.Source.Application
         public static int[] m_Width = { 3840, 680 };
         public static int[] m_Height = { 2748, 512 };
         static RegistryKey registerPreferences;
+
+        public Application()
+        {
+            if (!CheckMuTexProcess())
+            {
+                MessageBox.Show("The other Application is running!");
+
+                KillCurrentProcess();
+            }
+        }
+
+        #region KILL PROCCESS
+        public void KillCurrentProcess()
+        {
+            Environment.Exit(0);
+        }
+        #endregion
+
+        #region CHECK MUTEX (Run Only One SW)
+        public bool CheckMuTexProcess()
+        {
+            if (System.Diagnostics.Process.GetProcessesByName(System.Diagnostics.Process.GetCurrentProcess().ProcessName).Length > 1)
+            {
+                return false;
+            }
+            else
+            { return true; }
+        }
+        #endregion
 
         public static void CheckRegistry()
         {

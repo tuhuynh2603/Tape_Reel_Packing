@@ -1012,7 +1012,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 //LogMessage.LogMessage.WriteToDebugViewer(3, $"{nState} ");
 
                 //}
-                if (MainWindow.mainWindow.master.m_EmergencyStatus > 0 || MainWindow.mainWindow.master.m_bNeedToImidiateStop || HWinRobot.get_motor_state(HiWinRobotInterface.m_RobotConnectID) < 1)
+                if (MainWindow.mainWindow.master.m_EmergencyStatus == 1 || MainWindow.mainWindow.master.m_bNeedToImidiateStop || HWinRobot.get_motor_state(HiWinRobotInterface.m_RobotConnectID) < 1)
                 {
                     Thread.Sleep(500);
                     return 0;

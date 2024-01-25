@@ -265,7 +265,7 @@ namespace Magnus_WPF_1.Source.Define
                     LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, "Save 8!");
                     package.Save();
                     LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, "Save 9!");
-                    package.Dispose();
+                    //package.Dispose();
 
                 }
             }
@@ -274,11 +274,11 @@ namespace Magnus_WPF_1.Source.Define
 
                 LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, $"Save To Excel Failed! {e}");
 
-                //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                //{
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
 
-                //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Track{nTrack} Save To Excel Fail {e}!.", (int)ERROR_CODE.LABEL_FAIL);
-                //});
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Track{nTrack} Save To Excel Fail {e}!.", (int)ERROR_CODE.LABEL_FAIL);
+                });
             }
         }
 
@@ -291,6 +291,9 @@ namespace Magnus_WPF_1.Source.Define
                 Application.Application.currentRecipe,
                 Application.Application.m_strStartLotDay,
                 strTrackName[nTrack]);
+
+            if (!Directory.Exists(strRecipePath))
+                Directory.CreateDirectory(strRecipePath);
 
             string fullpath = Path.Combine(strRecipePath, $"{strLotID}.xlsx");
 

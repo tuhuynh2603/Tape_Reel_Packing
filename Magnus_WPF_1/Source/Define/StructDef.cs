@@ -55,7 +55,7 @@ namespace Magnus_WPF_1.Source.Define
         ANY_COLOR
     };
 
-    public enum AREA_INDEX: int
+    public enum AREA_INDEX : int
     {
         A1 = 0,
         A2,
@@ -63,7 +63,7 @@ namespace Magnus_WPF_1.Source.Define
         A4,
         A5,
     }
-    public enum WARNINGMESSAGE: int
+    public enum WARNINGMESSAGE : int
     {
         MESSAGE_EMERGENCY,
         MESSAGE_IMIDIATESTOP,
@@ -83,10 +83,10 @@ namespace Magnus_WPF_1.Source.Define
         POSITIVE
     };
 
-    public enum THRESHOLD_TYPE :int
+    public enum THRESHOLD_TYPE : int
     {
         BINARY_THRESHOLD = 0,
-        VAR_THRESHOLD = 1   
+        VAR_THRESHOLD = 1
     };
 
 
@@ -153,6 +153,12 @@ namespace Magnus_WPF_1.Source.Define
         NUM_DEFECTS
     };
 
+    public enum SEQUENCE_MODE : int
+    {
+        MODE_AUTO = 0,
+        MODE_MANUAL = 1
+    }
+
     public struct LocationReference
     {
         public int deltaX { get; set; }
@@ -195,16 +201,16 @@ namespace Magnus_WPF_1.Source.Define
             m_strFullImagePath = strPath;
         }
 
-        public static void SaveSequenceResultToExcel(string strLotID,int nTrack, VisionResultData data)
+        public static void SaveSequenceResultToExcel(string strLotID, int nTrack, VisionResultData data)
         {
 
             try
             {
                 string[] strTrackName = { "Camera", "Barcode" };
                 string strRecipePath = Path.Combine(
-                    Application.Application.pathStatistics,  
+                    Application.Application.pathStatistics,
                     Application.Application.currentRecipe,
-                    Application.Application.m_strStartLotDay,                  
+                    Application.Application.m_strStartLotDay,
                     strTrackName[nTrack]);
 
                 if (!Directory.Exists(strRecipePath))
@@ -218,10 +224,10 @@ namespace Magnus_WPF_1.Source.Define
                 if (!file.Exists)
                 {
                     file.Create();
-                    Thread.Sleep(200);
                 }
 
                 //file.CopyTo(backup_fullpath);
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Use NonCommercial license if applicable
 
                 using (ExcelPackage package = new ExcelPackage(file))
                 {
@@ -250,11 +256,10 @@ namespace Magnus_WPF_1.Source.Define
                     // Data
                     int row = data.m_nDeviceIndexOnReel + 2;
                     ncol = 1;
-                    worksheet.Cells[row, ncol++].Value = data.m_nDeviceIndexOnReel;
+                    worksheet.Cells[row, ncol++].Value = data.m_nDeviceIndexOnReel + 1;
                     worksheet.Cells[row, ncol++].Value = data.m_strDeviceID;
                     worksheet.Cells[row, ncol++].Value = data.m_nResult;
                     worksheet.Cells[row, ncol++].Value = data.m_strFullImagePath;
-
                     //foreach (var item in data)
                     //{
                     //    ncol = 1;
@@ -265,11 +270,11 @@ namespace Magnus_WPF_1.Source.Define
                     LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, "Save 8!");
                     package.Save();
                     LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, "Save 9!");
-                    //package.Dispose();
+                    package.Dispose();
 
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
 
                 LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, $"Save To Excel Failed! {e}");
@@ -312,7 +317,7 @@ namespace Magnus_WPF_1.Source.Define
                     package.Dispose();
                     return;
                 }
-                
+
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
                 worksheet.DefaultColWidth = 35;
                 worksheet.DefaultRowHeight = 35;
@@ -332,7 +337,7 @@ namespace Magnus_WPF_1.Source.Define
                     object valueTemp = worksheet.Cells[row, ncol++].Value;
                     if (valueTemp != null)
                     {
-                        result[row - 2].m_nDeviceIndexOnReel = Convert.ToInt32(valueTemp);
+                        result[row - 2].m_nDeviceIndexOnReel = Convert.ToInt32(valueTemp) - 1;
                         if (nSequenceDeviceTemp < result[row - 2].m_nDeviceIndexOnReel)
                             nSequenceDeviceTemp = result[row - 2].m_nDeviceIndexOnReel;
                     }
@@ -491,7 +496,7 @@ namespace Magnus_WPF_1.Source.Define
         public string m_strPathImage;
         public Emgu.CV.Mat imageSave;
     }
-    public enum TRACK_TYPE :int
+    public enum TRACK_TYPE : int
     {
         TRACK_CAM1 = 0,
         TRACK_CAM2 = 1,

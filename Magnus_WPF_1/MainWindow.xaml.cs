@@ -120,7 +120,7 @@ namespace Magnus_WPF_1
             }
         }
 
-        
+
 
         private double _dialogDefectHeight;
         private double _dialogDefectWidth;
@@ -321,7 +321,7 @@ namespace Magnus_WPF_1
             //    master.RunOfflineSequenceThread(n);
             //}
             master.RunOfflineSequenceThread(activeImageDock.trackID);
-            
+
             //master.RobotSequenceThread();
 
         }
@@ -358,7 +358,7 @@ namespace Magnus_WPF_1
         }
         public void func_loadAllStatistic(bool bResetSummary)
         {
-            for(int nT = 0; nT < 2; nT++)
+            for (int nT = 0; nT < 2; nT++)
             {
                 LoadStatistic(nT, bResetSummary);
             }
@@ -366,7 +366,7 @@ namespace Magnus_WPF_1
 
         public void LoadStatistic(int nT, bool bResetSummary)
         {
-                
+
             if (bResetSummary)
             {
                 for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)
@@ -501,7 +501,7 @@ namespace Magnus_WPF_1
                         ContentId = "N/A ",
                         CanFloat = true,
                         CanClose = false
-                        
+
                         //CanMove = false,
                     };
                     imagesViewPane[track_index].Children.Add(imagesViewDoc[track_index * num_Doc + doc_index]);
@@ -623,7 +623,8 @@ namespace Magnus_WPF_1
         bool isOneSpecificDocState = false;
         public void ZoomDocPanel(int trackID)
         {
-
+            if (MainWindow.mainWindow.m_bSequenceRunning)
+                return;
 
             if (!isOneSpecificDocState)
             {
@@ -641,27 +642,6 @@ namespace Magnus_WPF_1
                 layoutVision.ReplaceChild(tempPanelZoomView, tempDefaultPanelHomeView);
             }
 
-            //if (!isOneSpecificDocState)
-            //{
-            //    oldPanelGroup = mainPanelGroup;
-            //    imageZoomViewPane.ReplaceChild(zoomDoc, imagesViewDoc[trackID]);
-            //    imagesViewDoc[trackID].CanClose = true;
-            //    imagesViewDoc[trackID].CanFloat = true;
-            //    m_layoutPanel.ReplaceChildAt(0, bigPanelGroup);
-            //    //m_layoutPane
-            //    //m_layoutPanel.Orientation = Orientation.Horizontal;
-            //}
-            //else
-            //{
-            //    mainPanelGroup = oldPanelGroup;
-            //    imagesViewDoc[trackID].CanClose = true;
-            //    imagesViewDoc[trackID].CanFloat = true;
-            //    imageZoomViewPane.ReplaceChild(imagesViewDoc[trackID], zoomDoc);
-            //    imagesViewPane[trackID].Children.Add(imagesViewDoc[trackID]);
-            //    m_layoutPanel.ReplaceChildAt(0, m_layout);
-            //    //m_layoutPanel.Children.Add(m_MappingPaneGroup);
-            //}
-
             isOneSpecificDocState = !isOneSpecificDocState;
             child_PreviewMouseRightButtonDown(activeImageDock, null);
         }
@@ -670,6 +650,10 @@ namespace Magnus_WPF_1
 
         private void child_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
+
+            if (MainWindow.mainWindow.m_bSequenceRunning)
+                return;
+
             ImageView im = sender as ImageView;
             int track = im.trackID;
 
@@ -694,6 +678,10 @@ namespace Magnus_WPF_1
         public bool bEnableGrabCycle = false;
         private void btn_stream_camera_Checked(object sender, RoutedEventArgs e)
         {
+
+            if (MainWindow.mainWindow.m_bSequenceRunning)
+                return;
+
             bEnableGrabCycle = (bool)btn_stream_camera.IsChecked;
 
             if (master.thread_StreamCamera[activeImageDock.trackID] == null)
@@ -720,8 +708,15 @@ namespace Magnus_WPF_1
 
         private void btn_Camera_Setting_Checked(object sender, RoutedEventArgs e)
         {
-            bool bEnable = (bool)btn_camera_setting.IsChecked;
 
+            if (MainWindow.mainWindow.m_bSequenceRunning)
+            {
+                return;
+            }
+
+
+
+            bool bEnable = (bool)btn_camera_setting.IsChecked;
             int currentTabIndex = tab_controls.SelectedIndex;
             //tt_DialogSettings.X = 0;
             //tt_DialogSettings.Y = 0;
@@ -730,7 +725,7 @@ namespace Magnus_WPF_1
             grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Left;
 
             grd_PopupDialog.Children.Clear();
-            if(master.m_Tracks[0].m_hIKControlCameraView != null)
+            if (master.m_Tracks[0].m_hIKControlCameraView != null)
                 grd_PopupDialog.Children.Add(master.m_Tracks[0].m_hIKControlCameraView);
 
             grd_PopupDialog.Visibility = Visibility.Visible;
@@ -775,6 +770,8 @@ namespace Magnus_WPF_1
         }
         private void btn_save_current_image_Click(object sender, RoutedEventArgs e)
         {
+            if (MainWindow.mainWindow.m_bSequenceRunning)
+                return;
             //var result = MessageBox.Show("Do you want to save as teach image ?", "Save as Teach Image", MessageBoxButton.YesNo, MessageBoxImage.Question);
             //if (result == MessageBoxResult.Yes)
             //{
@@ -787,6 +784,10 @@ namespace Magnus_WPF_1
         string m_strSelectionFolderFilePath = "";
         private void btn_load_image_File_Click(object sender, RoutedEventArgs e)
         {
+
+            if (MainWindow.mainWindow.m_bSequenceRunning)
+                return;
+
             if (m_strSelectionFolderFilePath == @"C:\" || m_strSelectionFolderFilePath == "")
                 m_strSelectionFolderFilePath = Path.Combine(Application.pathImageSave, "UI Image");
             // Set the initial directory for the dialog box
@@ -815,6 +816,9 @@ namespace Magnus_WPF_1
 
         private void Btn_load_teach_image_Click(object sender, RoutedEventArgs e)
         {
+            if (MainWindow.mainWindow.m_bSequenceRunning)
+                return;
+
             master.loadTeachImageToUI(activeImageDock.trackID);
         }
 
@@ -823,32 +827,9 @@ namespace Magnus_WPF_1
         {
             if (!inspect_btn.IsEnabled || m_bSequenceRunning || (bool)btn_run_sequence.IsChecked)
                 return;
-            //if (bEnableSingleSnapImages)
-            //    bEnableSingleSnapImages = false;
-
-            //if (m_bEnableDebug)
-            //{
-            //    InspectionCore.LoadImageToInspection(master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource);
-            //    master.m_Tracks[activeImageDock.trackID].Inspect();
-            //    UpdateDebugInfor();
-            //    return;
-            //}
 
             Master.InspectEvent[activeImageDock.trackID].Set();
 
-            //if (master.thread_FullSequence[activeImageDock.trackID] == null)
-            //{
-            //    master.thread_FullSequence[activeImageDock.trackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Thread(true)));
-            //    master.thread_FullSequence[activeImageDock.trackID].Start();
-            //}
-            //else if (!master.thread_FullSequence[activeImageDock.trackID].IsAlive)
-            //{
-            //    master.thread_FullSequence[activeImageDock.trackID] = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Thread(true)));
-            //    master.thread_FullSequence[activeImageDock.trackID].Start();
-            //}
-
-            //mainWindow.statisticView.UpdateValueStatistic(master.m_Tracks[0].m_nResult);
-            //inspect_btn.IsEnabled = bEnableGrabImages;
         }
 
 
@@ -1006,9 +987,9 @@ namespace Magnus_WPF_1
             btn_mapping_parameters.IsChecked = false;
             grd_PopupDialog.Children.Clear();
 
-            if (m_nDeviceX != Source.Application.Application.categoriesMappingParam.M_NumberDeviceX 
+            if (m_nDeviceX != Source.Application.Application.categoriesMappingParam.M_NumberDeviceX
                 || m_nDeviceY != Source.Application.Application.categoriesMappingParam.M_NumberDeviceY
-                ||m_nTotalDevicePerLot != Source.Application.Application.categoriesMappingParam.M_NumberDevicePerLot)
+                || m_nTotalDevicePerLot != Source.Application.Application.categoriesMappingParam.M_NumberDevicePerLot)
             {
                 master.LoadRecipe();
                 m_staticView.InitCanvasMapping();
@@ -1022,6 +1003,7 @@ namespace Magnus_WPF_1
 
         private void btn_mapping_parameters_Checked(object sender, RoutedEventArgs e)
         {
+
             btn_mapping_parameters.IsChecked = true;
 
             int currentTabIndex = tab_controls.SelectedIndex;
@@ -1083,7 +1065,7 @@ namespace Magnus_WPF_1
 
         }
 
-         public void AddLineOutputLog(string text, int nStyle = (int)ERROR_CODE.PASS)
+        public void AddLineOutputLog(string text, int nStyle = (int)ERROR_CODE.PASS)
         {
             if (outputLogView == null)
                 return;
@@ -1117,6 +1099,12 @@ namespace Magnus_WPF_1
         bool m_bBinarizeStatus = false;
         private void btn_Binarize_Click(object sender, RoutedEventArgs e)
         {
+            if (MainWindow.mainWindow.m_bSequenceRunning)
+            {
+                btn_Binarize_Off();
+                return;
+            }
+
             if (activeImageDock == null)
                 return;
             m_bBinarizeStatus = !m_bBinarizeStatus;
@@ -1175,6 +1163,8 @@ namespace Magnus_WPF_1
         public bool m_bEnableDebug;
         private void btn_debug_Checked(object sender, RoutedEventArgs e)
         {
+            if (MainWindow.mainWindow.m_bSequenceRunning)
+                return;
 
             m_bEnableDebug = (bool)debug_btn.IsChecked;
             if (master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource.Width < 0)
@@ -1208,15 +1198,15 @@ namespace Magnus_WPF_1
                 grd_Defect_Settings.Visibility = Visibility.Collapsed;
                 return;
             }
-                //defectInfor.lvDefect.View = gridView;
-                defectInfor.lvDefect.ItemsSource = null;
-                defectInfor.lvDefect.ItemsSource = master.m_Tracks[activeImageDock.trackID].m_StepDebugInfors;
-                DialogDefectHeight = defectInfor.Height;
-                DialogDefectWidth = defectInfor.Width;
+            //defectInfor.lvDefect.View = gridView;
+            defectInfor.lvDefect.ItemsSource = null;
+            defectInfor.lvDefect.ItemsSource = master.m_Tracks[activeImageDock.trackID].m_StepDebugInfors;
+            DialogDefectHeight = defectInfor.Height;
+            DialogDefectWidth = defectInfor.Width;
 
-                grd_Defect.Children.Clear();
-                grd_Defect.Children.Add(defectInfor);
-                grd_Defect_Settings.Visibility = Visibility.Visible;
+            grd_Defect.Children.Clear();
+            grd_Defect.Children.Add(defectInfor);
+            grd_Defect_Settings.Visibility = Visibility.Visible;
 
         }
 
@@ -1249,6 +1239,9 @@ namespace Magnus_WPF_1
 
         private void btn_Robot_Controller_Checked(object sender, RoutedEventArgs e)
         {
+            if (MainWindow.mainWindow.m_bSequenceRunning && false)
+                return;
+
             isRobotControllerOpen = (bool)btn_Robot_Controller.IsChecked;
             master.OpenHiwinRobotDialog(isRobotControllerOpen);
 
@@ -1361,9 +1354,10 @@ namespace Magnus_WPF_1
         private void btn_Reset_Machine_Click(object sender, RoutedEventArgs e)
         {
             btn_Reset_Machine.IsChecked = false;
-            if(master.m_ResetMachineStatus_Simulate == 0)
+            if (master.m_ResetMachineStatus_Simulate == 0)
                 master.m_ResetMachineStatus_Simulate = 1;
-
+            if (m_bSequenceRunning)
+                return;
             if (master.thread_RobotSequence == null)
             {
                 master.thread_RobotSequence = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.ResetSequence()));
@@ -1548,8 +1542,8 @@ namespace Magnus_WPF_1
             btn_Emergency_Stop.IsEnabled = bEnable;
             btn_LoadRecipe.IsEnabled = bEnable;
         }
-        
-        public void  EnableMotorFunction()
+
+        public void EnableMotorFunction()
         {
             if (master == null)
                 return;
@@ -1565,7 +1559,7 @@ namespace Magnus_WPF_1
 
         private void CleanHotKey()
         {
-            
+
             foreach (var obj in hotkey)
             {
                 InputBindings.Remove(obj);
@@ -1629,7 +1623,7 @@ namespace Magnus_WPF_1
 
         }
 
-       public bool bNextStepSimulateSequence = false;
+        public bool bNextStepSimulateSequence = false;
         //private void btn_Simulate_Sequence_Click(object sender, RoutedEventArgs e)
         //{
         //    if(bNextStepSimulateSequence == false)
@@ -1649,7 +1643,7 @@ namespace Magnus_WPF_1
 
         private void text_LotID_TextChanged(object sender, TextChangedEventArgs e)
         {
-             //text_LotID.IsEnabled = !m_bEnableRunSequence;
+            //text_LotID.IsEnabled = !m_bEnableRunSequence;
             //if (m_bEnableRunSequence
             //    m_strCurrentLotID = Application.m_strCurrentLot;
         }

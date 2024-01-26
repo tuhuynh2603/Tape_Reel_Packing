@@ -700,7 +700,7 @@
                                                             CheckedBackground="{StaticResource CheckedButtonStyle}"
                                                             Width="auto" Unchecked="btn_enable_saveimage_Unchecked" 
                                                             Checked="btn_enable_saveimage_Checked"
-                                                            IsChecked="True"/>
+                                                            IsChecked="False"/>
 
                                     <RibbonButton Name="load_teach_image_btn"
                                                             Label="Load Teach Image"

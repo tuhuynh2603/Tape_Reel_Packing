@@ -238,13 +238,18 @@ namespace Magnus_WPF_1.UI.UserControls.View
         }
         private void canvas_Mapping_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (MainWindow.mainWindow.m_bSequenceRunning)
+                return;
+
             int nTrackId = 0;
             m_CanvasMovePoint = e.GetPosition(canvas_Mapping);
             int nID = Check_mapping_Cursor_ID(m_CanvasMovePoint, true, ref nTrackId);
+
+
             MainWindow.mainWindow.master.m_Tracks[nTrackId].m_nCurrentClickMappingID = nID + m_nPageID[nTrackId] * MainWindow.mainWindow.m_nDeviceX * MainWindow.mainWindow.m_nDeviceY;
 
-            MainWindow.mainWindow.master.m_Tracks[nTrackId].CheckInspectionOnlineThread();
-            if (MainWindow.mainWindow.m_bSequenceRunning || MainWindow.mainWindow.bEnableOfflineInspection)
+            //MainWindow.mainWindow.master.m_Tracks[nTrackId].CheckInspectionOnlineThread();
+            if ( MainWindow.mainWindow.bEnableOfflineInspection)
                 Master.m_OfflineTriggerSnapEvent[nTrackId].Set();
             else
                 Master.InspectEvent[nTrackId].Set();
@@ -252,6 +257,9 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
         private void canvas_Mapping_MouseMove(object sender, MouseEventArgs e)
         {
+            if (MainWindow.mainWindow.m_bSequenceRunning)
+                return;
+
             m_CanvasMovePoint = e.GetPosition(canvas_Mapping);
             int nTrack = 0;
             Check_mapping_Cursor_ID(m_CanvasMovePoint, false, ref nTrack);
@@ -259,6 +267,9 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
         private void canvas_Mapping_MouseLeave(object sender, MouseEventArgs e)
         {
+            if (MainWindow.mainWindow.m_bSequenceRunning)
+                return;
+
             border_boundingbox_moving.BorderThickness = new Thickness(0);
             nDeviceID = -1;
         }
@@ -391,22 +402,32 @@ namespace Magnus_WPF_1.UI.UserControls.View
 
         private void btn_Previous_Page_Click(object sender, RoutedEventArgs e)
         {
+            if (MainWindow.mainWindow.m_bSequenceRunning)
+                return;
+
             previousPage(0);
         }
 
         private void btn_Next_Page_Click(object sender, RoutedEventArgs e)
         {
+            if (MainWindow.mainWindow.m_bSequenceRunning)
+                return;
 
             NextPage(0);
         }
 
         private void btn_Previous_Page2_Click(object sender, RoutedEventArgs e)
         {
+            if (MainWindow.mainWindow.m_bSequenceRunning)
+                return;
+
             previousPage(1);
         }
 
         private void btn_Next_Page2_Click(object sender, RoutedEventArgs e)
         {
+            if (MainWindow.mainWindow.m_bSequenceRunning)
+                return;
 
             NextPage(1);
         }

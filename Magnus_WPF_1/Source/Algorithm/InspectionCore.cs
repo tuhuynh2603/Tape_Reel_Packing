@@ -1021,7 +1021,6 @@ namespace Magnus_WPF_1.Source.Algorithm
                 nErrorBlackChip = FindBlackChip(ref zoomedInImage, ref region_SearchDeviceLocation, ref pCenterBlackChip, ref list_arrayOverlay, ref debugInfors, bEnableDebug);
 
                 //CvInvoke.WaitKey(0);
-                timeIns.Restart();
 
 
                 if (nErrorBlackChip == -(int)ERROR_CODE.PASS && nErrorTemp == -(int)ERROR_CODE.NO_PATTERN_FOUND)
@@ -1044,6 +1043,8 @@ namespace Magnus_WPF_1.Source.Algorithm
 
                 }
             }
+
+            timeIns.Restart();
 
             CvImage mat_point = new CvImage();
             mat_point = CvImage.Zeros(zoomedInImage.Height, zoomedInImage.Width, DepthType.Cv8U, 1);

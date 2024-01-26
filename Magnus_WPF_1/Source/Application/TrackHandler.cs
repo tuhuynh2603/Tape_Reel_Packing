@@ -618,7 +618,7 @@ namespace Magnus_WPF_1.Source.Application
             timeIns.Start();
             int nDeviceID = m_CurrentSequenceDeviceID;
             int nDeviceIDFail = 0;
-
+            bool bAlreadySetEvent = false;
             while (true)
             {
                 if (!MainWindow.m_IsWindowOpen || MainWindow.mainWindow == null)
@@ -627,7 +627,6 @@ namespace Magnus_WPF_1.Source.Application
                 try
                 {
                     m_bInspecting = false;
-                    LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{Application.LineNumber()}: {Application.PrintCallerName()}");
                     pCenter = new PointF(0, 0);
                     pCorner = new PointF(0, 0);
 
@@ -640,7 +639,8 @@ namespace Magnus_WPF_1.Source.Application
                     //    Thread.Sleep(5);
                     //}
                     Master.InspectEvent[m_nTrackID].WaitOne();
-
+                    Master.InspectEvent[m_nTrackID].Reset();
+                    bAlreadySetEvent = false;
                     if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
                         break;
 
@@ -656,11 +656,11 @@ namespace Magnus_WPF_1.Source.Application
                             ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($" {strCameraName[m_nTrackID]}: Capture Failed!", (int)ERROR_CODE.LABEL_FAIL);
 
                         });
-                        m_InspectionOnlineThreadVisionResult.m_nResult = -(int)ERROR_CODE.CAPTURE_FAIL;
+                        m_InspectionOnlineThreadVisionResult.m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
+                        Master.InspectDoneEvent[m_nTrackID].Set();
                         goto InspectionDone;
                     }
 
-                    //Master.InspectEvent[m_nTrackID].Reset();
                     m_bInspecting = true;
                     //if (m_CurrentSequenceDeviceID < 0 || m_CurrentSequenceDeviceID >= m_VisionResultDatas.Length)
                     //    m_CurrentSequenceDeviceID = 0;
@@ -689,6 +689,7 @@ namespace Magnus_WPF_1.Source.Application
                         m_InspectionOnlineThreadVisionResult.m_strFullImagePath = mainWindow.master.createImageFilePathToSave(nDeviceIDFail++, m_SequenceVisionResult, "Camera", Application.m_strCurrentLot);
 
                     Master.InspectDoneEvent[m_nTrackID].Set();
+                    bAlreadySetEvent = true;
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, "Total inspection time: " + timeIns.ElapsedMilliseconds.ToString());
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
@@ -746,8 +747,11 @@ namespace Magnus_WPF_1.Source.Application
                         ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($" {strCameraName[m_nTrackID]}: Inspection Thread PROCESS ERROR", (int)ERROR_CODE.LABEL_FAIL);
 
                     });
-                    m_InspectionOnlineThreadVisionResult.m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
-                    Master.InspectDoneEvent[m_nTrackID].Set();
+                    if (!bAlreadySetEvent)
+                    {
+                        m_InspectionOnlineThreadVisionResult.m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
+                        Master.InspectDoneEvent[m_nTrackID].Set();
+                    }
                     continue;
                 }
             }
@@ -923,7 +927,7 @@ namespace Magnus_WPF_1.Source.Application
         public void func_InspectOnlineThread()
         {
             string[] strCameraName = { "Camera", "BarCode" };
-
+            bool bAlreadySetEvent = false;
         Start_InspectionOnlineThread:
             LogMessage.WriteToDebugViewer(7 + m_nTrackID, $"Start Inspection Online thread {strCameraName[m_nTrackID]}");
 
@@ -959,7 +963,8 @@ namespace Magnus_WPF_1.Source.Application
 
                 LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Get event HarTrigger ");
                 Master.m_hardwareTriggerSnapEvent[m_nTrackID].WaitOne();
-
+                Master.m_hardwareTriggerSnapEvent[m_nTrackID].Reset();
+                bAlreadySetEvent = false;
                 if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
                     break;
 
@@ -985,8 +990,9 @@ namespace Magnus_WPF_1.Source.Application
 
                             });
                             m_InspectionOnlineThreadVisionResult.m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
-
-                            goto InspectionDone;
+                            Master.m_EventInspectionOnlineThreadDone[m_nTrackID].Set();
+                            Master.InspectEvent[m_nTrackID].Reset();
+                            goto Start_InspectionOnlineThread;
                         }
 
                         m_hIKControlCameraView.CaptureAndGetImageBuffer(ref m_imageViews[0].bufferImage, ref nWidth, ref nHeight);
@@ -999,8 +1005,9 @@ namespace Magnus_WPF_1.Source.Application
 
                             });
                             m_InspectionOnlineThreadVisionResult.m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
-
-                            goto InspectionDone;
+                            Master.m_EventInspectionOnlineThreadDone[m_nTrackID].Set();
+                            Master.InspectEvent[m_nTrackID].Reset();
+                            goto Start_InspectionOnlineThread;
                         }
                         m_imageViews[0].UpdateSourceImageMono();
                     }
@@ -1028,9 +1035,10 @@ namespace Magnus_WPF_1.Source.Application
                         });
                         m_InspectionOnlineThreadVisionResult.m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
                         Master.m_EventInspectionOnlineThreadDone[m_nTrackID].Set();
-                        //Master.InspectEvent[m_nTrackID].Reset();
+                        Master.InspectEvent[m_nTrackID].Reset();
                         goto Start_InspectionOnlineThread;
                     }
+                    Master.InspectDoneEvent[m_nTrackID].Reset();
 
                 InspectionDone:
 
@@ -1038,7 +1046,9 @@ namespace Magnus_WPF_1.Source.Application
                     {
                         m_InspectionOnlineThreadVisionResult.m_nDeviceIndexOnReel = nDeviceID;
                         m_InspectionOnlineThreadVisionResult.m_strDeviceID = m_CurrentSequenceDeviceID.ToString();
+                        bAlreadySetEvent = true;
                         Master.m_EventInspectionOnlineThreadDone[m_nTrackID].Set();
+
                         LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Get Inspection Result Done. Total Inspection Time: " + timeIns.ElapsedMilliseconds.ToString());
 
                     }
@@ -1065,6 +1075,7 @@ namespace Magnus_WPF_1.Source.Application
                             LogMessage.WriteToDebugViewer(8, "Barcode Save Image Done!");
                         }
                         m_InspectionOnlineThreadVisionResult.m_strFullImagePath = strFullPathImageOut;
+                        bAlreadySetEvent = true;
                         Master.m_EventInspectionOnlineThreadDone[m_nTrackID].Set();
                         LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Get Barcode Result Done. Total Inspection Time: " + timeIns.ElapsedMilliseconds.ToString());
 
@@ -1091,12 +1102,25 @@ namespace Magnus_WPF_1.Source.Application
                         ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Function_Inspection Online Thread FAILED!", (int)ERROR_CODE.LABEL_FAIL);
                     });
 
+                    if (!bAlreadySetEvent)
+                    {
+                        m_InspectionOnlineThreadVisionResult.m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
+                        Master.m_EventInspectionOnlineThreadDone[m_nTrackID].Set();
+                        Master.InspectEvent[m_nTrackID].Reset();
+                    }
+
                     goto Start_InspectionOnlineThread;
 
                 }
 
             }
 
+            if (!bAlreadySetEvent)
+            {
+                m_InspectionOnlineThreadVisionResult.m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
+                Master.m_EventInspectionOnlineThreadDone[m_nTrackID].Set();
+                Master.InspectEvent[m_nTrackID].Reset();
+            }
             LogMessage.WriteToDebugViewer(1, $"Track {m_nTrackID}: func_InspectionOnlineThread Thread Released!");
 
         }

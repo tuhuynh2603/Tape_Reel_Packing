@@ -61,7 +61,7 @@ namespace Magnus_WPF_1.UI.UserControls.ViewModel
 
                                                                             MainWindow.m_IsWindowOpen = false;
                                                                             Master.ReleaseEventAndThread();
-                                                                            Thread.Sleep(1000);
+                                                                            Thread.Sleep(500);
                                                                             //MainWindow.mainWindow.master = null;
                                                                             MainWindow.mainWindow.Close();
                                                                             //MainWindow.mainWindow = null;

@@ -1037,16 +1037,6 @@ namespace Magnus_WPF_1
 
         }
 
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            master.m_hiWinRobotInterface.m_hikThread.Interrupt();
-            master.m_hiWinRobotInterface.m_hikThread.Abort();
-            master.DeleteMaster();
-            mainWindow = null;
-            master = null;
-
-        }
-
         private void btn_online_Checked(object sender, RoutedEventArgs e)
         {
 

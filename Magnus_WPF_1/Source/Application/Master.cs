@@ -13,6 +13,7 @@ namespace Magnus_WPF_1.Source.Application
     using Magnus_WPF_1.Source.Hardware;
     using Microsoft.Win32;
     using System.Diagnostics;
+    using System.Runtime.InteropServices;
     using System.Windows;
     using static HiWinRobotInterface;
     using static Magnus_WPF_1.Source.Application.Track;
@@ -35,16 +36,16 @@ namespace Magnus_WPF_1.Source.Application
         public static AutoResetEvent m_NextStepTeachEvent;
         //public CommLog commLog = new CommLog();
 
-        public static AutoResetEvent[] InspectEvent;
-        public static AutoResetEvent[] InspectDoneEvent;
-        public static AutoResetEvent[] m_hardwareTriggerSnapEvent;
+        public static ManualResetEvent[] InspectEvent;
+        public static ManualResetEvent[] InspectDoneEvent;
+        public static ManualResetEvent[] m_hardwareTriggerSnapEvent;
         public static AutoResetEvent[] m_OfflineTriggerSnapEvent;
         public int m_bNextStepSequence = 0;
 
         public static AutoResetEvent m_NextStepSequenceEvent;
         public static AutoResetEvent m_EmergencyStopSequenceEvent;
 
-        public static AutoResetEvent[] m_EventInspectionOnlineThreadDone;
+        public static ManualResetEvent[] m_EventInspectionOnlineThreadDone;
         public static AutoResetEvent[] StartWaitPLCToTriggerCameraEvent;
 
         // public AutoDeleteImagesDlg m_AutoDeleteImagesDlg = new AutoDeleteImagesDlg();
@@ -161,6 +162,7 @@ namespace Magnus_WPF_1.Source.Application
                 InspectEvent[nTrack].Dispose();
                 InspectDoneEvent[nTrack].Set();
                 InspectDoneEvent[nTrack].Dispose();
+                m_EventInspectionOnlineThreadDone[nTrack].Set();
                 m_EventInspectionOnlineThreadDone[nTrack].Dispose();
             }
         }
@@ -214,12 +216,12 @@ namespace Magnus_WPF_1.Source.Application
         private void ContructorDocComponent()
         {
             m_Tracks = new Track[Application.m_nTrack];
-            InspectEvent = new AutoResetEvent[Application.m_nTrack];
-            InspectDoneEvent = new AutoResetEvent[Application.m_nTrack];
+            InspectEvent = new ManualResetEvent[Application.m_nTrack];
+            InspectDoneEvent = new ManualResetEvent[Application.m_nTrack];
             m_OfflineTriggerSnapEvent = new AutoResetEvent[Application.m_nTrack];
-            m_EventInspectionOnlineThreadDone = new AutoResetEvent[Application.m_nTrack];
-            StartWaitPLCToTriggerCameraEvent = new AutoResetEvent[Application.m_nTrack];
-            m_hardwareTriggerSnapEvent = new AutoResetEvent[Application.m_nTrack];
+            m_EventInspectionOnlineThreadDone = new ManualResetEvent[Application.m_nTrack];
+            //StartWaitPLCToTriggerCameraEvent = new AutoResetEvent[Application.m_nTrack];
+            m_hardwareTriggerSnapEvent = new ManualResetEvent[Application.m_nTrack];
             m_NextStepSequenceEvent = new AutoResetEvent(false);
             m_EmergencyStopSequenceEvent = new AutoResetEvent(false);
             m_SaveInspectImageThread = new Thread[Application.m_nTrack];
@@ -238,13 +240,13 @@ namespace Magnus_WPF_1.Source.Application
                 m_SaveInspectImageQueue[index_track] = new Queue<ImageSaveData>();
                 m_UpdateResultQueue[index_track] = new Queue<VisionResultData>();
                 //for(int index_doc = 0; index_doc < Application.m_nDoc; index_doc++)
-                InspectEvent[index_track] = new AutoResetEvent(false);
-                InspectDoneEvent[index_track] = new AutoResetEvent(false);
-                m_hardwareTriggerSnapEvent[index_track] = new AutoResetEvent(false);
+                InspectEvent[index_track] = new ManualResetEvent(false);
+                InspectDoneEvent[index_track] = new ManualResetEvent(false);
+                m_hardwareTriggerSnapEvent[index_track] = new ManualResetEvent(false);
                 m_OfflineTriggerSnapEvent[index_track] = new AutoResetEvent(false);
 
-                m_EventInspectionOnlineThreadDone[index_track] = new AutoResetEvent(false);
-                StartWaitPLCToTriggerCameraEvent[index_track] = new AutoResetEvent(false);
+                m_EventInspectionOnlineThreadDone[index_track] = new ManualResetEvent(false);
+                //StartWaitPLCToTriggerCameraEvent[index_track] = new AutoResetEvent(false);
 
                 list_arrayOverlay[index_track] = new List<ArrayOverLay>();
 
@@ -451,21 +453,18 @@ namespace Magnus_WPF_1.Source.Application
         }
         internal void RunOnlineSequenceThread(int nTrack)
         {
+            //InspectDoneEvent[nTrack].Reset();
+            //InspectEvent[nTrack].Reset();
+            //m_hardwareTriggerSnapEvent[nTrack].Reset();
             if (thread_InspectSequence[nTrack] == null)
             {
-                InspectDoneEvent[nTrack].Reset();
-                InspectEvent[nTrack].Reset();
-                m_hardwareTriggerSnapEvent[nTrack].Reset();
+
                 thread_InspectSequence[nTrack] = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[nTrack].func_InspectOnlineThread()));
                 //thread_InspectSequence[nTrack].IsBackground = true;
                 thread_InspectSequence[nTrack].Start();
             }
             else if (!thread_InspectSequence[nTrack].IsAlive)
             {
-                InspectDoneEvent[nTrack].Reset();
-                InspectEvent[nTrack].Reset();
-                m_hardwareTriggerSnapEvent[nTrack].Reset();
-
                 thread_InspectSequence[nTrack] = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[nTrack].func_InspectOnlineThread()));
                 //thread_InspectSequence[nTrack].IsBackground = true;
                 thread_InspectSequence[nTrack].Start();
@@ -681,6 +680,30 @@ namespace Magnus_WPF_1.Source.Application
                     m_DoorOpennedStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_DOOR_STATUS);
                     m_CreateNewLotStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CREATE_NEW_LOT);
                     m_EndLotStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_END_LOT);
+
+                    if (m_EmergencyStatus > 1 && m_bRobotSequenceStatus)
+                    {
+                    reconnect:
+                        m_hiWinRobotInterface.ReconnectToHIKRobot();
+                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Robot Disconnected! Reconnecting... = {m_EmergencyStatus}!", (int)ERROR_CODE.LABEL_FAIL);
+                        });
+                        Thread.Sleep(1000);
+
+                        if (m_RobotConnectID >= 0)
+                        {
+                            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Robot Connected.. = {m_EmergencyStatus}!", (int)ERROR_CODE.LABEL_FAIL);
+                            });
+                            continue;
+                        }
+                        else
+                            goto reconnect;
+
+                    }
+
                 }
 
                 if (m_ImidiateStatus == 1)
@@ -816,9 +839,9 @@ namespace Magnus_WPF_1.Source.Application
                             VisionResultData.SaveSequenceResultToExcel(Application.m_strCurrentLot, nT, new VisionResultData());
                             MainWindow.mainWindow.m_staticView.m_nPageID[nT] = 0;
                             MainWindow.mainWindow.LoadStatistic(nT, false);
-                            InspectEvent[nT].Reset();
-                            InspectDoneEvent[nT].Reset();
-                            m_hardwareTriggerSnapEvent[nT].Reset();
+                            //InspectEvent[nT].Reset();
+                            //InspectDoneEvent[nT].Reset();
+                            //m_hardwareTriggerSnapEvent[nT].Reset();
                             m_Tracks[nT].m_CurrentSequenceDeviceID = 0;
                             while (m_SaveInspectImageQueue[nT].Count > 0)
                                 m_SaveInspectImageQueue[nT].Dequeue();
@@ -918,6 +941,7 @@ namespace Magnus_WPF_1.Source.Application
 
             if (thread_RobotSequence == null)
             {
+
                 thread_RobotSequence = new System.Threading.Thread(new System.Threading.ThreadStart(() => func_RobotSequence()));
                 //thread_RobotSequence.IsBackground = true;
                 thread_RobotSequence.Start();
@@ -1045,7 +1069,7 @@ namespace Magnus_WPF_1.Source.Application
 
             //Application.SetIntRegistry(Application.m_strCurrentDeviceID_Registry[0], m_Tracks[0].m_CurrentSequenceDeviceID);
 
-
+            m_nWaitEventInspectionOnlineThreadStatus = 0;
             if (func_CameraTriggerThread() < 0 || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
             {
                 return;
@@ -1072,7 +1096,7 @@ namespace Magnus_WPF_1.Source.Application
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Waiting for vision result...");
 
-                while (!Master.m_EventInspectionOnlineThreadDone[0].WaitOne(10))
+                while (m_nWaitEventInspectionOnlineThreadStatus == 0)
                 {
                     if (MainWindow.mainWindow == null)
                         return;
@@ -1093,7 +1117,6 @@ namespace Magnus_WPF_1.Source.Application
                         Thread.Sleep(3000);
                         goto _Start_Lot;
                     }
-
                 }
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Waiting for vision result Done!");
@@ -1112,7 +1135,12 @@ namespace Magnus_WPF_1.Source.Application
                 }
 
                 Thread.Sleep(10);
-                nCamera1InspectionResult = m_Tracks[0].m_InspectionOnlineThreadVisionResult.m_nResult;
+                if(m_nWaitEventInspectionOnlineThreadStatus > 0 )
+                    nCamera1InspectionResult = m_Tracks[0].m_InspectionOnlineThreadVisionResult.m_nResult;
+                else
+                    nCamera1InspectionResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
+
+
                 if (nCamera1InspectionResult == -(int)ERROR_CODE.NO_PATTERN_FOUND) // If no pattern found, popup Error 
                 {
                     nRetry++;
@@ -1139,6 +1167,7 @@ namespace Magnus_WPF_1.Source.Application
                     goto StartSequence;
                     //return;
                 }
+
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Station 1 Inspection done  ({timeIns.ElapsedMilliseconds} ms)"); timeIns.Restart();
                 nError = WaitForNextStepSequenceEvent("Inspection done. Press Next to Move to  pre pick position");
                 if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
@@ -1313,6 +1342,7 @@ namespace Magnus_WPF_1.Source.Application
                 // If not yet trigger camera 1, trigger again
                 if (m_StartWaitPLCReadyToTriggerCameraThread[0] == null || !m_StartWaitPLCReadyToTriggerCameraThread[0].IsAlive)
                 {
+                    m_nWaitEventInspectionOnlineThreadStatus = 0;
                     m_StartWaitPLCReadyToTriggerCameraThread[0] = new System.Threading.Thread(new System.Threading.ThreadStart(() => func_CameraTriggerThread(nCurrentSequenceStep, 0)));
                     //m_StartWaitPLCReadyToTriggerCameraThread[0].IsBackground = true;
                     m_StartWaitPLCReadyToTriggerCameraThread[0].Start();
@@ -1558,13 +1588,12 @@ namespace Magnus_WPF_1.Source.Application
             }
 
         }
+
+        int m_nWaitEventInspectionOnlineThreadStatus = 0;
         public int func_CameraTriggerThread(int nCurrentSequenceStep = -1, int nTrack = 0)
         {
             //int nError;
             LogMessage.LogMessage.WriteToDebugViewer(9, $"Waiting for Chip found Signal from PLC");
-            m_EventInspectionOnlineThreadDone[0].Reset();
-            m_hardwareTriggerSnapEvent[0].Reset();
-
             while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CHIPFOUND) == 0)
             {
 
@@ -1577,7 +1606,24 @@ namespace Magnus_WPF_1.Source.Application
             LogMessage.LogMessage.WriteToDebugViewer(9, $"Set PLC Conveyor ({ (int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON} ON");
             HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON, false);
             LogMessage.LogMessage.WriteToDebugViewer(9, $"Set Camera Trigger Event ");
+            m_EventInspectionOnlineThreadDone[0].Reset();
             m_hardwareTriggerSnapEvent[0].Set();
+            Stopwatch timeIns_fullSequence = new Stopwatch();
+            int m_nTimeOut = 0;
+            while (!m_EventInspectionOnlineThreadDone[0].WaitOne(10))
+            {
+                m_nTimeOut++;
+                if (m_nTimeOut > 500)
+                {
+                    break;
+                }
+            }
+            m_EventInspectionOnlineThreadDone[0].Reset();
+
+            if (m_nTimeOut > 500)
+                m_nWaitEventInspectionOnlineThreadStatus = -1;
+            else
+                m_nWaitEventInspectionOnlineThreadStatus = 1;
             return 0;
         }
         internal void BarcodeReaderSequenceThread()
@@ -1689,7 +1735,7 @@ namespace Magnus_WPF_1.Source.Application
                 int nDeviceID = m_Tracks[1].m_CurrentSequenceDeviceID;
 
                 LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Set BARCODE_CAPTURE_BUSY {(int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY} ON ");
-                if (m_SequenceMode == 0)
+                if (m_SequenceMode == SEQUENCE_MODE.MODE_AUTO)
                     HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY, true);
                 else
                     m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_CAPTURE_BUSY, 1);
@@ -1715,7 +1761,7 @@ namespace Magnus_WPF_1.Source.Application
                 else
                     nVisionResult = m_Tracks[1].m_InspectionOnlineThreadVisionResult.m_nResult;
 
-
+                m_EventInspectionOnlineThreadDone[1].Reset();
                 m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nDeviceIndexOnReel = nDeviceID;
                 m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strDeviceID = m_Tracks[1].m_InspectionOnlineThreadVisionResult.m_strDeviceID;
                 m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = nVisionResult;
@@ -1989,10 +2035,10 @@ namespace Magnus_WPF_1.Source.Application
                 m_OfflineTriggerSnapEvent[nTrack].Set();
                 //m_NextStepSequenceEvent.Set();
                 m_EventInspectionOnlineThreadDone[nTrack].Set();
-                StartWaitPLCToTriggerCameraEvent[nTrack].Set();
+                //StartWaitPLCToTriggerCameraEvent[nTrack].Set();
 
 
-                //Thread.Sleep(1000);
+                Thread.Sleep(500);
 
                 InspectEvent[nTrack].Dispose();
                 InspectDoneEvent[nTrack].Dispose();
@@ -2000,7 +2046,7 @@ namespace Magnus_WPF_1.Source.Application
                 m_OfflineTriggerSnapEvent[nTrack].Dispose();
                 m_NextStepSequenceEvent.Dispose();
                 m_EventInspectionOnlineThreadDone[nTrack].Dispose();
-                StartWaitPLCToTriggerCameraEvent[nTrack].Dispose();
+                //StartWaitPLCToTriggerCameraEvent[nTrack].Dispose();
 
             }
         }

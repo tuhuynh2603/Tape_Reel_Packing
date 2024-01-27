@@ -1331,14 +1331,16 @@ namespace Magnus_WPF_1
         private void btn_Emergency_Stop_Click(object sender, RoutedEventArgs e)
         {
             master.m_EmergencyStatus_Simulate = (bool)btn_Emergency_Stop.IsChecked == false ? 0 : 1;
-            Master.m_EmergencyStopSequenceEvent.Set();
+            //Master.m_EmergencyStopSequenceEvent.Set();
 
         }
 
         private void btn_Imidiate_Stop_Click(object sender, RoutedEventArgs e)
         {
-            master.m_ImidiateStatus_Simulate = (bool)btn_Imidiate_Stop.IsChecked == false ? 0 : 1;
-            Master.m_EmergencyStopSequenceEvent.Set();
+            //master.m_ImidiateStatus_Simulate = (bool)btn_Imidiate_Stop.IsChecked == false ? 0 : 1;
+            //btn_Imidiate_Stop.IsChecked = false;
+
+            //Master.m_EmergencyStopSequenceEvent.Set();
         }
 
         private void btn_Reset_Machine_Click(object sender, RoutedEventArgs e)
@@ -1647,6 +1649,19 @@ namespace Magnus_WPF_1
         {
             if (e.ChangedButton == MouseButton.Left)
                 DragMove();
+        }
+
+        private void btn_Imidiate_Stop_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            master.m_ImidiateStatus_Simulate = 1;
+            btn_Imidiate_Stop.IsChecked = true;
+            Thread.Sleep(100);
+        }
+
+        private void btn_Imidiate_Stop_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            master.m_ImidiateStatus_Simulate = 0;
+            btn_Imidiate_Stop.IsChecked = false;
         }
     }
 }

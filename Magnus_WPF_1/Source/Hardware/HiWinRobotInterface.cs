@@ -438,6 +438,7 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
                 HWinRobot.get_hrsdk_version(v);
                 HWinRobot.set_connection_level(m_RobotConnectID, 1);
                 int level = HWinRobot.get_connection_level(m_RobotConnectID);
+                HWinRobot.set_operation_mode(m_RobotConnectID, (int)ROBOT_OPERATION_MODE.MODE_AUTO);
 
                 // Turn on Motor to allow Moving
                 HWinRobot.set_motor_state(m_RobotConnectID, 1);

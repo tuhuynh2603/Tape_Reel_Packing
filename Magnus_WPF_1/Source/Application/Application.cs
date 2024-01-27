@@ -19,7 +19,7 @@ namespace Magnus_WPF_1.Source.Application
         public const int TOTAL_AREA = 5;
         public static int m_nTrack = (int)TRACK_TYPE.TRACK_ALL;
         public static int m_nDoc = 1;
-        public static bool m_bEnableSavingOnlineImage = true;
+        public static bool m_bEnableSavingOnlineImage = false;
 
         public static TeachParametersUC.CategoryTeachParameter categoriesTeachParam = new TeachParametersUC.CategoryTeachParameter();
         //public static TeachParametersUC.CategoryAreaParameter categoryAreaParam = new TeachParametersUC.CategoryAreaParameter();

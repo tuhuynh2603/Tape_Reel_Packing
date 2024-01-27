@@ -691,11 +691,11 @@ namespace Magnus_WPF_1.Source.Application
                     Master.InspectDoneEvent[m_nTrackID].Set();
                     bAlreadySetEvent = true;
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, "Total inspection time: " + timeIns.ElapsedMilliseconds.ToString());
-                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($" {strCameraName[m_nTrackID]}:  Inspect Done. {timeIns.ElapsedMilliseconds}");
+                    //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    //{
+                    //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($" {strCameraName[m_nTrackID]}:  Inspect Done. {timeIns.ElapsedMilliseconds}");
 
-                    });
+                    //});
 
                     if (Application.m_bEnableSavingOnlineImage && m_nTrackID == 0 && MainWindow.mainWindow.m_bSequenceRunning)
                     {
@@ -1090,7 +1090,7 @@ namespace Magnus_WPF_1.Source.Application
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"{strCameraName[m_nTrackID]}: Device {nDeviceID + 1}, Result = {m_InspectionOnlineThreadVisionResult.m_nResult}  Inspection sequence time: " + timeIns.ElapsedMilliseconds.ToString(), m_InspectionOnlineThreadVisionResult.m_nResult);
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"{strCameraName[m_nTrackID]}: Device {nDeviceID + 1}, Result = {m_InspectionOnlineThreadVisionResult.m_nResult}.  {timeIns.ElapsedMilliseconds} (ms)", m_InspectionOnlineThreadVisionResult.m_nResult);
 
                     });
                     timeIns.Restart();

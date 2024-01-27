@@ -880,7 +880,8 @@
                                     MouseOverBackground="{StaticResource BgButton}" 
                                     CheckedBackground="{StaticResource BgButton}"
                                     IsChecked="False"
-                                    Click="btn_Imidiate_Stop_Click">
+                                    MouseLeftButtonDown="btn_Imidiate_Stop_MouseDown"
+                                    MouseLeftButtonUp="btn_Imidiate_Stop_MouseUp">
                         </RibbonToggleButton>
 
                         <RibbonToggleButton x:Name="btn_Emergency_Stop" 

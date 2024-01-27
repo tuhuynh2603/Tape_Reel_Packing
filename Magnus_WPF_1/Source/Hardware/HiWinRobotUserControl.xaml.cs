@@ -531,6 +531,14 @@ namespace Magnus_WPF_1.Source.Hardware
             m_Thread.Start();
         }
 
+        public void MoveZMotorUp(int nValue)
+        {
+            double[] dValue = { 0, 0, 0, 0, 0, 0 };
+            dValue[2] = nValue;
+            HWinRobot.ptp_rel_pos(HiWinRobotInterface.m_RobotConnectID, 0, dValue);
+
+        }
+
         public void MoveMotor(int nMotorID, int nType, int ndirection)
         {
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
@@ -752,42 +760,42 @@ namespace Magnus_WPF_1.Source.Hardware
 
         public void GetSoftLimit()
         {
-            double[] dlowSoftLimit = new double[6];
-            double[] dhighSoftLimit = new double[6];
-            bool b_rel = false;
-            HiWinRobotInterface.GetSoftLimit(HiWinRobotInterface.m_RobotConnectID, (int)JOG_TYPE.JOG_XYZ, ref b_rel, ref dlowSoftLimit, ref dhighSoftLimit);
+            //double[] dlowSoftLimit = new double[6];
+            //double[] dhighSoftLimit = new double[6];
+            //bool b_rel = false;
+            //HiWinRobotInterface.GetSoftLimit(HiWinRobotInterface.m_RobotConnectID, (int)JOG_TYPE.JOG_XYZ, ref b_rel, ref dlowSoftLimit, ref dhighSoftLimit);
 
-            double[] dlowJointSoftLimit = new double[6];
-            double[] dhighJointSoftLimit = new double[6];
-            HiWinRobotInterface.GetSoftLimit(HiWinRobotInterface.m_RobotConnectID, (int)JOG_TYPE.JOG_JOINT, ref b_rel, ref dlowJointSoftLimit, ref dhighJointSoftLimit);
+            //double[] dlowJointSoftLimit = new double[6];
+            //double[] dhighJointSoftLimit = new double[6];
+            //HiWinRobotInterface.GetSoftLimit(HiWinRobotInterface.m_RobotConnectID, (int)JOG_TYPE.JOG_JOINT, ref b_rel, ref dlowJointSoftLimit, ref dhighJointSoftLimit);
 
-            int nLowIndex = -1;
-            int nHighIndex = -1;
-            for (int nIndex = 0; nIndex < m_List_sequencePointData.Count; nIndex++)
-            {
-                if (m_List_sequencePointData[nIndex].m_PointComment == "Lower Soft Limit")
-                    nLowIndex = nIndex;
+            //int nLowIndex = -1;
+            //int nHighIndex = -1;
+            //for (int nIndex = 0; nIndex < m_List_sequencePointData.Count; nIndex++)
+            //{
+            //    if (m_List_sequencePointData[nIndex].m_PointComment == "Lower Soft Limit")
+            //        nLowIndex = nIndex;
 
-                if (m_List_sequencePointData[nIndex].m_PointComment == "Higher Soft Limit")
-                    nHighIndex = nIndex;
-            }
-            if (nLowIndex >= 0)
-                m_List_sequencePointData[nLowIndex] = HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, dlowSoftLimit, dlowJointSoftLimit, nLowIndex + 1, "Lower Soft Limit");
-            else
-                m_List_sequencePointData.Add(HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, dlowSoftLimit, dlowJointSoftLimit, m_List_sequencePointData.Count, "Lower Soft Limit"));
+            //    if (m_List_sequencePointData[nIndex].m_PointComment == "Higher Soft Limit")
+            //        nHighIndex = nIndex;
+            //}
+            //if (nLowIndex >= 0)
+            //    m_List_sequencePointData[nLowIndex] = HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, dlowSoftLimit, dlowJointSoftLimit, nLowIndex + 1, "Lower Soft Limit");
+            //else
+            //    m_List_sequencePointData.Add(HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, dlowSoftLimit, dlowJointSoftLimit, m_List_sequencePointData.Count, "Lower Soft Limit"));
 
-            if (nHighIndex >= 0)
-                m_List_sequencePointData[nHighIndex] = HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, dhighSoftLimit, dlowJointSoftLimit, nHighIndex + 1, "Higher Soft Limit");
-            else
-                m_List_sequencePointData.Add(HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, dhighSoftLimit, dhighJointSoftLimit, m_List_sequencePointData.Count, "Higher Soft Limit"));
+            //if (nHighIndex >= 0)
+            //    m_List_sequencePointData[nHighIndex] = HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, dhighSoftLimit, dlowJointSoftLimit, nHighIndex + 1, "Higher Soft Limit");
+            //else
+            //    m_List_sequencePointData.Add(HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, dhighSoftLimit, dhighJointSoftLimit, m_List_sequencePointData.Count, "Higher Soft Limit"));
 
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                if (MainWindow.mainWindow.master == null)
-                    return;
-                dataGrid_all_robot_Positions.ItemsSource = null;
-                dataGrid_all_robot_Positions.ItemsSource = m_List_sequencePointData;
-            });
+            //System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            //{
+            //    if (MainWindow.mainWindow.master == null)
+            //        return;
+            //    dataGrid_all_robot_Positions.ItemsSource = null;
+            //    dataGrid_all_robot_Positions.ItemsSource = m_List_sequencePointData;
+            //});
         }
         private void button_GetSoftLimit_Click(object sender, RoutedEventArgs e)
         {
@@ -796,56 +804,56 @@ namespace Magnus_WPF_1.Source.Hardware
 
         public void SetSoftLimit(int nLimit = 0)
         {
-            if (dataGrid_all_robot_Positions.SelectedIndex < m_List_sequencePointData.Count && dataGrid_all_robot_Positions.SelectedIndex >= 0)
-            {
+            //if (dataGrid_all_robot_Positions.SelectedIndex < m_List_sequencePointData.Count && dataGrid_all_robot_Positions.SelectedIndex >= 0)
+            //{
 
-                double[] dPos = new double[6];
-                double[] dJoint = new double[6];
-                double[] dLowPos = new double[6];
-                double[] dHighPos = new double[6];
-                bool bRe = false;
-                HiWinRobotInterface.GetSoftLimit(m_RobotConnectID, combo_JogType.SelectedIndex, ref bRe, ref dLowPos, ref dHighPos);
+            //    double[] dPos = new double[6];
+            //    double[] dJoint = new double[6];
+            //    double[] dLowPos = new double[6];
+            //    double[] dHighPos = new double[6];
+            //    bool bRe = false;
+            //    HiWinRobotInterface.GetSoftLimit(m_RobotConnectID, combo_JogType.SelectedIndex, ref bRe, ref dLowPos, ref dHighPos);
 
-                if (combo_JogType.SelectedIndex == (int)JOG_TYPE.JOG_JOINT)
-                {
-                    m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex].GetJointPoint(ref dJoint);
-                }
-                else
-                    m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex].GetXYZPoint(ref dPos);
+            //    if (combo_JogType.SelectedIndex == (int)JOG_TYPE.JOG_JOINT)
+            //    {
+            //        m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex].GetJointPoint(ref dJoint);
+            //    }
+            //    else
+            //        m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex].GetXYZPoint(ref dPos);
 
-                int nSoftPointIndex = -1;
-                string[] strComment = { "Lower Soft Limit", "Higher Soft Limit" };
-                for (int nIndex = 0; nIndex < m_List_sequencePointData.Count; nIndex++)
-                {
-                    if (m_List_sequencePointData[nIndex].m_PointComment == strComment[nLimit])
-                        nSoftPointIndex = nIndex;
-                }
+            //    int nSoftPointIndex = -1;
+            //    string[] strComment = { "Lower Soft Limit", "Higher Soft Limit" };
+            //    for (int nIndex = 0; nIndex < m_List_sequencePointData.Count; nIndex++)
+            //    {
+            //        if (m_List_sequencePointData[nIndex].m_PointComment == strComment[nLimit])
+            //            nSoftPointIndex = nIndex;
+            //    }
 
-                if (nSoftPointIndex >= 0)
-                {
-                    if (combo_JogType.SelectedIndex == (int)JOG_TYPE.JOG_JOINT)
-                        m_List_sequencePointData[nSoftPointIndex].SetXYZPoint(dPos);//
-                    else
-                        m_List_sequencePointData[nSoftPointIndex].SetJointPoint(dPos);//
+            //    if (nSoftPointIndex >= 0)
+            //    {
+            //        if (combo_JogType.SelectedIndex == (int)JOG_TYPE.JOG_JOINT)
+            //            m_List_sequencePointData[nSoftPointIndex].SetXYZPoint(dPos);//
+            //        else
+            //            m_List_sequencePointData[nSoftPointIndex].SetJointPoint(dPos);//
 
-                }
-                else
-                    m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex].m_PointComment = strComment[nLimit];
+            //    }
+            //    else
+            //        m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex].m_PointComment = strComment[nLimit];
 
 
-                if (nLimit == 0)
-                    HiWinRobotInterface.SetSoftLimit(m_RobotConnectID, dPos, dHighPos, combo_JogType.SelectedIndex);
-                else
-                    HiWinRobotInterface.SetSoftLimit(m_RobotConnectID, dLowPos, dPos, combo_JogType.SelectedIndex);
-            }
+            //    if (nLimit == 0)
+            //        HiWinRobotInterface.SetSoftLimit(m_RobotConnectID, dPos, dHighPos, combo_JogType.SelectedIndex);
+            //    else
+            //        HiWinRobotInterface.SetSoftLimit(m_RobotConnectID, dLowPos, dPos, combo_JogType.SelectedIndex);
+            //}
 
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                if (MainWindow.mainWindow.master == null)
-                    return;
-                dataGrid_all_robot_Positions.ItemsSource = null;
-                dataGrid_all_robot_Positions.ItemsSource = m_List_sequencePointData;
-            });
+            //System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            //{
+            //    if (MainWindow.mainWindow.master == null)
+            //        return;
+            //    dataGrid_all_robot_Positions.ItemsSource = null;
+            //    dataGrid_all_robot_Positions.ItemsSource = m_List_sequencePointData;
+            //});
 
         }
 

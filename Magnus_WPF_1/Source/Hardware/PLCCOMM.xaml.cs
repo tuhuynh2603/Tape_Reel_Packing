@@ -28,7 +28,6 @@ using EasyModbus;
             //PLC_BARCODE_CAPTURE_DONE = 101,
             PLC_CURRENT_BARCODE_CHIP_COUNT = 103,
             PLC_CURRENT_ROBOT_CHIP_COUNT = 104,
-            PLC_RESET_LOT = 105,
             PLC_READY_STATUS = 106,
             PLC_BARCODE_READY =107,
             PLC_EMERGENCY_STATUS = 108,
@@ -43,7 +42,11 @@ using EasyModbus;
             PLC_MANUAL_BARCODE_TRIGGER = 124,
             PLC_MANUAL_BARCODE_RESULT_PASS = 125,
             PLC_MANUAL_BARCODE_RESULT_FAIL = 126,
-            PLC_MANUAL_BARCODE_CAPTURE_BUSY = 127
+            PLC_MANUAL_BARCODE_CAPTURE_BUSY = 127,
+
+            PLC_RESET_LOT = 131,
+            PLC_RESET_LOT_ACK = 132,
+
 
         }
 
@@ -198,6 +201,51 @@ using EasyModbus;
                     return -1;
             }
         }
+
+        public int WritePLCMultiRegister(int nAddress, int[] ival)
+        {
+            lock (m_modbusClient)
+            {
+                //int[] ival = new int[1];
+                //ival[0] = nValue;
+                int brepeat = 0;
+            RetryWrite:
+                Thread.Sleep(10);
+                if (m_modbusClient.Connected)
+                {
+                    try
+                    {
+                        m_modbusClient.WriteMultipleRegisters(nAddress, ival);
+                        Thread.Sleep(10);
+                    }
+                    catch (Exception e)
+                    {
+                        brepeat++;
+                        Thread.Sleep(10);
+                        if (brepeat > 10)
+                            return -1;
+                        try
+                        {
+                            m_modbusClient.Disconnect();
+                            m_modbusClient.Connect();
+                        }
+                        catch
+                        {
+                            goto RetryWrite;
+                        }
+
+                        int a = m_modbusClient.ConnectionTimeout;
+
+                        goto RetryWrite;
+                    }
+                }
+                else
+                    return -1;
+                return 0;
+            }
+        }
+
+
 
         public int WritePLCRegister(int nAddress, int nValue)
         {

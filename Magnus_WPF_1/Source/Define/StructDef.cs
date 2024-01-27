@@ -279,11 +279,11 @@ namespace Magnus_WPF_1.Source.Define
 
                 LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, $"Save To Excel Failed! {e}");
 
-                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                {
+                //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                //{
 
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Track{nTrack} Save To Excel Fail {e}!.", (int)ERROR_CODE.LABEL_FAIL);
-                });
+                //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Track{nTrack} Save To Excel Fail {e}!.", (int)ERROR_CODE.LABEL_FAIL);
+                //});
             }
         }
 

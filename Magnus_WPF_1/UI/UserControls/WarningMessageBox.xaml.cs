@@ -136,12 +136,13 @@ namespace Magnus_WPF_1.UI.UserControls
         public void ContinueSequenceButtonClicked(WARNINGMESSAGE nWarningMessges)
         {
 
-            if (MainWindow.mainWindow.master.m_ImidiateStatus == 1 || MainWindow.mainWindow.master.m_EmergencyStatus == 1)
+            if (MainWindow.mainWindow.master.m_EmergencyStatus == 1)
                 return;
 
             Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
             MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
-
+            if(MainWindow.mainWindow.master.m_ImidiateStatus_Simulate == 1)
+                MainWindow.mainWindow.master.m_ImidiateStatus_Simulate = 0;
             MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE;
             MainWindow.mainWindow.master.m_bNeedToImidiateStop = false;
             Thread.Sleep(500);
@@ -168,7 +169,7 @@ namespace Magnus_WPF_1.UI.UserControls
 
         private void btn_Sequence_Abort_Click(object sender, RoutedEventArgs e)
         {
-            if (MainWindow.mainWindow.master.m_ImidiateStatus == 1 || MainWindow.mainWindow.master.m_EmergencyStatus == 1)
+            if (MainWindow.mainWindow.master.m_EmergencyStatus == 1)
                 return;
 
             MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
@@ -195,7 +196,7 @@ namespace Magnus_WPF_1.UI.UserControls
 
         private void btn_Sequence_Next_Click(object sender, RoutedEventArgs e)
         {
-            if (MainWindow.mainWindow.master.m_ImidiateStatus == 1 || MainWindow.mainWindow.master.m_EmergencyStatus == 1)
+            if (MainWindow.mainWindow.master.m_EmergencyStatus == 1)
                 return;
 
             Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);

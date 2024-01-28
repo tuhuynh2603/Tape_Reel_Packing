@@ -880,8 +880,7 @@
                                     MouseOverBackground="{StaticResource BgButton}" 
                                     CheckedBackground="{StaticResource BgButton}"
                                     IsChecked="False"
-                                    MouseLeftButtonDown="btn_Imidiate_Stop_MouseDown"
-                                    MouseLeftButtonUp="btn_Imidiate_Stop_MouseUp">
+                                    Click="btn_Imidiate_Stop_Click">
                         </RibbonToggleButton>
 
                         <RibbonToggleButton x:Name="btn_Emergency_Stop" 
@@ -991,9 +990,35 @@
             <Grid x:Name="grd_Defect"
                 Height="{Binding DialogDefectWidth,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
             </Grid>
-
-
         </Grid>
+
+        <Grid x:Name="grd_Warning_Setting"
+                Panel.ZIndex="5"
+                MouseDown="grd_Warning_Setting_MouseDown" 
+                MouseMove="grd_Warning_Setting_MouseMove" 
+                MouseUp="grd_Warning_Setting_MouseUp">
+            <Grid.Margin>
+                <Thickness Top="190" Left="0" Right="100" Bottom="0"></Thickness>
+            </Grid.Margin>
+            <Grid.RenderTransform >
+                <TranslateTransform x:Name="tt_WarningSettings"/>
+            </Grid.RenderTransform>
+            <Grid.Effect>
+                <DropShadowEffect BlurRadius="2" ShadowDepth="1" Color="#FFAEAEAE"/>
+            </Grid.Effect>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.6*"></ColumnDefinition>
+                <ColumnDefinition Width="0.2*"></ColumnDefinition>
+                <ColumnDefinition Width="0.2*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid x:Name="grd_Warning"
+                Height="{Binding DialogWarningHeight,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+            </Grid>
+        </Grid>
+
+
+
+
         <Popup x:Name="popup_uc" Height="auto" Width="Auto"  Grid.Row="2"
                    AllowsTransparency="True"
                    HorizontalOffset="0"

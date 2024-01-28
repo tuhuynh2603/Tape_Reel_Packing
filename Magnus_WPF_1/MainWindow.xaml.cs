@@ -5,6 +5,7 @@ using Magnus_WPF_1.Source.Define;
 using Magnus_WPF_1.Source.LogMessage;
 using Magnus_WPF_1.UI.UserControls;
 using Magnus_WPF_1.UI.UserControls.View;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -75,6 +76,10 @@ namespace Magnus_WPF_1
 
         private Point _startPositionDlg;
         private System.Windows.Vector _startOffsetPositionDlg;
+
+        private Point _startWarningPositionDlg;
+        private System.Windows.Vector _startOffsetWarningPositionDlg;
+
         private LayoutRoot _layoutVision;
         public LayoutRoot layoutVision
         {
@@ -148,6 +153,37 @@ namespace Magnus_WPF_1
                 }
             }
         }
+
+
+        private double _dialogWarningHeight;
+        private double _dialogWarningWidth;
+        public double DialogWarningHeight
+        {
+            get { return _dialogWarningHeight; }
+            set
+            {
+                if (value != _dialogWarningHeight)
+                {
+                    _dialogWarningHeight = value;
+                    OnPropertyChanged("DialogWarningHeight");
+                }
+            }
+        }
+        public double DialogWarningWidth
+        {
+            get { return _dialogWarningWidth; }
+            set
+            {
+                if (value != _dialogWarningWidth)
+                {
+                    _dialogWarningWidth = value;
+                    OnPropertyChanged("DialogWarningWidth");
+                }
+            }
+        }
+
+
+
 
         #region STATE OF CONNECTION PLC 
         //name port
@@ -225,6 +261,9 @@ namespace Magnus_WPF_1
 
         public MainWindow()
         {
+
+
+
             InitializeComponent();
             DataContext = this;
             LogMessage.WriteToDebugViewer(0, string.Format("Start Application...."));
@@ -311,6 +350,8 @@ namespace Magnus_WPF_1
 
         private void btn_inspect_offline_Checked(object sender, RoutedEventArgs e)
         {
+
+
             if (inspect_offline_btn.IsEnabled == false)
                 return;
 
@@ -1225,6 +1266,36 @@ namespace Magnus_WPF_1
             grd_Defect_Settings.ReleaseMouseCapture();
         }
 
+
+
+        private void grd_Warning_Setting_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            _startWarningPositionDlg = e.GetPosition(this);
+            if (_startWarningPositionDlg.X != 0 && _startWarningPositionDlg.Y != 0)
+            {
+                _startOffsetWarningPositionDlg = new Vector(tt_WarningSettings.X, tt_WarningSettings.Y);
+                grd_Warning_Setting.CaptureMouse();
+            }
+        }
+
+        private void grd_Warning_Setting_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (grd_Warning_Setting.IsMouseCaptured)
+            {
+                Vector offset = Point.Subtract(e.GetPosition(this), _startWarningPositionDlg);
+                tt_WarningSettings.X = _startOffsetWarningPositionDlg.X + offset.X;
+                tt_WarningSettings.Y = _startOffsetWarningPositionDlg.Y + offset.Y;
+            }
+        }
+
+        private void grd_Warning_Setting_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            grd_Warning_Setting.ReleaseMouseCapture();
+        }
+
+
+
+
         #endregion
 
         private void btn_Robot_Controller_Checked(object sender, RoutedEventArgs e)
@@ -1335,13 +1406,7 @@ namespace Magnus_WPF_1
 
         }
 
-        private void btn_Imidiate_Stop_Click(object sender, RoutedEventArgs e)
-        {
-            //master.m_ImidiateStatus_Simulate = (bool)btn_Imidiate_Stop.IsChecked == false ? 0 : 1;
-            //btn_Imidiate_Stop.IsChecked = false;
 
-            //Master.m_EmergencyStopSequenceEvent.Set();
-        }
 
         private void btn_Reset_Machine_Click(object sender, RoutedEventArgs e)
         {
@@ -1411,29 +1476,29 @@ namespace Magnus_WPF_1
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
 
-                grd_Defect_Settings.Margin = new Thickness(0, 160, 0, 0);
-                grd_Defect_Settings.VerticalAlignment = VerticalAlignment.Center;
-                grd_Defect_Settings.HorizontalAlignment = HorizontalAlignment.Center;
+                grd_Warning_Setting.Margin = new Thickness(0, 160, 0, 0);
+                grd_Warning_Setting.VerticalAlignment = VerticalAlignment.Center;
+                grd_Warning_Setting.HorizontalAlignment = HorizontalAlignment.Center;
                 m_WarningMessageBoxUC.Width = 800;
                 m_WarningMessageBoxUC.Height = 400;
 
 
                 if (bIsPopup)
                 {
-                    grd_Defect.Children.Clear();
+                    grd_Warning.Children.Clear();
                     m_WarningMessageBoxUC.updateMessageString(strDebugMessage, warningtype);
-                    grd_Defect.Width = m_WarningMessageBoxUC.Width;
-                    grd_Defect.Height = m_WarningMessageBoxUC.Height;
-                    grd_Defect.Children.Add(m_WarningMessageBoxUC);
+                    grd_Warning.Width = m_WarningMessageBoxUC.Width;
+                    grd_Warning.Height = m_WarningMessageBoxUC.Height;
+                    grd_Warning.Children.Add(m_WarningMessageBoxUC);
 
-                    grd_Defect.Visibility = Visibility.Visible;
-                    grd_Defect_Settings.Visibility = Visibility.Visible;
+                    grd_Warning.Visibility = Visibility.Visible;
+                    grd_Warning_Setting.Visibility = Visibility.Visible;
                 }
                 else
                 {
-                    grd_Defect.Children.Clear();
-                    grd_Defect.Visibility = Visibility.Collapsed;
-                    grd_Defect_Settings.Visibility = Visibility.Collapsed;
+                    grd_Warning.Children.Clear();
+                    grd_Warning.Visibility = Visibility.Collapsed;
+                    grd_Warning_Setting.Visibility = Visibility.Collapsed;
 
                 }
             });
@@ -1651,17 +1716,21 @@ namespace Magnus_WPF_1
                 DragMove();
         }
 
-        private void btn_Imidiate_Stop_MouseDown(object sender, MouseButtonEventArgs e)
+        private void btn_Imidiate_Stop_Click(object sender, RoutedEventArgs e)
         {
-            master.m_ImidiateStatus_Simulate = 1;
-            btn_Imidiate_Stop.IsChecked = true;
-            Thread.Sleep(100);
+            btn_Imidiate_Stop.IsChecked = false;
+            if(master.m_ImidiateStatus_Simulate ==0)
+                master.m_ImidiateStatus_Simulate = 1;
         }
 
-        private void btn_Imidiate_Stop_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            master.m_ImidiateStatus_Simulate = 0;
-            btn_Imidiate_Stop.IsChecked = false;
-        }
+        //private void btn_Imidiate_Stop_Click(object sender, RoutedEventArgs e)
+        //{
+
+        //    //master.m_ImidiateStatus_Simulate = (bool)btn_Imidiate_Stop.IsChecked == false ? 0 : 1;
+        //    //btn_Imidiate_Stop.IsChecked = false;
+
+        //    //Master.m_EmergencyStopSequenceEvent.Set();
+        //}
+
     }
 }

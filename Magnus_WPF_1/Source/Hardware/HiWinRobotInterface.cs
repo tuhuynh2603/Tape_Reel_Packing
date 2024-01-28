@@ -42,8 +42,9 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             IMIDIATE_STOP_STATUS = 6,
             RESET_STATUS = 7,
             RUNSEQUENCE_STATUS = 8,
-            PLC_CREATE_NEW_LOT = 9,
+            PLC_BARCODE_COUNT = 9,
             PLC_END_LOT = 10,
+            PLC_CREATE_NEW_LOT = 11,
             PLC_LAST_CHIP = 12,
             PLC_DOOR_STATUS = 15,
             AIR_PRESSURESTATUS = 16, // 

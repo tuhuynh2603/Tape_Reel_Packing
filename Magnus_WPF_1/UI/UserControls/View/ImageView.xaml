@@ -95,25 +95,7 @@
                       HorizontalAlignment="Left"
                       Panel.ZIndex="3"/>
             <!--View Setting Defect Infor-->
-            <Grid x:Name="grd_Defect_Settings" 
-              Width="{Binding Path=DialogDefectWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-              Panel.ZIndex="4"
-              Visibility="Collapsed"
-              HorizontalAlignment="Right"
-              VerticalAlignment="Top"
-              MouseDown="grd_Defect_Settings_MouseDown" 
-              MouseMove="grd_Defect_Settings_MouseMove" 
-              MouseUp="grd_Defect_Settings_MouseUp">
-                <Grid.RenderTransform>
-                    <TranslateTransform x:Name="tt_DefectSettings"/>
-                </Grid.RenderTransform>
-                <Grid.Background>
-                    <SolidColorBrush Color="Black" Opacity="0.6"/>
-                </Grid.Background>
-                <Grid.Effect>
-                    <DropShadowEffect BlurRadius="2" ShadowDepth="1" Color="#FFAEAEAE"/>
-                </Grid.Effect>
-            </Grid>
+           
             
             <StackPanel Name="resultTeach" Margin="10,30,0,0" Orientation="Vertical" Panel.ZIndex="2">
                 <TextBlock x:Name="tbl_Status1" Foreground="#FF1A46FF" FontSize="35" FontWeight="Bold"></TextBlock>

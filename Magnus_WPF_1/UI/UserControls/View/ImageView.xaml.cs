@@ -739,34 +739,6 @@ namespace Magnus_WPF_1.UI.UserControls.View
         }
         #endregion
 
-        private System.Windows.Point _startPositionDlg;
-        private System.Windows.Vector _startOffsetPositionDlg;
-        private void grd_Defect_Settings_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            _startPositionDlg = e.GetPosition(this);
-            if (_startPositionDlg.X != 0 && _startPositionDlg.Y != 0)
-            {
-                _startOffsetPositionDlg = new System.Windows.Vector(tt_DefectSettings.X, tt_DefectSettings.Y);
-                grd_Defect_Settings.CaptureMouse();
-            }
-
-
-        }
-
-        private void grd_Defect_Settings_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            if (grd_Defect_Settings.IsMouseCaptured)
-            {
-                System.Windows.Vector offset = System.Windows.Point.Subtract(e.GetPosition(this), _startPositionDlg);
-                tt_DefectSettings.X = _startOffsetPositionDlg.X + offset.X;
-                tt_DefectSettings.Y = _startOffsetPositionDlg.Y + offset.Y;
-            }
-        }
-        private void grd_Defect_Settings_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            grd_Defect_Settings.ReleaseMouseCapture();
-        }
-
         #region Update RGB Value and Gray Value
         //private bool positionInImage = false;
         private void GetCoordinateInImage(object sender, System.Windows.Input.MouseEventArgs e)

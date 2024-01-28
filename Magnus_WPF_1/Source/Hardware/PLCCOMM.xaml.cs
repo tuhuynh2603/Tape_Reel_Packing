@@ -39,10 +39,14 @@ using EasyModbus;
             PLC_ROBOT_RUNNING_STATUS = 114,
 
             //For Manual mode
+            PLC_MANUAL_BARCODE_ENABLE = 123,
             PLC_MANUAL_BARCODE_TRIGGER = 124,
+
             PLC_MANUAL_BARCODE_RESULT_PASS = 125,
             PLC_MANUAL_BARCODE_RESULT_FAIL = 126,
             PLC_MANUAL_BARCODE_CAPTURE_BUSY = 127,
+            PLC_MANUAL_BARCODE_COUNT = 128,
+
 
             PLC_RESET_LOT = 131,
             PLC_RESET_LOT_ACK = 132,

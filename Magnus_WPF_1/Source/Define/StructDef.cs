@@ -193,17 +193,21 @@ namespace Magnus_WPF_1.Source.Define
         public string m_strDeviceID = "";
         public int m_nResult = -(int)ERROR_CODE.NOT_INSPECTED;
         public string m_strFullImagePath = "";
-        public VisionResultData(int nDeviceIndexOnReel = 0, string strDeviceID = "", int nResult = -(int)ERROR_CODE.NOT_INSPECTED, string strPath = "")
+        public bool bIsTotal = false;
+        public VisionResultData(int nDeviceIndexOnReel = 0, string strDeviceID = "", int nResult = -(int)ERROR_CODE.NOT_INSPECTED, string strPath = "", bool bIsTotal = false)
         {
             m_nDeviceIndexOnReel = nDeviceIndexOnReel;
             m_strDeviceID = strDeviceID;
             m_nResult = nResult;
             m_strFullImagePath = strPath;
+            this.bIsTotal = bIsTotal;
         }
 
-        public static void SaveSequenceResultToExcel(string strLotID, int nTrack, VisionResultData data)
+        public static void SaveSequenceResultToExcel(string strLotID, int nTrack, VisionResultData data, bool bTotal = false)
         {
-
+            string strFileName = strLotID;
+            if (bTotal)
+                strFileName = strFileName + "_Total";
             try
             {
                 string[] strTrackName = { "Camera", "Barcode" };
@@ -216,7 +220,7 @@ namespace Magnus_WPF_1.Source.Define
                 if (!Directory.Exists(strRecipePath))
                     Directory.CreateDirectory(strRecipePath);
 
-                string fullpath = Path.Combine(strRecipePath, $"{strLotID}.xlsx");
+                string fullpath = Path.Combine(strRecipePath, $"{strFileName}.xlsx");
 
 
                 FileInfo file = new FileInfo(fullpath);
@@ -287,7 +291,7 @@ namespace Magnus_WPF_1.Source.Define
             }
         }
 
-        public static void ReadLotResultFromExcel(string strLotID, int nTrack, ref VisionResultData[] result, ref int nCurrentDeviceID)
+        public static void ReadLotResultFromExcel(string strLotID, int nTrack, ref VisionResultData[] result, ref int nCurrentDeviceID, bool bIsTotal = false)
         {
             nCurrentDeviceID = 0;
             string[] strTrackName = { "Camera", "Barcode" };
@@ -300,7 +304,10 @@ namespace Magnus_WPF_1.Source.Define
             if (!Directory.Exists(strRecipePath))
                 Directory.CreateDirectory(strRecipePath);
 
-            string fullpath = Path.Combine(strRecipePath, $"{strLotID}.xlsx");
+            string nFileName = strLotID;
+            if (bIsTotal)
+                nFileName = nFileName + "_Total";
+            string fullpath = Path.Combine(strRecipePath, $"{nFileName}.xlsx");
 
             FileInfo file = new FileInfo(fullpath);
             if (!file.Exists)

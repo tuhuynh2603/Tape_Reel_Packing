@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using Magnus_WPF_1.Source.Define;
+using Microsoft.Win32;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -822,6 +823,19 @@ namespace Magnus_WPF_1.Source.Hardware.SDKHrobot
             int nRobotIDBackup = -999;
             while (true)
             {
+                if (MainWindow.mainWindow.master == null)
+                {
+                    Thread.Sleep(1000);
+
+                    continue;
+                }
+
+                if (MainWindow.mainWindow.master.m_SequenceMode == (int)SEQUENCE_MODE.MODE_MANUAL)
+                {
+                    Thread.Sleep(1000);
+                    continue;
+                }
+
                 if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
                     break;
                 //Connect button

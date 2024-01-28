@@ -176,7 +176,7 @@ namespace Magnus_WPF_1.UI.UserControls
 		void ResetTextBox()
 		{
 			// For Login
-			userName.Text = "USERNAME"; userName.Foreground = Brushes.Gray;
+			userName.Text = ""; userName.Foreground = Brushes.Gray;
 			passWord.Password = "1111111"; passWord.Foreground = Brushes.Gray;
 
 			// For create new account
@@ -261,35 +261,36 @@ namespace Magnus_WPF_1.UI.UserControls
 				ResetTextBox();
 
 				//main.ChangeUIState();
-				main.btnLogIn.IsChecked = false;
+				//main.btnLogIn.IsChecked = false;
 				main.btnLogIn.IsEnabled = true;
 				main.btnLogIn.Content = MainWindow.accountUser.ToString();
 				main.acessLevel.Text = MainWindow.accessLevel.ToString();
 				ResetTextBox();
 				main.enableButton(true);
-				//main.RegistryPreference();
-				//main.master.inspectionParameter.InitReferenceBoxSize();
+                //main.RegistryPreference();
+                //main.master.inspectionParameter.InitReferenceBoxSize();
 
-				//bool isFullCam = true;
-				//for (int itrack = 0; itrack < Application.Application.num_track; itrack++)
-				//{
-				//	if (!main.master.trackSF[itrack].isAvailable)
-				//	{
-				//		isFullCam = false;
-				//		break;
-				//	}		
-				//}
-				//if (isFullCam)
-				//	CommPLC.PlcCommMode = PLCCommMode.PLC_ONLINE;
+                //bool isFullCam = true;
+                //for (int itrack = 0; itrack < Application.Application.num_track; itrack++)
+                //{
+                //	if (!main.master.trackSF[itrack].isAvailable)
+                //	{
+                //		isFullCam = false;
+                //		break;
+                //	}		
+                //}
+                //if (isFullCam)
+                //	CommPLC.PlcCommMode = PLCCommMode.PLC_ONLINE;
 
-				//else
-				//	CommPLC.PlcCommMode = PLCCommMode.PLC_SIMULATOR;
+                //else
+                //	CommPLC.PlcCommMode = PLCCommMode.PLC_SIMULATOR;
 
-				//main.master.commPLC.isVisionReady = true;
-				//main.master.commPLC.UpdateSentMessageToPLC((int)VisionProcess.VISION_READY);
+                //main.master.commPLC.isVisionReady = true;
+                //main.master.commPLC.UpdateSentMessageToPLC((int)VisionProcess.VISION_READY);
 
-				//KeepHeartBeat();
-				return;
+                //KeepHeartBeat();
+                MainWindow.mainWindow.showLoginUser(false);
+                return;
 			}
 			else
 			{
@@ -466,8 +467,8 @@ namespace Magnus_WPF_1.UI.UserControls
             Panel.SetZIndex(panelCreateUser, 0);
             ResetTextBox();
 			userName.Focus();
-			//userName.IsTabStop = true;
-		}
+            userName.IsTabStop = true;
+        }
 
 		private void NewUserMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{

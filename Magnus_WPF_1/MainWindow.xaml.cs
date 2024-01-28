@@ -5,7 +5,6 @@ using Magnus_WPF_1.Source.Define;
 using Magnus_WPF_1.Source.LogMessage;
 using Magnus_WPF_1.UI.UserControls;
 using Magnus_WPF_1.UI.UserControls.View;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -259,10 +258,10 @@ namespace Magnus_WPF_1
 
         List<KeyBinding> hotkey = new List<KeyBinding>();
 
+
+        public static string BaseDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         public MainWindow()
         {
-
-
 
             InitializeComponent();
             DataContext = this;
@@ -318,6 +317,7 @@ namespace Magnus_WPF_1
 
 
             loadAllStatistic(true);
+            showLoginUser(true);
         }
 
 
@@ -350,8 +350,6 @@ namespace Magnus_WPF_1
 
         private void btn_inspect_offline_Checked(object sender, RoutedEventArgs e)
         {
-
-
             if (inspect_offline_btn.IsEnabled == false)
                 return;
 
@@ -413,9 +411,12 @@ namespace Magnus_WPF_1
                 for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)
                 {
                     master.m_Tracks[nT].m_VisionResultDatas[n] = new VisionResultData();
+                    master.m_Tracks[nT].m_VisionResultDatas_Total[n] = new VisionResultData();
                 }
 
                 VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, nT, ref master.m_Tracks[nT].m_VisionResultDatas, ref master.m_Tracks[nT].m_CurrentSequenceDeviceID);
+                VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, nT, ref master.m_Tracks[nT].m_VisionResultDatas_Total, ref master.m_Tracks[nT].m_CurrentSequenceDeviceID_Total, true);
+
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
                     for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)
@@ -1635,50 +1636,65 @@ namespace Magnus_WPF_1
 
         private void btn_LogIn_Unchecked(object sender, RoutedEventArgs e)
         {
-            Source.Application.Application.loginUser.PreviewKeyDown -= Source.Application.Application.loginUser.KeyShortcut;
-            //tabItem_Production.IsSelected = true;
-            grd_PopupDialog.Children.Clear();
-            grd_PopupDialog.Visibility = Visibility.Collapsed;
-            grd_Dialog_Settings.Visibility = Visibility.Collapsed;
+            showLoginUser(false);
         }
 
         private void btn_LogIn_Checked(object sender, RoutedEventArgs e)
         {
-            Source.Application.Application.loginUser.AssignMainWindow();
-            tt_DialogSettings.X = 0;
-            tt_DialogSettings.Y = 0;
-            btnLogIn.IsEnabled = false;
-            grd_PopupDialog.Children.Clear();
-            //DisableDialogLogin();
-            grd_PopupDialog.Children.Add(Source.Application.Application.loginUser);
-            CleanHotKey();
-
-            Source.Application.Application.loginUser.PreviewKeyDown += Source.Application.Application.loginUser.KeyShortcut;
-            //foreach (COMMAND_CODE cmd in Master.cmdCode)
-            //{
-            //    if (cmd != COMMAND_CODE.IDLE)
-            //    {
-            //        Panel.SetZIndex(Application.Application.loginUser.panelCreateUser, 2);
-            //        grd_Dialog_Settings.Margin = new Thickness(0, 0, 0, 0);
-            //        DialogUCHeight = Application.Application.loginUser.Height;
-            //        DialogUCWidth = Application.Application.loginUser.Width;
-            //        grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Center;
-            //        grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Center;
-            //        return;
-            //    }
-            //}
-            //Panel.SetZIndex(Source.Application.Application.loginUser.panelLogIn, 3);
-            //_dialogDefectHeight = Source.Application.Application.loginUser.Height;
-            //DialogUCWidth = Source.Application.Application.loginUser.Width;
-            grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Center;
-            grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Center;
-            grd_PopupDialog.Visibility = Visibility.Visible;
-            grd_Dialog_Settings.Visibility = Visibility.Visible;
-            Source.Application.Application.loginUser.InitLogInDialog();
-
-            //Source.Application.Application.loginUser.userName.Focus();
-
+            showLoginUser(true);
         }
+
+        public void showLoginUser(bool bShow)
+        {
+            if (bShow)
+            {
+                Source.Application.Application.loginUser.AssignMainWindow();
+                tt_DialogSettings.X = 0;
+                tt_DialogSettings.Y = 0;
+                //btnLogIn.IsEnabled = false;
+                grd_PopupDialog.Children.Clear();
+                //DisableDialogLogin();
+                grd_PopupDialog.Children.Add(Source.Application.Application.loginUser);
+                CleanHotKey();
+
+                Source.Application.Application.loginUser.PreviewKeyDown += Source.Application.Application.loginUser.KeyShortcut;
+                //foreach (COMMAND_CODE cmd in Master.cmdCode)
+                //{
+                //    if (cmd != COMMAND_CODE.IDLE)
+                //    {
+                //        Panel.SetZIndex(Application.Application.loginUser.panelCreateUser, 2);
+                //        grd_Dialog_Settings.Margin = new Thickness(0, 0, 0, 0);
+                //        DialogUCHeight = Application.Application.loginUser.Height;
+                //        DialogUCWidth = Application.Application.loginUser.Width;
+                //        grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Center;
+                //        grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Center;
+                //        return;
+                //    }
+                //}
+                //Panel.SetZIndex(Source.Application.Application.loginUser.panelLogIn, 3);
+                //_dialogDefectHeight = Source.Application.Application.loginUser.Height;
+                //DialogUCWidth = Source.Application.Application.loginUser.Width;
+                grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Center;
+                grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Center;
+                grd_PopupDialog.Visibility = Visibility.Visible;
+                grd_Dialog_Settings.Visibility = Visibility.Visible;
+                Source.Application.Application.loginUser.InitLogInDialog();
+
+                //Source.Application.Application.loginUser.userName.Focus();
+                btnLogIn.IsChecked = true;
+            }
+            else
+            {
+                Source.Application.Application.loginUser.PreviewKeyDown -= Source.Application.Application.loginUser.KeyShortcut;
+                //tabItem_Production.IsSelected = true;
+                grd_PopupDialog.Children.Clear();
+                grd_PopupDialog.Visibility = Visibility.Collapsed;
+                grd_Dialog_Settings.Visibility = Visibility.Collapsed;
+                btnLogIn.IsChecked = false;
+
+            }
+        }
+
 
         public bool bNextStepSimulateSequence = false;
         //private void btn_Simulate_Sequence_Click(object sender, RoutedEventArgs e)

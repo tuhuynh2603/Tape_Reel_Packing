@@ -36,6 +36,8 @@ namespace Magnus_WPF_1.Source.Application
         public ImageView[] m_imageViews;
 
         public VisionResultData[] m_VisionResultDatas;
+        public VisionResultData[] m_VisionResultDatas_Total;
+
         public VisionResultData m_InspectionOnlineThreadVisionResult = new VisionResultData();
         public VisionResultData m_SequenceThreadVisionResult = new VisionResultData();
 
@@ -56,9 +58,14 @@ namespace Magnus_WPF_1.Source.Application
             m_nTrackID = indexTrack;
             mainWindow = app;
             m_imageViews = new ImageView[numdoc];
-            m_VisionResultDatas = new VisionResultData[10000];
+            m_VisionResultDatas = new VisionResultData[100000];
+            m_VisionResultDatas_Total = new VisionResultData[100000];
+
             for (int n = 0; n < m_VisionResultDatas.Length; n++)
+            {
                 m_VisionResultDatas[n] = new VisionResultData();
+                m_VisionResultDatas_Total[n] = new VisionResultData();
+            }
 
             //VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, indexTrack, ref m_VisionResultDatas, ref m_CurrentSequenceDeviceID);
 
@@ -762,6 +769,7 @@ namespace Magnus_WPF_1.Source.Application
 
 
         public int m_CurrentSequenceDeviceID = 0;
+        public int m_CurrentSequenceDeviceID_Total = 0;
         public int m_CurrentPLCRegisterDeviceID = 0;
         public int m_nCurrentClickMappingID = 0;
         public PointF m_Center_Vision = new PointF();
@@ -1064,16 +1072,6 @@ namespace Magnus_WPF_1.Source.Application
 
                         m_InspectionOnlineThreadVisionResult.m_nDeviceIndexOnReel = nDeviceID;
                         m_InspectionOnlineThreadVisionResult.m_strDeviceID = strBarcodeResult;
-                        if (m_InspectionOnlineThreadVisionResult.m_nResult != (int)ERROR_CODE.PASS)
-                        {
-
-                            LogMessage.WriteToDebugViewer(8, "Barcode Save Image!");
-                            string strFailImage = strFullPathImageOut.Replace("PASS IMAGE", "FAIL IMAGE");
-                            if (File.Exists(strFullPathImageOut) && !File.Exists(strFailImage))
-                                File.Move(strFullPathImageOut, strFailImage);
-                            strFullPathImageOut = strFailImage;
-                            LogMessage.WriteToDebugViewer(8, "Barcode Save Image Done!");
-                        }
                         m_InspectionOnlineThreadVisionResult.m_strFullImagePath = strFullPathImageOut;
                         bAlreadySetEvent = true;
                         Master.m_EventInspectionOnlineThreadDone[m_nTrackID].Set();

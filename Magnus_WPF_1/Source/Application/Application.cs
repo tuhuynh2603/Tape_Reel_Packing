@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
+
 namespace Magnus_WPF_1.Source.Application
 {
     public class Application
@@ -48,15 +49,14 @@ namespace Magnus_WPF_1.Source.Application
 
         public Application()
         {
-
-            RegistryKey reg = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-            reg.SetValue("HD Tape And Reel Packing Vision", System.Windows.Forms.Application.ExecutablePath.ToString());
             if (!CheckMuTexProcess())
             {
                 MessageBox.Show("The other Application is running!");
 
                 KillCurrentProcess();
             }
+            RegistryKey reg = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            reg.SetValue("HD Tape And Reel Packing Vision", System.Windows.Forms.Application.ExecutablePath.ToString());
         }
 
         #region KILL PROCCESS

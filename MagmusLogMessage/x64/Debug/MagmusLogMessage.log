@@ -1,4 +1,7 @@
-﻿LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/LTCG' specification
+﻿  pch.cpp
+  _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+  LogMessage.cpp
+LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/LTCG' specification
      Creating library ..\..\Tape_Reel_Packing\TapeReelPacking\bin\x64\Debug\MagmusLogMessage.lib and object ..\..\Tape_Reel_Packing\TapeReelPacking\bin\x64\Debug\MagmusLogMessage.exp
   Generating code
   Not all modules are compiled with -Gy (function comdat), build without incremental LTCG.

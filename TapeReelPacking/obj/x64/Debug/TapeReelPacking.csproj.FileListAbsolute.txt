@@ -6,7 +6,6 @@ C:\HDVision\Debug\x64\vcruntime140.dll
 C:\HDVision\Debug\TapeReelPacking.exe.config
 C:\HDVision\Debug\TapeReelPacking.exe
 C:\HDVision\Debug\TapeReelPacking.pdb
-C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Debug\TapeReelPacking.csproj.AssemblyReference.cache
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Debug\TapeReelPacking.exe.config
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Debug\Source\Hardware\BarCodeReaderView.baml
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Debug\MainWindow.g.cs

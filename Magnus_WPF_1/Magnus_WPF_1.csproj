@@ -75,7 +75,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Magnus.ico</ApplicationIcon>
+    <ApplicationIcon>ICONHD.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>Magnus_WPF_1.App</StartupObject>
@@ -435,6 +435,13 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Machine.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ICONHD.png" />
+    <Resource Include="Resources\LOGOHD.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="ICONHD.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

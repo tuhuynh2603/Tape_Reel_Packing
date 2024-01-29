@@ -965,9 +965,6 @@ namespace Magnus_WPF_1
                 master.m_Tracks[nTrack].m_imageViews[0].ClearOverlay();
                 master.m_Tracks[nTrack].m_imageViews[0].controlWin.Visibility = Visibility.Collapsed;
             }
-
-
-
         }
 
         private void btn_next_teach_click(object sender, RoutedEventArgs e)

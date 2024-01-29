@@ -17,11 +17,11 @@
     <Grid x:Name="LoginGrid">
         <Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="#FF03D4F2" Offset="0.439"/>
+                <GradientStop Color="White" Offset="0.439"/>
                 <GradientStop Color="#FF17717E" Offset="0.808"/>
             </LinearGradientBrush>
         </Grid.Background>
-        <!--<Image Source="..\..\Resources\Machine.png" Width="1000"></Image>-->
+        <Image Source="..\..\Resources\LOGOHD.png" VerticalAlignment="Top"></Image>
 
         <Grid>
             <Grid.ColumnDefinitions>
@@ -34,7 +34,7 @@
                     <!--<Image Source="/Resource/ED_LOGO_Circle.png"                 
             		Stretch="Uniform"
             		VerticalAlignment="Center" Height="80" Margin="15,20,0,0"/>-->
-                    <TextBlock Text="WELCOME TO HD "
+                    <TextBlock Text=""
             		Foreground="#FFD16512"
             		FontFamily="Segoe Print"
             		FontSize="28"
@@ -44,7 +44,7 @@
                 </StackPanel>
 
                 <TextBlock Margin="0 0 0 0"></TextBlock>
-                <Border BorderThickness="0,0,0,0"  Margin="0 20 0 0">
+                <Border BorderThickness="0,0,0,0"  Margin="0 50 0 0">
                     <StackPanel Orientation="Horizontal" >
                         <Label Content="User:" Padding="5,1,0,1"
                        FontFamily="Microsoft YaHei UI" 
@@ -185,17 +185,17 @@
                     <GradientStop Color="#FF17717E" Offset="0.808"/>
                 </LinearGradientBrush>
             </Border.Background>-->
-                <StackPanel x:Name="PanelLogIn" VerticalAlignment="Top" Margin="0,50,0,0"
+                <StackPanel x:Name="PanelLogIn" VerticalAlignment="Top" Margin="0,130,0,0"
                         HorizontalAlignment="Center">
                     <Label Content="Log In" FontSize="25" Foreground="#FFD16512"
                        Name="lbLogin"
                        FontWeight="Bold" FontStretch="Expanded"
                        FontFamily="Microsoft YaHei UI" 
                        ></Label>
-                    <Label Name="sa" Content="Login to access software" Foreground="Wheat"/>
+                    <!--<Label Name="sa" Content="Login to access software" Foreground="Wheat"/>-->
                     <TextBlock x:Name="NotifyLogin"
                            Foreground="Red"
-                           Margin="11,10,0,0">
+                           Margin="11,-10,0,0">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Visible"/>
@@ -284,16 +284,17 @@
                     <GradientStop Color="#FF17717E" Offset="0.808"/>
                 </LinearGradientBrush>-->
                 <!--</Border.Background>-->
-                <StackPanel VerticalAlignment="Top" Margin="0,20,0,0"
+                <StackPanel VerticalAlignment="Top" Margin="0,100,0,0"
                         HorizontalAlignment="Center">
                     <Label Content="Create New User" FontSize="25"
             		   Foreground="#FFD16512"
                        FontWeight="Bold" FontStretch="Expanded" HorizontalAlignment="Center"
+                           Margin="0,27,0,0"
                        FontFamily="Microsoft YaHei UI"
                        ></Label>
                     <TextBlock x:Name="NotifyNewUser"
-                           Foreground="Red"
-                           Margin="38,15,0,10">
+                           Foreground="#FFD16512"
+                           Margin="38,-20,0,10">
                         <TextBlock.Style>
                             <Style TargetType="{x:Type TextBlock}">
                                 <Setter Property="Visibility" Value="Visible"/>
@@ -339,7 +340,7 @@
                                  GotFocus="PWGotFocus" LostFocus="PWLostFoucs"></PasswordBox>
                     </Border>
                     <StackPanel Orientation="Horizontal" 
-                            Margin="5,15,0,0"
+                            Margin="5,5,0,0"
                             Width="200"
                             HorizontalAlignment="Center"
                             Height="20">
@@ -363,7 +364,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Center"
-                            Margin="20">
+                            Margin="20,10,20,20">
                         <Border CornerRadius="10" Margin="0,0,40,0"
                             BorderThickness="3" >
                             <Border.Background>
@@ -404,7 +405,7 @@
                     <GradientStop Color="#FF17717E" Offset="0.808"/>
                 </LinearGradientBrush>
             </Border.Background>-->
-                <StackPanel x:Name="PanelChangePassword" VerticalAlignment="Top" Margin="0,50,0,0"
+                <StackPanel x:Name="PanelChangePassword" VerticalAlignment="Top" Margin="0,130,0,0"
                         HorizontalAlignment="Center">
                     <Label Content="New Password" FontSize="25" Foreground="#FFD16512"
                        FontWeight="Bold" FontStretch="Expanded"

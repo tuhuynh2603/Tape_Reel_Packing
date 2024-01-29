@@ -341,7 +341,7 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <StackPanel Orientation="Horizontal" Grid.Column="0">
-                        <Image  Source="Resources\Magnus.png" Width="30" Height="30"></Image>
+                        <Image  Source="Resources\ICONHD.png" Width="30" Height="30"></Image>
                         <Label Content="Tap and Reel Packing Machine" FontSize="15" FontFamily="Microsoft New Tai Lue" Foreground="WhiteSmoke"></Label>
                     </StackPanel>
 

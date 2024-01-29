@@ -1,0 +1,6 @@
+﻿LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/LTCG' specification
+     Creating library ..\..\Tape_Reel_Packing\TapeReelPacking\bin\x64\Debug\MagmusLogMessage.lib and object ..\..\Tape_Reel_Packing\TapeReelPacking\bin\x64\Debug\MagmusLogMessage.exp
+  Generating code
+  Not all modules are compiled with -Gy (function comdat), build without incremental LTCG.
+  Finished generating code
+  MagmusLogMessage.vcxproj -> C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\bin\x64\Debug\MagmusLogMessage.dll

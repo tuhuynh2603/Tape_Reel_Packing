@@ -1,0 +1,543 @@
+﻿<UserControl x:Class="TapeReelPacking.Source.Hardware.HiWinRobotUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TapeReelPacking.Source.Hardware"
+             mc:Ignorable="d" 
+             d:DesignHeight="550" d:DesignWidth="700">
+    <Grid Background="AliceBlue">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"></RowDefinition>
+            <RowDefinition Height="3.4*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Width="Auto">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"></RowDefinition>
+                <RowDefinition Height="5*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" Content="Robot Control" Background="DimGray" Foreground="Black"></Label>
+            <Border Grid.Row="1" Height="Auto" BorderThickness="0,1,0,1" BorderBrush="Black" Width="Auto">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*"></ColumnDefinition>
+                        <ColumnDefinition Width="2*"></ColumnDefinition>
+                        <ColumnDefinition Width="0.7*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="4*"></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50"></ColumnDefinition>
+                                <ColumnDefinition Width="1*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Column="0" Content="Status" BorderThickness="1" BorderBrush="Black" VerticalContentAlignment="Center" Background="WhiteSmoke" HorizontalContentAlignment="Center"></Label>
+                            <TextBlock x:Name="label_Alarm" Grid.Column="1" Background="Wheat" TextWrapping="WrapWithOverflow"></TextBlock>
+                        </Grid>
+
+                        <Button Grid.Column="1" Content="Reset Alarm" Click="button_ResetAlarm_Click"></Button>
+                        
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"></RowDefinition>
+                            <RowDefinition Height="1*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Border Grid.Row="0" BorderThickness="1,0,1,1" BorderBrush="Gray">
+                            <Grid>
+                                <Label Content="Robot IP Address: " Width="Auto" HorizontalAlignment="Left"></Label>
+
+                                <TextBlock x:Name="text_RobotIPAddress" Background="White" Width="110" HorizontalAlignment="Right" Foreground ="Black" Text ="{Binding Path=txtRobotIPAddress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+                            </Grid>
+                        </Border>
+                        <Border Grid.Row="1" BorderThickness="1" BorderBrush="Gray" >
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                                    <ColumnDefinition Width="2*"></ColumnDefinition>
+                                    <ColumnDefinition Width="2*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label       Grid.Column="0" Content="Model: " HorizontalContentAlignment="Right"></Label>
+                                <RadioButton Grid.Column="1" Name="check_Manual" Checked="check_Manual_Checked" Content="Manual" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"></RadioButton>
+                                <RadioButton Grid.Column="2" Name="check_Auto" Checked="check_Auto_Checked" Margin="10,0,0,0" Content="Auto" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"></RadioButton>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <ToggleButton x:Name="button_RobotConnect"  
+                                  Checked="button_RobotConnect_Checked" 
+                                  Unchecked="button_RobotConnect_Unchecked" 
+                                  Grid.Column="2" 
+                                  Content="N/A" Width="Auto"  
+                                  VerticalContentAlignment="Center"></ToggleButton>
+                </Grid>
+
+            </Border>
+
+        </Grid>
+        <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="2">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.3*"></ColumnDefinition>
+                    <ColumnDefinition Width="1.5*"></ColumnDefinition>
+                    <ColumnDefinition Width="0.7*"></ColumnDefinition>
+                    <ColumnDefinition Width="0.7*"></ColumnDefinition>
+                    <ColumnDefinition Width="1.5*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0" Margin="0,5,5,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"></RowDefinition>
+                        <RowDefinition Height="1*"></RowDefinition>
+                        <RowDefinition Height="1*"></RowDefinition>
+                        <RowDefinition Height="1*"></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <GroupBox   Grid.Row="0"  Header="Acc Ratio (0-100 %)" BorderThickness="1" BorderBrush="Black" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <Grid Margin="0,5,0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"></ColumnDefinition>
+                                <ColumnDefinition Width="3*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+
+                            <Slider ValueChanged="slider_AccRatioPercent_ValueChanged"  Grid.Column="1" x:Name="slider_AccRatioPercent" Minimum="10" Maximum="100" SmallChange="1" VerticalAlignment="Center" 
+                                                                                     Value="{Binding Path=Text, ElementName=slider_AccRatioPercentShow, Mode=TwoWay}">
+                            </Slider>
+                            <TextBox x:Name="slider_AccRatioPercentShow" TextChanged ="slider_AccRatioPercentShow_TextChanged"  Background="Transparent" Text="{Binding Path=Value, ElementName=m_nAccRatioPercentValue, Mode=TwoWay ,UpdateSourceTrigger=PropertyChanged}" Foreground="Black" TextAlignment="Center" VerticalContentAlignment="Center" FontSize="15"></TextBox>
+
+                        </Grid>
+                    </GroupBox>
+
+                    <GroupBox   Grid.Row="1"  Header="PTP Speed (0-100 %)" BorderThickness="1" BorderBrush="Black" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <Grid Margin="0,5,0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"></ColumnDefinition>
+                                <ColumnDefinition Width="3*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+
+                            <Slider ValueChanged ="slider_PTPSpeedPercent_ValueChanged"  Grid.Column="1" x:Name="slider_PTPSpeedPercent" Minimum="10" Maximum="100" SmallChange="1" VerticalAlignment="Center" 
+                                                                                     Value="{Binding Path=Text, ElementName=slider_PTPSpeedPercentShow, Mode=TwoWay}">
+                            </Slider>
+                            <TextBox x:Name="slider_PTPSpeedPercentShow" TextChanged ="slider_PTPSpeedPercentShow_TextChanged"  Background="Transparent" Text="{Binding Path=Value, ElementName=m_PTPSpeedPercentValue, Mode=TwoWay ,UpdateSourceTrigger=PropertyChanged}" Foreground="Black" TextAlignment="Center" VerticalContentAlignment="Center" FontSize="15"></TextBox>
+
+                        </Grid>
+                    </GroupBox>
+
+                    <GroupBox   Grid.Row="2"  Header="Lin Speed (1-2000 mm/s)" BorderThickness="1" BorderBrush="Black" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <Grid Margin="0,5,0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"></ColumnDefinition>
+                                <ColumnDefinition Width="3*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+
+                            <Slider ValueChanged="slider_LinearSpeed_ValueChanged"  Grid.Column="1" x:Name="slider_LinearSpeed" Minimum="1" Maximum="2000" SmallChange="10" VerticalAlignment="Center" 
+                                                                                     Value="{Binding Path=Text, ElementName=slider_LinearSpeedShow, Mode=TwoWay}">
+                            </Slider>
+                            <TextBox x:Name="slider_LinearSpeedShow" TextChanged = "slider_LinearSpeedShow_TextChanged" Background="Transparent" Text="{Binding Path=Value, ElementName=m_nLinearSpeedValue, Mode=TwoWay ,UpdateSourceTrigger=PropertyChanged}" Foreground="Black" TextAlignment="Center" VerticalContentAlignment="Center" FontSize="12"></TextBox>
+
+                        </Grid>
+                    </GroupBox>
+
+                    <GroupBox   Grid.Row="3"  Header="Override (0-100 %)" BorderThickness="1" BorderBrush="Black" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <Grid Margin="0,5,0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"></ColumnDefinition>
+                                <ColumnDefinition Width="3*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+
+                            <Slider ValueChanged="slider_OverridePercent_ValueChanged"  Grid.Column="1" x:Name="slider_OverridePercent" Minimum="10" Maximum="100" SmallChange="1" VerticalAlignment="Center" 
+                                                                                     Value="{Binding Path=Text, ElementName=slider_OverridePercentShow, Mode=TwoWay}">
+                            </Slider>
+                            <TextBox x:Name="slider_OverridePercentShow" TextChanged ="slider_OverridePercentShow_TextChanged"  Background="Transparent" Text="{Binding Path=Value, ElementName=m_nOverridePercent, Mode=TwoWay ,UpdateSourceTrigger=PropertyChanged}" Foreground="Black" TextAlignment="Center" VerticalContentAlignment="Center" FontSize="12"></TextBox>
+
+                        </Grid>
+                    </GroupBox>
+
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="8*"></RowDefinition>
+                        <RowDefinition Height="2*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                <DataGrid Grid.Row="0"  Name="dataGrid_robot_Position" 
+                          CanUserAddRows="False"
+                          AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Param"
+                                            Width="1*" 
+                                            IsReadOnly="True" 
+                                            CanUserResize="False"
+                                            CanUserSort="False"  
+                                            CanUserReorder="False" 
+                                             Foreground ="Black"
+                                            Binding="{Binding m_field, Mode=TwoWay}"/>
+                        <DataGridTextColumn Header="Value"
+                                            Width="2*" 
+                                            IsReadOnly="True" 
+                                            CanUserResize="False" 
+                                            CanUserSort="False"
+                                            CanUserReorder="False" 
+                                             Foreground ="Black"
+                                            Binding="{Binding m_value, Mode=TwoWay}"/>
+                        <DataGridTextColumn Header="Unit"
+                                            Width="1*" 
+                                            IsReadOnly="True" 
+                                            CanUserResize="False" 
+                                            CanUserSort="False" 
+                                            CanUserReorder="False"  
+                                             Foreground ="Black"
+                                            Binding="{Binding m_unit, Mode=TwoWay}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="button_GetHomePosition" Content="Get Home" Click="button_GetHomePosition_Click"></Button>
+                            <Button Grid.Column="1" x:Name="button_SetHomePosition" Content="Set Home" Click="button_SetHomePosition_Click"></Button>
+                        </Grid>
+
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="button_Stop_Moving"  Content="STOP" Click="button_Stop_Moving_Click" HorizontalAlignment="Stretch"></Button>
+                            <Button Grid.Column="1" x:Name="button_Home_Move"  Content="Home Move" Click="button_Home_Move_Click"></Button>
+                        </Grid>
+
+                    </Grid>
+
+                </Grid>
+
+                <DataGrid Grid.Column="2" Name="dataGrid_robot_Input" 
+                          CanUserAddRows="False"
+                          AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Input"
+                                            Width="1*" 
+                                            IsReadOnly="True" 
+                                            CanUserResize="False"
+                                            CanUserSort="False"  
+                                            CanUserReorder="False" 
+                                             Foreground ="Black"
+                                            Binding="{Binding m_field, Mode=TwoWay}"/>
+                        <DataGridTextColumn Header="Value"
+                                            Width="1*" 
+                                            IsReadOnly="True" 
+                                            CanUserResize="False" 
+                                            CanUserSort="False"
+                                            CanUserReorder="False" 
+                                             Foreground ="Black"
+                                            Binding="{Binding m_value, Mode=TwoWay}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <DataGrid Grid.Column="3" Name="dataGrid_robot_Output" 
+                          CanUserAddRows="False"
+                          AutoGenerateColumns="False" MouseDoubleClick="dataGrid_robot_Output_MouseDoubleClick">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Output"                                
+                                            Width="1*" 
+                                            IsReadOnly="True" 
+                                            CanUserResize="False"
+                                            CanUserSort="False"  
+                                            CanUserReorder="False" 
+                                             Foreground ="Black"
+                                            Binding="{Binding m_field, Mode=TwoWay}"/>
+                        <DataGridTextColumn Header="Value"
+                                            Width="1*" 
+                                            IsReadOnly="True" 
+                                            CanUserResize="False" 
+                                            CanUserSort="False"
+                                            CanUserReorder="False" 
+                                            Foreground ="Black"
+                                            Binding="{Binding m_value, Mode=TwoWay}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <Grid Grid.Column="4" Margin="0,5,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height = "0.95*"></RowDefinition>
+                        <RowDefinition Height = "1*"></RowDefinition>
+                        <RowDefinition Height = "1*"></RowDefinition>
+                        <RowDefinition Height = "1.75*"></RowDefinition>
+                        <RowDefinition Height = "1*"></RowDefinition>
+                        <RowDefinition Height = "1*"></RowDefinition>
+                        <RowDefinition Height = "1*"></RowDefinition>
+                        <RowDefinition Height = "1*"></RowDefinition>
+                        <RowDefinition Height = "1*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"></ColumnDefinition>
+                                <ColumnDefinition Width="2*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Jog Type" HorizontalContentAlignment="Left"></Label>
+                            <ComboBox Grid.Column="1" x:Name="combo_JogType" VerticalAlignment="Stretch"
+                                      SelectionChanged="combo_JogType_SelectionChanged"></ComboBox>
+                        </Grid>
+                    </Grid>
+
+                    <Grid Grid.Row ="1" Margin="2,2,2,2">
+                        <ToggleButton x:Name="toggle_ServoOnOff" 
+                                      Click="toggle_ServoOnOff_Click"
+                                      Content="Servo On/Off">
+                        </ToggleButton>
+
+                    </Grid>
+
+                    <Grid Grid.Row="2">
+                        <Grid>
+                            <Label Content="Move Type" VerticalContentAlignment="Center"></Label>
+                            <ComboBox x:Name="combo_MoveTypes" VerticalAlignment="Stretch" Margin="65,0,0,0"
+                                      SelectionChanged="combo_MoveType_SelectionChanged"></ComboBox>
+                        </Grid>
+                    </Grid>
+
+                    <GroupBox Grid.Row="3" Header="Step (um)" FontSize="15">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"></ColumnDefinition>
+                                <ColumnDefinition Width="2*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+
+                            <Slider Height="Auto" Grid.Column="1" x:Name="slider_StepRelative" Minimum="-500000" Maximum="500000" SmallChange="1" VerticalAlignment="Center" 
+                                                                                    Value="{Binding Path=Text, ElementName=slider_StepRelativeShow, Mode=TwoWay}">
+                            </Slider>
+                            <TextBox  x:Name="slider_StepRelativeShow" TextChanged ="slider_StepRelativeShow_TextChanged"  Background="Transparent" 
+                                     Text="{Binding Path=Value, ElementName=m_nStepRelativeValue, 
+                                Mode=TwoWay ,UpdateSourceTrigger=PropertyChanged}" Foreground="Black" TextAlignment="Center" VerticalContentAlignment="Center" FontSize="10"></TextBox>
+
+                        </Grid>
+
+                    </GroupBox>
+
+                    <Grid Grid.Row="4" Margin="2,2,2,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label x:Name="label_move_Motor1" Grid.Column="0" Content="A1" Foreground="Black" HorizontalContentAlignment="Right"></Label>
+                        <Button x:Name="button_negative_Move1" Click="button_negative_Move1_MouseLeftButtonDown"   Content= "-"  Grid.Column="1" Foreground="Black" FontSize="15" VerticalContentAlignment="Center"></Button>
+                        <Button x:Name="button_positive_Move1" Click="button_positive_Move1_MouseLeftButtonDown"  Content= "+"  Grid.Column="2" Foreground="Black" FontSize="15" VerticalContentAlignment="Center"></Button>
+                    </Grid>
+
+                    <Grid Grid.Row="5" Margin="2,2,2,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label x:Name="label_move_Motor2" Grid.Column="0" Content="A2" Foreground="Black" HorizontalContentAlignment="Right"></Label>
+                        <Button x:Name="button_negative_Move2" Click ="button_negative_Move2_MouseLeftButtonDown"   Content= "-"  Grid.Column="1" Foreground="Black" FontSize="15" VerticalContentAlignment="Center"></Button>
+                        <Button x:Name="button_positive_Move2" Click="button_positive_Move2_MouseLeftButtonDown"  Content= "+"  Grid.Column="2" Foreground="Black" FontSize="15" VerticalContentAlignment="Center"></Button>
+                    </Grid>
+
+                    <Grid Grid.Row="6" Margin="2,2,2,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label x:Name="label_move_Motor3" Grid.Column="0" Content="A3" Foreground="Black" HorizontalContentAlignment="Right"></Label>
+                        <Button x:Name="button_negative_Move3" Click="button_negative_Move3_MouseLeftButtonDown"  Content= "-"  Grid.Column="1" Foreground="Black" FontSize="15" VerticalContentAlignment="Center"></Button>
+                        <Button x:Name="button_positive_Move3" Click="button_positive_Move3_MouseLeftButtonDown"  Content= "+"  Grid.Column="2" Foreground="Black" FontSize="15" VerticalContentAlignment="Center"></Button>
+                    </Grid>
+
+                    <Grid Grid.Row="7" Margin="2,2,2,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label x:Name="label_move_Motor4" Grid.Column="0" Content="A4" Foreground="Black" HorizontalContentAlignment="Right"></Label>
+                        <Button x:Name="button_negative_Move4" Click="button_negative_Move4_MouseLeftButtonDown"   Content= "-"  Grid.Column="1" Foreground="Black" FontSize="15" VerticalContentAlignment="Center"></Button>
+                        <Button x:Name="button_positive_Move4" Click="button_positive_Move4_MouseLeftButtonDown"  Content= "+"  Grid.Column="2" Foreground="Black" FontSize="15" VerticalContentAlignment="Center"></Button>
+                    </Grid>
+
+                    <Grid Grid.Row="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="Add Point" Margin="0,0,2,0" FontSize="10" Click="button_Add_Point_To_Sequence_Click"></Button>
+                        <Button Grid.Column="1" x:Name="button_setTo_ChoosenPos" Content="Set Point" Click="button_setTo_ChoosenPos_Click"></Button>
+                        <Button Grid.Column="2" Content="Delete" Margin="2,0,0,0" FontSize="10" Click="button_Delete_Point_To_Sequence_Click"></Button>
+
+                    </Grid>
+
+                </Grid>
+
+            </Grid>
+
+
+        </Border>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"></ColumnDefinition>
+                <ColumnDefinition Width="8*"></ColumnDefinition>
+                <ColumnDefinition Width="1.5*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <!--<Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="No. Point" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"></Label>
+                    <TextBox Grid.Column="1" x:Name="textBox_NumberPoint" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                             Text="{Binding Path=Value, ElementName=m_nNumberPointValue, 
+                                Mode=TwoWay ,UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                </Grid>-->
+                <Button x:Name="button_CameraRobotCalibration" Content=" Do Calibration" Click="button_CameraRobotCalibration_Click" Grid.Row="0" Height="28" VerticalAlignment="Bottom"/>
+                <Button x:Name="button_Next_Calibration" Content="Next" Click="button_Next_Calibration_Click"  Grid.Row="1"></Button>
+                <Button x:Name="button_Import_Task" Content="Import Task" Click="button_Import_Task_Click" Grid.Row="2"></Button>
+                <Button x:Name="button_Start_Task" Content="Start Task" Click="button_Start_Task_Click" Grid.Row="3"></Button>
+                <Button x:Name="button_Abort_Task" Content="Abort Task" Click="button_Abort_Task_Click" Grid.Row="4"></Button>
+
+            </Grid>
+
+            <DataGrid Grid.Column="1" Name="dataGrid_all_robot_Positions" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                          CanUserAddRows="False"
+                          AutoGenerateColumns="False" HorizontalContentAlignment="Left" MouseDoubleClick="dataGrid_all_robot_Positions_MouseDoubleClick">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="PS No." 
+                                            Width="auto" 
+                                            IsReadOnly="True" 
+                                            CanUserResize="False"
+                                            CanUserSort="False"  
+                                            CanUserReorder="False" 
+                                            Foreground ="Black"
+                                            Binding="{Binding m_PointIndex, Mode=TwoWay}"/>
+                    <DataGridTextColumn Header="Comment" 
+                                            Width="auto" 
+                                            IsReadOnly="True" 
+                                            CanUserResize="False"
+                                            CanUserSort="False"  
+                                            CanUserReorder="False" 
+                                            Foreground ="Black"
+                                            Binding="{Binding m_PointComment, Mode=TwoWay}"/>
+                    <DataGridTextColumn Header="X (mm)"                   
+                                            Width="auto" 
+                                            IsReadOnly="False" 
+                                            CanUserResize="False" 
+                                            CanUserSort="False"
+                                            CanUserReorder="False" 
+                                            Foreground ="Black"
+                                            Binding="{Binding m_X, Mode=TwoWay}"/>
+                    <DataGridTextColumn Header="Y (mm)"
+                                            Width="auto" 
+                                            IsReadOnly="False" 
+                                            CanUserResize="False" 
+                                            CanUserSort="False"
+                                            CanUserReorder="False" 
+                                            Foreground ="Black"
+                                            Binding="{Binding m_Y, Mode=TwoWay}"/>
+                    <DataGridTextColumn Header="Z (mm)"
+                                            Width="auto" 
+                                            IsReadOnly="False" 
+                                            CanUserResize="False" 
+                                            CanUserSort="False"
+                                            CanUserReorder="False" 
+                                            Foreground ="Black"
+                                            Binding="{Binding m_Z, Mode=TwoWay}"/>
+                    <DataGridTextColumn Header="Rz (De)"
+                                            Width="auto" 
+                                            IsReadOnly="False" 
+                                            CanUserResize="False" 
+                                            CanUserSort="False"
+                                            CanUserReorder="False" 
+                                            Foreground ="Black"
+                                            Binding="{Binding m_Rz, Mode=TwoWay}"/>
+                    <DataGridTextColumn Header="M1 (deg)"                   
+                                            Width="auto" 
+                                            IsReadOnly="False" 
+                                            CanUserResize="False" 
+                                            CanUserSort="False"
+                                            CanUserReorder="False" 
+                                            Foreground ="Black"
+                                            Binding="{Binding m_Joint1, Mode=TwoWay}"/>
+                    <DataGridTextColumn Header="M2 (deg)"   
+                                            Width="auto" 
+                                            IsReadOnly="False" 
+                                            CanUserResize="False" 
+                                            CanUserSort="False"
+                                            CanUserReorder="False" 
+                                            Foreground ="Black"
+                                            Binding="{Binding m_Joint2, Mode=TwoWay}"/>
+                    <DataGridTextColumn Header="M3 (deg)"   
+                                            Width="auto" 
+                                            IsReadOnly="False" 
+                                            CanUserResize="False" 
+                                            CanUserSort="False"
+                                            CanUserReorder="False" 
+                                            Foreground ="Black"
+                                            Binding="{Binding m_Joint3, Mode=TwoWay}"/>
+                    <DataGridTextColumn Header="M4 (deg)"   
+                                            Width="auto" 
+                                            IsReadOnly="False" 
+                                            CanUserResize="False" 
+                                            CanUserSort="False"
+                                            CanUserReorder="False" 
+                                            Foreground ="Black"
+                                            Binding="{Binding m_Joint4, Mode=TwoWay}"/>
+                    <DataGridTextColumn Header="Base"
+                                            Width="auto" 
+                                            IsReadOnly="False" 
+                                            CanUserResize="False" 
+                                            CanUserSort="False"
+                                            CanUserReorder="False" 
+                                            Foreground ="Black"
+                                            Binding="{Binding m_Base, Mode=TwoWay}"/>
+                    <DataGridTextColumn Header="Tool"
+                                            Width="auto" 
+                                            IsReadOnly="False" 
+                                            CanUserResize="False" 
+                                            CanUserSort="False"
+                                            CanUserReorder="False" 
+                                            Foreground ="Black"
+                                            Binding="{Binding m_Tool, Mode=TwoWay}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <StackPanel Grid.Column="2" Orientation="Vertical">
+                <Button x:Name="button_GetSoftLimit" Content="Get Soft Limit" Click="button_GetSoftLimit_Click"></Button>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" x:Name="button_SetLowerSoftLimit" Content="Low Limit" Click="button_SetLowerSoftLimit_Click" Margin="0,0,1,0"></Button>
+                    <Button Grid.Column="1" x:Name="button_SetHigherSoftLimit" Content="High Limit" Click="button_SetHigherSoftLimit_Click"  Margin="1,0,0,0"></Button>
+                </Grid>
+                <Button x:Name="button_Save_Sequence" Content="Save" Click="button_Save_Sequence_Click"></Button>
+            </StackPanel>
+                     
+        </Grid>
+    </Grid>
+</UserControl>

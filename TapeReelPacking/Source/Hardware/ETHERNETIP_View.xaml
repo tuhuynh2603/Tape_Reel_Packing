@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="TapeReelPacking.Source.Hardware.ETHERNETIP_View"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TapeReelPacking.Source.Hardware"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid>
+            <StackPanel Margin="20">
+                <TextBlock x:Name="txtReadValue" Text="Read Tag Value:"/>
+                <TextBox Name="txtReadTagValue" Width="200" Margin="0,5,0,15"/>
+                <Button Content="Read" Click="btn_Read"/>
+                <TextBlock x:Name="txtWriteValue" Text="Write Tag Value:" Margin="0,20,0,0"/>
+                <TextBox Name="txtWriteTagValue" Width="200" Margin="0,5,0,15"/>
+                <Button Content="Write" Click="btn_Write"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

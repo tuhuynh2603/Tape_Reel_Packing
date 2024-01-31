@@ -26,7 +26,6 @@ using EasyModbus;
             //PLC_BARCODE_TRIGGER = 100,
 
             //PLC_BARCODE_CAPTURE_DONE = 101,
-            PLC_CURRENT_BARCODE_CHIP_COUNT = 103,
             PLC_CURRENT_ROBOT_CHIP_COUNT = 104,
             PLC_READY_STATUS = 106,
             PLC_BARCODE_READY =107,
@@ -46,6 +45,7 @@ using EasyModbus;
             PLC_MANUAL_BARCODE_RESULT_FAIL = 126,
             PLC_MANUAL_BARCODE_CAPTURE_BUSY = 127,
             PLC_MANUAL_BARCODE_COUNT = 128,
+            PLC_CURRENT_BARCODE_CHIP_COUNT = 129,
 
 
             PLC_RESET_LOT = 131,

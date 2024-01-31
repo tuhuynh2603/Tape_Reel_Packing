@@ -1054,6 +1054,8 @@ namespace TapeReelPacking.Source.Application
                     {
                         m_InspectionOnlineThreadVisionResult.m_nDeviceIndexOnReel = nDeviceID;
                         m_InspectionOnlineThreadVisionResult.m_strDeviceID = m_CurrentSequenceDeviceID.ToString();
+                        string strDateTime = string.Format("{0}:{1}:{2}_{3}:{4}:{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+                        m_InspectionOnlineThreadVisionResult.m_strDatetime = strDateTime;
                         bAlreadySetEvent = true;
                         Master.m_EventInspectionOnlineThreadDone[m_nTrackID].Set();
 
@@ -1073,6 +1075,9 @@ namespace TapeReelPacking.Source.Application
                         m_InspectionOnlineThreadVisionResult.m_nDeviceIndexOnReel = nDeviceID;
                         m_InspectionOnlineThreadVisionResult.m_strDeviceID = strBarcodeResult;
                         m_InspectionOnlineThreadVisionResult.m_strFullImagePath = strFullPathImageOut;
+                        string strDateTime = string.Format("{0}:{1}:{2}_{3}:{4}:{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+                        m_InspectionOnlineThreadVisionResult.m_strDatetime = strDateTime;
+
                         bAlreadySetEvent = true;
                         Master.m_EventInspectionOnlineThreadDone[m_nTrackID].Set();
                         LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Get Barcode Result Done. Total Inspection Time: " + timeIns.ElapsedMilliseconds.ToString());

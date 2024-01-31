@@ -6,7 +6,6 @@ C:\HDVision\Release\x64\vcruntime140.dll
 C:\HDVision\Release\TapeReelPacking.exe.config
 C:\HDVision\Release\TapeReelPacking.exe
 C:\HDVision\Release\TapeReelPacking.pdb
-C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking.csproj.AssemblyReference.cache
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking.exe.config
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\Source\Hardware\BarCodeReaderView.baml
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\MainWindow.g.cs
@@ -56,3 +55,6 @@ C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking.c
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking.csproj.CopyComplete
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking.exe
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking.pdb
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\LotBarcodeDataTable.g.cs
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\LotBarcodeDataTable.baml
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking.csproj.AssemblyReference.cache

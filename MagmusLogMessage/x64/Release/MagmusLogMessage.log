@@ -1,1 +1,9 @@
-﻿
+﻿  pch.cpp
+  _WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)
+  LogMessage.cpp
+     Creating library ..\..\Tape_Reel_Packing\TapeReelPacking\bin\x64\Release\MagmusLogMessage.lib and object ..\..\Tape_Reel_Packing\TapeReelPacking\bin\x64\Release\MagmusLogMessage.exp
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 171 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  MagmusLogMessage.vcxproj -> C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\bin\x64\Release\MagmusLogMessage.dll

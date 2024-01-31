@@ -155,7 +155,7 @@ namespace TapeReelPacking.Source.Hardware
 			//}
 			Thread.Sleep(250);
 			int nResult = -(int)ERROR_CODE.PASS;
-			if((strDeviceID).Length < 1)
+			if(strDeviceID.Length < 1)
             {
 				nResult = -(int)ERROR_CODE.PROCESS_ERROR;
 			}
@@ -168,7 +168,10 @@ namespace TapeReelPacking.Source.Hardware
 
 				MainWindow.mainWindow.master.m_Tracks[1].m_imageViews[0].UpdateNewImageMono(strImageFullName);
 			});
-			//m_reader.ExecCommand("LOFF");
+			if (strDeviceID.Length < 1)
+			{
+				m_reader.ExecCommand("LOFF");
+			}
 			bIsDownload = false;
 			return strDeviceID;
 		}

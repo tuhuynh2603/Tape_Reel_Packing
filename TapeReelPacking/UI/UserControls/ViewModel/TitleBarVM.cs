@@ -50,8 +50,15 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             CloseWindowCommand = new RelayCommand<UserControl>((p) => { return true; },
                                                                     (p) =>
                                                                     {
+
+
                                                                         if (MessageBox.Show("Close App?","", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                                                                         {
+                                                                            if (MainWindow.mainWindow.m_bSequenceRunning)
+                                                                            {
+                                                                                MessageBox.Show("Machine is running, cannot close the application", "");
+                                                                                return;
+                                                                            }
 
                                                                             MainWindow.mainWindow.master.m_Tracks[0].m_hIKControlCameraView.m_MyCamera.MV_CC_ClearImageBuffer_NET();
                                                                             MainWindow.mainWindow.master.m_Tracks[0].m_hIKControlCameraView.m_MyCamera.MV_CC_CloseDevice_NET();

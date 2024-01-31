@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\App.xaml
-19-2133759089
+2025066267
 
-49-109550737
+50508197373
 501967658746
-MainWindow.xaml;MappingSetingUC.xaml;PopupUserControl.xaml;ResourceControl.xaml;Source\Hardware\BarCodeReaderView.xaml;Source\Hardware\ETHERNETIP_View.xaml;Source\Hardware\HIKControlCameraView.xaml;Source\Hardware\HiWinRobotUserControl.xaml;Source\Hardware\PLCCOMM.xaml;TeachParametersUC.xaml;UI\UserControls\DefectInfor.xaml;UI\UserControls\LoginUser.xaml;UI\UserControls\OutputLogView.xaml;UI\UserControls\PixelRuler.xaml;UI\UserControls\RecipeManageView.xaml;UI\UserControls\View\ImageView.xaml;UI\UserControls\View\StatisticView.xaml;UI\UserControls\View\TitleBar.xaml;UI\UserControls\WarningMessageBox.xaml;
+MainWindow.xaml;MappingSetingUC.xaml;PopupUserControl.xaml;ResourceControl.xaml;Source\Hardware\BarCodeReaderView.xaml;Source\Hardware\ETHERNETIP_View.xaml;Source\Hardware\HIKControlCameraView.xaml;Source\Hardware\HiWinRobotUserControl.xaml;Source\Hardware\PLCCOMM.xaml;TeachParametersUC.xaml;UI\UserControls\DefectInfor.xaml;UI\UserControls\LoginUser.xaml;UI\UserControls\LotBarcodeDataTable.xaml;UI\UserControls\OutputLogView.xaml;UI\UserControls\PixelRuler.xaml;UI\UserControls\RecipeManageView.xaml;UI\UserControls\View\ImageView.xaml;UI\UserControls\View\StatisticView.xaml;UI\UserControls\View\TitleBar.xaml;UI\UserControls\WarningMessageBox.xaml;
 
-False
+True
 

@@ -177,6 +177,9 @@
     <Compile Include="UI\UserControls\LoginUser.xaml.cs">
       <DependentUpon>LoginUser.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\UserControls\LotBarcodeDataTable.xaml.cs">
+      <DependentUpon>LotBarcodeDataTable.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\UserControls\OutputLogView.xaml.cs">
       <DependentUpon>OutputLogView.xaml</DependentUpon>
     </Compile>
@@ -255,6 +258,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\UserControls\LoginUser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\UserControls\LotBarcodeDataTable.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

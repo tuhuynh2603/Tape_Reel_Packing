@@ -415,7 +415,7 @@ namespace TapeReelPacking
                 }
 
                 VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, nT, ref master.m_Tracks[nT].m_VisionResultDatas, ref master.m_Tracks[nT].m_CurrentSequenceDeviceID);
-                VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, nT, ref master.m_Tracks[nT].m_VisionResultDatas_Total, ref master.m_Tracks[nT].m_CurrentSequenceDeviceID_Total, true);
+                //VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, nT, ref master.m_Tracks[nT].m_VisionResultDatas_Total, ref master.m_Tracks[nT].m_CurrentSequenceDeviceID_Total, true);
 
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
@@ -467,9 +467,6 @@ namespace TapeReelPacking
         {
             Stop_Sequence(activeImageDock.trackID);
         }
-
-
-
 
         public void InitBigDocPanel()
         {

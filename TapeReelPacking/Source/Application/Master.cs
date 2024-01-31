@@ -667,6 +667,8 @@ namespace TapeReelPacking.Source.Application
             int bDoorStatus_Backup = m_DoorOpennedStatus;// HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_DOOR_STATUS);
             int bEndLotStatus_Backup = m_EndLotStatus;// HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_END_LOT);
             int bCreateNewLotStatus_Backup = m_CreateNewLotStatus;// HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CREATE_NEW_LOT);
+            m_SequenceMode = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_ENABLE);
+
             while (true)
             {
                 if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
@@ -674,7 +676,6 @@ namespace TapeReelPacking.Source.Application
 
                 Thread.Sleep(50);
 
-                m_SequenceMode = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_ENABLE);
                 if(m_SequenceMode == (int)(SEQUENCE_MODE.MODE_MANUAL))
                 {
                     if (HiWinRobotInterface.m_RobotConnectID >= 0)
@@ -895,7 +896,7 @@ namespace TapeReelPacking.Source.Application
                             }
                             //m_Tracks[nT].m_CurrentSequenceDeviceID = 0;
                             VisionResultData.SaveSequenceResultToExcel(Application.m_strCurrentLot, nT, new VisionResultData());
-                            VisionResultData.SaveSequenceResultToExcel(Application.m_strCurrentLot, nT, new VisionResultData(), true);
+                            //VisionResultData.SaveSequenceResultToExcel(Application.m_strCurrentLot, nT, new VisionResultData(), true);
 
                             MainWindow.mainWindow.m_staticView.m_nPageID[nT] = 0;
                             MainWindow.mainWindow.LoadStatistic(nT, false);
@@ -1260,6 +1261,7 @@ namespace TapeReelPacking.Source.Application
                 visionResultDataTemp.m_strDeviceID = m_Tracks[0].m_InspectionOnlineThreadVisionResult.m_strDeviceID;
                 visionResultDataTemp.m_nResult = nCamera1InspectionResult;
                 visionResultDataTemp.m_strFullImagePath = m_Tracks[0].m_InspectionOnlineThreadVisionResult.m_strFullImagePath;
+                visionResultDataTemp.m_strDatetime = m_Tracks[0].m_InspectionOnlineThreadVisionResult.m_strDatetime;
 
                 robotPoint = MagnusMatrix.ApplyTransformation(MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.m_MatCameraRobotTransform, m_Tracks[0].m_Center_Vision);
                 MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection);
@@ -1488,6 +1490,8 @@ namespace TapeReelPacking.Source.Application
                 m_Tracks[0].m_VisionResultDatas[nDeviceID].m_strDeviceID = (nDeviceID + 1).ToString();
                 m_Tracks[0].m_VisionResultDatas[nDeviceID].m_nResult = nCamera1InspectionResult;
                 m_Tracks[0].m_VisionResultDatas[nDeviceID].m_strFullImagePath = visionResultDataTemp.m_strFullImagePath;
+                m_Tracks[0].m_VisionResultDatas[nDeviceID].m_strDatetime = visionResultDataTemp.m_strDatetime;
+
 
                 if (nCamera1InspectionResult == -(int)ERROR_CODE.PASS)
                 {
@@ -1758,6 +1762,12 @@ namespace TapeReelPacking.Source.Application
             if (m_plcComm == null)
                 goto EndThread;
 
+
+
+            int nDeviceTemp = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_CURRENT_BARCODE_CHIP_COUNT);
+            if (nDeviceTemp > 0)
+                m_Tracks[1].m_CurrentSequenceDeviceID = nDeviceTemp - 1;
+
             m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_READY, 1);
 
             while (true/*MainWindow.mainWindow.m_bSequenceRunning*/)
@@ -1849,7 +1859,7 @@ namespace TapeReelPacking.Source.Application
                 m_hardwareTriggerSnapEvent[1].Set();
                 LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Waiting for vision done.... ");
                 int nVisionResult = m_Tracks[1].m_SequenceThreadVisionResult.m_nResult;
-                if (!m_EventInspectionOnlineThreadDone[1].WaitOne(1500))
+                if (!m_EventInspectionOnlineThreadDone[1].WaitOne(2500))
                 {
                     if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
                         goto EndThread;
@@ -1871,6 +1881,7 @@ namespace TapeReelPacking.Source.Application
                 m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strDeviceID = m_Tracks[1].m_InspectionOnlineThreadVisionResult.m_strDeviceID;
                 m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = nVisionResult;
                 m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath = m_Tracks[1].m_InspectionOnlineThreadVisionResult.m_strFullImagePath;
+                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strDatetime = m_Tracks[1].m_InspectionOnlineThreadVisionResult.m_strDatetime;
                 //if (m_EmergencyStatus == 1)
                 //{
                 //    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
@@ -1931,6 +1942,15 @@ namespace TapeReelPacking.Source.Application
                     if (nVisionResult == -(int)ERROR_CODE.PASS)
                     {
 
+                        m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = nVisionResult;
+
+                        lock (m_UpdateResultQueue)
+                        {
+                            m_UpdateResultQueue[1].Enqueue(m_Tracks[1].m_VisionResultDatas[nDeviceID]);
+                        }
+                        
+
+
                         int nAbleCout;
                         if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_MANUAL)
                         {
@@ -1969,6 +1989,7 @@ namespace TapeReelPacking.Source.Application
                     }
 
                     m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = nVisionResult;
+                    // If disconnect during save data, set at fail
                     if (m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult != -(int)ERROR_CODE.PASS)
                     {
                         string strFullPathImageOut = m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath;
@@ -1976,17 +1997,19 @@ namespace TapeReelPacking.Source.Application
                         if (File.Exists(strFullPathImageOut) && !File.Exists(strFailImage))
                             File.Move(strFullPathImageOut, strFailImage);
                         m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath = strFailImage;
-                    }
 
-                    if (m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult == -(int)ERROR_CODE.PASS)
-                    {
                         lock (m_UpdateResultQueue)
                         {
                             m_UpdateResultQueue[1].Enqueue(m_Tracks[1].m_VisionResultDatas[nDeviceID]);
                         }
-                        m_Tracks[1].m_CurrentSequenceDeviceID++;
+
                     }
 
+                    if (m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult == -(int)ERROR_CODE.PASS)
+                    {
+
+                        m_Tracks[1].m_CurrentSequenceDeviceID++;
+                    }
                 }
                 LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Scan Done!");
 
@@ -2195,11 +2218,11 @@ namespace TapeReelPacking.Source.Application
             for (int nTrack = 0; nTrack < 2; nTrack++)
             {
                 InspectEvent[nTrack].Set();
-                InspectDoneEvent[nTrack].Set();
+                //InspectDoneEvent[nTrack].Set();
                 m_hardwareTriggerSnapEvent[nTrack].Set();
-                m_OfflineTriggerSnapEvent[nTrack].Set();
+                //m_OfflineTriggerSnapEvent[nTrack].Set();
                 //m_NextStepSequenceEvent.Set();
-                m_EventInspectionOnlineThreadDone[nTrack].Set();
+                //m_EventInspectionOnlineThreadDone[nTrack].Set();
                 //StartWaitPLCToTriggerCameraEvent[nTrack].Set();
 
 

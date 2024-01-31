@@ -186,7 +186,20 @@ namespace TapeReelPacking.Source.Define
 
     }
 
-
+    public class VisionResultDataExcel
+    {
+        public string str_NO;
+        public string str_DateScan;
+        public string str_BarcodeID;
+        public string str_Result;
+        public VisionResultDataExcel(int nDeviceID = 0, string strDatetime = "", string strDeviceID = "", int nResult = 0)
+        {
+            str_NO = nDeviceID.ToString();
+            str_DateScan = strDatetime;
+            str_BarcodeID = strDeviceID;
+            str_Result = nResult.ToString();
+        }
+    }
     public class VisionResultData
     {
         public int m_nDeviceIndexOnReel = 0;
@@ -194,27 +207,32 @@ namespace TapeReelPacking.Source.Define
         public int m_nResult = -(int)ERROR_CODE.NOT_INSPECTED;
         public string m_strFullImagePath = "";
         public bool bIsTotal = false;
-        public VisionResultData(int nDeviceIndexOnReel = 0, string strDeviceID = "", int nResult = -(int)ERROR_CODE.NOT_INSPECTED, string strPath = "", bool bIsTotal = false)
+        public string m_strDatetime = "";
+
+        public VisionResultData(int nDeviceIndexOnReel = 0, string strDeviceID = "", int nResult = -(int)ERROR_CODE.NOT_INSPECTED, string strPath = "", string strDate = "", bool bIsTotal = false)
         {
             m_nDeviceIndexOnReel = nDeviceIndexOnReel;
             m_strDeviceID = strDeviceID;
             m_nResult = nResult;
             m_strFullImagePath = strPath;
+            m_strDatetime = strDate;
             this.bIsTotal = bIsTotal;
         }
 
         public static void SaveSequenceResultToExcel(string strLotID, int nTrack, VisionResultData data, bool bTotal = false)
         {
             string strFileName = strLotID;
-            if (bTotal)
-                strFileName = strFileName + "_Total";
+            string strStartLotDay = strLotID.Split('_')[0];
+
+            //if (bTotal)
+            //    strFileName = strFileName + "_Total";
             try
             {
                 string[] strTrackName = { "Camera", "Barcode" };
                 string strRecipePath = Path.Combine(
                     Application.Application.pathStatistics,
                     Application.Application.currentRecipe,
-                    Application.Application.m_strStartLotDay,
+                    strStartLotDay,
                     strTrackName[nTrack]);
 
                 if (!Directory.Exists(strRecipePath))
@@ -253,6 +271,7 @@ namespace TapeReelPacking.Source.Define
                     // Header
                     int ncol = 1;
                     worksheet.Cells[1, ncol++].Value = "Device Index";
+                    worksheet.Cells[1, ncol++].Value = "Date Time Scan";
                     worksheet.Cells[1, ncol++].Value = "Device ID";
                     worksheet.Cells[1, ncol++].Value = "Result";
                     worksheet.Cells[1, ncol++].Value = "Image Path";
@@ -261,6 +280,7 @@ namespace TapeReelPacking.Source.Define
                     int row = data.m_nDeviceIndexOnReel + 2;
                     ncol = 1;
                     worksheet.Cells[row, ncol++].Value = data.m_nDeviceIndexOnReel + 1;
+                    worksheet.Cells[row, ncol++].Value = data.m_strDatetime;
                     worksheet.Cells[row, ncol++].Value = data.m_strDeviceID;
                     worksheet.Cells[row, ncol++].Value = data.m_nResult;
                     worksheet.Cells[row, ncol++].Value = data.m_strFullImagePath;
@@ -293,20 +313,25 @@ namespace TapeReelPacking.Source.Define
 
         public static void ReadLotResultFromExcel(string strLotID, int nTrack, ref VisionResultData[] result, ref int nCurrentDeviceID, bool bIsTotal = false)
         {
+
+            string nFileName = strLotID;
+            if (bIsTotal)
+                nFileName = nFileName + "_Total";
+
             nCurrentDeviceID = 0;
+            string strStartLotDay = strLotID.Split('_')[0];
+
             string[] strTrackName = { "Camera", "Barcode" };
             string strRecipePath = Path.Combine(
                 Application.Application.pathStatistics,
                 Application.Application.currentRecipe,
-                Application.Application.m_strStartLotDay,
+                strStartLotDay,
                 strTrackName[nTrack]);
 
             if (!Directory.Exists(strRecipePath))
                 Directory.CreateDirectory(strRecipePath);
 
-            string nFileName = strLotID;
-            if (bIsTotal)
-                nFileName = nFileName + "_Total";
+
             string fullpath = Path.Combine(strRecipePath, $"{nFileName}.xlsx");
 
             FileInfo file = new FileInfo(fullpath);
@@ -348,6 +373,11 @@ namespace TapeReelPacking.Source.Define
                         if (nSequenceDeviceTemp < result[row - 2].m_nDeviceIndexOnReel)
                             nSequenceDeviceTemp = result[row - 2].m_nDeviceIndexOnReel;
                     }
+
+                    valueTemp = worksheet.Cells[row, ncol++].Value;
+                    if (valueTemp != null)
+                        result[row - 2].m_strDatetime = valueTemp.ToString();
+
                     valueTemp = worksheet.Cells[row, ncol++].Value;
                     if (valueTemp != null)
                         result[row - 2].m_strDeviceID = valueTemp.ToString();

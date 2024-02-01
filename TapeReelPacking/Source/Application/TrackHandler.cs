@@ -456,9 +456,11 @@ namespace TapeReelPacking.Source.Application
                 m_imageViews[0].DrawRegionOverlay(m_ArrayOverLay[m_ArrayOverLay.Count - 1].mat_Region, c);
             }
 
-            color = new SolidColorBrush(Colors.Blue);
-            m_imageViews[0].DrawStringOverlay("(" + pCenter.X.ToString() + ", " + pCenter.Y.ToString() + ", " + ((int)dAngle).ToString() + ")", (int)pCenter.X, (int)pCenter.Y + 30, color, 7);
-
+            if (m_nTrackID == 0)
+            {
+                color = new SolidColorBrush(Colors.Blue);
+                m_imageViews[0].DrawStringOverlay("(" + pCenter.X.ToString() + ", " + pCenter.Y.ToString() + ", " + ((int)dAngle).ToString() + ")", (int)pCenter.X, (int)pCenter.Y + 30, color, 7);
+            }
 
             if (nResult == (int)ERROR_CODE.PASS)
             {
@@ -1048,8 +1050,7 @@ namespace TapeReelPacking.Source.Application
                     }
                     Master.InspectDoneEvent[m_nTrackID].Reset();
 
-                InspectionDone:
-
+                    // Camera
                     if (m_nTrackID == 0)
                     {
                         m_InspectionOnlineThreadVisionResult.m_nDeviceIndexOnReel = nDeviceID;

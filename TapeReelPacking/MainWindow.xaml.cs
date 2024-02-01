@@ -40,6 +40,7 @@ namespace TapeReelPacking
         public int m_nTotalDevicePerLot = 1000;
         public DefectInfor defectInfor = new DefectInfor();
         public WarningMessageBox m_WarningMessageBoxUC = new WarningMessageBox();
+        public LotBarcodeDataTable m_LotBarcodeDataExcelDlg = new LotBarcodeDataTable();
 
         public static string[] titles = new string[] { "Top Camera", "Barcode Reader", "Flap Side 2 " };
 
@@ -1466,6 +1467,10 @@ namespace TapeReelPacking
         }
 
 
+        public bool IsPopupWarningMessageBoxOpenned()
+        {
+            return grd_Warning_Setting.IsVisible;
+        }
         public void PopupWarningMessageBox(string strDebugMessage, WARNINGMESSAGE warningtype, bool bIsPopup = true)
         {
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
@@ -1586,13 +1591,13 @@ namespace TapeReelPacking
             btn_Clear_Comm.IsEnabled = bEnable;
 
 
-            btn_run_sequence.IsEnabled = bEnable;
+            //btn_run_sequence.IsEnabled = bEnable;
             btn_Debug_sequence.IsEnabled = bEnable;
-            btn_Imidiate_Stop.IsEnabled = bEnable;
-            btn_Emergency_Stop.IsEnabled = bEnable;
-            btn_Reset_Machine.IsEnabled = bEnable;
-            btn_Emergency_Stop.IsEnabled = bEnable;
-            btn_LoadRecipe.IsEnabled = bEnable;
+            //btn_Imidiate_Stop.IsEnabled = bEnable;
+            //btn_Emergency_Stop.IsEnabled = bEnable;
+            //btn_Reset_Machine.IsEnabled = bEnable;
+            //btn_Emergency_Stop.IsEnabled = bEnable;
+            //btn_LoadRecipe.IsEnabled = bEnable;
         }
 
         public void EnableMotorFunction()
@@ -1732,6 +1737,43 @@ namespace TapeReelPacking
             if(master.m_ImidiateStatus_Simulate ==0)
                 master.m_ImidiateStatus_Simulate = 1;
         }
+
+        private void btn_Lot_DataExcel_Checked(object sender, RoutedEventArgs e)
+        {
+            showLotDataExcel(true);
+        }
+
+        private void btn_Lot_DataExcel_Unchecked(object sender, RoutedEventArgs e)
+        {
+            showLotDataExcel(false);
+        }
+
+        public void showLotDataExcel(bool bShow)
+        {
+            if (bShow)
+            {
+                Source.Application.Application.loginUser.AssignMainWindow();
+                tt_DialogSettings.X = 0;
+                tt_DialogSettings.Y = 0;
+                //btnLogIn.IsEnabled = false;
+                grd_PopupDialog.Children.Clear();
+                //DisableDialogLogin();
+                grd_PopupDialog.Children.Add(m_LotBarcodeDataExcelDlg);
+
+                grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Center;
+                grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Center;
+                grd_PopupDialog.Visibility = Visibility.Visible;
+                grd_Dialog_Settings.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                grd_PopupDialog.Children.Clear();
+                grd_PopupDialog.Visibility = Visibility.Collapsed;
+                grd_Dialog_Settings.Visibility = Visibility.Collapsed;
+
+            }
+        }
+
 
         //private void btn_Imidiate_Stop_Click(object sender, RoutedEventArgs e)
         //{

@@ -188,10 +188,10 @@ namespace TapeReelPacking.Source.Define
 
     public class VisionResultDataExcel
     {
-        public string str_NO;
-        public string str_DateScan;
-        public string str_BarcodeID;
-        public string str_Result;
+        public string str_NO { get; set; }
+        public string str_DateScan { get; set; }
+        public string str_BarcodeID { get; set; }
+        public string str_Result { get; set; }
         public VisionResultDataExcel(int nDeviceID = 0, string strDatetime = "", string strDeviceID = "", int nResult = 0)
         {
             str_NO = nDeviceID.ToString();

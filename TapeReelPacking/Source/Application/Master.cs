@@ -658,7 +658,7 @@ namespace TapeReelPacking.Source.Application
         public bool m_IsDoorOpennedAction = false;
         public bool m_bIsReleasePopupMessage = false;
         public int m_SequenceMode = (int)SEQUENCE_MODE.MODE_AUTO;
-
+        public int m_SequenceMode_With_Or_No_Robot = 0;
         private void func_IOStatusThread()
         {
             int bEmergencyStatus_Backup = -1;
@@ -676,7 +676,7 @@ namespace TapeReelPacking.Source.Application
 
                 Thread.Sleep(50);
 
-                if(m_SequenceMode == (int)(SEQUENCE_MODE.MODE_MANUAL))
+                if (m_SequenceMode == (int)(SEQUENCE_MODE.MODE_MANUAL))
                 {
                     if (HiWinRobotInterface.m_RobotConnectID >= 0)
                     {
@@ -699,6 +699,9 @@ namespace TapeReelPacking.Source.Application
                         m_ResetMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RESET_STATUS) /*| m_ResetMachineStatus_Simulate*/;
                         m_RunMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RUNSEQUENCE_STATUS);
                         m_DoorOpennedStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_DOOR_STATUS);
+                        m_SequenceMode_With_Or_No_Robot = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_RUN_NO_ROBOT);
+
+
                         //m_CreateNewLotStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CREATE_NEW_LOT);
                         m_EndLotStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_END_LOT);
 
@@ -835,35 +838,39 @@ namespace TapeReelPacking.Source.Application
                             ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Imidiate button Status changed Status = {m_ImidiateStatus}!", (int)ERROR_CODE.LABEL_FAIL);
                         });
                     }
-
-                    if (bResetStatus_Backup != m_ResetMachineStatus)
+                    bool bIsShow = MainWindow.mainWindow.IsPopupWarningMessageBoxOpenned();
+                    //LogMessage.LogMessage.WriteToDebugViewer(9, $"PopupWarning Dialog Status = {bIsShow}!");
+                    if (bResetStatus_Backup != m_ResetMachineStatus || bIsShow)
                     {
                         //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_STATUS, m_ResetMachineStatus);
 
                         m_EmergencyStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.EMERGENCY_STATUS) | m_EmergencyStatus_Simulate;
 
-                        if (m_EmergencyStatus == 0)
-                            MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_EMERGENCY, false);
+                        //if (m_EmergencyStatus == 0)
+                        //    MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_EMERGENCY, false);
 
 
                         if (m_ResetMachineStatus == 1)
                         {
                             MainWindow.mainWindow.m_WarningMessageBoxUC.ContinueSequenceButtonClicked(WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
-                        }
 
+                        }
                         //if (m_EmergencyStatus + m_ImidiateStatus == 0)
                         //    MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_EMERGENCY, false);
-
-                        LogMessage.LogMessage.WriteToDebugViewer(9, $"Reset button Status changed Status = {m_ResetMachineStatus}!");
-
-                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        if (bResetStatus_Backup != m_ResetMachineStatus)
                         {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Reset button Status changed Status = {m_ResetMachineStatus}!", (int)ERROR_CODE.LABEL_FAIL);
-                        });
-                    }
+                            LogMessage.LogMessage.WriteToDebugViewer(9, $"Reset button Status changed Status = {m_ResetMachineStatus}!");
 
+                            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Reset button Status changed Status = {m_ResetMachineStatus}!", (int)ERROR_CODE.LABEL_FAIL);
+                            });
+                        }
+                    }
                     bResetStatus_Backup = m_ResetMachineStatus;
+
                 }
+
                 //m_CreateNewLotStatus = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT); //  HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CREATE_NEW_LOT);
                 m_CreateNewLotStatus = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT);
                 if (m_CreateNewLotStatus == 1 && bCreateNewLotStatus_Backup != m_CreateNewLotStatus)  /*(m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT) > 0)*/
@@ -1061,6 +1068,26 @@ namespace TapeReelPacking.Source.Application
             }
 
 
+            if (m_SequenceMode_With_Or_No_Robot == 1)
+            {
+                LogMessage.LogMessage.WriteToDebugViewer(0, $"Begin sequence... MANUAL MODE");
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Begin sequence... MANUAL MODE");
+                });
+
+                while (true)
+                {
+                    if (!MainWindow.mainWindow.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1)
+                    {
+                        break;
+                    }
+                }
+            }
+
+
+
             m_bRobotSequenceStatus = false;
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
@@ -1108,7 +1135,7 @@ namespace TapeReelPacking.Source.Application
             }
 
 
-            
+
             while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_PACKING_PROCESS_READY) != 1)
             {
                 // Need popup Dialog if waiting too long 
@@ -1136,7 +1163,7 @@ namespace TapeReelPacking.Source.Application
             //Application.SetIntRegistry(Application.m_strCurrentDeviceID_Registry[0], m_Tracks[0].m_CurrentSequenceDeviceID);
 
             m_nWaitEventInspectionOnlineThreadStatus = 0;
-            if (func_CameraTriggerThread() < 0 || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+            if (func_CameraTriggerThread() < 0 || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen || m_SequenceMode_With_Or_No_Robot == 1)
             {
                 return;
             }
@@ -1152,7 +1179,7 @@ namespace TapeReelPacking.Source.Application
             while (MainWindow.mainWindow.m_bSequenceRunning || MainWindow.mainWindow.bEnableOfflineInspection || m_bMachineNotReadyNeedToReset)
             {
 
-                if (MainWindow.mainWindow == null || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (MainWindow.mainWindow == null || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen || m_SequenceMode_With_Or_No_Robot == 1)
                     return;
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, "Begin Sequence");
@@ -1167,7 +1194,7 @@ namespace TapeReelPacking.Source.Application
                     if (MainWindow.mainWindow == null)
                         return;
 
-                    if (!MainWindow.mainWindow.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1)
+                    if (!MainWindow.mainWindow.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1 || m_SequenceMode_With_Or_No_Robot == 1)
                     {
                         return;
                     }
@@ -1201,7 +1228,7 @@ namespace TapeReelPacking.Source.Application
                 }
 
                 Thread.Sleep(10);
-                if(m_nWaitEventInspectionOnlineThreadStatus > 0 )
+                if (m_nWaitEventInspectionOnlineThreadStatus > 0)
                     nCamera1InspectionResult = m_Tracks[0].m_InspectionOnlineThreadVisionResult.m_nResult;
                 else
                     nCamera1InspectionResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
@@ -1436,7 +1463,7 @@ namespace TapeReelPacking.Source.Application
                 if (nCamera1InspectionResult == -(int)ERROR_CODE.PASS)
                 {
                     HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_PLACE_DONE, false);
-                    LogMessage.LogMessage.WriteToDebugViewer(9, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+                    LogMessage.LogMessage.WriteToDebugViewer(9, $"{Application.LineNumber()}: {Application.PrintCallerName()}");
                     while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_ALLOW_TO_PLACE) != 1)
                     {
                         if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || m_EndLotStatus == 1)
@@ -1681,7 +1708,7 @@ namespace TapeReelPacking.Source.Application
                 }
                 Thread.Sleep(10);
             }
-            LogMessage.LogMessage.WriteToDebugViewer(9, $"Set PLC Conveyor ({ (int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON} ON");
+            LogMessage.LogMessage.WriteToDebugViewer(9, $"Set PLC Conveyor ({(int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON} ON");
             HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON, false);
             LogMessage.LogMessage.WriteToDebugViewer(9, $"Set Camera Trigger Event ");
             m_EventInspectionOnlineThreadDone[0].Reset();
@@ -1737,14 +1764,14 @@ namespace TapeReelPacking.Source.Application
 
             LogMessage.LogMessage.WriteToDebugViewer(9, "Run Barcode Sequence Thread....");
 
-            BarcodeReaderSequence();
+            BarcodeReaderSequence_New();
             m_bBarcodeReaderSequenceStatus = false;
         }
 
         public bool m_bBarcodeBusy = false;
         void BarcodeReaderSequence()
         {
-            startBarcodeSequence:
+        startBarcodeSequence:
             if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_AUTO)
             {
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_PASS, false);
@@ -1776,7 +1803,7 @@ namespace TapeReelPacking.Source.Application
                 {
                     LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Wait PLC Barcode Trigger {(int)INPUT_IOROBOT.PLC_BARCODE_TRIGGER}!");
                     HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY, false);
-                    m_bBarcodeBusy= false;
+                    m_bBarcodeBusy = false;
                     int nTimeOut = 0;
                     while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_BARCODE_TRIGGER) != 1)
                     {
@@ -1787,7 +1814,7 @@ namespace TapeReelPacking.Source.Application
                             goto EndThread;
                         Thread.Sleep(30);
                         nTimeOut++;
-                        if(nTimeOut > 10)
+                        if (nTimeOut > 10)
                         {
                             nTimeOut = 0;
                             HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY, false);
@@ -1923,7 +1950,7 @@ namespace TapeReelPacking.Source.Application
                     HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_FAIL, bFailSendToPLC);
                     HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY, false);
 
-                    
+
                 }
                 else
                 {
@@ -1948,7 +1975,7 @@ namespace TapeReelPacking.Source.Application
                         {
                             m_UpdateResultQueue[1].Enqueue(m_Tracks[1].m_VisionResultDatas[nDeviceID]);
                         }
-                        
+
 
 
                         int nAbleCout;
@@ -2019,6 +2046,301 @@ namespace TapeReelPacking.Source.Application
             LogMessage.LogMessage.WriteToDebugViewer(1, $"BarCodeReaderSequence Thread Released");
 
         }
+
+        void BarcodeReaderSequence_New()
+        {
+        startBarcodeSequence:
+            if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_AUTO)
+            {
+                HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_PASS, false);
+                HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_FAIL, false);
+            }
+            else
+            {
+                m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_RESULT_PASS, 0);
+                m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_RESULT_FAIL, 0);
+            }
+
+            //int nTimeout = 0;
+            if (m_plcComm == null)
+                goto EndThread;
+
+            m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_READY, 1);
+
+            while (true/*MainWindow.mainWindow.m_bSequenceRunning*/)
+            {
+                if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_AUTO)
+                {
+                    LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Wait PLC Barcode Trigger {(int)INPUT_IOROBOT.PLC_BARCODE_TRIGGER}!   Device {m_Tracks[1].m_CurrentSequenceDeviceID}");
+                    //LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Scan Done!  Device {m_Tracks[1].m_CurrentSequenceDeviceID}");
+
+                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY, false);
+                    m_bBarcodeBusy = false;
+                    int nTimeOut = 0;
+                    while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_BARCODE_TRIGGER) != 1)
+                    {
+                        if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_MANUAL)
+                            goto startBarcodeSequence;
+
+                        if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
+                            goto EndThread;
+                        Thread.Sleep(30);
+                        nTimeOut++;
+                        if (nTimeOut > 10)
+                        {
+                            nTimeOut = 0;
+                            HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY, false);
+                        }
+                        //if (m_RunMachineStatus == 1)
+                        //{
+
+                        //    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        //    {
+
+                        //        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("PLC Button Run is pressed. Restarting the Barcode sequence....", (int)ERROR_CODE.LABEL_FAIL);
+                        //    });
+                        //    Thread.Sleep(3000);
+                        //    goto startBarcodeSequence;
+                        //}
+
+                    }
+                }
+                else
+                {
+                    LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Wait PLC Barcode Trigger {(int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_TRIGGER}!   Device {m_Tracks[1].m_CurrentSequenceDeviceID}");
+                    while (m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_TRIGGER) != 1)
+                    {
+                        if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
+                            goto EndThread;
+                        Thread.Sleep(100);
+                    }
+                    m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_TRIGGER, 0);
+                }
+
+
+
+
+                if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_AUTO)
+                {
+                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_PASS, false);
+                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_FAIL, false);
+                }
+                else
+                {
+                    int[] nvalue = { 0, 0 };
+                    m_plcComm.WritePLCMultiRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_RESULT_PASS, nvalue);
+                }
+
+
+                int nDeviceTemp = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_CURRENT_BARCODE_CHIP_COUNT);
+                LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Read Barcode  Device {nDeviceTemp}");
+
+                if (nDeviceTemp > 0)
+                    m_Tracks[1].m_CurrentSequenceDeviceID = nDeviceTemp;
+
+                LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Read Barcode  Device {m_Tracks[1].m_CurrentSequenceDeviceID}");
+
+                int nDeviceID = m_Tracks[1].m_CurrentSequenceDeviceID;
+
+                LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Set BARCODE_CAPTURE_BUSY {(int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY} ON   Device {m_Tracks[1].m_CurrentSequenceDeviceID}");
+                m_bBarcodeBusy = true;
+
+                if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_AUTO)
+                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY, true);
+                else
+                    m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_CAPTURE_BUSY, 1);
+
+
+
+                LogMessage.LogMessage.WriteToDebugViewer(7 + 1, $"Get barcode  Device {m_Tracks[1].m_CurrentSequenceDeviceID} ");
+                string strFullPathImageOut;
+                string strBarcodeResult = m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut, nDeviceID, Application.m_strCurrentLot);
+                LogMessage.LogMessage.WriteToDebugViewer(7 + 1, "Get barcode Done ");
+
+
+                LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Waiting for vision done....  Device {m_Tracks[1].m_CurrentSequenceDeviceID} ");
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+
+                    m_Tracks[1].m_InspectionCore.LoadImageToInspection(m_Tracks[1].m_imageViews[0].btmSource);
+
+                });
+
+                System.Drawing.PointF pCenter = new System.Drawing.PointF(0, 0);
+                System.Drawing.PointF pCorner = new System.Drawing.PointF(0, 0);
+                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = m_Tracks[1].Inspect(ref mainWindow.master.m_Tracks[1], out pCenter, out pCorner);
+
+
+                if (strBarcodeResult.Contains("Dummy") || strBarcodeResult.Length < 1)
+                {
+                    m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = -(int)ERROR_CODE.LABEL_FAIL;
+                }
+
+                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nDeviceIndexOnReel = nDeviceID;
+                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strDeviceID = strBarcodeResult;
+                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath = strFullPathImageOut;
+                string strDateTime = string.Format("{0}:{1}:{2}_{3}:{4}:{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strDatetime = strDateTime;
+                //if (m_EmergencyStatus == 1)
+                //{
+                //    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                //    {
+                //        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Reader Sequence Ended!", (int)ERROR_CODE.LABEL_FAIL);
+
+                //    });
+                //    continue;
+
+                //}
+
+                LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Vision Done!  Device {m_Tracks[1].m_CurrentSequenceDeviceID}");
+                if (nDeviceID > 0)
+                    if (m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strDeviceID == m_Tracks[1].m_VisionResultDatas[nDeviceID - 1].m_strDeviceID
+                        && m_Tracks[1].m_VisionResultDatas[nDeviceID - 1].m_nResult == m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult)
+                    {
+                        m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = -(int)ERROR_CODE.PROCESS_ERROR;
+                        string strFullPathImageOutTemp = m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath;
+                        string strFailImage = strFullPathImageOutTemp.Replace("PASS IMAGE", "FAIL IMAGE");
+                        if (File.Exists(strFullPathImageOutTemp) && !File.Exists(strFailImage))
+                            File.Move(strFullPathImageOutTemp, strFailImage);
+                        m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath = strFailImage;
+                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Barcode Reader: Scanned same device. Result FAILED!  Device {m_Tracks[1].m_CurrentSequenceDeviceID}", (int)ERROR_CODE.LABEL_FAIL);
+
+                        });
+                    }
+
+                bool bFailSendToPLC = false;
+                if (m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult != -(int)ERROR_CODE.PASS)
+                {
+
+                    bFailSendToPLC = true;
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Barcode Reader: Result FAILED!  Device {m_Tracks[1].m_CurrentSequenceDeviceID}", (int)ERROR_CODE.LABEL_FAIL);
+
+                    });
+                }
+
+                LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Send result to PLC {(int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_RESULT}  . Result: {bFailSendToPLC}    Device {m_Tracks[1].m_CurrentSequenceDeviceID}");
+                m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_RESULT, m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult);
+
+                if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_AUTO)
+                {
+                    int nSttusss = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_BARCODE_TRIGGER);
+                    if (nSttusss > 1)
+                    {
+                        LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Robot Disconnect. Input {(int)INPUT_IOROBOT.PLC_BARCODE_TRIGGER}  status = {nSttusss}  Device {m_Tracks[1].m_CurrentSequenceDeviceID}");
+                        Thread.Sleep(1000);
+                        goto startBarcodeSequence;
+                    }
+
+                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_PASS, !bFailSendToPLC);
+                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_FAIL, bFailSendToPLC);
+                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY, false);
+
+
+                }
+                else
+                {
+                    m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_RESULT_PASS, bFailSendToPLC == false ? 1 : 0);
+                    m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_RESULT_FAIL, bFailSendToPLC == false ? 0 : 1);
+                    m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_CAPTURE_BUSY, 0);
+                }
+
+
+                LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Send result to PLC Done {(int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_RESULT}  . Result: {bFailSendToPLC}  Device {m_Tracks[1].m_CurrentSequenceDeviceID}");
+
+                //LogMessage.LogMessage.WriteToDebugViewer(8, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
+                if (MainWindow.mainWindow.m_bSequenceRunning || m_SequenceMode == (int)SEQUENCE_MODE.MODE_MANUAL)
+                {
+
+                    if (m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult == -(int)ERROR_CODE.PASS)
+                    {
+
+                        lock (m_UpdateResultQueue)
+                        {
+                            m_UpdateResultQueue[1].Enqueue(m_Tracks[1].m_VisionResultDatas[nDeviceID]);
+                        }
+
+
+
+                        int nAbleCout;
+                        if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_MANUAL)
+                        {
+                            nAbleCout = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_COUNT);
+                        }
+                        else
+                        {
+                            nAbleCout = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_BARCODE_COUNT);
+                        }
+                        int nTimeOut = 0;
+                        while (nAbleCout != 1)
+                        {
+                            if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_MANUAL)
+                            {
+                                nAbleCout = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_COUNT);
+                            }
+                            else
+                            {
+                                nAbleCout = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_BARCODE_COUNT);
+                            }
+
+                            Thread.Sleep(50);
+                            nTimeOut++;
+                            if (nTimeOut > 50)
+                            {
+                                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                                {
+                                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Barcode Reader: Get Count Signal Failed !  Device {m_Tracks[1].m_CurrentSequenceDeviceID}", (int)ERROR_CODE.LABEL_FAIL);
+
+                                });
+
+                                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
+                                break;
+                            }
+                        }
+                    }
+                    LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Get count PLC Done. Result: {bFailSendToPLC}  Device {m_Tracks[1].m_CurrentSequenceDeviceID}");
+
+                    // If disconnect during save data, set at fail
+                    if (m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult != -(int)ERROR_CODE.PASS)
+                    {
+                        string strFullPathImageOutTemp = m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath;
+                        string strFailImage = strFullPathImageOutTemp.Replace("PASS IMAGE", "FAIL IMAGE");
+                        if (File.Exists(strFullPathImageOutTemp) && !File.Exists(strFailImage))
+                            File.Move(strFullPathImageOutTemp, strFailImage);
+                        m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath = strFailImage;
+
+
+                    }
+
+                    if (m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult == -(int)ERROR_CODE.PASS)
+                    {
+
+                        //lock (m_UpdateResultQueue)
+                        //{
+                        //    m_UpdateResultQueue[1].Enqueue(m_Tracks[1].m_VisionResultDatas[nDeviceID]);
+                        //}
+
+                        double dDeltaAngle = 0;
+                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+                            m_Tracks[1].DrawInspectionResult(ref m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult, ref pCenter, ref dDeltaAngle);
+                        });
+                        m_Tracks[1].m_CurrentSequenceDeviceID++;
+                    }
+                }
+                LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Scan Done!");
+
+            }
+
+        EndThread:
+            LogMessage.LogMessage.WriteToDebugViewer(1, $"BarCodeReaderSequence Thread Released");
+
+        }
+
+
 
         string m_FailstrLotIDFolder = "";
         int nFailCount = 0;

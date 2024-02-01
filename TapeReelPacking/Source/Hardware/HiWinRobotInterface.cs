@@ -47,6 +47,7 @@ namespace TapeReelPacking.Source.Hardware.SDKHrobot
             PLC_END_LOT = 10,
             PLC_CREATE_NEW_LOT = 11,
             PLC_LAST_CHIP = 12,
+            PLC_RUN_NO_ROBOT = 13,            
             PLC_DOOR_STATUS = 15,
             AIR_PRESSURESTATUS = 16, // 
 

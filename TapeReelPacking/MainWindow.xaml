@@ -807,6 +807,19 @@
                                                 CheckedBackground="{StaticResource BgButton}"
                                                 Width="68">
                                     </RibbonToggleButton>
+
+                                    
+
+                                    <RibbonToggleButton Name="btn_Lot_DataExcel"
+                                                            Label="Lot Overview"
+                                                            LargeImageSource="Resources\book-open-custom.png"
+                                                            MouseOverBackground="{StaticResource MouseOverButtonStyle}"
+                                                            Foreground="GhostWhite"
+                                                            CheckedBackground="{StaticResource CheckedButtonStyle}"
+                                                            Width="auto" 
+                                                            Checked="btn_Lot_DataExcel_Checked"
+                                                            Unchecked="btn_Lot_DataExcel_Unchecked" />
+
                                     <RibbonToggleButton Name="btn_mapping_parameters"
                                                             Label="Mapping Setting"
                                                             LargeImageSource="Resources\blue-chip.png"

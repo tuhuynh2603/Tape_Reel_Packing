@@ -164,14 +164,21 @@ namespace TapeReelPacking.Source.Hardware
 			strFullPathImageOut = strImageFullName;
 			System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
 			{
-				m_liveviewForm.DownloadRecentImage(strImageFullName);
+                if (!m_liveviewForm.IsHandleCreated)
+                {
+					m_liveviewForm.CreateControl();
+					LogMessage.WriteToDebugViewer(3, "FAILED!!!!!!! Recreate Live View Control");
+
+                }
+
+                m_liveviewForm.DownloadRecentImage(strImageFullName);
 
 				MainWindow.mainWindow.master.m_Tracks[1].m_imageViews[0].UpdateNewImageMono(strImageFullName);
 			});
-			if (strDeviceID.Length < 1)
-			{
-				m_reader.ExecCommand("LOFF");
-			}
+			//if (strDeviceID.Length < 1)
+			//{
+			//	m_reader.ExecCommand("LOFF");
+			//}
 			bIsDownload = false;
 			return strDeviceID;
 		}

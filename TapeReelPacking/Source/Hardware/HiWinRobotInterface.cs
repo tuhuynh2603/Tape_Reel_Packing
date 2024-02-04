@@ -1177,7 +1177,8 @@ namespace TapeReelPacking.Source.Hardware.SDKHrobot
         {
             if (m_RobotConnectID < 0)
                 return;
-            HWinRobot.set_motor_state(m_RobotConnectID, nMode);
+            if(HWinRobot.get_motor_state(m_RobotConnectID) != nMode)
+                HWinRobot.set_motor_state(m_RobotConnectID, nMode);
         }
 
         public static int GetMotorState()

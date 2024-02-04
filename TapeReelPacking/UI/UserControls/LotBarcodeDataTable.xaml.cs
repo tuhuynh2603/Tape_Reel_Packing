@@ -102,7 +102,6 @@ namespace TapeReelPacking.UI.UserControls
                     {
                         dataTemp.str_DateScan = valueTemp.ToString();
                     }
-                    dataTemp.str_DateScan = valueTemp.ToString();
 
                     valueTemp = worksheet.Cells[row, ncol++].Value;
                     if (valueTemp != null)
@@ -133,6 +132,8 @@ namespace TapeReelPacking.UI.UserControls
 
         private void btn_Load_Lot_Click(object sender, RoutedEventArgs e)
         {
+            if (ccb_LotSelected_ComboBox.SelectedIndex < 0 || ccb_LotSelected_ComboBox.Items.Count < 1)
+                return;
             ReadLotResultFromExcel(m_ListStrLotFullPath[ccb_LotSelected_ComboBox.SelectedIndex], ref m_ListLotBarcodeDataTable);
             lvLotBarCodeData.ItemsSource = null;
             lvLotBarCodeData.ItemsSource = m_ListLotBarcodeDataTable;

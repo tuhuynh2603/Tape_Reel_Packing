@@ -1482,6 +1482,7 @@ namespace TapeReelPacking.Source.Application
                             Thread.Sleep(3000);
                             goto _Start_Lot;
                         }
+                        Thread.Sleep(10);
                     }
                 }
 

@@ -49,12 +49,12 @@ namespace TapeReelPacking.Source.Application
 
         public Application()
         {
-            if (!CheckMuTexProcess())
-            {
-                MessageBox.Show("The other Application is running!");
+            //if (!CheckMuTexProcess())
+            //{
+            //    MessageBox.Show("The other Application is running!");
 
-                KillCurrentProcess();
-            }
+            //    KillCurrentProcess();
+            //}
             RegistryKey reg = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
             reg.SetValue("HD Tape And Reel Packing Vision", System.Windows.Forms.Application.ExecutablePath.ToString());
         }
@@ -80,7 +80,7 @@ namespace TapeReelPacking.Source.Application
 
         public static void CheckRegistry()
         {
-            pathRegistry = "Software\\HD Vision\\SemiConductor_1";
+            pathRegistry = "Software\\HD Vision\\Tape And Reel Vision";
             RegistryKey register = Registry.CurrentUser.CreateSubKey(pathRegistry, true);
             registerPreferences = Registry.CurrentUser.CreateSubKey(pathRegistry + "\\Preferences", true);
 
@@ -94,6 +94,10 @@ namespace TapeReelPacking.Source.Application
         public static string GetStringRegistry(string strKey, string strDefault)
         {
             string strTemp = "";
+            if (registerPreferences == null)
+                CheckRegistry();
+
+
             if ((string)registerPreferences.GetValue(strKey) == "" || (string)registerPreferences.GetValue(strKey) == null)
             {
                 strTemp = strDefault;
@@ -176,7 +180,7 @@ namespace TapeReelPacking.Source.Application
             m_strCameraSerial = new List<string>();
             for (int nTrack = 0; nTrack < m_nTrack; nTrack++)
             {
-                m_strCameraSerial.Add(GetStringRegistry($"Camera{nTrack + 1} IP Serial: ", ""));
+                m_strCameraSerial.Add(GetCommInfo($"Camera{nTrack + 1} IP Serial: ", ""));
             }
 
         }
@@ -211,7 +215,7 @@ namespace TapeReelPacking.Source.Application
 
         public static string GetCommInfo(string key, string defaults)
         {
-            RegistryKey registerPreferences = Registry.CurrentUser.CreateSubKey(pathRegistry + "\\Comm", true);
+            RegistryKey registerPreferences = Registry.CurrentUser.CreateSubKey(pathRegistry + "\\Hardware", true);
             if ((string)registerPreferences.GetValue(key) == null)
             {
                 registerPreferences.SetValue(key, defaults);

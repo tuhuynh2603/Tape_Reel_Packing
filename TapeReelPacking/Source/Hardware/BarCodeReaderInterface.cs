@@ -36,8 +36,11 @@ namespace TapeReelPacking.Source.Hardware
 			if (main == null)
 				main = MainWindow.mainWindow;
 
+			m_BarcodeReader = new BarCodeReaderView();
+			updateConnectionStatus(false);
+
 			string defaults = "127.0.0.1";
-			barCodeipAddress = GetCommInfo("Barcode Comm::IpAddress", defaults);
+			barCodeipAddress = Application.Application.GetCommInfo("Barcode Comm::IpAddress", defaults);
 
 			m_nicList = m_searcher.ListUpNic();
 			if (m_nicList != null)
@@ -60,7 +63,6 @@ namespace TapeReelPacking.Source.Hardware
 
 			nReceiveMessage = new int[BUFLEN];
 			LoadInforPortNumber();
-			m_BarcodeReader = new BarCodeReaderView();
 		}
 
 		public void appendSearchResult(ReaderSearchResult res)

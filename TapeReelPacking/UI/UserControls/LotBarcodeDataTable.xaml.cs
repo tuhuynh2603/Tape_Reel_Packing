@@ -60,13 +60,28 @@ namespace TapeReelPacking.UI.UserControls
         }
 
 
-        public static void ReadLotResultFromExcel(string strFullPath, ref List<VisionResultDataExcel> result)
+        public static void ReadLotResultFromExcel(string strLotID, ref List<VisionResultDataExcel> result)
         {
+
+            string strFileName = strLotID;
+            string strStartLotDay = strLotID.Split('_')[0];
+
+            string[] strTrackName = { "Camera", "Barcode" };
+            string strRecipePath = System.IO.Path.Combine(
+               Source.Application.Application.pathStatistics,
+                 Source.Application.Application.currentRecipe,
+                strStartLotDay,
+                strTrackName[1]);
+
+            if (!Directory.Exists(strRecipePath))
+                return;
+
+            string strFullPath = System.IO.Path.Combine(strRecipePath, $"{strFileName}.xlsx");
 
             FileInfo file = new FileInfo(strFullPath);
             if (!file.Exists)
             {
-                file.Create();
+                return;
             }
 
             result.Clear();
@@ -141,7 +156,24 @@ namespace TapeReelPacking.UI.UserControls
 
         private void btn_Send_To_Server_Click(object sender, RoutedEventArgs e)
         {
+            List<VisionResultDataExcel> list_DeviceID = new List<VisionResultDataExcel>();
+            if (m_ListLotBarcodeDataTable.Count() == 0)
+                return;
 
+            string strWriteData = CombineReelIDStringSentToClient(ref m_ListLotBarcodeDataTable);
+            ViewModel.SerialCommunicationVM.WriteSerialCom(strWriteData);
+            
+        }
+
+        public static string CombineReelIDStringSentToClient(ref List<VisionResultDataExcel> list_DeviceID)
+        {
+            string strCombine = "";
+            for(int n = 0; n < list_DeviceID.Count(); n++ )
+            {
+                strCombine += list_DeviceID[n].str_BarcodeID + ",";
+            }
+            strCombine += $"{ list_DeviceID.Count()}";
+            return strCombine;
         }
 
         public void UpdateLotDataTable()

@@ -4,6 +4,7 @@ using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Ports;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
@@ -200,6 +201,7 @@ namespace TapeReelPacking.Source.Define
             str_Result = nResult.ToString();
         }
     }
+
     public class VisionResultData
     {
         public int m_nDeviceIndexOnReel = 0;

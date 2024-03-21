@@ -62,8 +62,9 @@ using EasyModbus;
             InitializeComponent();
             m_strCommAddress = Application.Application.GetCommInfo("PLC Comm", m_strCommAddress);
             m_PLCPort = int.Parse(Application.Application.GetCommInfo("PLC Port", m_PLCPort.ToString()));
-
             m_modbusClient = new ModbusClient(m_strCommAddress, 502);
+            updateConnectionStatus();
+
             m_modbusClient.ConnectionTimeout = 10000;
             //m_modbusServer.LocalIPAddress = ;
             //m_modbusServer.Port = 502;
@@ -84,6 +85,11 @@ using EasyModbus;
 
         private void M_modbusClient_ConnectedChanged(object sender)
         {
+            updateConnectionStatus();
+
+        }
+        public void updateConnectionStatus()
+        {
             if (System.Windows.Application.Current == null)
                 return;
 
@@ -99,14 +105,13 @@ using EasyModbus;
                 }
                 else
                 {
-                    MainWindow.mainWindow.label_PLCCOMM_Status.Background = new SolidColorBrush(Colors.Gray);
+                    MainWindow.mainWindow.label_PLCCOMM_Status.Background = new SolidColorBrush(Colors.Red);
                     MainWindow.mainWindow.label_PLCCOMM_Status.Content = $"{m_strCommAddress}:{m_PLCPort}";
-                    MainWindow.mainWindow.label_PLCCOMM_Status.Foreground = new SolidColorBrush(Colors.Red);
+                    MainWindow.mainWindow.label_PLCCOMM_Status.Foreground = new SolidColorBrush(Colors.Black);
                     button_PLC_Connect.Background = new SolidColorBrush(Colors.Red);
 
                 }
             });
-
         }
 
         private void M_modbusClient_ReceiveDataChanged(object sender)

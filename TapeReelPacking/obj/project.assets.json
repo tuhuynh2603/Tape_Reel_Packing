@@ -208,6 +208,29 @@
           "lib/net46/Microsoft.IO.RecyclableMemoryStream.dll": {}
         }
       },
+      "Microsoft.SDK.Expression.Blend/1.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net45/Microsoft.Expression.Controls.dll": {},
+          "lib/net45/Microsoft.Expression.Drawing.dll": {},
+          "lib/net45/Microsoft.Expression.Effects.dll": {},
+          "lib/net45/Microsoft.Expression.Interactions.dll": {},
+          "lib/net45/Microsoft.Expression.Prototyping.Interactivity.dll": {},
+          "lib/net45/Microsoft.Expression.Prototyping.SketchControls.dll": {},
+          "lib/net45/Microsoft.SDK.Expression.Blend.dll": {},
+          "lib/net45/System.Windows.Interactivity.dll": {}
+        },
+        "runtime": {
+          "lib/net45/Microsoft.Expression.Controls.dll": {},
+          "lib/net45/Microsoft.Expression.Drawing.dll": {},
+          "lib/net45/Microsoft.Expression.Effects.dll": {},
+          "lib/net45/Microsoft.Expression.Interactions.dll": {},
+          "lib/net45/Microsoft.Expression.Prototyping.Interactivity.dll": {},
+          "lib/net45/Microsoft.Expression.Prototyping.SketchControls.dll": {},
+          "lib/net45/Microsoft.SDK.Expression.Blend.dll": {},
+          "lib/net45/System.Windows.Interactivity.dll": {}
+        }
+      },
       "System.ComponentModel.Annotations/5.0.0": {
         "type": "package",
         "frameworkAssemblies": [
@@ -489,6 +512,29 @@
         },
         "runtime": {
           "lib/net46/Microsoft.IO.RecyclableMemoryStream.dll": {}
+        }
+      },
+      "Microsoft.SDK.Expression.Blend/1.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net45/Microsoft.Expression.Controls.dll": {},
+          "lib/net45/Microsoft.Expression.Drawing.dll": {},
+          "lib/net45/Microsoft.Expression.Effects.dll": {},
+          "lib/net45/Microsoft.Expression.Interactions.dll": {},
+          "lib/net45/Microsoft.Expression.Prototyping.Interactivity.dll": {},
+          "lib/net45/Microsoft.Expression.Prototyping.SketchControls.dll": {},
+          "lib/net45/Microsoft.SDK.Expression.Blend.dll": {},
+          "lib/net45/System.Windows.Interactivity.dll": {}
+        },
+        "runtime": {
+          "lib/net45/Microsoft.Expression.Controls.dll": {},
+          "lib/net45/Microsoft.Expression.Drawing.dll": {},
+          "lib/net45/Microsoft.Expression.Effects.dll": {},
+          "lib/net45/Microsoft.Expression.Interactions.dll": {},
+          "lib/net45/Microsoft.Expression.Prototyping.Interactivity.dll": {},
+          "lib/net45/Microsoft.Expression.Prototyping.SketchControls.dll": {},
+          "lib/net45/Microsoft.SDK.Expression.Blend.dll": {},
+          "lib/net45/System.Windows.Interactivity.dll": {}
         }
       },
       "System.ComponentModel.Annotations/5.0.0": {
@@ -774,6 +820,29 @@
           "lib/net46/Microsoft.IO.RecyclableMemoryStream.dll": {}
         }
       },
+      "Microsoft.SDK.Expression.Blend/1.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net45/Microsoft.Expression.Controls.dll": {},
+          "lib/net45/Microsoft.Expression.Drawing.dll": {},
+          "lib/net45/Microsoft.Expression.Effects.dll": {},
+          "lib/net45/Microsoft.Expression.Interactions.dll": {},
+          "lib/net45/Microsoft.Expression.Prototyping.Interactivity.dll": {},
+          "lib/net45/Microsoft.Expression.Prototyping.SketchControls.dll": {},
+          "lib/net45/Microsoft.SDK.Expression.Blend.dll": {},
+          "lib/net45/System.Windows.Interactivity.dll": {}
+        },
+        "runtime": {
+          "lib/net45/Microsoft.Expression.Controls.dll": {},
+          "lib/net45/Microsoft.Expression.Drawing.dll": {},
+          "lib/net45/Microsoft.Expression.Effects.dll": {},
+          "lib/net45/Microsoft.Expression.Interactions.dll": {},
+          "lib/net45/Microsoft.Expression.Prototyping.Interactivity.dll": {},
+          "lib/net45/Microsoft.Expression.Prototyping.SketchControls.dll": {},
+          "lib/net45/Microsoft.SDK.Expression.Blend.dll": {},
+          "lib/net45/System.Windows.Interactivity.dll": {}
+        }
+      },
       "System.ComponentModel.Annotations/5.0.0": {
         "type": "package",
         "frameworkAssemblies": [
@@ -1055,6 +1124,29 @@
         },
         "runtime": {
           "lib/net46/Microsoft.IO.RecyclableMemoryStream.dll": {}
+        }
+      },
+      "Microsoft.SDK.Expression.Blend/1.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net45/Microsoft.Expression.Controls.dll": {},
+          "lib/net45/Microsoft.Expression.Drawing.dll": {},
+          "lib/net45/Microsoft.Expression.Effects.dll": {},
+          "lib/net45/Microsoft.Expression.Interactions.dll": {},
+          "lib/net45/Microsoft.Expression.Prototyping.Interactivity.dll": {},
+          "lib/net45/Microsoft.Expression.Prototyping.SketchControls.dll": {},
+          "lib/net45/Microsoft.SDK.Expression.Blend.dll": {},
+          "lib/net45/System.Windows.Interactivity.dll": {}
+        },
+        "runtime": {
+          "lib/net45/Microsoft.Expression.Controls.dll": {},
+          "lib/net45/Microsoft.Expression.Drawing.dll": {},
+          "lib/net45/Microsoft.Expression.Effects.dll": {},
+          "lib/net45/Microsoft.Expression.Interactions.dll": {},
+          "lib/net45/Microsoft.Expression.Prototyping.Interactivity.dll": {},
+          "lib/net45/Microsoft.Expression.Prototyping.SketchControls.dll": {},
+          "lib/net45/Microsoft.SDK.Expression.Blend.dll": {},
+          "lib/net45/System.Windows.Interactivity.dll": {}
         }
       },
       "System.ComponentModel.Annotations/5.0.0": {
@@ -1861,6 +1953,25 @@
         "microsoft.io.recyclablememorystream.nuspec"
       ]
     },
+    "Microsoft.SDK.Expression.Blend/1.0.0": {
+      "sha512": "SzhrOZ8Nn24+XuY69rT+0TvdZH6irbSvRbvY4Lwtnohn3nZfczq4O1uFQkfVIGD+0ReMkNnfHKR7T3DmGVz4zw==",
+      "type": "package",
+      "path": "microsoft.sdk.expression.blend/1.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net45/Microsoft.Expression.Controls.dll",
+        "lib/net45/Microsoft.Expression.Drawing.dll",
+        "lib/net45/Microsoft.Expression.Effects.dll",
+        "lib/net45/Microsoft.Expression.Interactions.dll",
+        "lib/net45/Microsoft.Expression.Prototyping.Interactivity.dll",
+        "lib/net45/Microsoft.Expression.Prototyping.SketchControls.dll",
+        "lib/net45/Microsoft.SDK.Expression.Blend.dll",
+        "lib/net45/System.Windows.Interactivity.dll",
+        "microsoft.sdk.expression.blend.1.0.0.nupkg.sha512",
+        "microsoft.sdk.expression.blend.nuspec"
+      ]
+    },
     "System.ComponentModel.Annotations/5.0.0": {
       "sha512": "dMkqfy2el8A8/I76n2Hi1oBFEbG1SfxD2l5nhwXV3XjlnOmwxJlQbYpJH4W51odnU9sARCSAgv7S3CyAFMkpYg==",
       "type": "package",
@@ -2002,6 +2113,7 @@
       "Extended.Wpf.Toolkit >= 3.8.2",
       "MaterialDesignColors >= 1.2.0",
       "MaterialDesignThemes >= 2.6.0",
+      "Microsoft.SDK.Expression.Blend >= 1.0.0",
       "Xceed.Wpf.AvalonDock.Themes.VS2013 >= 2.9.0.1",
       "iTextSharp >= 5.5.13.3"
     ]
@@ -2074,6 +2186,10 @@
           "MaterialDesignThemes": {
             "target": "Package",
             "version": "[2.6.0, )"
+          },
+          "Microsoft.SDK.Expression.Blend": {
+            "target": "Package",
+            "version": "[1.0.0, )"
           },
           "Xceed.Wpf.AvalonDock.Themes.VS2013": {
             "target": "Package",

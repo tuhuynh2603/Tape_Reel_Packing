@@ -20,6 +20,9 @@ namespace TapeReelPacking.Source.Application
     using static TapeReelPacking.Source.Application.Track;
     using static TapeReelPacking.Source.Hardware.SDKHrobot.Global;
     using static OfficeOpenXml.ExcelErrorValue;
+    using TapeReelPacking.UI.UserControls.ViewModel;
+    using TapeReelPacking.UI.UserControls;
+    using TapeReelPacking.Source.Comm;
 
     public class Master
     {
@@ -947,8 +950,6 @@ namespace TapeReelPacking.Source.Application
                     //m_CreateNewLotStatus = 0;
                 }
                 bCreateNewLotStatus_Backup = m_CreateNewLotStatus;
-
-
             }
         }
 
@@ -1045,11 +1046,13 @@ namespace TapeReelPacking.Source.Application
                 });
 
                 RobotSequence();
+
+                PrinterSerialCommunicationSequence();
+
                 m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_ROBOT_RUNNING_STATUS, -1);
 
             }
             else
-
             {
                 LogMessage.LogMessage.WriteToDebugViewer(0, $"Begin sequence... MANUAL MODE");
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
@@ -1087,14 +1090,156 @@ namespace TapeReelPacking.Source.Application
             }
 
 
+        }
 
-            m_bRobotSequenceStatus = false;
-            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+
+        void PrinterSerialCommunicationSequence()
+        {
+            // Waiting for Complete Reel from PLC Signal
+            int m_CompletedReelStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_COMPLETED_LOT);
+            //m_CompletedReelStatus = 1;
+            while (m_CompletedReelStatus != 1)
             {
-                MainWindow.mainWindow.btn_run_sequence.IsChecked = false;
-                MainWindow.mainWindow.m_bSequenceRunning = false;
-            });
+                Thread.Sleep(500);
+                m_CompletedReelStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_COMPLETED_LOT);
 
+                if (!MainWindow.mainWindow.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1)
+                {
+                    m_bRobotSequenceStatus = false;
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        MainWindow.mainWindow.btn_run_sequence.IsChecked = false;
+                        MainWindow.mainWindow.m_bSequenceRunning = false;
+                    });
+                    return;
+                }
+            }
+
+            // Waiting for data received from Client
+            //int nRepeat = 0;
+            if (m_CompletedReelStatus == 1)
+            {
+                //SendDataToClient:
+                //if (nRepeat < 5)
+                //{
+
+                //    WaitForNextStepSequenceEvent("Send Reel Data To Client Failed! Please Check the Connection. End Sequence...", true);
+                //    return;
+                //}
+
+                List<VisionResultDataExcel> list_BarcodeResult = new List<VisionResultDataExcel>();
+                LotBarcodeDataTable.ReadLotResultFromExcel(Application.m_strCurrentLot, ref list_BarcodeResult);
+                string strDataSend = LotBarcodeDataTable.CombineReelIDStringSentToClient(ref list_BarcodeResult);
+                SerialCommunication.m_SerialDataReceivedEvent.Reset();
+                SerialCommunication.WriteData(strDataSend);
+                while (SerialCommunication.m_SerialDataReceivedEvent.WaitOne(100) == false)
+                {
+                    if (m_bMachineNotReadyNeedToReset)
+                    {
+                        m_bRobotSequenceStatus = false;
+                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+                            MainWindow.mainWindow.btn_run_sequence.IsChecked = false;
+                            MainWindow.mainWindow.m_bSequenceRunning = false;
+                        });
+                        return;
+                    }
+                }
+
+                SerialCommunication.m_SerialDataReceivedEvent.Reset();
+                // Check whether data sent and received are same or not
+                string[] strReceived = SerialCommunication.ReadData().Split('_');
+                if (strReceived.Length < 1)
+                {
+                    WaitForNextStepSequenceEvent("Send Reel Data To Client Failed! Please Check the Connection.", true);
+
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("PLC Button Run is pressed. Restarting the Robot sequence....", (int)ERROR_CODE.LABEL_FAIL);
+                    });
+
+                    return;
+                }
+
+
+                string[] strRe = strReceived[0].Split(',');
+                string[] strSend = strDataSend.Split(',');
+
+                for (int n = 0; n < strDataSend.Split(',').Length; n++)
+                {
+                    if (strRe.Length <= n)
+                        break;
+                    LogMessage.LogMessage.WriteToDebugViewer(1, $"Send - Received: {strSend[n]}     {strRe[n]}");
+                }
+
+                if (strReceived[0] != strDataSend)
+                {
+
+                    WaitForNextStepSequenceEvent("Mismatching Data Between Client And TR Machine Failed! Please Check the Connection.", true);
+
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Mismatching Data Between Client And TR Machine Failed! Please Check the Connection.", (int)ERROR_CODE.LABEL_FAIL);
+                    });
+
+                    return;
+                    //nRepeat++;
+                    //goto SendDataToClient;
+                }
+
+                if (strReceived[1].Contains("OK") == false)
+                {
+                    WaitForNextStepSequenceEvent("Received Reel_Error From Client. End Sequence.", true);
+
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Received Reel_Error From Client. End Sequence.", (int)ERROR_CODE.LABEL_FAIL);
+                    });
+
+                    return;
+                    //nRepeat++;
+                    //goto SendDataToClient;
+                }
+
+                SerialCommunication.m_SerialDataReceivedEvent.Reset();
+                while (SerialCommunication.m_SerialDataReceivedEvent.WaitOne(100) == false)
+                {
+                    if (m_bMachineNotReadyNeedToReset)
+                    {
+                        m_bRobotSequenceStatus = false;
+                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+                            MainWindow.mainWindow.btn_run_sequence.IsChecked = false;
+                            MainWindow.mainWindow.m_bSequenceRunning = false;
+                        });
+                        return;
+                    }
+                }
+                SerialCommunication.m_SerialDataReceivedEvent.Reset();
+                string strReceived_ACK = SerialCommunication.ReadData();
+
+                if (strReceived_ACK.Contains("ACK") == false)
+                {
+                    WaitForNextStepSequenceEvent("Received ACK_Error From Client. End Sequence.", true);
+
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+
+                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Received ACK_Error From Client. End Sequence.", (int)ERROR_CODE.LABEL_FAIL);
+                    });
+
+                    return;
+                    //nRepeat++;
+                    //goto SendDataToClient;
+                }
+
+                SerialCommunication.WriteData("ACK_OK");
+
+
+            }
         }
 
 
@@ -2235,12 +2380,9 @@ namespace TapeReelPacking.Source.Application
                         Thread.Sleep(1000);
                         goto startBarcodeSequence;
                     }
-
                     HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_PASS, !bFailSendToPLC);
                     HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_FAIL, bFailSendToPLC);
                     HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY, false);
-
-
                 }
                 else
                 {
@@ -2248,8 +2390,6 @@ namespace TapeReelPacking.Source.Application
                     m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_RESULT_FAIL, bFailSendToPLC == false ? 0 : 1);
                     m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_CAPTURE_BUSY, 0);
                 }
-
-
                 LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Send result to PLC Done {(int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_RESULT}  . Result: {bFailSendToPLC}  Device {m_Tracks[1].m_CurrentSequenceDeviceID}");
 
                 //LogMessage.LogMessage.WriteToDebugViewer(8, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");

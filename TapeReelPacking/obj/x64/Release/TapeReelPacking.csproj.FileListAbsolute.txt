@@ -57,4 +57,5 @@ C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking.e
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking.pdb
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\LotBarcodeDataTable.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\LotBarcodeDataTable.baml
-C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking.csproj.AssemblyReference.cache
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\View\SerialCommunicationView.g.cs
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\View\SerialCommunicationView.baml

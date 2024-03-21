@@ -139,6 +139,7 @@
     <Compile Include="Source\Application\IniFile.cs" />
     <Compile Include="Source\Application\Master.cs" />
     <Compile Include="Source\Application\TrackHandler.cs" />
+    <Compile Include="Source\Comm\SerialCommunication.cs" />
     <Compile Include="Source\Define\StructDef.cs" />
     <Compile Include="Source\Drawing\DrawingOverlay.cs" />
     <Compile Include="Source\Hardware\BarCodeReaderInterface.cs" />
@@ -191,11 +192,15 @@
     </Compile>
     <Compile Include="UI\UserControls\ViewModel\BaseVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\RecipeManageVM.cs" />
+    <Compile Include="UI\UserControls\ViewModel\SerialCommunicationVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\TitleBarVM.cs" />
     <Compile Include="UI\UserControls\View\ImageView.xaml.cs">
       <DependentUpon>ImageView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Source\UIImage\TransformImage.cs" />
+    <Compile Include="UI\UserControls\View\SerialCommunicationView.xaml.cs">
+      <DependentUpon>SerialCommunicationView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\UserControls\View\StatisticView.xaml.cs">
       <DependentUpon>StatisticView.xaml</DependentUpon>
     </Compile>
@@ -281,6 +286,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\UserControls\View\SerialCommunicationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\UserControls\View\StatisticView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -350,6 +359,9 @@
     </PackageReference>
     <PackageReference Include="MaterialDesignThemes">
       <Version>2.6.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.SDK.Expression.Blend">
+      <Version>1.0.0</Version>
     </PackageReference>
     <PackageReference Include="Xceed.Wpf.AvalonDock.Themes.VS2013">
       <Version>2.9.0.1</Version>
@@ -443,6 +455,13 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="ICONHD.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\binary.png" />
+    <Resource Include="Resources\clear-log.png" />
+    <Resource Include="Resources\overlay.png" />
+    <Resource Include="Resources\pixel-ruler.png" />
+    <Resource Include="Resources\serial-comm.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

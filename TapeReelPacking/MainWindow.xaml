@@ -620,6 +620,32 @@
                                                     >
                                         </Label>
                                     </Grid>
+
+
+                                    <Grid Margin="0,0,0,-30">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="5*"></RowDefinition>
+                                            <RowDefinition Height="3*"></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <RibbonToggleButton x:Name="btn_Serial_COMM" Grid.Row="0"
+                                                        Label="Serial COMM"
+                                                        LargeImageSource="Resources\serial-comm.png"
+                                                        Foreground="White"                          
+                                                        IsEnabled="true"
+                                                        Checked="btn_Serial_COMM_Checked"
+                                                        Unchecked="btn_Serial_COMM_Unchecked" 
+                                                        IsChecked="False"
+                                                        CheckedBackground="{StaticResource CheckedButtonStyle}"
+                                                        MouseOverBackground="{StaticResource BgButton}" 
+                                                        Width="Auto">
+
+                                        </RibbonToggleButton>
+
+                                        <Label x:Name="label_Serial_Comm" FontSize="15" Grid.Row="1" 
+                                                    Content="Disconnected" VerticalContentAlignment="Top"  HorizontalContentAlignment="Center">
+                                        </Label>
+                                    </Grid>
+
                                 </RibbonGroup>
                             </StackPanel>
                         </TabItem>
@@ -769,7 +795,7 @@
 
                                     <RibbonToggleButton Name="btn_Binarize"
                                             Label="Binarize" 
-                                            LargeImageSource="Resources\run-custom.png"
+                                            LargeImageSource="Resources\binary.png"
                                             Foreground="GhostWhite" 
                                             MouseOverBackground="{StaticResource BgButton}"
                                             CheckedBackground="{StaticResource BgButton}"
@@ -780,7 +806,7 @@
 
                                     <RibbonToggleButton Name="btn_ShowOverlay"
                                             Label="Show Overlay" 
-                                            LargeImageSource="Resources\run-custom.png"
+                                            LargeImageSource="Resources\overlay.png"
                                             Foreground="GhostWhite" 
                                             MouseOverBackground="{StaticResource BgButton}"
                                             CheckedBackground="{StaticResource BgButton}"
@@ -789,8 +815,8 @@
 
 
                                     <RibbonButton Name="btn_Clear_Comm"
-                                            Label="Clear Comm Log"
-                                            LargeImageSource="Resources\run-custom.png"
+                                            Label="Clear Output Log"
+                                            LargeImageSource="Resources\clear-log.png"
                                             Foreground="GhostWhite" 
                                             Click="btn_Clear_Comm_Click"
                                             MouseOverBackground="{StaticResource BgButton}"
@@ -799,7 +825,7 @@
                                     <RibbonToggleButton Name="btn_Pixel_Ruler"
                                                 IsChecked="False"
                                                 Label="Pixel Ruler"
-                                                LargeImageSource="Resources\run-custom.png"
+                                                LargeImageSource="Resources\pixel-ruler.png"
                                                 Foreground="GhostWhite" 
                                                 Click="btn_Pixel_Ruler_Click"
                                                 FontSize="13"
@@ -829,6 +855,8 @@
                                                             Width="auto" 
                                                             Checked="btn_mapping_parameters_Checked"
                                                             Unchecked="btn_mapping_parameters_Unchecked" />
+
+
 
                                 </RibbonGroup>
                                 <!--Binarize group-->

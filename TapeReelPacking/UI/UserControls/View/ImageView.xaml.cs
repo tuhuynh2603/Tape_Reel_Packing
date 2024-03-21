@@ -1116,7 +1116,7 @@ namespace TapeReelPacking.UI.UserControls.View
                     L_DeviceLocationRoi_Temp = GetRectangle();
                     Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi = L_DeviceLocationRoi_Temp;
                     controlWin.Visibility = Visibility.Collapsed;
-                    UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Searching Area Taught", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+                    UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Searching Area Teached", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
                     UpdateRegionOverlay();
 
                 });
@@ -1142,7 +1142,7 @@ namespace TapeReelPacking.UI.UserControls.View
                     Rectangles lPVIAreaTemp = L_PVIArea[nPVIArea];
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Please Locate Pvi Area " + nPVIArea.ToString(), "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+                        UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Please Locate Pvi Area " + (nPVIArea+1).ToString(), "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
                         controlWin.Visibility = Visibility.Visible;
                         SetControlWin(lPVIAreaTemp);
                     });
@@ -1157,7 +1157,7 @@ namespace TapeReelPacking.UI.UserControls.View
                         L_PVIArea[nPVIArea] = GetRectangle();
                         //Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi = L_DeviceLocationRoi_Temp;
                         controlWin.Visibility = Visibility.Collapsed;
-                        UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Pvi Area " + nPVIArea.ToString() + " is Taught", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+                        UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Pvi Area " + (nPVIArea + 1).ToString() + " Teached", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
                         UpdateRegionOverlay();
 
                     });
@@ -1211,7 +1211,7 @@ namespace TapeReelPacking.UI.UserControls.View
                     //DrawPolygonOverlay(ref p_Regionpolygon, color, 1);
                     //DrawRegionOverlay(mat_DeviceLocationRegion, color);
 
-                    UpdateTextOverlay((nCurrentStep + 1).ToString()/* + "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "  Device Found", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
+                    UpdateTextOverlay((nCurrentStep + 1).ToString()/* + "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "Teaching Sequence Compleleted", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
                     UpdateRegionOverlay();
                 });
 

@@ -415,11 +415,11 @@
                              Text="{Binding Path=Value, ElementName=m_nNumberPointValue, 
                                 Mode=TwoWay ,UpdateSourceTrigger=PropertyChanged}"></TextBox>
                 </Grid>-->
-                <Button x:Name="button_CameraRobotCalibration" Content=" Do Calibration" Click="button_CameraRobotCalibration_Click" Grid.Row="0" Height="28" VerticalAlignment="Bottom"/>
-                <Button x:Name="button_Next_Calibration" Content="Next" Click="button_Next_Calibration_Click"  Grid.Row="1"></Button>
-                <Button x:Name="button_Import_Task" Content="Import Task" Click="button_Import_Task_Click" Grid.Row="2"></Button>
+                <Button x:Name="button_CameraRobotCalibration" Content=" Do Calibration" Click="button_CameraRobotCalibration_Click" Grid.Row="1" Height="28" VerticalAlignment="Bottom"/>
+                <Button x:Name="button_Next_Calibration" Content="Next" Click="button_Next_Calibration_Click"  Grid.Row="2"></Button>
+                <!--<Button x:Name="button_Import_Task" Content="Import Task" Click="button_Import_Task_Click" Grid.Row="2"></Button>
                 <Button x:Name="button_Start_Task" Content="Start Task" Click="button_Start_Task_Click" Grid.Row="3"></Button>
-                <Button x:Name="button_Abort_Task" Content="Abort Task" Click="button_Abort_Task_Click" Grid.Row="4"></Button>
+                <Button x:Name="button_Abort_Task" Content="Abort Task" Click="button_Abort_Task_Click" Grid.Row="4"></Button>-->
 
             </Grid>
 
@@ -525,8 +525,8 @@
                                             Binding="{Binding m_Tool, Mode=TwoWay}"/>
                 </DataGrid.Columns>
             </DataGrid>
-            <StackPanel Grid.Column="2" Orientation="Vertical">
-                <Button x:Name="button_GetSoftLimit" Content="Get Soft Limit" Click="button_GetSoftLimit_Click"></Button>
+            <Grid Grid.Column="2">
+                <!--<Button x:Name="button_GetSoftLimit" Content="Get Soft Limit" Click="button_GetSoftLimit_Click"></Button>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>
@@ -534,9 +534,9 @@
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0" x:Name="button_SetLowerSoftLimit" Content="Low Limit" Click="button_SetLowerSoftLimit_Click" Margin="0,0,1,0"></Button>
                     <Button Grid.Column="1" x:Name="button_SetHigherSoftLimit" Content="High Limit" Click="button_SetHigherSoftLimit_Click"  Margin="1,0,0,0"></Button>
-                </Grid>
-                <Button x:Name="button_Save_Sequence" Content="Save" Click="button_Save_Sequence_Click"></Button>
-            </StackPanel>
+                </Grid>-->
+                <Button VerticalAlignment="Center" x:Name="button_Save_Sequence" Content="Save" Click="button_Save_Sequence_Click" Height="50"></Button>
+            </Grid>
                      
         </Grid>
     </Grid>

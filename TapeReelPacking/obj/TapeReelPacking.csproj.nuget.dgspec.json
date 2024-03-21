@@ -70,6 +70,10 @@
               "target": "Package",
               "version": "[2.6.0, )"
             },
+            "Microsoft.SDK.Expression.Blend": {
+              "target": "Package",
+              "version": "[1.0.0, )"
+            },
             "Xceed.Wpf.AvalonDock.Themes.VS2013": {
               "target": "Package",
               "version": "[2.9.0.1, )"

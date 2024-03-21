@@ -41,7 +41,7 @@ namespace TapeReelPacking
         public DefectInfor defectInfor = new DefectInfor();
         public WarningMessageBox m_WarningMessageBoxUC = new WarningMessageBox();
         public LotBarcodeDataTable m_LotBarcodeDataExcelDlg = new LotBarcodeDataTable();
-
+        public SerialCommunicationView m_SerialCommunicationView;
         public static string[] titles = new string[] { "Top Camera", "Barcode Reader", "Flap Side 2 " };
 
         private int screenWidth = 2000;// System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width;
@@ -274,7 +274,7 @@ namespace TapeReelPacking
             master = new Master(this);
             outputLogView = new OutputLogView(this);
             m_staticView = new StatisticView(this);
-
+            m_SerialCommunicationView = new SerialCommunicationView();
 
             //master.m_SaveInspectImageThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => master.Grab_Image_Testing_Thread(true)));
 
@@ -1521,8 +1521,8 @@ namespace TapeReelPacking
 
             if (bEnable)
             {
-                AddHotKey();
-
+               
+                CleanHotKey();
                 m_RecipeManage = new RecipeManageView();
                 grd_Dialog_Settings.Margin = new Thickness(0, 160, 0, 0);
                 grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Top;
@@ -1541,7 +1541,7 @@ namespace TapeReelPacking
             }
             else
             {
-                CleanHotKey();
+                AddHotKey();
 
                 grd_PopupDialog.Children.Clear();
                 grd_PopupDialog.Visibility = Visibility.Collapsed;
@@ -1774,7 +1774,42 @@ namespace TapeReelPacking
             }
         }
 
+        private void btn_Serial_COMM_Checked(object sender, RoutedEventArgs e)
+        {
+            showSerialCommunicationView(true);
+        }
 
+        private void btn_Serial_COMM_Unchecked(object sender, RoutedEventArgs e)
+        {
+            showSerialCommunicationView(false);
+
+        }
+
+        public void showSerialCommunicationView(bool bShow)
+        {
+            if (bShow)
+            {
+                Source.Application.Application.loginUser.AssignMainWindow();
+                tt_DialogSettings.X = 0;
+                tt_DialogSettings.Y = 0;
+                //btnLogIn.IsEnabled = false;
+                grd_PopupDialog.Children.Clear();
+                //DisableDialogLogin();
+                grd_PopupDialog.Children.Add(m_SerialCommunicationView);
+
+                grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Center;
+                grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Center;
+                grd_PopupDialog.Visibility = Visibility.Visible;
+                grd_Dialog_Settings.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                grd_PopupDialog.Children.Clear();
+                grd_PopupDialog.Visibility = Visibility.Collapsed;
+                grd_Dialog_Settings.Visibility = Visibility.Collapsed;
+
+            }
+        }
         //private void btn_Imidiate_Stop_Click(object sender, RoutedEventArgs e)
         //{
 

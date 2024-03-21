@@ -47,7 +47,8 @@ namespace TapeReelPacking.Source.Hardware.SDKHrobot
             PLC_END_LOT = 10,
             PLC_CREATE_NEW_LOT = 11,
             PLC_LAST_CHIP = 12,
-            PLC_RUN_NO_ROBOT = 13,            
+            PLC_RUN_NO_ROBOT = 13,  
+            PLC_COMPLETED_LOT = 14,
             PLC_DOOR_STATUS = 15,
             AIR_PRESSURESTATUS = 16, // 
 
@@ -895,10 +896,10 @@ namespace TapeReelPacking.Source.Hardware.SDKHrobot
                       else
                       {
                           m_hiWinRobotUserControl.button_RobotConnect.Content = "Disconnected";
-                          m_hiWinRobotUserControl.button_RobotConnect.Background = new SolidColorBrush(Colors.Gray);
+                          m_hiWinRobotUserControl.button_RobotConnect.Background = new SolidColorBrush(Colors.Red);
                           MainWindow.mainWindow.color_RobotStatus = "Black";
                           MainWindow.mainWindow.label_Robot_Status.Content = m_strRobotIPAddress;
-                          MainWindow.mainWindow.label_Robot_Status.Background = new SolidColorBrush(Colors.Gray);
+                          MainWindow.mainWindow.label_Robot_Status.Background = new SolidColorBrush(Colors.Red);
                       }
                   });
                 }

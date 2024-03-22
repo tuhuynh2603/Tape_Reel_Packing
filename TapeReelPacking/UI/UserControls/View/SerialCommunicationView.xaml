@@ -7,7 +7,7 @@
              xmlns:viewmodels="clr-namespace:TapeReelPacking.UI.UserControls.ViewModel" 
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="500">
+             d:DesignHeight="450" d:DesignWidth="700">
     <UserControl.DataContext>
         <viewmodels:SerialCommunicationVM></viewmodels:SerialCommunicationVM>
     </UserControl.DataContext>
@@ -62,7 +62,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <TextBox Height="100" x:Name="txt_DataWrite"  TextWrapping="Wrap" Width="300"
+                <TextBox Height="200" x:Name="txt_DataWrite"  TextWrapping="Wrap" Width="500"
                          Text="{Binding txtDataWriteString, UpdateSourceTrigger=PropertyChanged}"></TextBox>
             </Grid>
             <Grid VerticalAlignment="Top">
@@ -78,7 +78,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <TextBox Height="100" x:Name="txt_DataRead"  TextWrapping="Wrap" Width="300"
+                <TextBox Height="200" x:Name="txt_DataRead"  TextWrapping="Wrap" Width="500"
                          Text="{Binding txt_DataReadString, UpdateSourceTrigger=PropertyChanged}"></TextBox>
             </Grid>
             <Grid VerticalAlignment="Top">

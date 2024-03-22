@@ -316,7 +316,7 @@ namespace TapeReelPacking
             for (int n = 0; n < InputBindings.Count; n++)
                 hotkey.Add((KeyBinding)InputBindings[n]);
 
-
+            //VisionResultData.ReadTotalLotFromExcel(Application.m_strCurrentLot, int nTrack, ref int nLot, ref int nNumberOfDevices)
             loadAllStatistic(true);
             showLoginUser(true);
         }

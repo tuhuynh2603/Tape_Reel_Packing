@@ -662,6 +662,9 @@ namespace TapeReelPacking.Source.Application
         public bool m_bIsReleasePopupMessage = false;
         public int m_SequenceMode = (int)SEQUENCE_MODE.MODE_AUTO;
         public int m_SequenceMode_With_Or_No_Robot = 0;
+        public DateTime startLot_dateTime;
+        public int m_nTotalCompletedLot = 0;
+
         private void func_IOStatusThread()
         {
             int bEmergencyStatus_Backup = -1;
@@ -887,13 +890,12 @@ namespace TapeReelPacking.Source.Application
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
                         ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Reset Lot", (int)ERROR_CODE.LABEL_FAIL);
-                        Application.m_strCurrentLot = string.Format("{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+                        startLot_dateTime = DateTime.Now;
+                        Application.m_strCurrentLot = string.Format("{0}{1}{2}_{3}{4}{5}", startLot_dateTime.ToString("yyyy"), startLot_dateTime.ToString("MM"), startLot_dateTime.ToString("dd"), startLot_dateTime.ToString("HH"), startLot_dateTime.ToString("mm"), startLot_dateTime.ToString("ss"));
                         if (Application.m_strStartLotDay != Application.m_strCurrentLot.Split('_')[0])
                             MainWindow.mainWindow.m_staticView.ClearStatistic();
                         Application.m_strStartLotDay = Application.m_strCurrentLot.Split('_')[0];
-
                         Application.SetStringRegistry(Application.m_strCurrentLot_Registry, Application.m_strCurrentLot);
-
                         //MainWindow.mainWindow.m_staticView.ClearStatistic();
                         Thread.Sleep(250);
                         for (int nT = 0; nT < 2; nT++)
@@ -1035,7 +1037,7 @@ namespace TapeReelPacking.Source.Application
                 ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Run Sequence Thead...", (int)ERROR_CODE.LABEL_FAIL);
                 //MainWindow.mainWindow.LoadStatistic(0,true);
             });
-
+            //m_SequenceMode = (int)SEQUENCE_MODE.MODE_AUTO;
             if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_AUTO)
             {
                 LogMessage.LogMessage.WriteToDebugViewer(0, $"Begin sequence... AUTO MODE");
@@ -1237,7 +1239,11 @@ namespace TapeReelPacking.Source.Application
                 }
 
                 SerialCommunication.WriteData("ACK_OK");
-
+                int nTotalDevice = 0;
+                VisionResultData.ReadTotalLotFromExcel(Application.m_strCurrentLot, 1, ref m_nTotalCompletedLot, ref nTotalDevice);
+                m_nTotalCompletedLot++;
+                VisionResultData.SaveTotalLotToExcel(Application.m_strCurrentLot, 1, m_nTotalCompletedLot, startLot_dateTime.ToString(), list_BarcodeResult.Count);
+                
 
             }
         }

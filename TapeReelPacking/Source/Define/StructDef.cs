@@ -221,6 +221,182 @@ namespace TapeReelPacking.Source.Define
             this.bIsTotal = bIsTotal;
         }
 
+
+        public static void ReadTotalLotFromExcel(string strLotID, int nTrack, ref int nLot, ref int nNumberOfDevices)
+        {
+            nLot = 0;
+            nNumberOfDevices = 0;
+            string strStartLotDay = strLotID.Split('_')[0];
+            try
+            {
+                string[] strTrackName = { "Camera", "Barcode" };
+                string strRecipePath = Path.Combine(
+                    Application.Application.pathStatistics,
+                    Application.Application.currentRecipe,
+                    strStartLotDay,
+                    strTrackName[nTrack]);
+
+                if (!Directory.Exists(strRecipePath))
+                    Directory.CreateDirectory(strRecipePath);
+
+                string fullpath = Path.Combine(strRecipePath, $"Total_{strStartLotDay}.xlsx");
+
+
+                FileInfo file = new FileInfo(fullpath);
+
+                if (!file.Exists)
+                {
+                    file.Create();
+                }
+
+                //file.CopyTo(backup_fullpath);
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Use NonCommercial license if applicable
+
+                using (ExcelPackage package = new ExcelPackage(file))
+                {
+
+                    if (package.Workbook.Worksheets.Count == 0)
+                    {
+                        package.Dispose();
+                        return;
+                    }
+
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                    worksheet.DefaultColWidth = 35;
+                    worksheet.DefaultRowHeight = 35;
+                    int rowCount = worksheet.Dimension.Rows;
+                    for (int row = 5; row <= rowCount; row++)
+                    {
+                        var valueTemp = worksheet.Cells[row, 1].Value;
+                        if (valueTemp != null)
+                        {
+                            nLot++;
+                        }
+                        valueTemp = worksheet.Cells[row, 5].Value;
+                        if (valueTemp != null)
+                        {
+                            nNumberOfDevices = nNumberOfDevices + Int16.Parse(valueTemp.ToString());
+                        }
+                    }
+                    package.Dispose();
+                }
+            }
+            catch (Exception e)
+            {
+
+                LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, $"Save To Excel Failed! {e}");
+
+                //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                //{
+
+                //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Track{nTrack} Save To Excel Fail {e}!.", (int)ERROR_CODE.LABEL_FAIL);
+                //});
+            }
+
+        }
+
+        public static void SaveTotalLotToExcel(string strLotID, int nTrack, int nLot, string strStart, int nNumberDeviceS)
+        {
+            string strFileName = strLotID;
+            string strStartLotDay = strLotID.Split('_')[0];
+
+            //if (bTotal)
+            //    strFileName = strFileName + "_Total";
+            try
+            {
+                string[] strTrackName = { "Camera", "Barcode" };
+                string strRecipePath = Path.Combine(
+                    Application.Application.pathStatistics,
+                    Application.Application.currentRecipe,
+                    strStartLotDay,
+                    strTrackName[nTrack]);
+
+                if (!Directory.Exists(strRecipePath))
+                    Directory.CreateDirectory(strRecipePath);
+
+                string fullpath = Path.Combine(strRecipePath, $"Total_{strStartLotDay}.xlsx");
+
+
+                FileInfo file = new FileInfo(fullpath);
+
+                if (!file.Exists)
+                {
+                    file.Create();
+                }
+
+                //file.CopyTo(backup_fullpath);
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // Use NonCommercial license if applicable
+
+                using (ExcelPackage package = new ExcelPackage(file))
+                {
+
+                    bool bCreated = false;
+                    for (int n = 0; n < package.Workbook.Worksheets.Count; n++)
+                        if (package.Workbook.Worksheets[n].Name == "Total Lot Result")
+                        {
+                            bCreated = true;
+                            break;
+                        }
+
+                    if (!bCreated)
+                        package.Workbook.Worksheets.Add("Total Lot Result");
+
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                    worksheet.DefaultColWidth = 35;
+                    worksheet.DefaultRowHeight = 35;
+
+                    // Header
+                    int ncol = 1;
+                    worksheet.Cells[4, ncol++].Value = "Lot Number";
+                    worksheet.Cells[4, ncol++].Value = "Lot ID";
+                    worksheet.Cells[4, ncol++].Value = "Start Lot";
+                    worksheet.Cells[4, ncol++].Value = "End Lot";
+                    worksheet.Cells[4, ncol++].Value = "Number Device";
+
+                    // Data
+                    if (nLot > 0)
+                    {
+                        int row = nLot + 4;
+                        ncol = 1;
+                        worksheet.Cells[row, ncol++].Value = nLot;
+                        worksheet.Cells[row, ncol++].Value = strLotID;
+                        worksheet.Cells[row, ncol++].Value = strStart;
+                        worksheet.Cells[row, ncol++].Value = DateTime.Now.ToString();
+                        worksheet.Cells[row, ncol++].Value = nNumberDeviceS;
+
+                        worksheet.Cells[1, 1].Value = "Day";
+                        worksheet.Cells[1, 2].Value = DateTime.Today.ToString();
+                        worksheet.Cells[2, 1].Value = "Total Devices On Day";
+                        int nTotalDevices = 0;
+                        for (int n = 0; n < nLot; n++)
+                        {
+                            var valueTemp = worksheet.Cells[n + 5, 5].Value;
+                            if (valueTemp != null)
+                                nTotalDevices += Int16.Parse(valueTemp.ToString());
+
+                        }
+
+                        worksheet.Cells[2, 2].Value = nTotalDevices;
+                    }
+                    package.Save();
+                    package.Dispose();
+
+                }
+            }
+            catch (Exception e)
+            {
+
+                LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, $"Save To Excel Failed! {e}");
+
+                //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                //{
+
+                //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Track{nTrack} Save To Excel Fail {e}!.", (int)ERROR_CODE.LABEL_FAIL);
+                //});
+            }
+        }
+
+
         public static void SaveSequenceResultToExcel(string strLotID, int nTrack, VisionResultData data, bool bTotal = false)
         {
             string strFileName = strLotID;
@@ -270,6 +446,7 @@ namespace TapeReelPacking.Source.Define
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
                     worksheet.DefaultColWidth = 35;
                     worksheet.DefaultRowHeight = 35;
+
                     // Header
                     int ncol = 1;
                     worksheet.Cells[1, ncol++].Value = "Device Index";

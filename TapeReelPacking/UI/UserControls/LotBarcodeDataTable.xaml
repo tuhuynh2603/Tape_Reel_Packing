@@ -24,7 +24,7 @@
                     <ComboBox Grid.Column="1" x:Name="ccb_LotSelected_ComboBox" SelectionChanged="ccb_LotSelected_ComboBox_SelectionChanged"></ComboBox>
                 </Grid>
                 <Button Width="70"  Margin="0,10,10,0" HorizontalAlignment="Right" x:Name="btn_Load_Lot" Content="Load Lot" Click="btn_Load_Lot_Click"></Button>
-                <Button Width="70" Margin="0,10,10,0" HorizontalAlignment="Right" x:Name="btn_Send_To_Server" Content="Send Lot" Click ="btn_Send_To_Server_Click"></Button>
+                <Button Width="70" Margin="0,10,10,0" HorizontalAlignment="Right" x:Name="btn_Send_To_Server" Content="Send Lot" IsEnabled="False" Visibility="Hidden" Click ="btn_Send_To_Server_Click"></Button>
 
             </StackPanel>
 

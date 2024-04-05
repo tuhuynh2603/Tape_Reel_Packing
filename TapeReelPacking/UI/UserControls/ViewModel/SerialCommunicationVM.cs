@@ -8,6 +8,8 @@ using System.Collections.ObjectModel;
 using System.Windows.Input;
 using System.Windows.Controls;
 using System.IO.Ports;
+using TapeReelPacking.Source.Define;
+using TapeReelPacking.Source.Application;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
@@ -20,6 +22,9 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         public ICommand btn_ConnectSerial_Click { get; set; }
         public ICommand btn_WriteSerialCom_Click { get; set; }
         public ICommand btn_ReadSerialCom_Click { get; set; }
+        public ICommand btn_DisconnectSerial_Click { get; set; }
+
+        public ICommand btn_SendLastLot_Click { get; set; }
 
         #region Properties
 
@@ -101,10 +106,22 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             }
         }
 
+        private bool _bSendLotEnable = true;
+        public bool bSendLotEnable
+        {
+            get { return _bSendLotEnable; }
+            set
+            {
+                _bSendLotEnable = value;
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
         public string strCommSelected = "";
         public int nBaurate = 115200;
         public static Source.Comm.SerialCommunication m_serialCommunication;
+        public System.Threading.Thread threadSendLotData;
         public SerialCommunicationVM()
         {
             selectedCommLoad = Source.Application.Application.GetCommInfo("Serial Communication COM", "COM5");
@@ -143,7 +160,43 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                                              txt_DataReadString += ReadSerialCom();
                                          });
 
+            btn_DisconnectSerial_Click = new RelayCommand<UserControl>((p) => { return true; },
+                                         (p) =>
+                                         {
+                                                 m_serialCommunication.Disconnect();
+                                         });
+
+            btn_SendLastLot_Click = new RelayCommand<UserControl>((p) => { return true; },
+                                         (p) =>
+                                         {
+                                             if (threadSendLotData == null)
+                                             {
+                                                 threadSendLotData = new System.Threading.Thread(new System.Threading.ThreadStart(() => 
+                                                 {
+                                                     bSendLotEnable = false;
+                                                     MainWindow.mainWindow.master.sendLastLotDataToPID();
+                                                     bSendLotEnable = true;
+                                                 }
+                                                 ));
+                                                 threadSendLotData.Start();
+                                                 return ;
+                                             }
+                                             else if (!threadSendLotData.IsAlive)
+                                             {
+                                                 threadSendLotData = new System.Threading.Thread(new System.Threading.ThreadStart(() => 
+                                                 {
+                                                     bSendLotEnable = false;
+                                                     MainWindow.mainWindow.master.sendLastLotDataToPID();
+                                                     bSendLotEnable = true;
+                                                 }
+                                                 ));
+                                                 threadSendLotData.Start();
+                                                 return;
+                                             }
+
+                                         });          
         }
+
         
         public void InitCOMM()
         {
@@ -170,6 +223,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         {
             return Source.Comm.SerialCommunication.ReadData();
         }
+
 
         //public string CreateReelCommand(string strLotID)
         //{

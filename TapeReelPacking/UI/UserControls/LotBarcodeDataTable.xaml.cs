@@ -60,7 +60,7 @@ namespace TapeReelPacking.UI.UserControls
         }
 
 
-        public static void ReadLotResultFromExcel(string strLotID, ref List<VisionResultDataExcel> result)
+        public static void ReadLotResultFromExcel(string strLotID, ref List<VisionResultDataExcel> result, string strfullpathInput = "")
         {
 
             string strFileName = strLotID;
@@ -73,10 +73,12 @@ namespace TapeReelPacking.UI.UserControls
                 strStartLotDay,
                 strTrackName[1]);
 
-            if (!Directory.Exists(strRecipePath))
-                return;
+            //if (!Directory.Exists(strRecipePath))
+            //    return;
 
             string strFullPath = System.IO.Path.Combine(strRecipePath, $"{strFileName}.xlsx");
+            if (strfullpathInput != "")
+                strFullPath = strfullpathInput;
 
             FileInfo file = new FileInfo(strFullPath);
             if (!file.Exists)
@@ -149,7 +151,7 @@ namespace TapeReelPacking.UI.UserControls
         {
             if (ccb_LotSelected_ComboBox.SelectedIndex < 0 || ccb_LotSelected_ComboBox.Items.Count < 1)
                 return;
-            ReadLotResultFromExcel(m_ListStrLotFullPath[ccb_LotSelected_ComboBox.SelectedIndex], ref m_ListLotBarcodeDataTable);
+            ReadLotResultFromExcel("Dummy", ref m_ListLotBarcodeDataTable, m_ListStrLotFullPath[ccb_LotSelected_ComboBox.SelectedIndex]);
             lvLotBarCodeData.ItemsSource = null;
             lvLotBarCodeData.ItemsSource = m_ListLotBarcodeDataTable;
         }
@@ -160,12 +162,13 @@ namespace TapeReelPacking.UI.UserControls
             if (m_ListLotBarcodeDataTable.Count() == 0)
                 return;
 
-            string strWriteData = CombineReelIDStringSentToClient(ref m_ListLotBarcodeDataTable);
+            object selectLot = ccb_LotSelected_ComboBox.SelectedItem;
+            string strWriteData = CombineReelIDStringSentToClient(ref m_ListLotBarcodeDataTable, selectLot.ToString());
             ViewModel.SerialCommunicationVM.WriteSerialCom(strWriteData);
             
         }
 
-        public static string CombineReelIDStringSentToClient(ref List<VisionResultDataExcel> list_DeviceID)
+        public static string CombineReelIDStringSentToClient(ref List<VisionResultDataExcel> list_DeviceID, string strLotID)
         {
             string strCombine = "";
             for(int n = 0; n < list_DeviceID.Count(); n++ )
@@ -173,6 +176,8 @@ namespace TapeReelPacking.UI.UserControls
                 strCombine += list_DeviceID[n].str_BarcodeID + ",";
             }
             strCombine += $"{ list_DeviceID.Count()}";
+            strLotID = strLotID.Replace("_", "");
+            strCombine += $",{strLotID}";
             return strCombine;
         }
 

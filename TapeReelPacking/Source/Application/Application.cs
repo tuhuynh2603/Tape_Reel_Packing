@@ -49,12 +49,11 @@ namespace TapeReelPacking.Source.Application
 
         public Application()
         {
-            //if (!CheckMuTexProcess())
-            //{
-            //    MessageBox.Show("The other Application is running!");
-
-            //    KillCurrentProcess();
-            //}
+            if (!CheckMuTexProcess())
+            {
+                MessageBox.Show("The other Application is running!");
+                KillCurrentProcess();
+            }
             RegistryKey reg = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
             reg.SetValue("HD Tape And Reel Packing Vision", System.Windows.Forms.Application.ExecutablePath.ToString());
         }
@@ -210,7 +209,6 @@ namespace TapeReelPacking.Source.Application
             nameUserDefault = "Name=" + UserDefault;
             levelUserDefault = "Level=" + LevelDefault;
             pwsUserDefault = "Pswd=" + PwsDefault;
-
         }
 
         public static string GetCommInfo(string key, string defaults)

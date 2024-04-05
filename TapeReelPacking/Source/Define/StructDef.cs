@@ -222,7 +222,7 @@ namespace TapeReelPacking.Source.Define
         }
 
 
-        public static void ReadTotalLotFromExcel(string strLotID, int nTrack, ref int nLot, ref int nNumberOfDevices)
+        public static void ReadTotalLotFromExcel(string strLotID, int nTrack, ref int nLot, ref int nNumberOfDevices, ref string strLastLot)
         {
             nLot = 0;
             nNumberOfDevices = 0;
@@ -267,10 +267,11 @@ namespace TapeReelPacking.Source.Define
                     int rowCount = worksheet.Dimension.Rows;
                     for (int row = 5; row <= rowCount; row++)
                     {
-                        var valueTemp = worksheet.Cells[row, 1].Value;
+                        var valueTemp = worksheet.Cells[row, 2].Value;
                         if (valueTemp != null)
                         {
                             nLot++;
+                            strLastLot = valueTemp.ToString();
                         }
                         valueTemp = worksheet.Cells[row, 5].Value;
                         if (valueTemp != null)

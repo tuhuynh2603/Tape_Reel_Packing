@@ -53,9 +53,22 @@
             </Grid>
 
             <Grid Height="25" VerticalAlignment="Top">
-                <Button x:Name="btn_Connect" Content="Connect" Command="{Binding btn_ConnectSerial_Click}"></Button>
-            </Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
 
+                <Button Grid.Column="0"  x:Name="btn_Disconnect" Content="Disconnect" Command="{Binding btn_DisconnectSerial_Click}"></Button>
+                <Button Grid.Column="1" x:Name="btn_Connect" Content="Connect" Command="{Binding btn_ConnectSerial_Click}"></Button>
+
+            </Grid>
+            
+            <Grid Height="45" VerticalAlignment="Top">
+
+                <Button Background="LightYellow" Margin="5" Grid.Column="0"  x:Name="btn_SendLastLot" Content="Send Last Lot To PID" IsEnabled="{Binding bSendLotEnable}" Command="{Binding btn_SendLastLot_Click}"></Button>
+
+            </Grid>
+            
         </StackPanel>
         <StackPanel Grid.Column="1">
             <Grid VerticalAlignment="Top">

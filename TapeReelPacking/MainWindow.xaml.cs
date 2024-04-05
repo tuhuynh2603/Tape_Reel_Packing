@@ -1789,6 +1789,8 @@ namespace TapeReelPacking
         {
             if (bShow)
             {
+                CleanHotKey();
+
                 Source.Application.Application.loginUser.AssignMainWindow();
                 tt_DialogSettings.X = 0;
                 tt_DialogSettings.Y = 0;
@@ -1804,6 +1806,8 @@ namespace TapeReelPacking
             }
             else
             {
+                AddHotKey();
+
                 grd_PopupDialog.Children.Clear();
                 grd_PopupDialog.Visibility = Visibility.Collapsed;
                 grd_Dialog_Settings.Visibility = Visibility.Collapsed;

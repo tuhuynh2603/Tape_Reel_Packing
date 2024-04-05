@@ -878,12 +878,47 @@ namespace TapeReelPacking.Source.Application
                 }
 
                 //m_CreateNewLotStatus = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT); //  HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CREATE_NEW_LOT);
+                
+                
                 m_CreateNewLotStatus = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT);
                 if (m_CreateNewLotStatus == 1 && bCreateNewLotStatus_Backup != m_CreateNewLotStatus)  /*(m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT) > 0)*/
                 {
+
                     int[] va = { 0, 1 };
                     m_plcComm.WritePLCMultiRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT, va);
-                    //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT_ACK, 1);
+                    bCreateNewLotStatus_Backup = m_CreateNewLotStatus;
+
+                    SerialCommunication.WriteData("STATUS_PID");
+                    SerialCommunication.m_SerialDataReceivedEvent.Reset();
+                    if (SerialCommunication.m_SerialDataReceivedEvent.WaitOne(5000) == false)
+                    {
+
+                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("TimeOut when reading data from PID! Please check the PID machine status before running sequence", (int)ERROR_CODE.LABEL_FAIL);
+                        });
+
+                        WaitForNextStepSequenceEvent("TimeOut when reading data from PID! Please check the PID machine status before running sequence", true);
+                        continue;
+                    }
+
+                    string strReceived_ACK = SerialCommunication.ReadData();
+                    if (strReceived_ACK.Contains("STATUS_ERROR"))
+                    {
+
+
+                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"{strReceived_ACK}. Please check the PID machine status before running sequence", (int)ERROR_CODE.LABEL_FAIL);
+                        });
+
+                        WaitForNextStepSequenceEvent("STATUS_ERROR. Please check the PID machine status before running sequence", true);
+                        continue;
+                    }
+
+
+
+                    
 
                     m_IsLastChipStatus = 0;
                     LogMessage.LogMessage.WriteToDebugViewer(9, $"Reset Lot");
@@ -1121,131 +1156,188 @@ namespace TapeReelPacking.Source.Application
             //int nRepeat = 0;
             if (m_CompletedReelStatus == 1)
             {
-                //SendDataToClient:
-                //if (nRepeat < 5)
-                //{
 
-                //    WaitForNextStepSequenceEvent("Send Reel Data To Client Failed! Please Check the Connection. End Sequence...", true);
-                //    return;
-                //}
+                sendLastLotDataToPID();
+            }
+        }
 
-                List<VisionResultDataExcel> list_BarcodeResult = new List<VisionResultDataExcel>();
-                LotBarcodeDataTable.ReadLotResultFromExcel(Application.m_strCurrentLot, ref list_BarcodeResult);
-                string strDataSend = LotBarcodeDataTable.CombineReelIDStringSentToClient(ref list_BarcodeResult);
-                SerialCommunication.m_SerialDataReceivedEvent.Reset();
-                SerialCommunication.WriteData(strDataSend);
-                while (SerialCommunication.m_SerialDataReceivedEvent.WaitOne(100) == false)
+
+        public void sendLastLotDataToPID()
+        {
+            List<VisionResultDataExcel> list_BarcodeResult = new List<VisionResultDataExcel>();
+            LotBarcodeDataTable.ReadLotResultFromExcel(Application.m_strCurrentLot, ref list_BarcodeResult);
+            string strDataSend = LotBarcodeDataTable.CombineReelIDStringSentToClient(ref list_BarcodeResult, Application.m_strCurrentLot);
+            int nError = SendAndReceiveAndCheckDataFromPID(strDataSend);
+            if (nError == -1)
+                return;
+
+            int nTotalDevice = 0;
+            string strLastLot = "";
+            VisionResultData.ReadTotalLotFromExcel(Application.m_strCurrentLot, 1, ref m_nTotalCompletedLot, ref nTotalDevice, ref strLastLot);
+
+            if (strLastLot == Application.m_strCurrentLot)
+                return;
+
+            m_nTotalCompletedLot++;
+            VisionResultData.SaveTotalLotToExcel(Application.m_strCurrentLot, 1, m_nTotalCompletedLot, startLot_dateTime.ToString(), list_BarcodeResult.Count);
+        }
+
+        public int SendAndReceiveAndCheckDataFromPID(string strDataSend)
+        {
+
+            SerialCommunication.m_SerialDataReceivedEvent.Reset();
+        SendDataToClient:
+
+            SerialCommunication.WriteData(strDataSend);
+
+            int nTimeout = 0;
+            while (SerialCommunication.m_SerialDataReceivedEvent.WaitOne(100) == false)
+            {
+                if (m_bMachineNotReadyNeedToReset)
                 {
-                    if (m_bMachineNotReadyNeedToReset)
-                    {
-                        m_bRobotSequenceStatus = false;
-                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                        {
-                            MainWindow.mainWindow.btn_run_sequence.IsChecked = false;
-                            MainWindow.mainWindow.m_bSequenceRunning = false;
-                        });
-                        return;
-                    }
-                }
-
-                SerialCommunication.m_SerialDataReceivedEvent.Reset();
-                // Check whether data sent and received are same or not
-                string[] strReceived = SerialCommunication.ReadData().Split('_');
-                if (strReceived.Length < 1)
-                {
-                    WaitForNextStepSequenceEvent("Send Reel Data To Client Failed! Please Check the Connection.", true);
-
+                    m_bRobotSequenceStatus = false;
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("PLC Button Run is pressed. Restarting the Robot sequence....", (int)ERROR_CODE.LABEL_FAIL);
+                        MainWindow.mainWindow.btn_run_sequence.IsChecked = false;
+                        MainWindow.mainWindow.m_bSequenceRunning = false;
                     });
-
-                    return;
+                    return -1;
                 }
 
-
-                string[] strRe = strReceived[0].Split(',');
-                string[] strSend = strDataSend.Split(',');
-
-                for (int n = 0; n < strDataSend.Split(',').Length; n++)
+                nTimeout += 100;
+                MainWindow.mainWindow.PopupWarningMessageBox("Waiting 'ReelData,N,LotID_OK//Error' from PID...", WARNINGMESSAGE.MESSAGE_INFORMATION);
+                if (nTimeout >= 5000)
                 {
-                    if (strRe.Length <= n)
-                        break;
-                    LogMessage.LogMessage.WriteToDebugViewer(1, $"Send - Received: {strSend[n]}     {strRe[n]}");
+                    nTimeout = 0;
+                    string strString = "Timeout when Reading Data from PID. Press 'Continue' to resend or 'Abort' to end sequence.";
+                    int nSelect = WaitForNextStepSequenceEvent(strString, true);
+                    if (nSelect == (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE)
+                        goto SendDataToClient;
+                    else
+                        return -1;
                 }
-
-                if (strReceived[0] != strDataSend)
-                {
-
-                    WaitForNextStepSequenceEvent("Mismatching Data Between Client And TR Machine Failed! Please Check the Connection.", true);
-
-                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Mismatching Data Between Client And TR Machine Failed! Please Check the Connection.", (int)ERROR_CODE.LABEL_FAIL);
-                    });
-
-                    return;
-                    //nRepeat++;
-                    //goto SendDataToClient;
-                }
-
-                if (strReceived[1].Contains("OK") == false)
-                {
-                    WaitForNextStepSequenceEvent("Received Reel_Error From Client. End Sequence.", true);
-
-                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Received Reel_Error From Client. End Sequence.", (int)ERROR_CODE.LABEL_FAIL);
-                    });
-
-                    return;
-                    //nRepeat++;
-                    //goto SendDataToClient;
-                }
-
-                SerialCommunication.m_SerialDataReceivedEvent.Reset();
-                while (SerialCommunication.m_SerialDataReceivedEvent.WaitOne(100) == false)
-                {
-                    if (m_bMachineNotReadyNeedToReset)
-                    {
-                        m_bRobotSequenceStatus = false;
-                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                        {
-                            MainWindow.mainWindow.btn_run_sequence.IsChecked = false;
-                            MainWindow.mainWindow.m_bSequenceRunning = false;
-                        });
-                        return;
-                    }
-                }
-                SerialCommunication.m_SerialDataReceivedEvent.Reset();
-                string strReceived_ACK = SerialCommunication.ReadData();
-
-                if (strReceived_ACK.Contains("ACK") == false)
-                {
-                    WaitForNextStepSequenceEvent("Received ACK_Error From Client. End Sequence.", true);
-
-                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Received ACK_Error From Client. End Sequence.", (int)ERROR_CODE.LABEL_FAIL);
-                    });
-
-                    return;
-                    //nRepeat++;
-                    //goto SendDataToClient;
-                }
-
-                SerialCommunication.WriteData("ACK_OK");
-                int nTotalDevice = 0;
-                VisionResultData.ReadTotalLotFromExcel(Application.m_strCurrentLot, 1, ref m_nTotalCompletedLot, ref nTotalDevice);
-                m_nTotalCompletedLot++;
-                VisionResultData.SaveTotalLotToExcel(Application.m_strCurrentLot, 1, m_nTotalCompletedLot, startLot_dateTime.ToString(), list_BarcodeResult.Count);
-                
 
             }
+            MainWindow.mainWindow.PopupWarningMessageBox("Waiting 'ReelData,N,LotID_OK//Error' from PID...", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
+
+            SerialCommunication.m_SerialDataReceivedEvent.Reset();
+            // Check whether data sent and received are same or not
+            string[] strReceived = SerialCommunication.ReadData().Split('_');
+            if (strReceived.Length < 1)
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Data received from PID is wrong format. ", (int)ERROR_CODE.LABEL_FAIL);
+                });
+                SerialCommunication.WriteData("DATA_ERROR");
+                string strString = "Data received from PID is wrong format.  Press 'Continue' to resend or 'Abort' to end sequence.";
+                int nSelect = WaitForNextStepSequenceEvent(strString, true);
+                if (nSelect == (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE)
+                    goto SendDataToClient;
+                else
+                    return -1;
+            }
+
+
+            string[] strRe = strReceived[0].Split(',');
+            string[] strSend = strDataSend.Split(',');
+
+            for (int n = 0; n < strDataSend.Split(',').Length; n++)
+            {
+                if (strRe.Length <= n)
+                    break;
+                LogMessage.LogMessage.WriteToDebugViewer(1, $"Send - Received: {strSend[n]}     {strRe[n]}");
+            }
+
+            if (strReceived[0] != strDataSend)
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Mismatching Data Between Client And TR Machine Failed! Please Check the Connection.", (int)ERROR_CODE.LABEL_FAIL);
+                });
+                SerialCommunication.WriteData("DATA_ERROR");
+
+                string strString = "Mismatching Data Between PID and T&R. Press 'Continue' to resend or 'Abort' to end sequence.";
+                int nSelect = WaitForNextStepSequenceEvent(strString, true);
+
+                if (nSelect == (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE)
+                    goto SendDataToClient;
+
+                return -1;
+            }
+
+            if (strReceived[1].Contains("OK") == false)
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Received Error From PID.", (int)ERROR_CODE.LABEL_FAIL);
+                });
+
+                string strString = "Timeout when Reading Data from PID. Press 'Continue' to resend or 'Abort' to end sequence.";
+                int nSelect = WaitForNextStepSequenceEvent(strString, true);
+
+                if (nSelect == (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE)
+                    goto SendDataToClient;
+                return -1;
+            }
+
+
+            SerialCommunication.WriteData("DATA_OK");
+
+            SerialCommunication.m_SerialDataReceivedEvent.Reset();
+            nTimeout = 0;
+            while (SerialCommunication.m_SerialDataReceivedEvent.WaitOne(100) == false)
+            {
+                if (m_bMachineNotReadyNeedToReset)
+                {
+                    m_bRobotSequenceStatus = false;
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        MainWindow.mainWindow.btn_run_sequence.IsChecked = false;
+                        MainWindow.mainWindow.m_bSequenceRunning = false;
+                    });
+                    return -1;
+                }
+
+                MainWindow.mainWindow.PopupWarningMessageBox("Waiting 'ACK' from PID...", WARNINGMESSAGE.MESSAGE_INFORMATION);
+
+                nTimeout += 100;
+                if (nTimeout >= 50000)
+                {
+                    nTimeout = 0;
+
+                    string strString = "Timeout when Reading Data from PID. Press 'Continue' to resend or 'Abort' to end sequence.";
+                    int nSelect = WaitForNextStepSequenceEvent(strString, true);
+
+                    if (nSelect == (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE)
+                        goto SendDataToClient;
+                    else
+                        return -1;
+                }
+            }
+            MainWindow.mainWindow.PopupWarningMessageBox("Waiting 'ACK' from PID...", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
+
+            SerialCommunication.m_SerialDataReceivedEvent.Reset();
+            string strReceived_ACK = SerialCommunication.ReadData();
+
+            if (strReceived_ACK.Contains("ACK") == false)
+            {
+                string strString = "Received ACK_Error From Client. End Sequence. Please Check the PID machine then open Serial Communication Dialog to manually send lot data to PID.";
+                WaitForNextStepSequenceEvent(strString, true);
+                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+
+                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Received ACK_Error From Client. End Sequence.", (int)ERROR_CODE.LABEL_FAIL);
+                });
+
+                return -1;
+            }
+
+            //SerialCommunication.WriteData("ACK_OK");
+            return 0;
         }
 
 
@@ -1921,284 +2013,6 @@ namespace TapeReelPacking.Source.Application
         }
 
         public bool m_bBarcodeBusy = false;
-        void BarcodeReaderSequence()
-        {
-        startBarcodeSequence:
-            if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_AUTO)
-            {
-                HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_PASS, false);
-                HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_FAIL, false);
-            }
-            else
-            {
-                m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_RESULT_PASS, 0);
-                m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_RESULT_FAIL, 0);
-            }
-
-            //int nTimeout = 0;
-            Master.m_hardwareTriggerSnapEvent[1].Reset();
-            Master.m_EventInspectionOnlineThreadDone[1].Reset();
-            if (m_plcComm == null)
-                goto EndThread;
-
-
-
-            int nDeviceTemp = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_CURRENT_BARCODE_CHIP_COUNT);
-            if (nDeviceTemp > 0)
-                m_Tracks[1].m_CurrentSequenceDeviceID = nDeviceTemp - 1;
-
-            m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_READY, 1);
-
-            while (true/*MainWindow.mainWindow.m_bSequenceRunning*/)
-            {
-                if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_AUTO)
-                {
-                    LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Wait PLC Barcode Trigger {(int)INPUT_IOROBOT.PLC_BARCODE_TRIGGER}!");
-                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY, false);
-                    m_bBarcodeBusy = false;
-                    int nTimeOut = 0;
-                    while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_BARCODE_TRIGGER) != 1)
-                    {
-                        if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_MANUAL)
-                            goto startBarcodeSequence;
-
-                        if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
-                            goto EndThread;
-                        Thread.Sleep(30);
-                        nTimeOut++;
-                        if (nTimeOut > 10)
-                        {
-                            nTimeOut = 0;
-                            HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY, false);
-                        }
-                        //if (m_RunMachineStatus == 1)
-                        //{
-
-                        //    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                        //    {
-
-                        //        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("PLC Button Run is pressed. Restarting the Barcode sequence....", (int)ERROR_CODE.LABEL_FAIL);
-                        //    });
-                        //    Thread.Sleep(3000);
-                        //    goto startBarcodeSequence;
-                        //}
-
-                    }
-                }
-                else
-                {
-                    LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Wait PLC Barcode Trigger {(int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_TRIGGER}!");
-                    while (m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_TRIGGER) != 1)
-                    {
-                        if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
-                            goto EndThread;
-                        Thread.Sleep(100);
-                    }
-                    m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_TRIGGER, 0);
-                }
-
-
-                if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_AUTO)
-                {
-                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_PASS, false);
-                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_FAIL, false);
-                }
-                else
-                {
-                    int[] nvalue = { 0, 0 };
-                    m_plcComm.WritePLCMultiRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_RESULT_PASS, nvalue);
-
-
-                    //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_RESULT_PASS, 0);
-                    //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_RESULT_FAIL, 0);
-                }
-
-                //if (m_EmergencyStatus == 1)
-                //{
-                //    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                //    {
-                //        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Emergency! Barcode Reader Sequence Restart!", (int)ERROR_CODE.LABEL_FAIL);
-
-                //    });
-                //    Thread.Sleep(50);
-                //    continue;
-                //}
-
-                int nDeviceID = m_Tracks[1].m_CurrentSequenceDeviceID;
-
-                LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Set BARCODE_CAPTURE_BUSY {(int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY} ON ");
-                m_bBarcodeBusy = true;
-
-                if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_AUTO)
-                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY, true);
-                else
-                    m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_CAPTURE_BUSY, 1);
-
-                m_EventInspectionOnlineThreadDone[1].Reset();
-                m_hardwareTriggerSnapEvent[1].Set();
-                LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Waiting for vision done.... ");
-                int nVisionResult = m_Tracks[1].m_SequenceThreadVisionResult.m_nResult;
-                if (!m_EventInspectionOnlineThreadDone[1].WaitOne(2500))
-                {
-                    if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
-                        goto EndThread;
-                    m_hardwareTriggerSnapEvent[1].Reset();
-                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Reader: TIME OUT!", (int)ERROR_CODE.LABEL_FAIL);
-
-                    });
-
-                    RunOnlineSequenceThread(1);
-                    nVisionResult = -(int)ERROR_CODE.CAPTURE_FAIL;
-                }
-                else
-                    nVisionResult = m_Tracks[1].m_InspectionOnlineThreadVisionResult.m_nResult;
-
-                m_EventInspectionOnlineThreadDone[1].Reset();
-                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nDeviceIndexOnReel = nDeviceID;
-                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strDeviceID = m_Tracks[1].m_InspectionOnlineThreadVisionResult.m_strDeviceID;
-                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = nVisionResult;
-                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath = m_Tracks[1].m_InspectionOnlineThreadVisionResult.m_strFullImagePath;
-                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strDatetime = m_Tracks[1].m_InspectionOnlineThreadVisionResult.m_strDatetime;
-                //if (m_EmergencyStatus == 1)
-                //{
-                //    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                //    {
-                //        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Reader Sequence Ended!", (int)ERROR_CODE.LABEL_FAIL);
-
-                //    });
-                //    continue;
-
-                //}
-
-                LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Vision Done! ");
-
-                bool bFailSendToPLC = false;
-                if (nVisionResult != -(int)ERROR_CODE.PASS)
-                {
-
-                    bFailSendToPLC = true;
-                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Reader: Result FAILED!", (int)ERROR_CODE.LABEL_FAIL);
-
-                    });
-                }
-
-                LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Send result to PLC {(int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_RESULT}  . Result: {bFailSendToPLC} ");
-                m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_RESULT, nVisionResult);
-
-                if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_AUTO)
-                {
-                    int nSttusss = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_BARCODE_TRIGGER);
-                    if (nSttusss > 1)
-                    {
-                        LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Robot Disconnect. Input {(int)INPUT_IOROBOT.PLC_BARCODE_TRIGGER}  status = {nSttusss} ");
-                        Thread.Sleep(1000);
-                        goto startBarcodeSequence;
-                    }
-                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_PASS, !bFailSendToPLC);
-                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_RESULT_FAIL, bFailSendToPLC);
-                    HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.BARCODE_CAPTURE_BUSY, false);
-
-
-                }
-                else
-                {
-                    m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_RESULT_PASS, bFailSendToPLC == false ? 1 : 0);
-                    m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_RESULT_FAIL, bFailSendToPLC == false ? 0 : 1);
-                    m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_CAPTURE_BUSY, 0);
-                }
-
-
-                LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Send result to PLC Done {(int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_RESULT}  . Result: {bFailSendToPLC} ");
-
-                //LogMessage.LogMessage.WriteToDebugViewer(8, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-                if (MainWindow.mainWindow.m_bSequenceRunning || m_SequenceMode == (int)SEQUENCE_MODE.MODE_MANUAL)
-                {
-
-                    if (nVisionResult == -(int)ERROR_CODE.PASS)
-                    {
-
-                        m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = nVisionResult;
-
-                        lock (m_UpdateResultQueue)
-                        {
-                            m_UpdateResultQueue[1].Enqueue(m_Tracks[1].m_VisionResultDatas[nDeviceID]);
-                        }
-
-
-
-                        int nAbleCout;
-                        if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_MANUAL)
-                        {
-                            nAbleCout = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_COUNT);
-                        }
-                        else
-                        {
-                            nAbleCout = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_BARCODE_COUNT);
-                        }
-                        int nTimeOut = 0;
-                        while (nAbleCout != 1)
-                        {
-                            if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_MANUAL)
-                            {
-                                nAbleCout = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_COUNT);
-                            }
-                            else
-                            {
-                                nAbleCout = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_BARCODE_COUNT);
-                            }
-
-                            Thread.Sleep(50);
-                            nTimeOut++;
-                            if (nTimeOut > 50)
-                            {
-                                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                                {
-                                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Barcode Reader: Get Count Signal Failed !", (int)ERROR_CODE.LABEL_FAIL);
-
-                                });
-
-                                nVisionResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
-                                break;
-                            }
-                        }
-                    }
-
-                    m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = nVisionResult;
-                    // If disconnect during save data, set at fail
-                    if (m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult != -(int)ERROR_CODE.PASS)
-                    {
-                        string strFullPathImageOut = m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath;
-                        string strFailImage = strFullPathImageOut.Replace("PASS IMAGE", "FAIL IMAGE");
-                        if (File.Exists(strFullPathImageOut) && !File.Exists(strFailImage))
-                            File.Move(strFullPathImageOut, strFailImage);
-                        m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath = strFailImage;
-
-                        lock (m_UpdateResultQueue)
-                        {
-                            m_UpdateResultQueue[1].Enqueue(m_Tracks[1].m_VisionResultDatas[nDeviceID]);
-                        }
-
-                    }
-
-                    if (m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult == -(int)ERROR_CODE.PASS)
-                    {
-
-                        m_Tracks[1].m_CurrentSequenceDeviceID++;
-                    }
-                }
-                LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Scan Done!");
-
-            }
-
-        EndThread:
-            LogMessage.LogMessage.WriteToDebugViewer(1, $"BarCodeReaderSequence Thread Released");
-
-        }
-
         void BarcodeReaderSequence_New()
         {
         startBarcodeSequence:

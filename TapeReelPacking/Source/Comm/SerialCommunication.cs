@@ -82,6 +82,26 @@ namespace TapeReelPacking.Source.Comm
 
         }
 
+        public void Disconnect()
+        {
+            if (m_serialPort == null)
+                return;
+
+            if (m_serialPort.IsOpen)
+                m_serialPort.Close();
+
+            if (System.Windows.Application.Current == null)
+                return;
+
+
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                MainWindow.mainWindow.label_Serial_Comm.Background = new SolidColorBrush(Colors.Red);
+                MainWindow.mainWindow.label_Serial_Comm.Foreground = new SolidColorBrush(Colors.Black);
+            });
+
+        }
+
         public void ReadThread_Fcn()
         {
             char read;
@@ -134,7 +154,6 @@ namespace TapeReelPacking.Source.Comm
 
             }
             LogMessage.LogMessage.WriteToDebugViewer(1, "ReadThread_Fcn Endded");
-
         }
 
         public static string ReadData()
@@ -152,10 +171,13 @@ namespace TapeReelPacking.Source.Comm
         {
             //for (int n = 0; n < 1000; n++)
             //    strText += "234444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444fsdgdrgsrgrgdrggggggggggggggg";
-
-            LogMessage.LogMessage.WriteToDebugViewer(1, $"write { strText }");
-
-            strText += "\n";
+            if (!m_serialPort.IsOpen)
+            {
+                LogMessage.LogMessage.WriteToDebugViewer(1, $"Connection Failed! Serial COMM {m_serialPort.PortName} ");
+                return;
+            }
+            LogMessage.LogMessage.WriteToDebugViewer(1, $"Serial COMM {m_serialPort.PortName} Write: {strText} ");
+            //strText += "\n";
             m_serialPort.WriteLine(strText);
         }
 

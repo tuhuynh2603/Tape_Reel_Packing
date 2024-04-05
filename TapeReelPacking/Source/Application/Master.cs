@@ -884,10 +884,10 @@ namespace TapeReelPacking.Source.Application
                 if (m_CreateNewLotStatus == 1 && bCreateNewLotStatus_Backup != m_CreateNewLotStatus)  /*(m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT) > 0)*/
                 {
 
-                    int[] va = { 0, 1 };
-                    m_plcComm.WritePLCMultiRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT, va);
-                    bCreateNewLotStatus_Backup = m_CreateNewLotStatus;
+                    m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT, 0);
 
+                    bCreateNewLotStatus_Backup = m_CreateNewLotStatus;
+                    
                     SerialCommunication.WriteData("STATUS_PID");
                     SerialCommunication.m_SerialDataReceivedEvent.Reset();
                     if (SerialCommunication.m_SerialDataReceivedEvent.WaitOne(5000) == false)
@@ -981,7 +981,8 @@ namespace TapeReelPacking.Source.Application
                             MessageBox.Show("Please KeyIn the Lot ID (on the top) then press Continue");
                         }
                     });
-                    //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT, 0);
+                    m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT_ACK, 1);
+
                     Thread.Sleep(250);
 
                     //m_CreateNewLotStatus = 0;

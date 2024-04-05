@@ -129,7 +129,7 @@ namespace TapeReelPacking.Source.Comm
                                         {
                                             strReadString = strTemp;
                                             strTemp = "";
-                                            LogMessage.LogMessage.WriteToDebugViewer(1, strReadString);
+                                            //LogMessage.LogMessage.WriteToDebugViewer(1, strReadString);
                                             if (strReadString.Length > 0)
                                                 m_SerialDataReceivedEvent.Set();
                                         }

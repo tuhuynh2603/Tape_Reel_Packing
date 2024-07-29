@@ -682,7 +682,7 @@ namespace TapeReelPacking.Source.Application
 
                 Thread.Sleep(50);
 
-                if (m_SequenceMode == (int)(SEQUENCE_MODE.MODE_MANUAL))
+                if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_MANUAL)
                 {
                     if (HiWinRobotInterface.m_RobotConnectID >= 0)
                     {
@@ -887,7 +887,18 @@ namespace TapeReelPacking.Source.Application
                     m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT, 0);
 
                     bCreateNewLotStatus_Backup = m_CreateNewLotStatus;
-                    
+
+
+                    if (m_IsPIDSentStatus)
+                    {
+
+                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Busy when sending lot data to PID machine, cannot create lot!!!", (int)ERROR_CODE.LABEL_FAIL);
+                        });
+                        continue;
+                    }
+
                     SerialCommunication.WriteData("STATUS_PID");
                     SerialCommunication.m_SerialDataReceivedEvent.Reset();
                     if (SerialCommunication.m_SerialDataReceivedEvent.WaitOne(5000) == false)
@@ -1022,7 +1033,6 @@ namespace TapeReelPacking.Source.Application
                     if (m_EmergencyStatus == 1 || m_ImidiateStatus == 1)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
                 }
-
             }
             else if (bPopUpInformation)
             {
@@ -1162,25 +1172,33 @@ namespace TapeReelPacking.Source.Application
             }
         }
 
-
+        bool m_IsPIDSentStatus = false;
         public void sendLastLotDataToPID()
         {
+            m_IsPIDSentStatus = true;
             List<VisionResultDataExcel> list_BarcodeResult = new List<VisionResultDataExcel>();
             LotBarcodeDataTable.ReadLotResultFromExcel(Application.m_strCurrentLot, ref list_BarcodeResult);
             string strDataSend = LotBarcodeDataTable.CombineReelIDStringSentToClient(ref list_BarcodeResult, Application.m_strCurrentLot);
             int nError = SendAndReceiveAndCheckDataFromPID(strDataSend);
             if (nError == -1)
+            {
+                m_IsPIDSentStatus = false;
                 return;
+            }
 
             int nTotalDevice = 0;
             string strLastLot = "";
             VisionResultData.ReadTotalLotFromExcel(Application.m_strCurrentLot, 1, ref m_nTotalCompletedLot, ref nTotalDevice, ref strLastLot);
 
             if (strLastLot == Application.m_strCurrentLot)
+            {
+                m_IsPIDSentStatus = false;
                 return;
+            }
 
             m_nTotalCompletedLot++;
             VisionResultData.SaveTotalLotToExcel(Application.m_strCurrentLot, 1, m_nTotalCompletedLot, startLot_dateTime.ToString(), list_BarcodeResult.Count);
+            m_IsPIDSentStatus = false;
         }
 
         public int SendAndReceiveAndCheckDataFromPID(string strDataSend)
@@ -2403,7 +2421,14 @@ namespace TapeReelPacking.Source.Application
                     if (data.m_nResult == -(int)ERROR_CODE.NOT_INSPECTED)
                         continue;
 
-                    VisionResultData.SaveSequenceResultToExcel(Application.m_strCurrentLot, nTrack, data, data.bIsTotal);
+                    saveExcel:
+                    int nEror = VisionResultData.SaveSequenceResultToExcel(Application.m_strCurrentLot, nTrack, data, data.bIsTotal);
+                    if (nEror == -1)
+                    {
+                        Thread.Sleep(500);
+                        goto saveExcel;
+                    }
+
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
                         MainWindow.mainWindow.m_staticView.UpdateMappingResult(data, nTrack, data.m_nDeviceIndexOnReel);

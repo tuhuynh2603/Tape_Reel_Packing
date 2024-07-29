@@ -64,7 +64,8 @@
                 <FlowDocumentScrollViewer x:Name="flowDocumentSVOutputlog" Background="Transparent"
                                       Foreground="#FF9D4242" 
                                       SelectionBrush="#FF4092D3" 
-                                      BorderBrush="Transparent">
+                                      BorderBrush="Transparent"
+                                      >
                     <FlowDocument x:Name="outputLog" Foreground="White" PagePadding="5"
                                   Background="Transparent"
                                   FontFamily="Microsoft New Tai Lue"

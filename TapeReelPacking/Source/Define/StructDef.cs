@@ -398,8 +398,9 @@ namespace TapeReelPacking.Source.Define
         }
 
 
-        public static void SaveSequenceResultToExcel(string strLotID, int nTrack, VisionResultData data, bool bTotal = false)
+        public static int SaveSequenceResultToExcel(string strLotID, int nTrack, VisionResultData data, bool bTotal = false)
         {
+
             string strFileName = strLotID;
             string strStartLotDay = strLotID.Split('_')[0];
 
@@ -482,13 +483,15 @@ namespace TapeReelPacking.Source.Define
             {
 
                 LogMessage.LogMessage.WriteToDebugViewer(7 + nTrack, $"Save To Excel Failed! {e}");
-
+                return -1;
                 //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 //{
 
                 //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Track{nTrack} Save To Excel Fail {e}!.", (int)ERROR_CODE.LABEL_FAIL);
                 //});
             }
+
+            return 0;
         }
 
         public static void ReadLotResultFromExcel(string strLotID, int nTrack, ref VisionResultData[] result, ref int nCurrentDeviceID, bool bIsTotal = false)

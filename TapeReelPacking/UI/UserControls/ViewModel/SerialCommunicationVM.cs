@@ -98,7 +98,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         private string _txt_DataReadString;
         public string txt_DataReadString
         {
-            get { return _txt_DataReadString; }
+            get =>_txt_DataReadString;
             set
             {
                 _txt_DataReadString = value;

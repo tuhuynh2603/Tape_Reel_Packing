@@ -147,6 +147,8 @@ namespace TapeReelPacking.Source.Hardware
 			{
 				strDeviceID = resp.Replace("\r", "");
 				strDeviceID = strDeviceID.Replace(":", "");
+				strDeviceID = strDeviceID.Replace("-", "");
+
 			}
 
 			LogMessage.WriteToDebugViewer(3, "Message responsed from Barcode Bank 1: " + strDeviceID);

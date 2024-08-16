@@ -136,20 +136,20 @@ namespace TapeReelPacking.UI.UserControls
         public void ContinueSequenceButtonClicked(WARNINGMESSAGE nWarningMessges)
         {
 
-            if (MainWindow.mainWindow.master.m_EmergencyStatus == 1)
+            if (RobotIOStatus.m_EmergencyStatus == 1)
                 return;
 
             Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
             MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
-            if(MainWindow.mainWindow.master.m_ImidiateStatus_Simulate == 1)
-                MainWindow.mainWindow.master.m_ImidiateStatus_Simulate = 0;
+            if(RobotIOStatus.m_ImidiateStatus_Simulate == 1)
+                RobotIOStatus.m_ImidiateStatus_Simulate = 0;
             MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE;
-            MainWindow.mainWindow.master.m_bNeedToImidiateStop = false;
+                Master.m_bNeedToImidiateStop = false;
             Thread.Sleep(500);
             Master.m_NextStepSequenceEvent.Set();
 
 
-            //if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
+            //if (MainWindow.mainWindow.master.RobotIOStatus.m_ImidiateStatus + MainWindow.mainWindow.master.RobotIOStatus.m_EmergencyStatus > 0)
             //    return;
 
             //Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
@@ -169,7 +169,7 @@ namespace TapeReelPacking.UI.UserControls
 
         private void btn_Sequence_Abort_Click(object sender, RoutedEventArgs e)
         {
-            if (MainWindow.mainWindow.master.m_EmergencyStatus == 1)
+            if (Master.RobotIOStatus.m_EmergencyStatus == 1)
                 return;
 
             MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
@@ -182,7 +182,7 @@ namespace TapeReelPacking.UI.UserControls
 
         private void btn_Sequence_Previous_Click(object sender, RoutedEventArgs e)
         {
-            //if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
+            //if (MainWindow.mainWindow.master.RobotIOStatus.m_ImidiateStatus + MainWindow.mainWindow.master.RobotIOStatus.m_EmergencyStatus > 0)
             //    return;
 
             //Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
@@ -196,7 +196,7 @@ namespace TapeReelPacking.UI.UserControls
 
         private void btn_Sequence_Next_Click(object sender, RoutedEventArgs e)
         {
-            if (MainWindow.mainWindow.master.m_EmergencyStatus == 1)
+            if (Master.RobotIOStatus.m_EmergencyStatus == 1)
                 return;
 
             Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
@@ -210,7 +210,7 @@ namespace TapeReelPacking.UI.UserControls
 
         private void btn_Retry_Current_Step_Click(object sender, RoutedEventArgs e)
         {
-            //if (MainWindow.mainWindow.master.m_ImidiateStatus + MainWindow.mainWindow.master.m_EmergencyStatus > 0)
+            //if (MainWindow.mainWindow.master.RobotIOStatus.m_ImidiateStatus + MainWindow.mainWindow.master.RobotIOStatus.m_EmergencyStatus > 0)
             //    return;
 
             //MainWindow.mainWindow.master.m_bNeedToImidiateStop = false;

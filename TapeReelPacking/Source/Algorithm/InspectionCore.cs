@@ -869,27 +869,50 @@ namespace TapeReelPacking.Source.Algorithm
                 while (true)
                 {
                     timeIns.Restart();
-                    mat_BiggestInnerChipRegion = new CvImage();
-                    MagnusOpenCVLib.SelectBiggestRegion(ref mat_InnerChipOpeningRegion, ref mat_BiggestInnerChipRegion);
-                    PushBackDebugInfors(imgSource, mat_BiggestInnerChipRegion, "Inner Chip Region after select BiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
-                    timeIns.Restart();
+                    CvImage mat_BiggestInnerChipRegion_temp = new CvImage();
+                    MagnusOpenCVLib.SelectBiggestRegion(ref mat_InnerChipOpeningRegion, ref mat_BiggestInnerChipRegion_temp);
+                    PushBackDebugInfors(imgSource, mat_BiggestInnerChipRegion_temp, "Inner Chip Region after select BiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                    
 
-                    CvInvoke.FindNonZero(mat_BiggestInnerChipRegion, point_regions);
+                   // Find none zero first, if zero => return
+                    CvInvoke.FindNonZero(mat_BiggestInnerChipRegion_temp, point_regions);
                     if (point_regions.Size == 0)
                         break;
                     /////////////
-                    CvContourArray contours = new CvContourArray();
-                    MagnusOpenCVLib.GenContourRegion(ref mat_BiggestInnerChipRegion, ref contours, RetrType.External);
-                    rotateRect_Device = CvInvoke.MinAreaRect(contours[0]);
+                    CvContourArray contours_temp = new CvContourArray();
+                    MagnusOpenCVLib.GenContourRegion(ref mat_BiggestInnerChipRegion_temp, ref contours_temp, RetrType.External);
+                    rotateRect_Device = CvInvoke.MinAreaRect(contours_temp[0]);
 
+                    // Check Size of Region, if small => return because biggest region small => all smaller will small :V
                     if (rotateRect_Device.Size.Width < (int)(m_DeviceLocationParameter.m_L_MinWidthDevice * m_DeviceLocationParameter.m_L_ScaleImageRatio)
                         || rotateRect_Device.Size.Height < (int)(m_DeviceLocationParameter.m_L_MinHeightDevice * m_DeviceLocationParameter.m_L_ScaleImageRatio))
                         break;
 
 
-                    CvInvoke.BitwiseXor(mat_InnerChipOpeningRegion, mat_BiggestInnerChipRegion, mat_InnerChipOpeningRegion);
+                    // Openning to remove the noise on conveyor
+                    timeIns.Restart();
+                    mat_BiggestInnerChipRegion = new CvImage();
+                    MagnusOpenCVLib.OpenningCircle_Magnus(ref mat_BiggestInnerChipRegion_temp, ref mat_BiggestInnerChipRegion, (int)(m_DeviceLocationParameter.m_L_MinWidthDevice * m_DeviceLocationParameter.m_L_ScaleImageRatio / 4));
+                    PushBackDebugInfors(imgSource, mat_BiggestInnerChipRegion, "biggest Chip Region after opening. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                    timeIns.Restart();
+
+
+                    CvInvoke.BitwiseXor(mat_InnerChipOpeningRegion, mat_BiggestInnerChipRegion_temp, mat_InnerChipOpeningRegion);
                     PushBackDebugInfors(imgSource, mat_InnerChipOpeningRegion, "Inner Chip Region after Remove Biggest region. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
                     timeIns.Restart();
+
+
+                    CvInvoke.FindNonZero(mat_BiggestInnerChipRegion, point_regions);
+                    if (point_regions.Size == 0)
+                        continue;
+
+                    // Get smallest 
+                    CvContourArray contours = new CvContourArray();
+                    MagnusOpenCVLib.GenContourRegion(ref mat_BiggestInnerChipRegion, ref contours, RetrType.External);
+                    rotateRect_Device = CvInvoke.MinAreaRect(contours[0]);
+
+
+
                     if (Math.Abs(rotateRect_Device.Size.Width / rotateRect_Device.Size.Height - m_DeviceLocationParameter.m_L_TemplateRoi.Width / m_DeviceLocationParameter.m_L_TemplateRoi.Height) > 0.2)
                         continue;
 
@@ -1168,6 +1191,8 @@ namespace TapeReelPacking.Source.Algorithm
                     minDistance = distance_Square;
                 }
             }
+            PushBackDebugInfors(imgSourceInput, mat_CornerBiggestRegion, $"Corner Chip {pCornerOut.X}, {pCornerOut.Y} Region after SelectBiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            timeIns.Restart();
 
             pCornerOut = points[nminIndex];
             return 0;
@@ -1200,6 +1225,9 @@ namespace TapeReelPacking.Source.Algorithm
 
             double dDeltaAngle = Track.MagnusMatrix.CalculateShiftXYAngle(pCenter, pCorner, pCenterTeach, pCornerTeach);
 
+            PushBackDebugInfors(imgSourceInput, imgSourceInput, $"pCorner {pCorner.X}, {pCorner.Y}, pCornerTeach {pCornerTeach.X}, {pCornerTeach.Y}", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, imgSourceInput, $"pCenter {pCenter.X}, {pCenter.Y}, pCenterTeach {pCenterTeach.X},  {pCenterTeach.Y}", bEnableDebug, ref debugInfors);
+            
             double fShiftX = pCenter.X - m_DeviceLocationResult.m_dCenterDevicePoint.X * dScale;
             double fShiftY = pCenter.Y - m_DeviceLocationResult.m_dCenterDevicePoint.Y * dScale;
 

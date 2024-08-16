@@ -171,6 +171,7 @@
     <Compile Include="TeachParametersUC.xaml.cs">
       <DependentUpon>TeachParametersUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\UserControls\ViewModel\TeachParameterVM.cs" />
     <Compile Include="UI\CommandBase.cs" />
     <Compile Include="UI\UserControls\DefectInfor.xaml.cs">
       <DependentUpon>DefectInfor.xaml</DependentUpon>

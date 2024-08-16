@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
+using TapeReelPacking.UI.UserControls.ViewModel;
 
 namespace TapeReelPacking.Source.Application
 {
@@ -21,7 +22,7 @@ namespace TapeReelPacking.Source.Application
         public static int m_nDoc = 1;
         public static bool m_bEnableSavingOnlineImage = false;
 
-        public static TeachParametersUC.CategoryTeachParameter categoriesTeachParam = new TeachParametersUC.CategoryTeachParameter();
+        public static TeachParameterVM.CategoryTeachParameter categoriesTeachParam = new TeachParameterVM.CategoryTeachParameter();
         //public static TeachParametersUC.CategoryAreaParameter categoryAreaParam = new TeachParametersUC.CategoryAreaParameter();
 
         public static MappingSetingUC.CatergoryMappingParameters categoriesMappingParam = new MappingSetingUC.CatergoryMappingParameters();
@@ -347,7 +348,7 @@ namespace TapeReelPacking.Source.Application
 
         }
 
-        public static void LoadAreaParamFromFileToDict(ref int nTrack, int nAreaIndex = TOTAL_AREA)
+        public static void LoadAreaParamFromFileToDict(int nTrack, int nAreaIndex = TOTAL_AREA)
         {
             if (currentRecipe == null || pathRecipe == null)
                 return;
@@ -421,7 +422,7 @@ namespace TapeReelPacking.Source.Application
         }
 
 
-        public static void LoadTeachParamFromFileToDict(ref int nTrack)
+        public static void LoadTeachParamFromFileToDict(int nTrack)
         {
             if (currentRecipe == null || pathRecipe == null)
                 return;

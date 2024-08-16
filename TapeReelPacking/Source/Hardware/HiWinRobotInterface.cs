@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using LicenseContext = OfficeOpenXml.LicenseContext;
+using TapeReelPacking.Source.Application;
 
 namespace TapeReelPacking.Source.Hardware.SDKHrobot
 {
@@ -832,7 +833,7 @@ namespace TapeReelPacking.Source.Hardware.SDKHrobot
                     continue;
                 }
 
-                if (MainWindow.mainWindow.master.m_SequenceMode == (int)SEQUENCE_MODE.MODE_MANUAL)
+                if (Master.m_SequenceMode == (int)SEQUENCE_MODE.MODE_MANUAL)
                 {
                     Thread.Sleep(1000);
                     continue;
@@ -1030,7 +1031,7 @@ namespace TapeReelPacking.Source.Hardware.SDKHrobot
                 //LogMessage.LogMessage.WriteToDebugViewer(3, $"{nState} ");
 
                 //}
-                if (MainWindow.mainWindow.master.m_EmergencyStatus == 1 || MainWindow.mainWindow.master.m_bNeedToImidiateStop || HWinRobot.get_motor_state(HiWinRobotInterface.m_RobotConnectID) < 1)
+                if (Master.RobotIOStatus.m_EmergencyStatus == 1 || Master.m_bNeedToImidiateStop || HWinRobot.get_motor_state(HiWinRobotInterface.m_RobotConnectID) < 1)
                 {
                     Thread.Sleep(500);
                     return 0;

@@ -8,7 +8,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:TapeReelPacking"
         xmlns:view="clr-namespace:TapeReelPacking.UI.UserControls.View" 
-        xmlns:taskmanager="clr-namespace:TapeReelPacking.UI.UserControls"
+        xmlns:taskmanager="clr-namespace:TapeReelPacking.UI.UserControls" xmlns:viewmodel="clr-namespace:TapeReelPacking.UI.UserControls.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:TitleBarVM}"
         mc:Ignorable="d"
         d:DesignHeight="900" d:DesignWidth="1600"
         WindowState="Maximized" WindowStyle="None"

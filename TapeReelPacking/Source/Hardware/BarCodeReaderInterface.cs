@@ -156,7 +156,7 @@ namespace TapeReelPacking.Source.Hardware
 			//if (resp2.Length > 0)
 			//{
 			//	str2 = resp2.Replace("\r", "");
-			//}
+			//}// 008F00000D0004D1
 			Thread.Sleep(250);
 			int nResult = -(int)ERROR_CODE.PASS;
 			if(strDeviceID.Length < 1)

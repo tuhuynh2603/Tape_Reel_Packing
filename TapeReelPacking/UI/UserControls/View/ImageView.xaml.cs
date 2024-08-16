@@ -25,6 +25,7 @@ using Line = System.Windows.Shapes.Line;
 using LineArray = System.Collections.Generic.List<Emgu.CV.Structure.LineSegment2D>;
 using Point = System.Windows.Point;
 using Rectangle = System.Windows.Shapes.Rectangle;
+using TapeReelPacking.UI.UserControls.ViewModel;
 
 namespace TapeReelPacking.UI.UserControls.View
 {
@@ -1066,7 +1067,7 @@ namespace TapeReelPacking.UI.UserControls.View
         {
             Master.m_bIsTeaching = true;
             Master.m_NextStepTeachEvent.Reset();
-            Source.Application.Application.LoadTeachParamFromFileToDict(ref nTeachTrackID);
+            Source.Application.Application.LoadTeachParamFromFileToDict(nTeachTrackID);
             //MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
 
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
@@ -1075,7 +1076,8 @@ namespace TapeReelPacking.UI.UserControls.View
                 resultTeach.Children.Clear();
                 ClearOverlay();
                 loadTeachImageToUI(nTeachTrackID);
-                MainWindow.mainWindow.master.teachParameter.UpdateTeachParamFromDictToUI(Source.Application.Application.dictTeachParam);
+                TeachParameterVM teachParameterVM = (TeachParameterVM)MainWindow.mainWindow.master.teachParameter.DataContext;
+                teachParameterVM.UpdateTeachParamFromDictToUI(Source.Application.Application.dictTeachParam);
                 MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
             });
 
@@ -1238,10 +1240,12 @@ namespace TapeReelPacking.UI.UserControls.View
             }
             else
             {
-                Source.Application.Application.LoadTeachParamFromFileToDict(ref nTeachTrackID);
+                Source.Application.Application.LoadTeachParamFromFileToDict(nTeachTrackID);
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
-                    MainWindow.mainWindow.master.teachParameter.UpdateTeachParamFromDictToUI(Source.Application.Application.dictTeachParam);
+
+                    TeachParameterVM teachParameterVM = (TeachParameterVM)MainWindow.mainWindow.master.teachParameter.DataContext;
+                    teachParameterVM.UpdateTeachParamFromDictToUI(Source.Application.Application.dictTeachParam);
                 });
 
                 MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();

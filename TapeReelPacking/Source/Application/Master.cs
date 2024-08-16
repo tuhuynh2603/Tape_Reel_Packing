@@ -28,29 +28,29 @@ namespace TapeReelPacking.Source.Application
     {
         //private int width, height, dpi;
 
-        private MainWindow mainWindow;
-        public Track[] m_Tracks;
-        public int m_nActiveTrack;
-        public Application applications = new Application();
-        public BarCodeReaderInterface m_BarcodeReader;
-        public TeachParametersUC teachParameter = new TeachParametersUC();
-        public MappingSetingUC mappingParameter = new MappingSetingUC();
+        private MainWindow mainWindow { set; get; }
+        public Track[] m_Tracks { set; get; }
+        public int m_nActiveTrack { set; get; }
+        public Application applications { set; get; } = new Application();
+        public BarCodeReaderInterface m_BarcodeReader { set; get; }
+        public TeachParametersUC teachParameter { set; get; } = new TeachParametersUC();
+        public MappingSetingUC mappingParameter { set; get; } = new MappingSetingUC();
 
-        public static bool m_bIsTeaching;
-        public static AutoResetEvent m_NextStepTeachEvent;
+        public static bool m_bIsTeaching { set; get; }
+        public static AutoResetEvent m_NextStepTeachEvent { set; get; }
         //public CommLog commLog = new CommLog();
 
-        public static ManualResetEvent[] InspectEvent;
-        public static ManualResetEvent[] InspectDoneEvent;
-        public static ManualResetEvent[] m_hardwareTriggerSnapEvent;
-        public static AutoResetEvent[] m_OfflineTriggerSnapEvent;
-        public int m_bNextStepSequence = 0;
+        public static ManualResetEvent[] InspectEvent { set; get; }
+        public static ManualResetEvent[] InspectDoneEvent { set; get; }
+        public static ManualResetEvent[] m_hardwareTriggerSnapEvent { set; get; }
+        public static AutoResetEvent[] m_OfflineTriggerSnapEvent { set; get; }
+        public int m_bNextStepSequence { set; get; } = 0;
 
-        public static AutoResetEvent m_NextStepSequenceEvent;
-        public static AutoResetEvent m_EmergencyStopSequenceEvent;
+        public static AutoResetEvent m_NextStepSequenceEvent { set; get; }
+        public static AutoResetEvent m_EmergencyStopSequenceEvent { set; get; }
 
-        public static ManualResetEvent[] m_EventInspectionOnlineThreadDone;
-        public static AutoResetEvent[] StartWaitPLCToTriggerCameraEvent;
+        public static ManualResetEvent[] m_EventInspectionOnlineThreadDone { set; get; }
+        public static AutoResetEvent[] StartWaitPLCToTriggerCameraEvent { set; get; }
 
         // public AutoDeleteImagesDlg m_AutoDeleteImagesDlg = new AutoDeleteImagesDlg();
 
@@ -59,25 +59,25 @@ namespace TapeReelPacking.Source.Application
 
         //public delegate void GrabDelegate();
         //public GrabDelegate grabDelegate;
-        public Thread thread_RobotSequence;
-        public Thread thread_BarcodeReaderSequence;
-        public Thread[] thread_InspectSequence;
-        public Thread threadInspecOffline;
-        public Thread[] thread_StreamCamera;
-        public Thread m_TeachThread;
-        public Thread[] m_SaveInspectImageThread;
-        public Thread[] m_UpdateResultThread;
+        public Thread thread_RobotSequence { set; get; }
+        public Thread thread_BarcodeReaderSequence { set; get; }
+        public Thread[] thread_InspectSequence { set; get; }
+        public Thread threadInspecOffline { set; get; }
+        public Thread[] thread_StreamCamera { set; get; }
+        public Thread m_TeachThread { set; get; }
+        public Thread[] m_SaveInspectImageThread { set; get; }
+        public Thread[] m_UpdateResultThread { set; get; }
 
-        public Thread[] m_StartWaitPLCReadyToTriggerCameraThread;
-        public Thread m_UpdateMappingUIThread;
-        public Thread m_IOStatusThread;
+        public Thread[] m_StartWaitPLCReadyToTriggerCameraThread { set; get; }
+        public Thread m_UpdateMappingUIThread { set; get; }
+        public Thread m_IOStatusThread { set; get; }
 
-        public static List<ArrayOverLay>[] list_arrayOverlay;
-        public static Queue<ImageSaveData>[] m_SaveInspectImageQueue = new Queue<ImageSaveData>[2]; // create a queue to hold messages
-        public static Queue<VisionResultData>[] m_UpdateResultQueue = new Queue<VisionResultData>[2]; // create a queue to hold messages
+        public static List<ArrayOverLay>[] list_arrayOverlay { set; get; }
+        public static Queue<ImageSaveData>[] m_SaveInspectImageQueue { set; get; } = new Queue<ImageSaveData>[2]; // create a queue to hold messages
+        public static Queue<VisionResultData>[] m_UpdateResultQueue { set; get; } = new Queue<VisionResultData>[2]; // create a queue to hold messages
 
-        public HiWinRobotInterface m_hiWinRobotInterface;
-        public PLCCOMM m_plcComm;
+        public HiWinRobotInterface m_hiWinRobotInterface { set; get; }
+        public PLCCOMM m_plcComm { set; get; }
         #region Contructor Master
         public Master(MainWindow app)
         {
@@ -192,9 +192,11 @@ namespace TapeReelPacking.Source.Application
             for (int nTrack = 0; nTrack < Application.m_nTrack; nTrack++)
             {
                 Application.dictTeachParam.Clear();
-                Application.LoadTeachParamFromFileToDict(ref nTrack);
+                Application.LoadTeachParamFromFileToDict(nTrack);
                 //m_Tracks[nTrack].m_InspectionCore.LoadTeachImageToInspectionCore(nTrack);
-                teachParameter.UpdateTeachParamFromDictToUI(Application.dictTeachParam);
+
+                TeachParameterVM teachParameterVM = (TeachParameterVM)teachParameter.DataContext;
+                teachParameterVM.UpdateTeachParamFromDictToUI(Application.dictTeachParam);
                 m_Tracks[nTrack].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
 
 
@@ -202,8 +204,8 @@ namespace TapeReelPacking.Source.Application
                 {
                     Application.dictPVIAreaParam[nArea] = new Dictionary<string, string>();
 
-                    Application.LoadAreaParamFromFileToDict(ref nTrack, nArea);
-                    teachParameter.UpdateTeachParamFromDictToUI(Application.dictPVIAreaParam[nArea]);
+                    Application.LoadAreaParamFromFileToDict(nTrack, nArea);
+                    teachParameterVM.UpdateTeachParamFromDictToUI(Application.dictPVIAreaParam[nArea]);
                     m_Tracks[nTrack].m_InspectionCore.UpdateAreaParameterFromUIToInspectionCore(nArea);
                 }
 
@@ -496,7 +498,7 @@ namespace TapeReelPacking.Source.Application
             }
 
             m_hiWinRobotInterface.StopMotor();
-            if (m_EmergencyStatus + m_ImidiateStatus == 0)
+            if (RobotIOStatus.m_EmergencyStatus + RobotIOStatus.m_ImidiateStatus == 0)
                 HWinRobot.set_motor_state(HiWinRobotInterface.m_RobotConnectID, 1);
 
             MainWindow.mainWindow.EnableMotorFunction();
@@ -641,38 +643,42 @@ namespace TapeReelPacking.Source.Application
             SEQUENCE_RETRY = 3
         }
 
+        public static class RobotIOStatus
+        {
+            public static int m_PLC_Ready_Status = 0;
+            public static int m_EmergencyStatus = 0;
+            public static int m_ImidiateStatus = 0;
+            public static int m_ResetMachineStatus = 0;
+            public static int m_RunMachineStatus = 0;
+            public static int m_DoorOpennedStatus = 0;
+            public static int m_EndLotStatus = 0;
+            public static int m_CreateNewLotStatus = 0;
+            public static int m_IsLastChipStatus = 0;
+            public static int m_EmergencyStatus_Simulate = 0;
+            public static int m_ImidiateStatus_Simulate = 0;
+            public static int m_ResetMachineStatus_Simulate = 0;
+        }
 
-        public int m_PLC_Ready_Status = 0;
-        public int m_EmergencyStatus = 0;
-        public int m_ImidiateStatus = 0;
-        public int m_ResetMachineStatus = 0;
-        public int m_RunMachineStatus = 0;
-        public int m_DoorOpennedStatus = 0;
-        public int m_EndLotStatus = 0;
-        public int m_CreateNewLotStatus = 0;
-        public int m_IsLastChipStatus = 0;
 
 
-        public int m_EmergencyStatus_Simulate = 0;
-        public int m_ImidiateStatus_Simulate = 0;
-        public int m_ResetMachineStatus_Simulate = 0;
-        public bool m_bMachineNotReadyNeedToReset = true;
-        public bool m_bNeedToImidiateStop = false;
-        public bool m_IsDoorOpennedAction = false;
-        public bool m_bIsReleasePopupMessage = false;
-        public int m_SequenceMode = (int)SEQUENCE_MODE.MODE_AUTO;
-        public int m_SequenceMode_With_Or_No_Robot = 0;
-        public DateTime startLot_dateTime;
-        public int m_nTotalCompletedLot = 0;
+
+        public static bool m_bMachineNotReadyNeedToReset = true;
+        public static bool m_bNeedToImidiateStop = false;
+        public static bool m_IsDoorOpennedAction = false;
+        public static bool m_bIsReleasePopupMessage = false;
+        public static int m_SequenceMode = (int)SEQUENCE_MODE.MODE_AUTO;
+        public static int m_SequenceMode_With_Or_No_Robot = 0;
+        public static DateTime startLot_dateTime;
+        public static int m_nTotalCompletedLot = 0;
 
         private void func_IOStatusThread()
         {
             int bEmergencyStatus_Backup = -1;
             int bImidiateStatus_Backup = -1;
             int bResetStatus_Backup = -1;
-            int bDoorStatus_Backup = m_DoorOpennedStatus;// HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_DOOR_STATUS);
-            int bEndLotStatus_Backup = m_EndLotStatus;// HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_END_LOT);
-            int bCreateNewLotStatus_Backup = m_CreateNewLotStatus;// HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CREATE_NEW_LOT);
+            int bDoorStatus_Backup = RobotIOStatus.m_DoorOpennedStatus;// HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_DOOR_STATUS);
+            int bEndLotStatus_Backup = RobotIOStatus.m_EndLotStatus;// HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_END_LOT);
+            int bCreateNewLotStatus_Backup = RobotIOStatus.m_CreateNewLotStatus;// HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CREATE_NEW_LOT);
             m_SequenceMode = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_ENABLE);
 
             while (true)
@@ -693,32 +699,32 @@ namespace TapeReelPacking.Source.Application
                 {
                     if (HiWinRobotInterface.m_RobotConnectID < 0 || m_hiWinRobotInterface == null)
                     {
-                        m_EmergencyStatus = m_EmergencyStatus_Simulate;
-                        m_ImidiateStatus = m_ImidiateStatus_Simulate;
-                        m_ResetMachineStatus = m_ResetMachineStatus_Simulate;
+                        RobotIOStatus.m_EmergencyStatus = RobotIOStatus.m_EmergencyStatus_Simulate;
+                        RobotIOStatus.m_ImidiateStatus = RobotIOStatus.m_ImidiateStatus_Simulate;
+                        RobotIOStatus.m_ResetMachineStatus = RobotIOStatus.m_ResetMachineStatus_Simulate;
                     }
                     else
                     {
-                        m_PLC_Ready_Status = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_PACKING_PROCESS_READY);
-                        m_EmergencyStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.EMERGENCY_STATUS) | m_EmergencyStatus_Simulate;
-                        m_ImidiateStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.IMIDIATE_STOP_STATUS) | m_ImidiateStatus_Simulate;
-                        m_ResetMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RESET_STATUS) /*| m_ResetMachineStatus_Simulate*/;
-                        m_RunMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RUNSEQUENCE_STATUS);
-                        m_DoorOpennedStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_DOOR_STATUS);
+                        RobotIOStatus.m_PLC_Ready_Status = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_PACKING_PROCESS_READY);
+                        RobotIOStatus.m_EmergencyStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.EMERGENCY_STATUS) | RobotIOStatus.m_EmergencyStatus_Simulate;
+                        RobotIOStatus.m_ImidiateStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.IMIDIATE_STOP_STATUS) | RobotIOStatus.m_ImidiateStatus_Simulate;
+                        RobotIOStatus.m_ResetMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RESET_STATUS) /*| m_ResetMachineStatus_Simulate*/;
+                        RobotIOStatus.m_RunMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RUNSEQUENCE_STATUS);
+                        RobotIOStatus.m_DoorOpennedStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_DOOR_STATUS);
                         m_SequenceMode_With_Or_No_Robot = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_RUN_NO_ROBOT);
 
 
                         //m_CreateNewLotStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CREATE_NEW_LOT);
-                        m_EndLotStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_END_LOT);
+                        RobotIOStatus.m_EndLotStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_END_LOT);
 
-                        if (m_EmergencyStatus > 1 && m_bRobotSequenceStatus)
+                        if (RobotIOStatus.m_EmergencyStatus > 1 && m_bRobotSequenceStatus)
                         {
                             m_bMachineNotReadyNeedToReset = true;
                         reconnect:
                             m_hiWinRobotInterface.ReconnectToHIKRobot();
                             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                             {
-                                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Robot Disconnected! Reconnecting... = {m_EmergencyStatus}!", (int)ERROR_CODE.LABEL_FAIL);
+                                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Robot Disconnected! Reconnecting... = {RobotIOStatus.m_EmergencyStatus}!", (int)ERROR_CODE.LABEL_FAIL);
                             });
                             Thread.Sleep(1000);
 
@@ -726,7 +732,7 @@ namespace TapeReelPacking.Source.Application
                             {
                                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                                 {
-                                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Robot Connected.. = {m_EmergencyStatus}!", (int)ERROR_CODE.LABEL_FAIL);
+                                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Robot Connected.. = {RobotIOStatus.m_EmergencyStatus}!", (int)ERROR_CODE.LABEL_FAIL);
                                 });
                                 continue;
                             }
@@ -737,7 +743,7 @@ namespace TapeReelPacking.Source.Application
 
                     }
 
-                    if (m_ImidiateStatus == 1)
+                    if (RobotIOStatus.m_ImidiateStatus == 1)
                     {
                         m_bNeedToImidiateStop = true;
                         string strMess = "Imidiate Stop Button clicked!";
@@ -749,7 +755,7 @@ namespace TapeReelPacking.Source.Application
 
                     else if (!MainWindow.mainWindow.m_bEnableDebugSequence)
                     {
-                        if (m_DoorOpennedStatus == 1)
+                        if (RobotIOStatus.m_DoorOpennedStatus == 1)
                         {
                             //m_IsDoorOpennedAction = true;
                             if (MainWindow.mainWindow.m_bSequenceRunning)
@@ -764,10 +770,10 @@ namespace TapeReelPacking.Source.Application
                         }
                     }
 
-                    if (bDoorStatus_Backup != m_DoorOpennedStatus)
+                    if (bDoorStatus_Backup != RobotIOStatus.m_DoorOpennedStatus)
                     {
-                        //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_IMIDIATE_STATUS, m_ImidiateStatus);
-                        bDoorStatus_Backup = m_DoorOpennedStatus;
+                        //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_IMIDIATE_STATUS, RobotIOStatus.m_ImidiateStatus);
+                        bDoorStatus_Backup = RobotIOStatus.m_DoorOpennedStatus;
 
                         LogMessage.LogMessage.WriteToDebugViewer(9, $"Door Signal Status changed Status = {bDoorStatus_Backup}!");
 
@@ -776,10 +782,10 @@ namespace TapeReelPacking.Source.Application
                             ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Door Signal Status changed Status = {bDoorStatus_Backup}!", (int)ERROR_CODE.LABEL_FAIL);
                         });
                     }
-                    bDoorStatus_Backup = m_DoorOpennedStatus;
+                    bDoorStatus_Backup = RobotIOStatus.m_DoorOpennedStatus;
 
 
-                    if (m_EmergencyStatus == 1)
+                    if (RobotIOStatus.m_EmergencyStatus == 1)
                     {
                         m_bMachineNotReadyNeedToReset = true;
                         m_hiWinRobotInterface.StopMotor();
@@ -790,15 +796,15 @@ namespace TapeReelPacking.Source.Application
                         // Disable all motor function;
                     }
 
-                    if (m_RunMachineStatus == 1)
+                    if (RobotIOStatus.m_RunMachineStatus == 1)
                     {
                         //m_RunMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RUNSEQUENCE_STATUS);
                         //if (m_RunMachineStatus == 1)
                         //{
-                        m_EmergencyStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.EMERGENCY_STATUS) | m_EmergencyStatus_Simulate;
-                        //m_ImidiateStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.IMIDIATE_STOP_STATUS) | m_ImidiateStatus_Simulate;
+                        RobotIOStatus.m_EmergencyStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.EMERGENCY_STATUS) | RobotIOStatus.m_EmergencyStatus_Simulate;
+                        //RobotIOStatus.m_ImidiateStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.IMIDIATE_STOP_STATUS) | RobotIOStatus.m_ImidiateStatus_Simulate;
 
-                        if (m_EmergencyStatus == 0)
+                        if (RobotIOStatus.m_EmergencyStatus == 0)
                             MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_EMERGENCY, false);
 
 
@@ -820,73 +826,73 @@ namespace TapeReelPacking.Source.Application
                     if (!m_plcComm.m_modbusClient.Connected)
                         continue;
 
-                    if (bEmergencyStatus_Backup != m_EmergencyStatus)
+                    if (bEmergencyStatus_Backup != RobotIOStatus.m_EmergencyStatus)
                     {
-                        //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_EMERGENCY_STATUS, m_EmergencyStatus);
-                        bEmergencyStatus_Backup = m_EmergencyStatus;
-                        LogMessage.LogMessage.WriteToDebugViewer(9, $"Emergency Status changed Status = {m_EmergencyStatus}!");
+                        //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_EMERGENCY_STATUS, RobotIOStatus.m_EmergencyStatus);
+                        bEmergencyStatus_Backup = RobotIOStatus.m_EmergencyStatus;
+                        LogMessage.LogMessage.WriteToDebugViewer(9, $"Emergency Status changed Status = {RobotIOStatus.m_EmergencyStatus}!");
 
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Emergency Status changed Status = {m_EmergencyStatus}!", (int)ERROR_CODE.LABEL_FAIL);
+                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Emergency Status changed Status = {RobotIOStatus.m_EmergencyStatus}!", (int)ERROR_CODE.LABEL_FAIL);
                         });
                     }
 
-                    if (bImidiateStatus_Backup != m_ImidiateStatus)
+                    if (bImidiateStatus_Backup != RobotIOStatus.m_ImidiateStatus)
                     {
-                        //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_IMIDIATE_STATUS, m_ImidiateStatus);
-                        bImidiateStatus_Backup = m_ImidiateStatus;
+                        //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_IMIDIATE_STATUS, RobotIOStatus.m_ImidiateStatus);
+                        bImidiateStatus_Backup = RobotIOStatus.m_ImidiateStatus;
 
-                        LogMessage.LogMessage.WriteToDebugViewer(9, $"Imidiate button Status changed Status = {m_ImidiateStatus}!");
+                        LogMessage.LogMessage.WriteToDebugViewer(9, $"Imidiate button Status changed Status = {RobotIOStatus.m_ImidiateStatus}!");
 
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Imidiate button Status changed Status = {m_ImidiateStatus}!", (int)ERROR_CODE.LABEL_FAIL);
+                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Imidiate button Status changed Status = {RobotIOStatus.m_ImidiateStatus}!", (int)ERROR_CODE.LABEL_FAIL);
                         });
                     }
                     bool bIsShow = MainWindow.mainWindow.IsPopupWarningMessageBoxOpenned();
                     //LogMessage.LogMessage.WriteToDebugViewer(9, $"PopupWarning Dialog Status = {bIsShow}!");
-                    if (bResetStatus_Backup != m_ResetMachineStatus || bIsShow)
+                    if (bResetStatus_Backup != RobotIOStatus.m_ResetMachineStatus || bIsShow)
                     {
                         //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_STATUS, m_ResetMachineStatus);
 
-                        m_EmergencyStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.EMERGENCY_STATUS) | m_EmergencyStatus_Simulate;
+                        RobotIOStatus.m_EmergencyStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.EMERGENCY_STATUS) | RobotIOStatus.m_EmergencyStatus_Simulate;
 
-                        //if (m_EmergencyStatus == 0)
+                        //if (RobotIOStatus.m_EmergencyStatus == 0)
                         //    MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_EMERGENCY, false);
 
 
-                        if (m_ResetMachineStatus == 1)
+                        if (RobotIOStatus.m_ResetMachineStatus == 1)
                         {
                             MainWindow.mainWindow.m_WarningMessageBoxUC.ContinueSequenceButtonClicked(WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
 
                         }
-                        //if (m_EmergencyStatus + m_ImidiateStatus == 0)
+                        //if (RobotIOStatus.m_EmergencyStatus + RobotIOStatus.m_ImidiateStatus == 0)
                         //    MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_EMERGENCY, false);
-                        if (bResetStatus_Backup != m_ResetMachineStatus)
+                        if (bResetStatus_Backup != RobotIOStatus.m_ResetMachineStatus)
                         {
-                            LogMessage.LogMessage.WriteToDebugViewer(9, $"Reset button Status changed Status = {m_ResetMachineStatus}!");
+                            LogMessage.LogMessage.WriteToDebugViewer(9, $"Reset button Status changed Status = {RobotIOStatus.m_ResetMachineStatus}!");
 
                             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                             {
-                                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Reset button Status changed Status = {m_ResetMachineStatus}!", (int)ERROR_CODE.LABEL_FAIL);
+                                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Reset button Status changed Status = {RobotIOStatus.m_ResetMachineStatus}!", (int)ERROR_CODE.LABEL_FAIL);
                             });
                         }
                     }
-                    bResetStatus_Backup = m_ResetMachineStatus;
+                    bResetStatus_Backup = RobotIOStatus.m_ResetMachineStatus;
 
                 }
 
                 //m_CreateNewLotStatus = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT); //  HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CREATE_NEW_LOT);
-                
-                
-                m_CreateNewLotStatus = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT);
-                if (m_CreateNewLotStatus == 1 && bCreateNewLotStatus_Backup != m_CreateNewLotStatus)  /*(m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT) > 0)*/
+
+
+                RobotIOStatus.m_CreateNewLotStatus = m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT);
+                if (RobotIOStatus.m_CreateNewLotStatus == 1 && bCreateNewLotStatus_Backup != RobotIOStatus.m_CreateNewLotStatus)  /*(m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT) > 0)*/
                 {
 
                     m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT, 0);
 
-                    bCreateNewLotStatus_Backup = m_CreateNewLotStatus;
+                    bCreateNewLotStatus_Backup = RobotIOStatus.m_CreateNewLotStatus;
 
 
                     if (m_IsPIDSentStatus)
@@ -929,9 +935,9 @@ namespace TapeReelPacking.Source.Application
 
 
 
-                    
 
-                    m_IsLastChipStatus = 0;
+
+                    RobotIOStatus.m_IsLastChipStatus = 0;
                     LogMessage.LogMessage.WriteToDebugViewer(9, $"Reset Lot");
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
@@ -998,7 +1004,7 @@ namespace TapeReelPacking.Source.Application
 
                     //m_CreateNewLotStatus = 0;
                 }
-                bCreateNewLotStatus_Backup = m_CreateNewLotStatus;
+                bCreateNewLotStatus_Backup = RobotIOStatus.m_CreateNewLotStatus;
             }
         }
 
@@ -1006,7 +1012,7 @@ namespace TapeReelPacking.Source.Application
         {
             m_NextStepSequenceEvent.Reset();
             m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
-            if (m_EmergencyStatus == 1)
+            if (RobotIOStatus.m_EmergencyStatus == 1)
                 return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
 
             if (m_bNeedToImidiateStop)
@@ -1017,7 +1023,7 @@ namespace TapeReelPacking.Source.Application
                     if (MainWindow.mainWindow == null)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
 
-                    if (m_EmergencyStatus == 1)
+                    if (RobotIOStatus.m_EmergencyStatus == 1)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
                 }
                 //Show Dialog
@@ -1030,7 +1036,7 @@ namespace TapeReelPacking.Source.Application
                     if (MainWindow.mainWindow == null)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
 
-                    if (m_EmergencyStatus == 1 || m_ImidiateStatus == 1)
+                    if (RobotIOStatus.m_EmergencyStatus == 1 || RobotIOStatus.m_ImidiateStatus == 1)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
                 }
             }
@@ -1042,7 +1048,7 @@ namespace TapeReelPacking.Source.Application
                     if (MainWindow.mainWindow == null)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
 
-                    if (m_EmergencyStatus == 1 || m_ImidiateStatus == 1)
+                    if (RobotIOStatus.m_EmergencyStatus == 1 || RobotIOStatus.m_ImidiateStatus == 1)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
                 }
             }
@@ -1111,7 +1117,7 @@ namespace TapeReelPacking.Source.Application
 
                 while (true)
                 {
-                    if (!MainWindow.mainWindow.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1)
+                    if (!MainWindow.mainWindow.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
                     {
                         break;
                     }
@@ -1130,7 +1136,7 @@ namespace TapeReelPacking.Source.Application
 
                 while (true)
                 {
-                    if (!MainWindow.mainWindow.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1)
+                    if (!MainWindow.mainWindow.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
                     {
                         break;
                     }
@@ -1151,7 +1157,7 @@ namespace TapeReelPacking.Source.Application
                 Thread.Sleep(500);
                 m_CompletedReelStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_COMPLETED_LOT);
 
-                if (!MainWindow.mainWindow.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1)
+                if (!MainWindow.mainWindow.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
                 {
                     m_bRobotSequenceStatus = false;
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
@@ -1387,10 +1393,10 @@ namespace TapeReelPacking.Source.Application
                 return;
             }
 
-            while (m_RunMachineStatus == 1)
+            while (RobotIOStatus.m_RunMachineStatus == 1)
             {
                 LogMessage.LogMessage.WriteToDebugViewer(9, "Waiting for PLC Running Sequence Signal Off...");
-                if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || m_EmergencyStatus == 1 || m_EndLotStatus == 1)
+                if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || RobotIOStatus.m_EmergencyStatus == 1 || RobotIOStatus.m_EndLotStatus == 1)
                     return;
 
                 Thread.Sleep(500);
@@ -1401,7 +1407,7 @@ namespace TapeReelPacking.Source.Application
             while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_PACKING_PROCESS_READY) != 1)
             {
                 // Need popup Dialog if waiting too long 
-                if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || m_EmergencyStatus == 1 || m_EndLotStatus == 1)
+                if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || RobotIOStatus.m_EmergencyStatus == 1 || RobotIOStatus.m_EndLotStatus == 1)
                     return;
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, "Waiting for PLC ready Signal....");
@@ -1419,13 +1425,13 @@ namespace TapeReelPacking.Source.Application
             //HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON, false);
 
             nError = WaitForNextStepSequenceEvent("Begin Sequence: Press Next to trigger camera 1");
-            if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+            if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
                 return;
 
             //Application.SetIntRegistry(Application.m_strCurrentDeviceID_Registry[0], m_Tracks[0].m_CurrentSequenceDeviceID);
 
             m_nWaitEventInspectionOnlineThreadStatus = 0;
-            if (func_CameraTriggerThread() < 0 || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen || m_SequenceMode_With_Or_No_Robot == 1)
+            if (func_CameraTriggerThread() < 0 || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen || m_SequenceMode_With_Or_No_Robot == 1)
             {
                 return;
             }
@@ -1441,7 +1447,7 @@ namespace TapeReelPacking.Source.Application
             while (MainWindow.mainWindow.m_bSequenceRunning || MainWindow.mainWindow.bEnableOfflineInspection || m_bMachineNotReadyNeedToReset)
             {
 
-                if (MainWindow.mainWindow == null || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen || m_SequenceMode_With_Or_No_Robot == 1)
+                if (MainWindow.mainWindow == null || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen || m_SequenceMode_With_Or_No_Robot == 1)
                     return;
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, "Begin Sequence");
@@ -1456,12 +1462,12 @@ namespace TapeReelPacking.Source.Application
                     if (MainWindow.mainWindow == null)
                         return;
 
-                    if (!MainWindow.mainWindow.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1 || m_SequenceMode_With_Or_No_Robot == 1)
+                    if (!MainWindow.mainWindow.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || m_SequenceMode_With_Or_No_Robot == 1)
                     {
                         return;
                     }
 
-                    if (m_RunMachineStatus == 1)
+                    if (RobotIOStatus.m_RunMachineStatus == 1)
                     {
 
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
@@ -1477,7 +1483,7 @@ namespace TapeReelPacking.Source.Application
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Waiting for vision result Done!");
 
 
-                if (m_RunMachineStatus == 1)
+                if (RobotIOStatus.m_RunMachineStatus == 1)
                 {
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
@@ -1517,7 +1523,7 @@ namespace TapeReelPacking.Source.Application
                     HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
 
                     nError = WaitForNextStepSequenceEvent("Inspection Failed (Device Not found)! Please press 'RUN' on UI or PLC  to restart the sequence!", true);
-                    if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                    if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
                         return;
                     goto StartSequence;
                     //return;
@@ -1543,7 +1549,7 @@ namespace TapeReelPacking.Source.Application
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Move to Pre Pick position");
 
-                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
                     return;
 
                 visionResultDataTemp.m_nDeviceIndexOnReel = m_Tracks[0].m_InspectionOnlineThreadVisionResult.m_nDeviceIndexOnReel;
@@ -1566,7 +1572,7 @@ namespace TapeReelPacking.Source.Application
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Turn on vaccum");
 
 
-                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
                     return;
                 // Turn on vaccum
 
@@ -1589,7 +1595,7 @@ namespace TapeReelPacking.Source.Application
                 //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
                 //});
 
-                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
                     return;
                 // Move to Pick position (move Down Z motor)
 
@@ -1608,7 +1614,7 @@ namespace TapeReelPacking.Source.Application
                 nCurrentSequenceStep = 6;
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Move To Pre Pick Pos");
 
-                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
                     return;
                 MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection);
                 MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
@@ -1631,7 +1637,7 @@ namespace TapeReelPacking.Source.Application
 
                 while (nStatus == 0)
                 {
-                    if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || m_EndLotStatus == 1)
+                    if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || RobotIOStatus.m_EndLotStatus == 1)
                     {
                         return;
                     }
@@ -1667,7 +1673,7 @@ namespace TapeReelPacking.Source.Application
                 nCurrentSequenceStep = 8;
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Move To Pass fail position");
 
-                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
                     return;
                 // Move To Pass fail position
                 //nCamera1InspectionResult = (int)ERROR_CODE.PASS;
@@ -1694,7 +1700,7 @@ namespace TapeReelPacking.Source.Application
                 nCurrentSequenceStep = 9;
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Trigger Camera 1");
 
-                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
                     return;
 
                 // If not yet trigger camera 1, trigger again
@@ -1716,7 +1722,7 @@ namespace TapeReelPacking.Source.Application
             _Step_10:
                 nCurrentSequenceStep = 10;
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Wait For PLC Ready ");
-                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
                     return;
                 // Wait For PLC 2 Ready
                 //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_ROBOT_RESULT, nCamera1InspectionResult);
@@ -1728,12 +1734,12 @@ namespace TapeReelPacking.Source.Application
                     LogMessage.LogMessage.WriteToDebugViewer(9, $"{Application.LineNumber()}: {Application.PrintCallerName()}");
                     while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_ALLOW_TO_PLACE) != 1)
                     {
-                        if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || m_EndLotStatus == 1)
+                        if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || RobotIOStatus.m_EndLotStatus == 1)
                         {
                             return;
                         }
 
-                        if (m_RunMachineStatus == 1)
+                        if (RobotIOStatus.m_RunMachineStatus == 1)
                         {
 
                             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
@@ -1759,7 +1765,7 @@ namespace TapeReelPacking.Source.Application
                 nCurrentSequenceStep = 11;
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Put device to the tray");
 
-                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
                     return;
                 /////////////////Step 9: put device to the tray (turn off vaccum)
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
@@ -1785,7 +1791,7 @@ namespace TapeReelPacking.Source.Application
 
                 if (nCamera1InspectionResult == -(int)ERROR_CODE.PASS)
                 {
-                    if (m_IsLastChipStatus > 0)
+                    if (RobotIOStatus.m_IsLastChipStatus > 0)
                     {
 
                         if (MainWindow.mainWindow.m_bSequenceRunning)
@@ -1798,14 +1804,14 @@ namespace TapeReelPacking.Source.Application
                         }
 
 
-                        LogMessage.LogMessage.WriteToDebugViewer(9, $" Check Last Chip Status to Move or wait: {m_IsLastChipStatus}");
+                        LogMessage.LogMessage.WriteToDebugViewer(9, $" Check Last Chip Status to Move or wait: {RobotIOStatus.m_IsLastChipStatus}");
                         HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_PLACE_DONE, true);
-                        m_IsLastChipStatus = 0;
+                        RobotIOStatus.m_IsLastChipStatus = 0;
                         goto _Start_Lot;
                     }
 
                     //get Chip signal at end 29
-                    m_IsLastChipStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_LAST_CHIP);
+                    RobotIOStatus.m_IsLastChipStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_LAST_CHIP);
                     HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_PLACE_DONE, true);
 
                     //PLC start trigger last chip at begin 29
@@ -1845,12 +1851,12 @@ namespace TapeReelPacking.Source.Application
             _Step_12:
                 nCurrentSequenceStep = 12;
 
-                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
                     return;
 
                 _Step_13:
                 nCurrentSequenceStep = 13;
-                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
                     return;
 
                 _Step_14:
@@ -1858,7 +1864,7 @@ namespace TapeReelPacking.Source.Application
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Turn of Air. End Sequence");
 
-                if (m_bMachineNotReadyNeedToReset || m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
                     return;
                 // Move to ready position and turn off vaccum
 
@@ -1965,7 +1971,7 @@ namespace TapeReelPacking.Source.Application
             while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CHIPFOUND) != 1)
             {
 
-                if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || m_EmergencyStatus == 1)
+                if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || RobotIOStatus.m_EmergencyStatus == 1)
                 {
                     return -1;
                 }
@@ -2019,7 +2025,7 @@ namespace TapeReelPacking.Source.Application
             //while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_PACKING_PROCESS_READY) == 0)
             //{
             //    // Need popup Dialog if waiting too long 
-            //    if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || m_EmergencyStatus > 0)
+            //    if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || RobotIOStatus.m_EmergencyStatus > 0)
             //        return;
             //    LogMessage.LogMessage.WriteToDebugViewer(8, "Waiting for PLC ready Signal....");
             //    Thread.Sleep(500);
@@ -2166,7 +2172,7 @@ namespace TapeReelPacking.Source.Application
                 m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath = strFullPathImageOut;
                 string strDateTime = string.Format("{0}:{1}:{2}_{3}:{4}:{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
                 m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strDatetime = strDateTime;
-                //if (m_EmergencyStatus == 1)
+                //if (RobotIOStatus.m_EmergencyStatus == 1)
                 //{
                 //    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 //    {

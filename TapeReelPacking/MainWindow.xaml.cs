@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Xceed.Wpf.AvalonDock.Layout;
 using Application = TapeReelPacking.Source.Application.Application;
+using TapeReelPacking.UI.UserControls.ViewModel;
 
 namespace TapeReelPacking
 {
@@ -894,7 +895,9 @@ namespace TapeReelPacking
             master.teachParameter.Height = 600;
             //master.m_Tracks[0].m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autofocus, 1);
             master.teachParameter.track_ComboBox.SelectedIndex = activeImageDock.trackID;
-            master.teachParameter.ReloadTeachParameterUI(activeImageDock.trackID);
+            TeachParameterVM teachParameterVM = (TeachParameterVM)mainWindow.master.teachParameter.DataContext;
+
+            teachParameterVM.ReloadTeachParameterUI(activeImageDock.trackID);
             grd_PopupDialog.Children.Add(master.teachParameter);
             //grd_PopupDialog.Children.Add(master.m_Tracks[]);
             tab_controls.SelectedIndex = currentTabIndex;
@@ -1397,7 +1400,7 @@ namespace TapeReelPacking
 
         private void btn_Emergency_Stop_Click(object sender, RoutedEventArgs e)
         {
-            master.m_EmergencyStatus_Simulate = (bool)btn_Emergency_Stop.IsChecked == false ? 0 : 1;
+            Master.RobotIOStatus.m_EmergencyStatus_Simulate = (bool)btn_Emergency_Stop.IsChecked == false ? 0 : 1;
             //Master.m_EmergencyStopSequenceEvent.Set();
 
         }
@@ -1407,8 +1410,8 @@ namespace TapeReelPacking
         private void btn_Reset_Machine_Click(object sender, RoutedEventArgs e)
         {
             btn_Reset_Machine.IsChecked = false;
-            if (master.m_ResetMachineStatus_Simulate == 0)
-                master.m_ResetMachineStatus_Simulate = 1;
+            if (Master.RobotIOStatus.m_ResetMachineStatus_Simulate == 0)
+                Master.RobotIOStatus.m_ResetMachineStatus_Simulate = 1;
             if (m_bSequenceRunning)
                 return;
             if (master.thread_RobotSequence == null)
@@ -1734,8 +1737,8 @@ namespace TapeReelPacking
         private void btn_Imidiate_Stop_Click(object sender, RoutedEventArgs e)
         {
             btn_Imidiate_Stop.IsChecked = false;
-            if(master.m_ImidiateStatus_Simulate ==0)
-                master.m_ImidiateStatus_Simulate = 1;
+            if(Master.RobotIOStatus.m_ImidiateStatus_Simulate ==0)
+                Master.RobotIOStatus.m_ImidiateStatus_Simulate = 1;
         }
 
         private void btn_Lot_DataExcel_Checked(object sender, RoutedEventArgs e)
@@ -1817,7 +1820,7 @@ namespace TapeReelPacking
         //private void btn_Imidiate_Stop_Click(object sender, RoutedEventArgs e)
         //{
 
-        //    //master.m_ImidiateStatus_Simulate = (bool)btn_Imidiate_Stop.IsChecked == false ? 0 : 1;
+        //    //master.RobotIOStatus.m_ImidiateStatus_Simulate = (bool)btn_Imidiate_Stop.IsChecked == false ? 0 : 1;
         //    //btn_Imidiate_Stop.IsChecked = false;
 
         //    //Master.m_EmergencyStopSequenceEvent.Set();

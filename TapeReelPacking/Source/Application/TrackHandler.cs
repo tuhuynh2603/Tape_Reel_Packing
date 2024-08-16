@@ -373,7 +373,16 @@ namespace TapeReelPacking.Source.Application
                 double dY1 = pCorner1.Y - pCenter1.Y;
                 double dX2 = pCorner2.X - pCenter2.X;
                 double dY2 = pCorner2.Y - pCenter2.Y;
-                return AngleBetweenVectors(dX1, dY1, dX2, dY2) * RotationDirection(dX1, dY1, dX2, dY2);
+
+                double deltaangle = AngleBetweenVectors(dX1, dY1, dX2, dY2) * RotationDirection(dX1, dY1, dX2, dY2);
+                if (Math.Abs(deltaangle) <= 0.5 || Math.Abs(Math.Abs(deltaangle) - 180) <= 0.5)
+                {
+                    double dot = (pCenter1.X - pCorner1.X) * (pCenter2.X - pCorner2.X) + (pCenter1.Y - pCorner1.Y) * (pCenter2.Y - pCorner2.Y);
+
+                    if (dot < 0)
+                        deltaangle = 180;
+                }
+                return deltaangle;
             }
             public static double AngleWithXAxis(double xa, double ya)
             {

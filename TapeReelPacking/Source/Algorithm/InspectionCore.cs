@@ -13,14 +13,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using CvImage = Emgu.CV.Mat;
 using CvPointArray = Emgu.CV.Util.VectorOfPoint;
-using DefectInfor = TapeReelPacking.UI.UserControls.DefectInfor;
-using LineArray = System.Collections.Generic.List<Emgu.CV.Structure.LineSegment2D>;
 using CvContourArray = Emgu.CV.Util.VectorOfVectorOfPoint;
 
 namespace TapeReelPacking.Source.Algorithm
 {
     using TapeReelPacking.Source.Application;
-    using TapeReelPacking.Source.LogMessage;
     public class InspectionCore
     {
 
@@ -286,7 +283,7 @@ namespace TapeReelPacking.Source.Algorithm
             return true;
         }
 
-        public /*static*/ void PushBackDebugInfors(CvImage debugImage, CvImage debugRegion, string debugMessage, bool bEnableDebug, ref List<DefectInfor.DebugInfors> debugInfors)
+        public /*static*/ void PushBackDebugInfors(CvImage debugImage, CvImage debugRegion, string debugMessage, bool bEnableDebug, ref List<DebugInfors> debugInfors)
         {
             if (!bEnableDebug)
             {
@@ -300,7 +297,7 @@ namespace TapeReelPacking.Source.Algorithm
             CvImage zoomedRegion = new CvImage(m_SourceImage.Gray.Height, m_SourceImage.Gray.Width, DepthType.Cv8U, 1);
             CvInvoke.Resize(debugImage, zoomedImage, new System.Drawing.Size(zoomedImage.Width, zoomedImage.Height));
             CvInvoke.Resize(debugRegion, zoomedRegion, new System.Drawing.Size(zoomedImage.Width, zoomedImage.Height));
-            debugInfors.Add(new DefectInfor.DebugInfors() { mat_Image = zoomedImage, mat_Region = zoomedRegion, str_Step = (debugInfors.Count() + 1).ToString(), str_Message = debugMessage });
+            debugInfors.Add(new DebugInfors() { mat_Image = zoomedImage, mat_Region = zoomedRegion, str_Step = (debugInfors.Count() + 1).ToString(), str_Message = debugMessage });
 
         }
 
@@ -316,7 +313,7 @@ namespace TapeReelPacking.Source.Algorithm
 
         }
 
-        public /*static*/ int Inspect(ref ImageTarget InspectImage, ref List<ArrayOverLay> list_arrayOverlay, ref PointF pCenter, ref PointF pCorner, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug = false)
+        public /*static*/ int Inspect(ref ImageTarget InspectImage, ref List<ArrayOverLay> list_arrayOverlay, ref PointF pCenter, ref PointF pCorner, ref List<DebugInfors> debugInfors, bool bEnableDebug = false)
         {
             int nError;
             Stopwatch timeIns = new Stopwatch();
@@ -491,7 +488,7 @@ namespace TapeReelPacking.Source.Algorithm
 
         //}
 
-        public int LabelInspection(ref CvImage imgSource, List<ArrayOverLay> list_arrayOverlay, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug = false)
+        public int LabelInspection(ref CvImage imgSource, List<ArrayOverLay> list_arrayOverlay, ref List<DebugInfors> debugInfors, bool bEnableDebug = false)
         {
 
             System.Drawing.Rectangle rectLabel1 = new System.Drawing.Rectangle((int)(m_DeviceLocationParameter.m_L_DeviceLocationRoi.TopLeft.X * m_DeviceLocationParameter.m_L_ScaleImageRatio),
@@ -503,7 +500,7 @@ namespace TapeReelPacking.Source.Algorithm
         }
 
 
-        public int FindBlackChip(ref CvImage imgSource, ref CvImage mat_RegionInspectionROI, ref PointF pCenter, ref List<ArrayOverLay> list_arrayOverlay, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug = false)
+        public int FindBlackChip(ref CvImage imgSource, ref CvImage mat_RegionInspectionROI, ref PointF pCenter, ref List<ArrayOverLay> list_arrayOverlay, ref List<DebugInfors> debugInfors, bool bEnableDebug = false)
         {
             Stopwatch timeIns = new Stopwatch();
 
@@ -685,7 +682,7 @@ namespace TapeReelPacking.Source.Algorithm
             return -(int)ERROR_CODE.OPPOSITE_CHIP;
         }
 
-        public /*static*/ int FindDeviceLocation_Zoom(ref CvImage imgSource, ref List<ArrayOverLay> list_arrayOverlay, ref PointF pCenter, ref PointF pCorner, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug = false)
+        public /*static*/ int FindDeviceLocation_Zoom(ref CvImage imgSource, ref List<ArrayOverLay> list_arrayOverlay, ref PointF pCenter, ref PointF pCorner, ref List<DebugInfors> debugInfors, bool bEnableDebug = false)
         {
             Stopwatch timeIns = new Stopwatch();
             int nErrorTemp = -(int)ERROR_CODE.NO_PATTERN_FOUND;
@@ -1086,7 +1083,7 @@ namespace TapeReelPacking.Source.Algorithm
             return nErrorTemp;
         }
 
-        public int FindNearestPoints_Debug(CvImage imgSourceInput, RotatedRect rotateRect_Device, ref PointF pCornerOut, ref List<ArrayOverLay> list_arrayOverlay, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug)
+        public int FindNearestPoints_Debug(CvImage imgSourceInput, RotatedRect rotateRect_Device, ref PointF pCornerOut, ref List<ArrayOverLay> list_arrayOverlay, ref List<DebugInfors> debugInfors, bool bEnableDebug)
         {
             Stopwatch timeIns = new Stopwatch();
             CvPointArray regionPoints = new CvPointArray();
@@ -1199,7 +1196,7 @@ namespace TapeReelPacking.Source.Algorithm
         }
 
 
-        public void LabelMarking_Inspection(CvImage imgSourceInput, int nPVIAreaIndex, PointF pCenter, PointF pCorner, ref int nResultOutput, ref List<ArrayOverLay> list_arrayOverlay, ref List<DefectInfor.DebugInfors> debugInfors, bool bEnableDebug)
+        public void LabelMarking_Inspection(CvImage imgSourceInput, int nPVIAreaIndex, PointF pCenter, PointF pCorner, ref int nResultOutput, ref List<ArrayOverLay> list_arrayOverlay, ref List<DebugInfors> debugInfors, bool bEnableDebug)
         {
             if(m_SurfaceDefectParameter[nPVIAreaIndex].m_DR_AreaEnable == false)
             {

@@ -13,6 +13,9 @@ using System.Windows.Media;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using Application = TapeReelPacking.Source.Application;
 using TapeReelPacking.UI.UserControls.ViewModel;
+using System.Windows;
+using Xceed.Wpf.Toolkit.PropertyGrid;
+using static TapeReelPacking.UI.UserControls.ViewModel.TeachParameterVM;
 
 namespace TapeReelPacking
 {
@@ -29,11 +32,32 @@ namespace TapeReelPacking
         public TeachParametersUC()
         {
             InitializeComponent();
+            //this.DataContext = new TeachParameterVM();
+            //TeachParameterVM teachparameterVM = (TeachParameterVM)this.DataContext;
+            //pgr_PropertyGrid_Teach.DataContext = Application.Application.categoriesTeachParam;
 
-            TeachParameterVM teachparameterVM = (TeachParameterVM)this.DataContext;
-            teachparameterVM.UpdatePropertyGridAction = () => pgr_PropertyGrid_Teach.Update();
+            //TeachParameterVM.UpdatePropertyGridAction = () => { int a = 1; };
+            //pgr_PropertyGrid_Teach.Update();
             //this.DataContext = Application.Application.categoriesTeachParam;
         }
+
+        //private void pgr_PropertyGrid_Teach_PropertyValueChanged(object sender, PropertyValueChangedEventArgs e)
+        //{
+        //    // Access old and new values directly
+        //    var oldValue = e.OldValue;
+        //    var newValue = e.NewValue;
+
+        //    // Check if event arguments are null and handle accordingly
+        //    if (e == null)
+        //    {
+        //        MessageBox.Show("Event arguments are null.");
+        //        return;
+        //    }
+
+        //    // Optional: Notify the ViewModel if needed
+        //    var viewModel = DataContext as TeachParameterVM;
+        //    viewModel?.OnPropertyChanged(e);  // Call ViewModel method with event args
+        //}
 
 
         //public bool UpdateTeachParamFromDictToUI(Dictionary<string, string> dictTeachParam)

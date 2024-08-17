@@ -11,21 +11,85 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using Application = TapeReelPacking.Source.Application;
+using System.Runtime.CompilerServices;
+using TapeReelPacking.UI.UserControls.ViewModel;
 
 namespace TapeReelPacking
 {
     /// <summary>
     /// Interaction logic for MappingSetingUC.xaml
     /// </summary>
+    /// 
+    public class MappingSetingUCVM : BaseVM
+    {
+
+        private CatergoryMappingParameters _dataMapping;
+        public CatergoryMappingParameters categoriesMappingParam
+        {
+            set
+            {
+                _dataMapping = value;
+                OnPropertyChanged(nameof(categoriesMappingParam));
+            }
+            get => _dataMapping;
+        }
+
+        public MappingSetingUCVM()
+        {
+            categoriesMappingParam = Application.Application.categoriesMappingParam;
+        }
+
+        [CategoryOrder("MAPPING", 0)]
+        [DisplayName("Mapping Setting")]
+        public class CatergoryMappingParameters
+        {
+
+            #region MAPPING
+            [Browsable(true)]
+            [Category("MAPPING")]
+            [DisplayName("Number Device X")]
+            [Range(10, 100)]
+            [DefaultValue(10)]
+            [Description("")]
+            [PropertyOrder(0)]
+            public int M_NumberDeviceX { get; set; }
+            [Browsable(true)]
+            [Category("MAPPING")]
+            [DisplayName("Number Device Y")]
+            [Range(1, 100)]
+            [DefaultValue(10)]
+            [Description("")]
+            [PropertyOrder(1)]
+            public int M_NumberDeviceY { get; set; }
+
+            [Browsable(true)]
+            [Category("MAPPING")]
+            [DisplayName("Number Device Per Lot")]
+            [Range(1, 10000)]
+            [DefaultValue(1000)]
+            [Description("")]
+            [PropertyOrder(2)]
+            public int M_NumberDevicePerLot { get; set; }
+            #endregion
+
+        }
+
+
+    }
+
     public partial class MappingSetingUC : UserControl
     {
+
         private Dictionary<string, string> _dictMappingParam = new Dictionary<string, string>();
+
+
+
+
 
         //public CatergoryMappingParameters categoriesMappingParam = new CatergoryMappingParameters();
         public MappingSetingUC()
         {
             InitializeComponent();
-            this.DataContext = Application.Application.categoriesMappingParam;
 
         }
 
@@ -57,7 +121,7 @@ namespace TapeReelPacking
             object category = Application.Application.categoriesMappingParam;
             //object category_local = categoriesMappingParam;
             bool bSuccess = Application.Application.UpdateParamFromDictToUI(dictParam, ref category/*, ref category_local*/);
-            Application.Application.categoriesMappingParam = (CatergoryMappingParameters)category;
+            Application.Application.categoriesMappingParam = (MappingSetingUCVM.CatergoryMappingParameters)category;
             //categoriesMappingParam = (CatergoryMappingParameters)category_local;
             pgr_PropertyGrid_Mapping.Update();
             return bSuccess;
@@ -107,39 +171,6 @@ namespace TapeReelPacking
             mainWindow.btn_mapping_parameters.IsChecked = false;
         }
 
-        [CategoryOrder("MAPPING", 0)]
-        [DisplayName("Mapping Setting")]
-        public class CatergoryMappingParameters
-        {
 
-            #region MAPPING
-            [Browsable(true)]
-            [Category("MAPPING")]
-            [DisplayName("Number Device X")]
-            [Range(10, 100)]
-            [DefaultValue(10)]
-            [Description("")]
-            [PropertyOrder(0)]
-            public int M_NumberDeviceX { get; set; }
-            [Browsable(true)]
-            [Category("MAPPING")]
-            [DisplayName("Number Device Y")]
-            [Range(1, 100)]
-            [DefaultValue(10)]
-            [Description("")]
-            [PropertyOrder(1)]
-            public int M_NumberDeviceY { get; set; }
-
-            [Browsable(true)]
-            [Category("MAPPING")]
-            [DisplayName("Number Device Per Lot")]
-            [Range(1, 10000)]
-            [DefaultValue(1000)]
-            [Description("")]
-            [PropertyOrder(2)]
-            public int M_NumberDevicePerLot { get; set; }
-            #endregion
-
-        }
     }
 }

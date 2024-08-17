@@ -4,9 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TapeReelPacking.UI.UserControls"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:behaviors1="clr-namespace:TapeReelPacking.Source.Behaviors"
+             xmlns:viewmodel="clr-namespace:TapeReelPacking.UI.UserControls.ViewModel"
              mc:Ignorable="d" 
              Width="500" Height="500"
              UseLayoutRounding="True" Foreground="White">
+    <UserControl.DataContext>
+        <viewmodel:DefectInfoVM></viewmodel:DefectInfoVM>
+    </UserControl.DataContext>
     <Grid>
         <Border CornerRadius="0" BorderThickness="1" BorderBrush="#FF86D2F9" Background="#FF242526">
             <StackPanel>
@@ -35,12 +41,26 @@
                 </StackPanel>
             </StackPanel>
         </Border>
-        <ScrollViewer x:Name="scv_StepDebugScrollView" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="0,40,0,0" MouseWheel="ScrollViewer_MouseWheel">
+        <ScrollViewer x:Name="scv_StepDebugScrollView" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="0,40,0,0"
+                      MouseWheel="scv_StepDebugScrollView_MouseWheel">
             <!--<Border CornerRadius="0" BorderThickness="1" BorderBrush="#FF86D2F9" Background="#FF242526">-->
-                <ListView x:Name="lvDefect" FontSize="15" Width="Auto"  Background="Black" 
-                          SelectionChanged="lvDefect_SelectionChanged"
-                          FocusableChanged="lvDefect_FocusableChanged" PreviewMouseWheel="lvDefect_PreviewMouseWheel">
-                    
+
+                <ListView x:Name="lvDefect" FontSize="15" Width="Auto"  Background="Black"
+                          PreviewMouseWheel="lvDefect_PreviewMouseWheel"
+                          SelectedItem="{Binding selectedItem, Mode=TwoWay}">
+                <i:Interaction.Behaviors>
+                    <behaviors1:EventToCommandBehavior EventName="SelectionChanged"
+                                      Command="{Binding SelectionChangedCommand}" />
+                </i:Interaction.Behaviors>
+                <!--<i:Interaction.Behaviors>
+                    <behaviors1:EventToCommandBehavior EventName="SelectionChanged"
+                                      Command="{Binding SelectionChangedCommand}" />
+                    <behaviors1:EventToCommandBehavior EventName="FocusableChanged"
+                                      Command="{Binding FocusableChangedCommand}" />
+                    <behaviors1:EventToCommandBehavior EventName="PreviewMouseWheel"
+                                      Command="{Binding PreviewMouseWheelCommand}" />
+                </i:Interaction.Behaviors>-->
+
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal"  >

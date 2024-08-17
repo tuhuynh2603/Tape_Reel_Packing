@@ -8,8 +8,11 @@
              d:DesignHeight="450" d:DesignWidth="800"
              xmlns:xceedtk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <UserControl.DataContext>
+        <local:MappingSetingUCVM></local:MappingSetingUCVM></UserControl.DataContext>
         <Grid>
             <xceedtk:PropertyGrid x:Name="pgr_PropertyGrid_Mapping"
+                              DataContext="{Binding categoriesMappingParam, UpdateSourceTrigger=PropertyChanged}"
                               SelectedObject="{Binding}" Margin="0,0,0,30"
                               ShowTitle="True"
                               ShowSearchBox="True"

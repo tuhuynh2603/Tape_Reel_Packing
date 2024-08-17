@@ -25,7 +25,7 @@ namespace TapeReelPacking.Source.Application
         public static TeachParameterVM.CategoryTeachParameter categoriesTeachParam = new TeachParameterVM.CategoryTeachParameter();
         //public static TeachParametersUC.CategoryAreaParameter categoryAreaParam = new TeachParametersUC.CategoryAreaParameter();
 
-        public static MappingSetingUC.CatergoryMappingParameters categoriesMappingParam = new MappingSetingUC.CatergoryMappingParameters();
+        public static MappingSetingUCVM.CatergoryMappingParameters categoriesMappingParam = new MappingSetingUCVM.CatergoryMappingParameters();
 
         public static Dictionary<string, string> dictTeachParam = new Dictionary<string, string>();
         public static Dictionary<string, string>[] dictPVIAreaParam = new Dictionary<string, string>[TOTAL_AREA];
@@ -473,15 +473,6 @@ namespace TapeReelPacking.Source.Application
             }
 
 
-            //ReadLine("TOP PATTERN", "no of pattern", ini, ref dictTeachParam);
-            ////ReadLine("TOP PATTERN", "no of pattern", ini, ref categoriesTeachParam.TP_noOfPattern);
-            ////categoriesTeachParam.TP_noOfPattern = dictTeachParam[]
-            ////double a = int.Parse(dictTeachParam["TP_noOfPattern"]);
-            //if (dictTeachParam["TP_noOfPattern"] != "")
-            //{
-            //    for (int n = 0; n < int.Parse(dictTeachParam["TP_noOfPattern"]); n++)
-            //        ReadLine("TOP PATTERN", "roi no " + (n + 1).ToString(), ini, ref dictTeachParam);
-            //}
         }
 
         public void WriteTeachParam(int nTrack)
@@ -548,20 +539,6 @@ namespace TapeReelPacking.Source.Application
                 WriteLine("DEFECT ROI", $"Defect ROI Locations {nAreaIndex+1}", ini, ConvertRectanglesToString(inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_DR_DefectROILocations));
                 WritePVIAreaParam(nTrack, nAreaIndex);
             }
-
-            //WriteLine("TOP PATTERN", "no of pattern", ini, categoriesTeachParam.TP_noOfPattern.ToString());
-
-            //if (categoriesTeachParam.TP_noOfPattern != categoriesTeachParam.TP_roiNo.Count())
-            //{
-            //    categoriesTeachParam.TP_roiNo.Clear();
-            //    for (int n = 0; n <= categoriesTeachParam.TP_noOfPattern; n++)
-            //    {
-            //        Rectangles rec = new Rectangles();
-            //        categoriesTeachParam.TP_roiNo.Add(rec);
-            //    }
-            //} 
-            //for (int n = 0; n < categoriesTeachParam.TP_roiNo.Count(); n++)
-            //    WriteLine("TOP PATTERN", "roi no " + (n+1).ToString(), ini, ConvertRectanglesToString(categoriesTeachParam.TP_roiNo[n]));
 
         }
 

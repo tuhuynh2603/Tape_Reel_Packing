@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Prism.Commands;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -9,54 +10,50 @@ using System.Windows.Input;
 using TapeReelPacking.Source.Application;
 using TapeReelPacking.Source.Define;
 using TapeReelPacking.UI.UserControls.ViewModel;
+using Xceed.Wpf.Toolkit.PropertyGrid;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-using static TapeReelPacking.TeachParametersUC;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
     public class TeachParameterVM :BaseVM
     {
-        public Action UpdatePropertyGridAction { get; set; }
 
-        private int _m_nTrackSelected;
-        public int m_nTrackSelected
+        bool _isDisableOnpropertyChanged = false;
+        public void OnPropertyChanged(PropertyValueChangedEventArgs e)
         {
-            set
-            {
-                if (_m_nTrackSelected != value)
-                    _m_nTrackSelected = value;
-                {
-                    ReloadTeachParameterUI(m_nTrackSelected, nDefectROIIndex);
-                }
-                OnPropertyChanged(nameof(m_nTrackSelected));
-            }
-            get => _m_nTrackSelected;       
+            // Access changed property and its new value
+            if (e == null || _isDisableOnpropertyChanged)
+                return;
+
+            var propertyItem = e.OriginalSource as Xceed.Wpf.Toolkit.PropertyGrid.PropertyItem;
+            var propertyName = propertyItem?.DisplayName;
+
+            if (!propertyName.ToString().Contains("Defect ROI Index"))
+                return;
+
+            //var propertyName = e.GetType();
+            var oldValue = e.OldValue;
+            var newValue = e.NewValue;
+            if (oldValue == newValue)
+                return;
+
+            nDefectROIIndex = (int)newValue;
+            ReloadTeachParameterUI(SelectedCameraIndex, nDefectROIIndex);
+            // Handle the event
+            // For example, you might log the change or update some other parts of your UI
+            Console.WriteLine($"changed from '{oldValue}' to '{newValue}'");
         }
 
+        //private CategoryTeachParameter _selectedObject;
 
+        //public CategoryTeachParameter SelectedObject
+        //{
+        //    get => _selectedObject;
+        //    set => SetProperty(ref _selectedObject, value);
+        //}
 
 
         public int nDefectROIIndex = 0;
-
-        private object _selectedObject;
-        public object SelectedObject
-        {
-            get => _selectedObject;
-            set
-            {
-                if (_selectedObject != value)
-                {
-                    _selectedObject = value;
-
-                    if (nDefectROIIndex != (int)Application.categoriesTeachParam.DR_DefectROIIndex)
-                    {
-                        nDefectROIIndex = (int)Application.categoriesTeachParam.DR_DefectROIIndex;
-                        ReloadAreaParameterUI(m_nTrackSelected, nDefectROIIndex);
-                    }
-                    OnPropertyChanged(nameof(SelectedObject));
-                }
-            }
-        }
 
         private int _SelectedCameraIndex;
         public int SelectedCameraIndex
@@ -67,6 +64,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                 if (_SelectedCameraIndex != value)
                 {
                     _SelectedCameraIndex = value;
+                    ReloadTeachParameterUI(SelectedCameraIndex, nDefectROIIndex);
                     OnPropertyChanged(nameof(SelectedCameraIndex));
                     // Add logic to handle camera selection change if necessary
                 }
@@ -74,26 +72,23 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         }
 
         private CategoryTeachParameter _categoriesTeachParam;
-        public CategoryTeachParameter categoriesTeachParam
-        
-        {
-            set
-            {
-                _categoriesTeachParam = value;
-                OnPropertyChanged(nameof(categoriesTeachParam));
-            }
-               
-            get => _categoriesTeachParam;
-        }
 
+        public CategoryTeachParameter categoriesTeachParam
+        {
+            get => _categoriesTeachParam;
+            set => SetProperty(ref _categoriesTeachParam, value);
+        }
 
 
         public ICommand SaveCommand { get; }
         public ICommand CancelCommand { get; }
+        public ICommand PropertyChangedCommand { set; get; }
 
         public TeachParameterVM()
         {
-            categoriesTeachParam = Application.categoriesTeachParam;
+
+
+
             SaveCommand = new RelayCommand<TeachParameterVM>((p) => { return true; },
                                          (p) =>
                                          {
@@ -104,14 +99,21 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                              (p) =>
                              {
                                  UpdateTeachParamFromDictToUI(Application.dictTeachParam);
-                                 UpdatePropertyGridAction?.Invoke();
 
 
                                  MainWindow mainWindow = (MainWindow)System.Windows.Application.Current.MainWindow;
                                  mainWindow.teach_parameters_btn.IsChecked = false;
                              });
 
+            PropertyChangedCommand = new DelegateCommand<PropertyValueChangedEventArgs>(OnPropertyChanged);
+
+            categoriesTeachParam = Application.categoriesTeachParam;
+
+
         }
+
+
+
 
 
         public bool SaveParameterTeachDefault()
@@ -121,12 +123,11 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                 Mouse.OverrideCursor = Cursors.Wait;
                 //LoadTeachParamFromUIToDict();
                 MainWindow mainWindow = (MainWindow)System.Windows.Application.Current.MainWindow;
-                mainWindow.master.m_Tracks[m_nTrackSelected].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
-                mainWindow.master.m_Tracks[m_nTrackSelected].m_InspectionCore.UpdateAreaParameterFromUIToInspectionCore((int)Application.categoriesTeachParam.DR_DefectROIIndex);
-                mainWindow.master.WriteTeachParam(m_nTrackSelected);
-                Application.LoadTeachParamFromFileToDict(m_nTrackSelected);
-                Application.LoadAreaParamFromFileToDict(m_nTrackSelected, (int)Application.categoriesTeachParam.DR_DefectROIIndex);
-                UpdatePropertyGridAction?.Invoke();
+                mainWindow.master.m_Tracks[SelectedCameraIndex].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
+                mainWindow.master.m_Tracks[SelectedCameraIndex].m_InspectionCore.UpdateAreaParameterFromUIToInspectionCore((int)Application.categoriesTeachParam.DR_DefectROIIndex);
+                mainWindow.master.WriteTeachParam(SelectedCameraIndex);
+                Application.LoadTeachParamFromFileToDict(SelectedCameraIndex);
+                Application.LoadAreaParamFromFileToDict(SelectedCameraIndex, (int)Application.categoriesTeachParam.DR_DefectROIIndex);
 
 
                 Mouse.OverrideCursor = null;
@@ -141,13 +142,16 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         public void ReloadTeachParameterUI(int nTrack, int nArea = 0)
         {
+            _isDisableOnpropertyChanged = true;
+
             Application.dictTeachParam.Clear();
             Application.LoadTeachParamFromFileToDict(nTrack);
             //m_Tracks[nTrack].m_InspectionCore.LoadTeachImageToInspectionCore(nTrack);
             UpdateTeachParamFromDictToUI(Application.dictTeachParam);
 
-            ReloadAreaParameterUI(m_nTrackSelected, nDefectROIIndex);
-            UpdatePropertyGridAction?.Invoke();
+            ReloadAreaParameterUI(SelectedCameraIndex, nDefectROIIndex);
+            categoriesTeachParam = Application.categoriesTeachParam;
+            _isDisableOnpropertyChanged = false;
 
 
         }
@@ -159,7 +163,6 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             //m_Tracks[nTrack].m_InspectionCore.LoadTeachImageToInspectionCore(nTrack);
             UpdateTeachParamFromDictToUI(Application.dictPVIAreaParam[nDefectROIIndex]);
             //pgr_PropertyGrid_Teach.Update();
-            UpdatePropertyGridAction?.Invoke();
         }
 
 
@@ -174,8 +177,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             bool bSuccess = Application.UpdateParamFromDictToUI(dictTeachParam, ref category);
             Application.categoriesTeachParam = (CategoryTeachParameter)category;
 
-            //categoriesTeachParam = (CategoryTeachParameter)category_local;
-            UpdatePropertyGridAction?.Invoke();
+            categoriesTeachParam = Application.categoriesTeachParam;
 
 
             return bSuccess;
@@ -204,10 +206,8 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         [CategoryOrder("OPPOSITE CHIP", 1)]
         [CategoryOrder("DEFECT ROI", 2)]
         [CategoryOrder("LABEL DEFECT", 3)]
-
-
         [DisplayName("Teach Parameter")]
-        public class CategoryTeachParameter
+        public class CategoryTeachParameter : Prism.Mvvm.BindableBase
         {
 
             #region LOCATION
@@ -217,7 +217,13 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [Range(0, 5)]
             [Description("")]
             [PropertyOrder(0)]
-            public Rectangles L_DeviceLocationRoi { get; set; }
+            public Rectangles L_DeviceLocationRoi { 
+                get => _L_DeviceLocationRoi;
+
+                set => SetProperty(ref _L_DeviceLocationRoi, value);
+            }
+            private Rectangles _L_DeviceLocationRoi;
+
 
 
             [Browsable(true)]
@@ -225,7 +231,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DisplayName("Location Enable")]
             [PropertyOrder(1)]
             [DefaultValue(true)]
-            public bool L_LocationEnable { get; set; }
+            public bool L_LocationEnable {
+                get => _L_LocationEnable;
+
+                set => SetProperty(ref _L_LocationEnable, value);
+
+            }
+
+            private bool _L_LocationEnable;
 
 
             [Browsable(true)]
@@ -234,7 +247,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(THRESHOLD_TYPE.BINARY_THRESHOLD)]
             [Description("Threshold method")]
             [PropertyOrder(2)]
-            public THRESHOLD_TYPE L_ThresholdType { get; set; }
+            public THRESHOLD_TYPE L_ThresholdType {
+            get => _L_ThresholdType;
+
+                set => SetProperty(ref _L_ThresholdType, value);
+
+            }
+
+            private THRESHOLD_TYPE _L_ThresholdType;
 
             [Browsable(true)]
             [Category("LOCATION")]
@@ -242,7 +262,15 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(OBJECT_COLOR.BLACK)]
             [Description("The color of Object want to catch")]
             [PropertyOrder(3)]
-            public OBJECT_COLOR L_ObjectColor { get; set; }
+            public OBJECT_COLOR L_ObjectColor
+            {
+                get => _L_ObjectColor;
+
+                set => SetProperty(ref _L_ObjectColor, value);
+
+            }
+
+            private OBJECT_COLOR _L_ObjectColor;
 
             [Browsable(true)]
             [Category("LOCATION")]
@@ -252,7 +280,16 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [Description("")]
             [PropertyOrder(4)]
 
-            public int L_lowerThreshold { get; set; }
+            public int L_lowerThreshold
+            {
+                get => _L_lowerThreshold;
+
+                set => SetProperty(ref _L_lowerThreshold, value);
+
+            }
+
+            private int _L_lowerThreshold;
+
             [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Upper Threshold")]
@@ -260,7 +297,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(255)]
             [Description("")]
             [PropertyOrder(5)]
-            public int L_upperThreshold { get; set; }
+            public int L_upperThreshold
+            {
+                get => _L_upperThreshold;
+
+                set => SetProperty(ref _L_upperThreshold, value);
+
+            }
+            private int _L_upperThreshold;
 
             [Browsable(true)]
             [Category("LOCATION")]
@@ -269,7 +313,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(0)]
             [Description("")]
             [PropertyOrder(6)]
-            public int L_lowerThresholdInnerChip { get; set; }
+            public int L_lowerThresholdInnerChip
+            {
+                get => _L_lowerThresholdInnerChip;
+
+                set => SetProperty(ref _L_lowerThresholdInnerChip, value);
+
+            }
+            private int _L_lowerThresholdInnerChip;
 
 
             [Browsable(true)]
@@ -279,8 +330,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(255)]
             [Description("")]
             [PropertyOrder(7)]
-            public int L_upperThresholdInnerChip { get; set; }
+            public int L_upperThresholdInnerChip
+            {
+                get => _L_upperThresholdInnerChip;
 
+                set => SetProperty(ref _L_upperThresholdInnerChip, value);
+
+            }
+            private int _L_upperThresholdInnerChip;
 
             [Browsable(true)]
             [Category("LOCATION")]
@@ -289,7 +346,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(11)]
             [Description("")]
             [PropertyOrder(8)]
-            public int L_OpeningMask { get; set; }
+            public int L_OpeningMask
+            {
+                get => _L_OpeningMask;
+
+                set => SetProperty(ref _L_OpeningMask, value);
+
+            }
+            private int _L_OpeningMask;
 
             [Browsable(true)]
             [Category("LOCATION")]
@@ -298,7 +362,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(30)]
             [Description("")]
             [PropertyOrder(9)]
-            public int L_DilationMask { get; set; }
+            public int L_DilationMask
+            {
+                get => _L_DilationMask;
+
+                set => SetProperty(ref _L_DilationMask, value);
+
+            }
+            private int _L_DilationMask;
 
             [Browsable(true)]
             [Category("LOCATION")]
@@ -307,7 +378,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(50)]
             [Description("")]
             [PropertyOrder(10)]
-            public int L_MinWidthDevice { get; set; }
+            public int L_MinWidthDevice
+            {
+                get => _L_MinWidthDevice;
+
+                set => SetProperty(ref _L_MinWidthDevice, value);
+
+            }
+            private int _L_MinWidthDevice;
 
             [Browsable(true)]
             [Category("LOCATION")]
@@ -316,7 +394,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(50)]
             [Description("")]
             [PropertyOrder(11)]
-            public int L_MinHeightDevice { get; set; }
+            public int L_MinHeightDevice
+            {
+                get => _L_MinHeightDevice;
+
+                set => SetProperty(ref _L_MinHeightDevice, value);
+
+            }
+            private int _L_MinHeightDevice;
 
             [Browsable(false)]
             [Category("LOCATION")]
@@ -324,8 +409,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [Range(0, 5)]
             [Description("")]
             [PropertyOrder(12)]
-            public Rectangles L_TemplateRoi { get; set; }
+            public Rectangles L_TemplateRoi
+            {
+                get => _L_TemplateRoi;
 
+                set => SetProperty(ref _L_TemplateRoi, value);
+
+            }
+            private Rectangles _L_TemplateRoi;
             [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Number Side")]
@@ -333,7 +424,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(4)]
             [Description("")]
             [PropertyOrder(13)]
-            public int L_NumberSide { get; set; }
+            public int L_NumberSide
+            {
+                get => _L_NumberSide;
+
+                set => SetProperty(ref _L_NumberSide, value);
+
+            }
+            private int _L_NumberSide;
 
             [Browsable(true)]
             [Category("LOCATION")]
@@ -342,7 +440,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(1)]
             [Description("Before Inspecting, The image will be scaled by this value to reduce inspection time.")]
             [PropertyOrder(14)]
-            public double L_ScaleImageRatio { get; set; }
+            public double L_ScaleImageRatio
+            {
+                get => _L_ScaleImageRatio;
+
+                set => SetProperty(ref _L_ScaleImageRatio, value);
+
+            }
+            private double _L_ScaleImageRatio;
 
             [Browsable(true)]
             [Category("LOCATION")]
@@ -351,8 +456,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(50.0)]
             [Description("")]
             [PropertyOrder(15)]
-            public double L_MinScore { get; set; }
+            public double L_MinScore
+            {
+                get => _L_MinScore;
 
+                set => SetProperty(ref _L_MinScore, value);
+
+            }
+            private double _L_MinScore;
 
             [Browsable(false)]
             [Category("LOCATION")]
@@ -361,8 +472,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(0)]
             [Description("")]
             [PropertyOrder(16)]
-            public int L_CornerIndex { get; set; }
+            public int L_CornerIndex
+            {
+                get => _L_CornerIndex;
 
+                set => SetProperty(ref _L_CornerIndex, value);
+
+            }
+            private int _L_CornerIndex;
             #endregion
 
             #region Area
@@ -373,7 +490,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [Range(0, 5)]
             [Description("")]
             [PropertyOrder(0)]
-            public List<Rectangles> DR_DefectROILocations { get; set; }
+            public List<Rectangles> DR_DefectROILocations
+            {
+                get => _DR_DefectROILocations;
+
+                set => SetProperty(ref _DR_DefectROILocations, value);
+
+            }
+            private List<Rectangles> _DR_DefectROILocations;
 
             [Browsable(true)]
             [Category("DEFECT ROI")]
@@ -382,16 +506,28 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(1)]
             [Description("")]
             [PropertyOrder(1)]
-            public int DR_NumberROILocation { get; set; }
+            public int DR_NumberROILocation
+            {
+                get => _DR_NumberROILocation;
 
+                set => SetProperty(ref _DR_NumberROILocation, value);
+
+            }
+            private int _DR_NumberROILocation;
             [Browsable(true)]
             [Category("DEFECT ROI")]
             [DisplayName("Defect ROI Index")]
             [DefaultValue(AREA_INDEX.A1)]
             [PropertyOrder(2)]
             //[ItemsSource(typeof(AreaComboBox))]
-            public AREA_INDEX DR_DefectROIIndex { get; set; }
+            public AREA_INDEX DR_DefectROIIndex
+            {
+                get => _DR_DefectROIIndex;
 
+                set => SetProperty(ref _DR_DefectROIIndex, value);
+
+            }
+            private AREA_INDEX _DR_DefectROIIndex;
             #endregion
 
             #region OPPOSITE Chip
@@ -402,8 +538,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DisplayName("Enable")]
             [PropertyOrder(0)]
             [DefaultValue(false)]
-            public bool OC_EnableCheck { get; set; }
+            public bool OC_EnableCheck
+            {
+                get => _OC_EnableCheck;
 
+                set => SetProperty(ref _OC_EnableCheck, value);
+
+            }
+            private bool _OC_EnableCheck;
             [Browsable(true)]
             [Category("OPPOSITE CHIP")]
             [DisplayName("lower Threshold")]
@@ -411,8 +553,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(0)]
             [PropertyOrder(1)]
             //[ItemsSource(typeof(AreaComboBox))]
-            public int OC_lowerThreshold { get; set; }
+            public int OC_lowerThreshold
+            {
+                get => _OC_lowerThreshold;
 
+                set => SetProperty(ref _OC_lowerThreshold, value);
+
+            }
+            private int _OC_lowerThreshold;
             [Browsable(true)]
             [Category("OPPOSITE CHIP")]
             [DisplayName("upper Threshold")]
@@ -420,8 +568,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(100)]
             [PropertyOrder(2)]
             //[ItemsSource(typeof(AreaComboBox))]
-            public int OC_upperThreshold { get; set; }
+            public int OC_upperThreshold
+            {
+                get => _OC_upperThreshold;
 
+                set => SetProperty(ref _OC_upperThreshold, value);
+
+            }
+            private int _OC_upperThreshold;
             [Browsable(true)]
             [Category("OPPOSITE CHIP")]
             [DisplayName("Opening Mask")]
@@ -429,8 +583,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(0)]
             [Description("")]
             [PropertyOrder(3)]
-            public int OC_OpeningMask { get; set; }
+            public int OC_OpeningMask
+            {
+                get => _OC_OpeningMask;
 
+                set => SetProperty(ref _OC_OpeningMask, value);
+
+            }
+            private int _OC_OpeningMask;
             [Browsable(true)]
             [Category("OPPOSITE CHIP")]
             [DisplayName("Dilation Mask")]
@@ -438,8 +598,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(0)]
             [Description("")]
             [PropertyOrder(4)]
-            public int OC_DilationMask { get; set; }
+            public int OC_DilationMask
+            {
+                get => _OC_DilationMask;
 
+                set => SetProperty(ref _OC_DilationMask, value);
+
+            }
+            private int _OC_DilationMask;
 
             [Browsable(true)]
             [Category("OPPOSITE CHIP")]
@@ -448,7 +614,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(50)]
             [Description("")]
             [PropertyOrder(5)]
-            public int OC_MinWidthDevice { get; set; }
+            public int OC_MinWidthDevice
+            {
+                get => _OC_MinWidthDevice;
+
+                set => SetProperty(ref _OC_MinWidthDevice, value);
+
+            }
+            private int _OC_MinWidthDevice;
 
             [Browsable(true)]
             [Category("OPPOSITE CHIP")]
@@ -457,8 +630,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(50)]
             [Description("")]
             [PropertyOrder(6)]
-            public int OC_MinHeightDevice { get; set; }
+            public int OC_MinHeightDevice
+            {
+                get => _OC_MinHeightDevice;
 
+                set => SetProperty(ref _OC_MinHeightDevice, value);
+
+            }
+            private int _OC_MinHeightDevice;
             #endregion
 
             #region LABEL
@@ -468,16 +647,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DisplayName("Area Enable")]
             [PropertyOrder(0)]
             [DefaultValue(false)]
-            public bool LD_AreaEnable { get; set; }
+            public bool LD_AreaEnable
+            {
+                get => _LD_AreaEnable;
 
-            //[Browsable(false)]
-            //[Category("LABEL DEFECT")]
-            //[DisplayName("Number ROI Location")]
-            //[Range(0, 5)]
-            //[DefaultValue(1)]
-            //[Description("")]
-            //[PropertyOrder(1)]
-            //public int LD_NumberROILocation { get; set; }
+                set => SetProperty(ref _LD_AreaEnable, value);
+
+            }
+            private bool _LD_AreaEnable;
 
             [Browsable(true)]
             [Category("LABEL DEFECT")]
@@ -486,8 +663,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(0)]
             [Description("")]
             [PropertyOrder(2)]
-            public int LD_lowerThreshold { get; set; }
+            public int LD_lowerThreshold
+            {
+                get => _LD_lowerThreshold;
 
+                set => SetProperty(ref _LD_lowerThreshold, value);
+
+            }
+            private int _LD_lowerThreshold;
 
             [Browsable(true)]
             [Category("LABEL DEFECT")]
@@ -496,7 +679,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(255)]
             [Description("")]
             [PropertyOrder(3)]
-            public int LD_upperThreshold { get; set; }
+            public int LD_upperThreshold
+            {
+                get => _LD_upperThreshold;
+
+                set => SetProperty(ref _LD_upperThreshold, value);
+
+            }
+            private int _LD_upperThreshold;
 
             [Browsable(true)]
             [Category("LABEL DEFECT")]
@@ -505,7 +695,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(0)]
             [Description("")]
             [PropertyOrder(4)]
-            public int LD_OpeningMask { get; set; }
+            public int LD_OpeningMask
+            {
+                get => _LD_OpeningMask;
+
+                set => SetProperty(ref _LD_OpeningMask, value);
+
+            }
+            private int _LD_OpeningMask;
 
             [Browsable(true)]
             [Category("LABEL DEFECT")]
@@ -514,7 +711,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(0)]
             [Description("")]
             [PropertyOrder(5)]
-            public int LD_DilationMask { get; set; }
+            public int LD_DilationMask
+            {
+                get => _LD_DilationMask;
+
+                set => SetProperty(ref _LD_DilationMask, value);
+
+            }
+            private int _LD_DilationMask;
 
             [Browsable(true)]
             [Category("LABEL DEFECT")]
@@ -523,89 +727,15 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             [DefaultValue(50)]
             [Description("")]
             [PropertyOrder(6)]
-            public int LD_ObjectCoverPercent { get; set; }
+            public int LD_ObjectCoverPercent
+            {
+                get => _LD_ObjectCoverPercent;
 
+                set => SetProperty(ref _LD_ObjectCoverPercent, value);
+
+            }
+            private int _LD_ObjectCoverPercent;
             #endregion
-
-            //[DisplayName("Defect Parameter")]
-            //[CategoryOrder("AREA", 1)]
-            //[CategoryOrder("LABEL", 1)]
-            //public class CategoryAreaParameter
-            //{
-            //    #region Area
-            //    [Category("AREA")]
-            //    [Browsable(true)]
-            //    [DisplayName("Area Index")]
-            //    [DefaultValue(AREA_INDEX.A1)]
-            //    //[ItemsSource(typeof(AreaComboBox))]
-            //    [PropertyOrder(0)]
-            //    public AREA_INDEX A_AreaIndex { get; set; }
-
-            //    #endregion
-
-            //    #region LABEL
-
-            //    [Browsable(false)]
-            //    [Category("LABEL DEFECT")]
-            //    [DisplayName("Label Locations")]
-            //    [Range(0, 5)]
-            //    [Description("")]
-            //    [PropertyOrder(0)]
-            //    public Rectangles LD_LabelLocations { get; set; }
-
-
-            //    [Category("LABEL DEFECT")]
-            //    [DisplayName("Area Enable")]
-            //    [PropertyOrder(0)]
-            //    [DefaultValue(false)]
-            //    public bool LD_AreaEnable { get; set; }
-
-            //    //[Browsable(false)]
-            //    //[Category("LABEL DEFECT")]
-            //    //[DisplayName("Number ROI Location")]
-            //    //[Range(0, 5)]
-            //    //[DefaultValue(1)]
-            //    //[Description("")]
-            //    //[PropertyOrder(1)]
-            //    //public int LD_NumberROILocation { get; set; }
-
-            //    //[Browsable(false)]
-            //    [Category("LABEL DEFECT")]
-            //    [DisplayName("Lower Threshold")]
-            //    [Range(0, 255)]
-            //    [DefaultValue(0)]
-            //    [Description("")]
-            //    [PropertyOrder(2)]
-            //    public int LD_lowerThreshold { get; set; }
-            //    //[Browsable(false)]
-            //    [Category("LABEL DEFECT")]
-            //    [DisplayName("Upper Threshold")]
-            //    [Range(0, 255)]
-            //    [DefaultValue(255)]
-            //    [Description("")]
-            //    [PropertyOrder(3)]
-            //    public int LD_upperThreshold { get; set; }
-
-            //    //[Browsable(false)]
-            //    [Category("LABEL DEFECT")]
-            //    [DisplayName("Opening Mask")]
-            //    [Range(1, 100)]
-            //    [DefaultValue(1)]
-            //    [Description("")]
-            //    [PropertyOrder(4)]
-            //    public int LD_OpeningMask { get; set; }
-
-            //    //[Browsable(false)]
-            //    [Category("LABEL DEFECT")]
-            //    [DisplayName("Dilation Mask")]
-            //    [Range(1, 100)]
-            //    [DefaultValue(1)]
-            //    [Description("")]
-            //    [PropertyOrder(5)]
-            //    public int LD_DilationMask { get; set; }
-
-            //    #endregion
-            //}
 
         }
 

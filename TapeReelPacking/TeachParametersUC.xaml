@@ -7,10 +7,13 @@
              xmlns:xceedtk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:ViewModel="clr-namespace:TapeReelPacking.UI.UserControls.ViewModel"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:behaviors="clr-namespace:TapeReelPacking.Behaviors" 
+             xmlns:behaviors1="clr-namespace:TapeReelPacking.Source.Behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="550" d:DesignWidth="800">
     <UserControl.DataContext>
-        <ViewModel:TeachParameterVM></ViewModel:TeachParameterVM> 
+        <ViewModel:TeachParameterVM></ViewModel:TeachParameterVM>
     </UserControl.DataContext>
     <Grid>
         <Grid>
@@ -19,17 +22,34 @@
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0">
-                <StackPanel Grid.Row="0">
-                    <xceedtk:PropertyGrid  x:Name="pgr_PropertyGrid_Teach"
-                                  DataContext="{Binding categoriesTeachParam, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                  SelectedObject="{Binding SelectedObject}" 
-                                  Margin="0,0,0,30"
-                                  ShowTitle="True"
-                                  ShowSearchBox="false"
-                                  ShowSummary="True"
-                                  Background="#FF322F2E" 
-                                  Foreground="LightGray"/>
-                </StackPanel>
+
+                <xceedtk:PropertyGrid  x:Name="pgr_PropertyGrid_Teach"
+                                SelectedObject="{Binding categoriesTeachParam}" 
+                                Margin="0,0,0,30"
+                                ShowTitle="True"
+                                ShowSearchBox="false"
+                                ShowSummary="True"
+                                Background="#FF322F2E" 
+                                Foreground="LightGray">
+
+
+                    <i:Interaction.Behaviors>
+                        <behaviors1:EventToCommandBehavior EventName="PropertyValueChanged"
+                                      Command="{Binding PropertyChangedCommand}" />
+                    </i:Interaction.Behaviors>
+
+                    <!--
+                    <i:Interaction.Behaviors>    
+                        <behaviors:PropertyChangedBehavior Command="{Binding PropertyChangedCommand}"/>
+                    </i:Interaction.Behaviors>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="PropertyValueChanged">
+                            <i:InvokeCommandAction Command="{Binding PropertyChangedCommand}"
+                                               CommandParameter="{Binding ElementName=pgr_PropertyGrid_Teach, Path=SelectedObject}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>-->
+                </xceedtk:PropertyGrid>
+                
                 <!--<xceedtk:PropertyGrid  x:Name="pgr_PropertyGrid_Area"
                                   SelectedObject="{Binding}" Margin="0,0,0,30"
                                   ShowTitle="False"

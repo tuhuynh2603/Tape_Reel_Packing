@@ -12,8 +12,8 @@ DEBUG;TRACE
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\App.xaml
 211289446947
 
-54533590294
-58-1625434279
+57-1670682896
+59-329776708
 MainWindow.xaml;MappingSetingUC.xaml;PopupUserControl.xaml;ResourceControl.xaml;Source\Hardware\BarCodeReaderView.xaml;Source\Hardware\ETHERNETIP_View.xaml;Source\Hardware\HIKControlCameraView.xaml;Source\Hardware\HiWinRobotUserControl.xaml;Source\Hardware\PLCCOMM.xaml;TeachParametersUC.xaml;UI\UserControls\DefectInfor.xaml;UI\UserControls\LoginUser.xaml;UI\UserControls\LotBarcodeDataTable.xaml;UI\UserControls\OutputLogView.xaml;UI\UserControls\PixelRuler.xaml;UI\UserControls\RecipeManageView.xaml;UI\UserControls\View\ImageView.xaml;UI\UserControls\View\SerialCommunicationView.xaml;UI\UserControls\View\StatisticView.xaml;UI\UserControls\View\TitleBar.xaml;UI\UserControls\WarningMessageBox.xaml;
 
 True

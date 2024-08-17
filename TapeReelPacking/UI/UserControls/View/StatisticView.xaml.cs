@@ -19,7 +19,7 @@ namespace TapeReelPacking.UI.UserControls.View
     /// <summary>
     /// Interaction logic for StatisticView.xaml
     /// </summary>
-    public partial class StatisticView : System.Windows.Controls.UserControl
+    public partial class StatisticView : UserControl
     {
 
         public ObservableCollection<StatisticData> listSummary = new ObservableCollection<StatisticData>();

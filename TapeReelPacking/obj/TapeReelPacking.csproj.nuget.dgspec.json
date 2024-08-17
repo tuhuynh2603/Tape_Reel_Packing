@@ -74,6 +74,10 @@
               "target": "Package",
               "version": "[1.0.0, )"
             },
+            "Prism.Core": {
+              "target": "Package",
+              "version": "[8.1.97, )"
+            },
             "Xceed.Wpf.AvalonDock.Themes.VS2013": {
               "target": "Package",
               "version": "[2.9.0.1, )"

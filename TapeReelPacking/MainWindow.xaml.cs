@@ -1200,8 +1200,8 @@ namespace TapeReelPacking
             if (master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource.Width < 0)
                 return;
 
-
-            defectInfor.m_TrackDebugging = activeImageDock.trackID;
+            var defectInforData = (DefectInfoVM)defectInfor.DataContext;
+            defectInforData.m_TrackDebugging = activeImageDock.trackID;
             master.m_Tracks[activeImageDock.trackID].m_InspectionCore.LoadImageToInspection(master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource);
             master.m_Tracks[activeImageDock.trackID].DebugFunction(ref master.m_Tracks[activeImageDock.trackID]);
 

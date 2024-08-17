@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using Prism.Mvvm;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
-    public class BaseVM : INotifyPropertyChanged
+    public class BaseVM : BindableBase, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

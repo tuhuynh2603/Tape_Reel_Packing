@@ -160,6 +160,15 @@ namespace TapeReelPacking.Source.Define
         MODE_MANUAL = 1
     }
 
+
+    public struct DebugInfors
+    {
+        public Mat mat_Image { get; set; }
+        public Mat mat_Region { get; set; }
+        public string str_Message { get; set; }
+        public string str_Step { get; set; }
+    };
+
     public struct LocationReference
     {
         public int deltaX { get; set; }

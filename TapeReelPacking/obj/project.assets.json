@@ -231,6 +231,15 @@
           "lib/net45/System.Windows.Interactivity.dll": {}
         }
       },
+      "Prism.Core/8.1.97": {
+        "type": "package",
+        "compile": {
+          "lib/net47/Prism.dll": {}
+        },
+        "runtime": {
+          "lib/net47/Prism.dll": {}
+        }
+      },
       "System.ComponentModel.Annotations/5.0.0": {
         "type": "package",
         "frameworkAssemblies": [
@@ -535,6 +544,15 @@
           "lib/net45/Microsoft.Expression.Prototyping.SketchControls.dll": {},
           "lib/net45/Microsoft.SDK.Expression.Blend.dll": {},
           "lib/net45/System.Windows.Interactivity.dll": {}
+        }
+      },
+      "Prism.Core/8.1.97": {
+        "type": "package",
+        "compile": {
+          "lib/net47/Prism.dll": {}
+        },
+        "runtime": {
+          "lib/net47/Prism.dll": {}
         }
       },
       "System.ComponentModel.Annotations/5.0.0": {
@@ -843,6 +861,15 @@
           "lib/net45/System.Windows.Interactivity.dll": {}
         }
       },
+      "Prism.Core/8.1.97": {
+        "type": "package",
+        "compile": {
+          "lib/net47/Prism.dll": {}
+        },
+        "runtime": {
+          "lib/net47/Prism.dll": {}
+        }
+      },
       "System.ComponentModel.Annotations/5.0.0": {
         "type": "package",
         "frameworkAssemblies": [
@@ -1147,6 +1174,15 @@
           "lib/net45/Microsoft.Expression.Prototyping.SketchControls.dll": {},
           "lib/net45/Microsoft.SDK.Expression.Blend.dll": {},
           "lib/net45/System.Windows.Interactivity.dll": {}
+        }
+      },
+      "Prism.Core/8.1.97": {
+        "type": "package",
+        "compile": {
+          "lib/net47/Prism.dll": {}
+        },
+        "runtime": {
+          "lib/net47/Prism.dll": {}
         }
       },
       "System.ComponentModel.Annotations/5.0.0": {
@@ -1972,6 +2008,32 @@
         "microsoft.sdk.expression.blend.nuspec"
       ]
     },
+    "Prism.Core/8.1.97": {
+      "sha512": "EP5zrvWddw3eSq25Y7hHnDYdmLZEC2Z/gMrvmHzUuLbitmA1UaS7wQUlSwNr9Km8lzJNCvytFnaGBEFukHgoHg==",
+      "type": "package",
+      "path": "prism.core/8.1.97",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "lib/net461/Prism.dll",
+        "lib/net461/Prism.pdb",
+        "lib/net461/Prism.xml",
+        "lib/net47/Prism.dll",
+        "lib/net47/Prism.pdb",
+        "lib/net47/Prism.xml",
+        "lib/net5.0/Prism.dll",
+        "lib/net5.0/Prism.pdb",
+        "lib/net5.0/Prism.xml",
+        "lib/netstandard2.0/Prism.dll",
+        "lib/netstandard2.0/Prism.pdb",
+        "lib/netstandard2.0/Prism.xml",
+        "prism-logo.png",
+        "prism.core.8.1.97.nupkg.sha512",
+        "prism.core.nuspec",
+        "readme.txt"
+      ]
+    },
     "System.ComponentModel.Annotations/5.0.0": {
       "sha512": "dMkqfy2el8A8/I76n2Hi1oBFEbG1SfxD2l5nhwXV3XjlnOmwxJlQbYpJH4W51odnU9sARCSAgv7S3CyAFMkpYg==",
       "type": "package",
@@ -2114,6 +2176,7 @@
       "MaterialDesignColors >= 1.2.0",
       "MaterialDesignThemes >= 2.6.0",
       "Microsoft.SDK.Expression.Blend >= 1.0.0",
+      "Prism.Core >= 8.1.97",
       "Xceed.Wpf.AvalonDock.Themes.VS2013 >= 2.9.0.1",
       "iTextSharp >= 5.5.13.3"
     ]
@@ -2190,6 +2253,10 @@
           "Microsoft.SDK.Expression.Blend": {
             "target": "Package",
             "version": "[1.0.0, )"
+          },
+          "Prism.Core": {
+            "target": "Package",
+            "version": "[8.1.97, )"
           },
           "Xceed.Wpf.AvalonDock.Themes.VS2013": {
             "target": "Package",

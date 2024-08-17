@@ -49,11 +49,11 @@ namespace TapeReelPacking.Source.Application
         public VideoCapture m_cap;
         public Thread threadInspectOnline;
 
-        public List<DefectInfor.DebugInfors> m_StepDebugInfors;
+        public List<DebugInfors> m_StepDebugInfors;
         public List<ArrayOverLay> m_ArrayOverLay;
         public Track(int indexTrack, int numdoc, string serieCam, MainWindow app, int width = 3840, int height = 2748)
         {
-            m_StepDebugInfors = new List<DefectInfor.DebugInfors>();
+            m_StepDebugInfors = new List<DebugInfors>();
             m_ArrayOverLay = new List<ArrayOverLay>();
             m_nTrackID = indexTrack;
             mainWindow = app;

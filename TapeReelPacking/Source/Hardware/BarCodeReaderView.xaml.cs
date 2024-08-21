@@ -14,6 +14,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using TapeReelPacking.Source.Application;
+using Path = System.IO.Path;
 
 namespace TapeReelPacking.Source.Hardware
 {
@@ -27,123 +29,22 @@ namespace TapeReelPacking.Source.Hardware
         private const string MESSAGE_FILE_CORRECT = "< Find historical data file(s). >";
         private const string MESSAGE_FIND_NEW_FILE = "< Find new historical data file(s). >";
         private const string MESSAGE_JPEG_NO_EXIST = "< CANNOT find any image file in the historical data. >";
+
         public BarCodeReaderView()
         {
             LogMessage.LogMessage.WriteToDebugViewer(2, "Init Barcode UI");
 
             InitializeComponent();
-
-            combo_commandSendToBarCode.Items.Add("LON");
+            combo_BarcodeBrank.Items.Add("1");
+            combo_BarcodeBrank.Items.Add("2");
+            //combo_BarcodeBrank.SelectedItem = MainWindow.mainWindow.master.m_BarcodeReader.barcodeSetting.brankID;
             //combo_commandSendToBarCode.Items.Add("LOFF");
 
         }
-
-        //bool bOnOff = false;
-        //FileSystemWatcher watcher = null;
-        //public string m_ftpPath = @"C:\Wisely\Barcode Reader\FTP";
-
-
-        private void Connect_Click(object sender, RoutedEventArgs e)
-        {
-
-            if (MainWindow.mainWindow.master == null)
-                return;
-
-            //bOnOff = !bOnOff;
-            //if (bOnOff)
-            //    MainWindow.mainWindow.master.m_BarcodeReader.sendCommandToAllReaders("LON");
-            //else
-            //    MainWindow.mainWindow.master.m_BarcodeReader.sendCommandToAllReaders("LOFF");
-        }
-        //private void ReceivedBarCodeFile_Click(object sender, RoutedEventArgs e)
-        //{
-        //    System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-        //    folderBrowserDialog1.Description = "Select FTP path";
-        //    folderBrowserDialog1.SelectedPath = @"C:\Wisely\Barcode Reader\FTP";
-        //    //System.Windows.Forms.DialogResult result = folderBrowserDialog.ShowDialog();
-
-        //    System.Windows.Forms.DialogResult dr = folderBrowserDialog1.ShowDialog();
-        //    if (dr == System.Windows.Forms.DialogResult.OK)
-        //    {
-        //        Label_FTP_Path.Content = folderBrowserDialog1.SelectedPath;
-        //        m_ftpPath = folderBrowserDialog1.SelectedPath;
-        //    }
-        //}
-
-        //private void SendBarCodeFile_Click(object sender, RoutedEventArgs e)
-        //{
-
-        //}
-
-
-        //private void watcher_Changed(System.Object source, System.IO.FileSystemEventArgs e)
-        //{
-        //    switch (e.ChangeType)
-        //    {
-        //        case WatcherChangeTypes.Created:
-        //            string fileName = System.IO.Path.GetFileName(e.FullPath);
-        //            LabelContent.Content = fileName;
-        //            lbNewJpgFileName.Content = MESSAGE_FIND_NEW_FILE;
-        //            break;
-        //        default:
-        //            break;
-        //    }
-        //}
-
-        //private void watcher_Deleted(System.Object source, System.IO.FileSystemEventArgs e)
-        //{
-        //    switch (e.ChangeType)
-        //    {
-        //        case WatcherChangeTypes.Deleted:
-        //            LabelContent.Content = string.Empty;
-        //            lbNewJpgFileName.Content = MESSAGE_FILE_NO_EXIST;
-        //            break;
-
-        //        default:
-        //            break;
-        //    }
-        //}
-
-        //private string getLatestHistoricalFileName(string folderName)
-        //{
-        //    string[] historicalDataFiles;
-
-        //    try
-        //    {
-        //        historicalDataFiles = System.IO.Directory.GetFiles(folderName, "*.json", System.IO.SearchOption.TopDirectoryOnly);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return string.Empty;
-        //    }
-
-        //    string newesthistoricalDataFileName = string.Empty;
-        //    System.DateTime updateTime = System.DateTime.MinValue;
-
-        //    // Newest historicalDataFile Searching.
-        //    foreach (string file in historicalDataFiles)
-        //    {
-        //        // Get historicalDataFile Infomation
-        //        System.IO.FileInfo fi = new System.IO.FileInfo(file);
-
-        //        // Judge DateTime
-        //        if (fi.LastWriteTime > updateTime)
-        //        {
-        //            updateTime = fi.LastWriteTime;
-        //            newesthistoricalDataFileName = file;
-        //        }
-        //    }
-
-        //    return System.IO.Path.GetFileName(newesthistoricalDataFileName);
-        //}
-
-        //private void ReceivedFTPLastImage_Click(object sender, RoutedEventArgs e)
-        //{
-        //        MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage("LON");
-        //}
-
         private void combo_commandSendToBarCode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+
+            
            //string strFullPathImageOut = "";
            //MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut);
         }
@@ -168,6 +69,11 @@ namespace TapeReelPacking.Source.Hardware
             label_DataReceived.Content =  MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut, nDeviceIDTemp, strLot);
         }
 
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.mainWindow.master.m_BarcodeReader.barcodeSetting.brankID = combo_BarcodeBrank.SelectedItem.ToString();
+            MainWindow.mainWindow.master.m_BarcodeReader.WriteBarcodeSetting();
+        }
 
     }
 }

@@ -213,6 +213,8 @@ namespace TapeReelPacking.Source.Application
             }
             #endregion
 
+            m_BarcodeReader.LoadBarcodeSetting();
+            
         }
         #endregion
 

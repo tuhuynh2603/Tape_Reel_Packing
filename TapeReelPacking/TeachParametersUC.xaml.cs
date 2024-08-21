@@ -195,7 +195,6 @@ namespace TapeReelPacking
             [PropertyOrder(0)]
             public Rectangles L_DeviceLocationRoi { get; set; }
 
-
             [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Location Enable")]

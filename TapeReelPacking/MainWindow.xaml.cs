@@ -1322,6 +1322,7 @@ namespace TapeReelPacking
             grd_Dialog_Settings.Width = master.m_BarcodeReader.m_BarcodeReader.Width;
             grd_Dialog_Settings.Height = master.m_BarcodeReader.m_BarcodeReader.Height;
             grd_PopupDialog.Children.Clear();
+            master.m_BarcodeReader.m_BarcodeReader.combo_BarcodeBrank.SelectedItem = master.m_BarcodeReader.barcodeSetting.brankID;
             grd_PopupDialog.Children.Add(master.m_BarcodeReader.m_BarcodeReader);
             //grd_PopupDialog.Visibility = Visibility.Visible;
             grd_PopupDialog.Visibility = Visibility.Visible;

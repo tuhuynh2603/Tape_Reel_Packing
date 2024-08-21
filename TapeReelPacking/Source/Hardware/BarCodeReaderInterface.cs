@@ -14,7 +14,9 @@ namespace TapeReelPacking.Source.Hardware
 {
     using TapeReelPacking.Source.LogMessage;
     using System.IO;
-	public class BarCodeReaderInterface
+    using TapeReelPacking.UI.UserControls.ViewModel;
+
+    public class BarCodeReaderInterface:BaseVM
 	{
 		public CommInterface commBarCodeSequence;
 
@@ -29,6 +31,9 @@ namespace TapeReelPacking.Source.Hardware
 		public int[] nReceiveMessage;
 		private MainWindow main;
 		public BarCodeReaderView m_BarcodeReader;
+
+
+		public BarcodeSetting barcodeSetting = new BarcodeSetting();
 
 		public BarCodeReaderInterface()
 		{
@@ -92,14 +97,14 @@ namespace TapeReelPacking.Source.Hardware
 				if (bIsConnected)
 				{
 					m_BarcodeReader.label_ReaderIP_Address.Content = $"{m_reader.IpAddress}";
-					m_BarcodeReader.Connect.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
+					m_BarcodeReader.Save.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
 					MainWindow.mainWindow.label_Barcode_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
 					MainWindow.mainWindow.label_Barcode_Status.Content = $"{m_reader.IpAddress}";
 				}
 				else
 				{
 					m_BarcodeReader.label_ReaderIP_Address.Content = $"{m_reader.IpAddress}";
-					m_BarcodeReader.Connect.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Red);
+					m_BarcodeReader.Save.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Red);
 					MainWindow.mainWindow.label_Barcode_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Red);
 					MainWindow.mainWindow.label_Barcode_Status.Content = $"{m_reader.IpAddress}";
 
@@ -142,7 +147,7 @@ namespace TapeReelPacking.Source.Hardware
 			string strImageFullName;
 
 
-			string resp = m_reader.ExecCommand("LON,01");
+			string resp = m_reader.ExecCommand($"LON,0{barcodeSetting.brankID}");
 			if (resp.Length > 0)
 			{
 				strDeviceID = resp.Replace("\r", "");
@@ -207,5 +212,31 @@ namespace TapeReelPacking.Source.Hardware
         {
 			m_reader.Disconnect();
         }
+
+
+		public  void LoadBarcodeSetting()
+		{
+			string strRecipePath = Path.Combine(Application.Application.pathRecipe, Application.Application.currentRecipe);
+			string fullpathCam = Path.Combine(strRecipePath, "BarcodeSetting.cfg");
+			IniFile ini = new IniFile(fullpathCam);
+			barcodeSetting.brankID = ini.ReadValue("Barcode Setting", "brank ID", "1");
+			if (!Directory.Exists(strRecipePath))
+			{
+				Directory.CreateDirectory(strRecipePath);
+				WriteBarcodeSetting();
+			}
+		}
+		public  void WriteBarcodeSetting()
+		{
+			string strRecipePath = Path.Combine(Application.Application.pathRecipe, Application.Application.currentRecipe);
+			string fullpathCam = Path.Combine(strRecipePath, "BarcodeSetting.cfg");
+			IniFile ini = new IniFile(fullpathCam);
+			ini.WriteValue("Barcode Setting", "brank ID", barcodeSetting.brankID);
+			if (!Directory.Exists(strRecipePath))
+			{
+				Directory.CreateDirectory(strRecipePath);
+				WriteBarcodeSetting();
+			}
+		}
 	}
 }

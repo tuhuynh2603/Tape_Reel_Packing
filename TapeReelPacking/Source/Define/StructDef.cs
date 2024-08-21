@@ -176,6 +176,11 @@ namespace TapeReelPacking.Source.Define
         public float gain;
     }
 
+    public class BarcodeSetting
+    {
+        public string brankID { set; get; } = "1";
+    }
+
     public static class DefautTeachingSequence
     {
         public static System.Windows.Media.Brush ColorContentTeahing = System.Windows.Media.Brushes.Cyan;

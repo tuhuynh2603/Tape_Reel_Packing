@@ -347,6 +347,7 @@ namespace TapeReelPacking.Source.Application
 
         }
 
+
         public static void LoadAreaParamFromFileToDict(ref int nTrack, int nAreaIndex = TOTAL_AREA)
         {
             if (currentRecipe == null || pathRecipe == null)

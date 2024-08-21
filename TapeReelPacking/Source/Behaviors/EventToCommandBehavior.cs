@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿ using System;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Interactivity;
 namespace TapeReelPacking.Source.Behaviors
-{
-    using System;
-    using System.Windows;
-    using System.Windows.Input;
-    using System.Windows.Interactivity;
 
+{ 
     public class EventToCommandBehavior : Behavior<UIElement>
     {
         public static readonly DependencyProperty CommandProperty =

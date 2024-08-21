@@ -1,0 +1,90 @@
+﻿<UserControl x:Class="TapeReelPacking.UI.UserControls.View.VisionParameterUC"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ViewModel="clr-namespace:TapeReelPacking.UI.UserControls.ViewModel"
+             xmlns:xceedtk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:behaviors1="clr-namespace:TapeReelPacking.Source.Behaviors"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.DataContext>
+        <ViewModel:VisionParameterVM></ViewModel:VisionParameterVM>
+    </UserControl.DataContext>
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0">
+
+                <xceedtk:PropertyGrid  x:Name="pgr_PropertyGrid_Vision"
+                                SelectedObject="{Binding categoriesVisionParam}" 
+                                Margin="0,0,0,30"
+                                ShowTitle="True"
+                                ShowSearchBox="false"
+                                ShowSummary="True"
+                                Background="#FF322F2E" 
+                                Foreground="LightGray">
+
+
+                    <i:Interaction.Behaviors>
+                        <behaviors1:EventToCommandBehavior EventName="PropertyValueChanged"
+                                      Command="{Binding PropertyChangedCommand}" />
+                    </i:Interaction.Behaviors>
+                </xceedtk:PropertyGrid>
+
+
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="30">
+                <Button Name="btn_ok" FontSize="8" Padding="0"
+                    Background="#FF343333"
+                    Height="25" 
+                    HorizontalAlignment="Center"
+                    Margin="0,2,15,1"
+                    ToolTip="Save"
+                    Command="{Binding SaveCommand}"
+                    Width="40" BorderBrush="#FF352622">
+                    <materialDesign:PackIcon Kind="UserCheck" Height="24" Width="24" Foreground="#FFFD1A12"/>
+                </Button>
+                <Button Name="btn_cancel" FontSize="8" Padding="0"
+                    Background="#FF343333"
+                    Height="25"
+                    Margin="0,2,10,1"
+                    ToolTip="Cancel"
+                    HorizontalAlignment="Center"
+                    Command="{Binding CancelCommand}"
+                    Width="40" BorderBrush="#FF352622">
+                    <materialDesign:PackIcon Kind="RemoveCircle" Height="24" Width="24" Foreground="#FFFD1A12"/>
+                </Button>
+            </StackPanel>
+
+        </Grid>
+
+        <StackPanel  Margin="50,-460,0,0" Orientation="Horizontal">
+            <ComboBox Height="25" x:Name="track_ComboBox" Foreground="Black" Width="100"
+                  SelectedIndex="{Binding SelectedCameraIndex, Mode=TwoWay,
+            UpdateSourceTrigger=PropertyChanged}">
+                <ComboBoxItem Content="Camera 1"></ComboBoxItem>
+                <ComboBoxItem Content="Camera 2"></ComboBoxItem>
+            </ComboBox>
+
+            <ComboBox Height="25" x:Name="comboSelectedPVIArea" Foreground="Black"   Width="100"
+                  SelectedIndex="{Binding SelectedPVIAreaIndex, Mode=TwoWay,
+            UpdateSourceTrigger=PropertyChanged}">
+                <ComboBoxItem Content="Area 1"></ComboBoxItem>
+                <ComboBoxItem Content="Area 2"></ComboBoxItem>
+                <ComboBoxItem Content="Area 3"></ComboBoxItem>
+                <ComboBoxItem Content="Area 4"></ComboBoxItem>
+                <ComboBoxItem Content="Area 5"></ComboBoxItem>
+
+            </ComboBox>
+        </StackPanel>
+
+
+
+    </Grid>
+</UserControl>

@@ -80,20 +80,11 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             MinimizeWindowCommand = new RelayCommand<UserControl>((p) => { return true; },
                                                (p) =>
                                                {
-                                                   //FrameworkElement window = GetWindowParent(p);
-                                                   //var w = window as Window;
-                                                   //if (w == null)
-                                                   //    return;
                                                    MainWindow.mainWindow.WindowState = WindowState.Minimized;
-                                                   //w.WindowState = WindowState.Minimized;
                                                });
             MaximizeWindowCommand = new RelayCommand<UserControl>((p) => { return true; },
                                                                (p) =>
                                                                {
-                                                                   //FrameworkElement window = GetWindowParent(p);
-                                                                   //var w = window as Window;
-                                                                   //if (w == null)
-                                                                   //    return;
                                                                    if (MainWindow.mainWindow.WindowState == WindowState.Maximized)
                                                                    {
                                                                        MainWindow.mainWindow.WindowState = WindowState.Normal;

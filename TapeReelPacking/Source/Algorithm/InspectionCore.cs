@@ -18,6 +18,8 @@ using CvContourArray = Emgu.CV.Util.VectorOfVectorOfPoint;
 namespace TapeReelPacking.Source.Algorithm
 {
     using TapeReelPacking.Source.Application;
+    using TapeReelPacking.Source.Model;
+
     public class InspectionCore
     {
 
@@ -201,11 +203,11 @@ namespace TapeReelPacking.Source.Algorithm
 
 
             if (Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.Width > globalImageSize.Width
-                || Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.TopLeft.X >= globalImageSize.Width
-                || Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.TopLeft.Y >= globalImageSize.Height)
-                Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi = new Rectangles(new System.Windows.Point(globalImageSize.Width / 2, globalImageSize.Height / 2), 300, 300);
+                || Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.GetRectangle().TopLeft.X >= globalImageSize.Width
+                || Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.GetRectangle().TopLeft.Y >= globalImageSize.Height)
+                Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.SetRectangle(new Rectangles(new System.Windows.Point(globalImageSize.Width / 2, globalImageSize.Height / 2), 300, 300));
 
-            m_DeviceLocationParameter.m_L_DeviceLocationRoi = Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi;
+            m_DeviceLocationParameter.m_L_DeviceLocationRoi = Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.GetRectangle();
 
             m_DeviceLocationParameter.m_L_OpeningMask = Source.Application.Application.categoriesTeachParam.L_OpeningMask;
             m_DeviceLocationParameter.m_L_DilationMask = Source.Application.Application.categoriesTeachParam.L_DilationMask;
@@ -213,10 +215,11 @@ namespace TapeReelPacking.Source.Algorithm
             m_DeviceLocationParameter.m_L_MinHeightDevice = Source.Application.Application.categoriesTeachParam.L_MinHeightDevice;
 
             if (Source.Application.Application.categoriesTeachParam.L_TemplateRoi.Width > globalImageSize.Width ||
-                Source.Application.Application.categoriesTeachParam.L_TemplateRoi.TopLeft.X >= globalImageSize.Width
-                || Source.Application.Application.categoriesTeachParam.L_TemplateRoi.TopLeft.Y >= globalImageSize.Height)
-                Source.Application.Application.categoriesTeachParam.L_TemplateRoi = new Rectangles(new System.Windows.Point(globalImageSize.Width / 2, globalImageSize.Height / 2), 300, 300);
-            m_DeviceLocationParameter.m_L_TemplateRoi = Source.Application.Application.categoriesTeachParam.L_TemplateRoi;
+                Source.Application.Application.categoriesTeachParam.L_TemplateRoi.GetRectangle().TopLeft.X >= globalImageSize.Width
+                || Source.Application.Application.categoriesTeachParam.L_TemplateRoi.GetRectangle().TopLeft.Y >= globalImageSize.Height)
+                Source.Application.Application.categoriesTeachParam.L_TemplateRoi.SetRectangle(new Rectangles(new System.Windows.Point(globalImageSize.Width / 2, globalImageSize.Height / 2), 300, 300));
+            
+            m_DeviceLocationParameter.m_L_TemplateRoi = Source.Application.Application.categoriesTeachParam.L_TemplateRoi.GetRectangle();
 
             m_DeviceLocationParameter.m_L_StepTemplate = Source.Application.Application.categoriesTeachParam.L_NumberSide;
             m_DeviceLocationParameter.m_L_ScaleImageRatio = Source.Application.Application.categoriesTeachParam.L_ScaleImageRatio;
@@ -238,33 +241,40 @@ namespace TapeReelPacking.Source.Algorithm
 
 
 
-            m_DeviceLocationParameter.m_DR_NumberROILocation = Source.Application.Application.categoriesTeachParam.DR_NumberROILocation;
+            m_DeviceLocationParameter.m_DR_NumberROILocation = Source.Application.Application.categoriesTeachParam.L_NumberROILocation;
 
-            for (int nArea = 0; nArea < Application.TOTAL_AREA; nArea++)
-            {
+            //for (int nArea = 0; nArea < Application.TOTAL_AREA; nArea++)
+            //{
 
-                if (Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea].Width > globalImageSize.Width ||
-                    Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea].TopLeft.X >= globalImageSize.Width
-                    || Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea].TopLeft.Y >= globalImageSize.Height)
-                    Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea] = new Rectangles(new System.Windows.Point(globalImageSize.Width / 2, globalImageSize.Height / 2), 300, 300);
+            //    if (Source.Application.Application.categoryVisionParameter[nArea].LD_DefectROILocation.Width > globalImageSize.Width ||
+            //        Source.Application.Application.categoryVisionParameter[nArea].LD_DefectROILocation.TopLeft.X >= globalImageSize.Width
+            //        || Source.Application.Application.categoryVisionParameter[nArea].LD_DefectROILocation.TopLeft.Y >= globalImageSize.Height)
+            //        Source.Application.Application.categoryVisionParameter[nArea].LD_DefectROILocation = new Rectangles(new System.Windows.Point(globalImageSize.Width / 2, globalImageSize.Height / 2), 300, 300);
 
-                m_SurfaceDefectParameter[nArea].m_DR_DefectROILocations = Source.Application.Application.categoriesTeachParam.DR_DefectROILocations[nArea];
-                //m_SurfaceDefectParameter.m_LD_NumberROILocation = Source.Application.Application.categoriesTeachParam.LD_NumberROILocation;
+            //    m_SurfaceDefectParameter[nArea].m_DR_DefectROILocations = Source.Application.Application.categoryVisionParameter[nArea].LD_DefectROILocation;
+            //    //m_SurfaceDefectParameter.m_LD_NumberROILocation = Source.Application.Application.categoriesTeachParam.LD_NumberROILocation;
 
-            }
+            //}
             return true;
         }
 
 
-        public bool UpdateAreaParameterFromUIToInspectionCore(int nArea)
+        public bool UpdateAreaParameterFromUIToInspectionCore(CategoryVisionParameter areaParam , int nArea)
         {
 
-            m_SurfaceDefectParameter[nArea].m_DR_AreaEnable = Source.Application.Application.categoriesTeachParam.LD_AreaEnable;
-            m_SurfaceDefectParameter[nArea].m_LD_lowerThreshold = Source.Application.Application.categoriesTeachParam.LD_lowerThreshold;
-            m_SurfaceDefectParameter[nArea].m_LD_upperThreshold = Source.Application.Application.categoriesTeachParam.LD_upperThreshold;
-            m_SurfaceDefectParameter[nArea].m_LD_OpeningMask = Source.Application.Application.categoriesTeachParam.LD_OpeningMask;
-            m_SurfaceDefectParameter[nArea].m_LD_DilationMask = Source.Application.Application.categoriesTeachParam.LD_DilationMask;
-            m_SurfaceDefectParameter[nArea].m_LD_ObjectCoverPercent = Source.Application.Application.categoriesTeachParam.LD_ObjectCoverPercent;
+
+            if (areaParam.LD_DefectROILocation.Width > globalImageSize.Width ||
+            areaParam.LD_DefectROILocation.GetRectangle().TopLeft.X >= globalImageSize.Width
+                || areaParam.LD_DefectROILocation.GetRectangle().TopLeft.Y >= globalImageSize.Height)
+                areaParam.LD_DefectROILocation.SetRectangle(new Rectangles(new System.Windows.Point(globalImageSize.Width / 2, globalImageSize.Height / 2), 300, 300));
+
+            m_SurfaceDefectParameter[nArea].m_DR_DefectROILocations = areaParam.LD_DefectROILocation.GetRectangle();
+            m_SurfaceDefectParameter[nArea].m_DR_AreaEnable = areaParam.LD_AreaEnable;
+            m_SurfaceDefectParameter[nArea].m_LD_lowerThreshold = areaParam.LD_lowerThreshold;
+            m_SurfaceDefectParameter[nArea].m_LD_upperThreshold = areaParam.LD_upperThreshold;
+            m_SurfaceDefectParameter[nArea].m_LD_OpeningMask = areaParam.LD_OpeningMask;
+            m_SurfaceDefectParameter[nArea].m_LD_DilationMask = areaParam.LD_DilationMask;
+            m_SurfaceDefectParameter[nArea].m_LD_ObjectCoverPercent = areaParam.LD_ObjectCoverPercent;
 
             return true;
         }

@@ -891,14 +891,14 @@ namespace TapeReelPacking
             grd_Dialog_Settings.Margin = new Thickness(0, 160, 0, 0);
             grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Top;
             grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Left;
-            master.teachParameter.Width = 300;
-            master.teachParameter.Height = 600;
+            master.teachParameterUC.Width = 300;
+            master.teachParameterUC.Height = 600;
             //master.m_Tracks[0].m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autofocus, 1);
-            master.teachParameter.track_ComboBox.SelectedIndex = activeImageDock.trackID;
-            TeachParameterVM teachParameterVM = (TeachParameterVM)mainWindow.master.teachParameter.DataContext;
+            master.teachParameterUC.track_ComboBox.SelectedIndex = activeImageDock.trackID;
+            TeachParameterVM teachParameterVM = (TeachParameterVM)mainWindow.master.teachParameterUC.DataContext;
 
             teachParameterVM.ReloadTeachParameterUI(activeImageDock.trackID);
-            grd_PopupDialog.Children.Add(master.teachParameter);
+            grd_PopupDialog.Children.Add(master.teachParameterUC);
             //grd_PopupDialog.Children.Add(master.m_Tracks[]);
             tab_controls.SelectedIndex = currentTabIndex;
             grd_Dialog_Settings.Visibility = Visibility.Visible;
@@ -1204,7 +1204,6 @@ namespace TapeReelPacking
             defectInforData.m_TrackDebugging = activeImageDock.trackID;
             master.m_Tracks[activeImageDock.trackID].m_InspectionCore.LoadImageToInspection(master.m_Tracks[activeImageDock.trackID].m_imageViews[0].btmSource);
             master.m_Tracks[activeImageDock.trackID].DebugFunction(ref master.m_Tracks[activeImageDock.trackID]);
-
             UpdateDebugInfor();
             return;
         }
@@ -1817,14 +1816,40 @@ namespace TapeReelPacking
 
             }
         }
-        //private void btn_Imidiate_Stop_Click(object sender, RoutedEventArgs e)
-        //{
 
-        //    //master.RobotIOStatus.m_ImidiateStatus_Simulate = (bool)btn_Imidiate_Stop.IsChecked == false ? 0 : 1;
-        //    //btn_Imidiate_Stop.IsChecked = false;
+        private void pviArea_parameters_btn_Checked(object sender, RoutedEventArgs e)
+        {
+            //pviArea_parameters_btn.IsChecked = true;
+            //_BEnableSavingOnlineImage = !_BEnableSavingOnlineImage;
+            int currentTabIndex = tab_controls.SelectedIndex;
+            tt_DialogSettings.X = 0;
+            tt_DialogSettings.Y = 0;
 
-        //    //Master.m_EmergencyStopSequenceEvent.Set();
-        //}
+            grd_PopupDialog.Children.Clear();
+            grd_Dialog_Settings.Margin = new Thickness(0, 160, 0, 0);
+            grd_Dialog_Settings.VerticalAlignment = VerticalAlignment.Top;
+            grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Left;
+            master.visionParametersUC.Width = 300;
+            master.visionParametersUC.Height = 600;
+            master.visionParametersUC.track_ComboBox.SelectedIndex = activeImageDock.trackID;
+            master.visionParametersUC.comboSelectedPVIArea.SelectedIndex = 0;
+
+            VisionParameterVM areaParameter = (VisionParameterVM)master.visionParametersUC.DataContext;
+
+            areaParameter.ReloadCameraParameterUI(activeImageDock.trackID);
+            grd_PopupDialog.Children.Add(master.visionParametersUC);
+            tab_controls.SelectedIndex = currentTabIndex;
+            grd_Dialog_Settings.Visibility = Visibility.Visible;
+            grd_PopupDialog.Visibility = Visibility.Visible;
+        }
+
+        private void pviArea_parameters_btn_Unchecked(object sender, RoutedEventArgs e)
+        {
+            //pviArea_parameters_btn.IsChecked = false;
+            grd_PopupDialog.Children.Clear();
+            grd_Dialog_Settings.Visibility = Visibility.Collapsed;
+            grd_PopupDialog.Visibility = Visibility.Collapsed;
+        }
 
     }
 }

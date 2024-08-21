@@ -12,6 +12,8 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
 using TapeReelPacking.UI.UserControls.ViewModel;
+using TapeReelPacking.Source.Model;
+using Rectangles = TapeReelPacking.Source.Define.Rectangles;
 
 namespace TapeReelPacking.Source.Application
 {
@@ -22,7 +24,9 @@ namespace TapeReelPacking.Source.Application
         public static int m_nDoc = 1;
         public static bool m_bEnableSavingOnlineImage = false;
 
-        public static TeachParameterVM.CategoryTeachParameter categoriesTeachParam = new TeachParameterVM.CategoryTeachParameter();
+        public static CategoryTeachParameter categoriesTeachParam = new CategoryTeachParameter();
+        public static CategoryVisionParameter categoriesVisionParam = new CategoryVisionParameter();
+
         //public static TeachParametersUC.CategoryAreaParameter categoryAreaParam = new TeachParametersUC.CategoryAreaParameter();
 
         public static MappingSetingUCVM.CatergoryMappingParameters categoriesMappingParam = new MappingSetingUCVM.CatergoryMappingParameters();
@@ -301,7 +305,7 @@ namespace TapeReelPacking.Source.Application
                 dictionary.Add(strParameterName, data);
         }
 
-        void WriteLine(string section, string key, IniFile ini, string param)
+        static void WriteLine(string section, string key, IniFile ini, string param)
         {
             ini.WriteValue(section, key, param);
         }
@@ -348,45 +352,29 @@ namespace TapeReelPacking.Source.Application
 
         }
 
-        public static void LoadAreaParamFromFileToDict(int nTrack, int nAreaIndex = TOTAL_AREA)
+        public static void LoadAreaParamFromFileToDict(int nTrack, int nAreaIndex)
         {
             if (currentRecipe == null || pathRecipe == null)
                 return;
-
-            //if (nAreaIndex == TOTAL_AREA)
-            //{
-            //    for (int n = 0; n < TOTAL_AREA; n++)
-            //    {
-
-            //        string strFileName = $"PVIAreaParameters_Track{nTrack + 1}_Area{n + 1}" + ".cfg";
-            //        string pathFile = Path.Combine(pathRecipe, currentRecipe, strFileName);
-            //        IniFile ini = new IniFile(pathFile);
-
-            //        //ReadLine_Magnus("DEFECT ROI", $"Defect ROI Locations {n + 1}", ini, ref dictTeachParam);
-            //        ReadLine_Magnus("LABEL DEFECT", $"Area Enable {n + 1}", ini, ref dictPVIAreaParam[n]);
-            //        ReadLine_Magnus("LABEL DEFECT", $"Lower Threshold {n + 1}", ini, ref dictPVIAreaParam[n]);
-            //        ReadLine_Magnus("LABEL DEFECT", $"Upper Threshold {n + 1}", ini, ref dictPVIAreaParam[n]);
-            //        ReadLine_Magnus("LABEL DEFECT", $"Opening Mask {n + 1}", ini, ref dictPVIAreaParam[n]);
-            //        ReadLine_Magnus("LABEL DEFECT", $"Dilation Mask {n + 1}", ini, ref dictPVIAreaParam[n]);
-            //    }
-            //}
-            //else
-            //{
 
             string strFileName = $"PVIAreaParameters_Track{nTrack + 1}_Area{nAreaIndex + 1}" + ".cfg";
             string pathFile = Path.Combine(pathRecipe, currentRecipe, strFileName);
             IniFile ini = new IniFile(pathFile);
 
-            ReadLine_Magnus("LABEL DEFECT", $"Area Enable", ini, ref dictPVIAreaParam[nAreaIndex]);
-            ReadLine_Magnus("LABEL DEFECT", $"Lower Threshold", ini, ref dictPVIAreaParam[nAreaIndex]);
-            ReadLine_Magnus("LABEL DEFECT", $"Upper Threshold", ini, ref dictPVIAreaParam[nAreaIndex]);
-            ReadLine_Magnus("LABEL DEFECT", $"Opening Mask", ini, ref dictPVIAreaParam[nAreaIndex]);
-            ReadLine_Magnus("LABEL DEFECT", $"Dilation Mask", ini, ref dictPVIAreaParam[nAreaIndex]);
-            ReadLine_Magnus("LABEL DEFECT", $"Object Cover PerCent", ini, ref dictPVIAreaParam[nAreaIndex]);
+            
+
+            ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(categoriesVisionParam.LD_AreaEnable)), ini, ref dictPVIAreaParam[nAreaIndex]);
+            ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(categoriesVisionParam.LD_lowerThreshold)), ini, ref dictPVIAreaParam[nAreaIndex]);
+            ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(categoriesVisionParam.LD_upperThreshold)), ini, ref dictPVIAreaParam[nAreaIndex]);
+            ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(categoriesVisionParam.LD_OpeningMask)), ini, ref dictPVIAreaParam[nAreaIndex]);
+            ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(categoriesVisionParam.LD_DilationMask)), ini, ref dictPVIAreaParam[nAreaIndex]);
+            ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(categoriesVisionParam.LD_ObjectCoverPercent)), ini, ref dictPVIAreaParam[nAreaIndex]);
+            ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(categoriesVisionParam.LD_DefectROILocation)), ini, ref dictPVIAreaParam[nAreaIndex]);
+
             //}
         }
 
-        public void WritePVIAreaParam(int nTrack, int nAreaIndex)
+        public static void WritePVIAreaParam(int nTrack, int nAreaIndex)
         {
 
 
@@ -409,15 +397,13 @@ namespace TapeReelPacking.Source.Application
 
             IniFile ini = new IniFile(pathFile);
             InspectionCore inspectionCore = MainWindow.mainWindow.master.m_Tracks[nTrack].m_InspectionCore;
-
-            WriteLine("LABEL DEFECT", $"Area Enable", ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_DR_AreaEnable.ToString());
-            WriteLine("LABEL DEFECT", $"Lower Threshold", ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_LD_lowerThreshold.ToString());
-            WriteLine("LABEL DEFECT", $"Upper Threshold", ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_LD_upperThreshold.ToString());
-            WriteLine("LABEL DEFECT", $"Opening Mask", ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_LD_OpeningMask.ToString());
-            WriteLine("LABEL DEFECT", $"Dilation Mask", ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_LD_DilationMask.ToString());
-            WriteLine("LABEL DEFECT", $"Object Cover PerCent", ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_LD_ObjectCoverPercent.ToString());
-
-            
+            WriteLine(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(categoriesVisionParam.LD_AreaEnable)), ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_DR_AreaEnable.ToString());
+            WriteLine(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(categoriesVisionParam.LD_lowerThreshold)), ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_LD_lowerThreshold.ToString());
+            WriteLine(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(categoriesVisionParam.LD_upperThreshold)), ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_LD_upperThreshold.ToString());
+            WriteLine(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(categoriesVisionParam.LD_OpeningMask)), ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_LD_OpeningMask.ToString());
+            WriteLine(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(categoriesVisionParam.LD_DilationMask)), ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_LD_DilationMask.ToString());
+            WriteLine(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(categoriesVisionParam.LD_ObjectCoverPercent)), ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_LD_ObjectCoverPercent.ToString());
+            WriteLine(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(categoriesVisionParam.LD_DefectROILocation)), ini, ConvertRectanglesToString(inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_DR_DefectROILocations));
 
         }
 
@@ -429,48 +415,47 @@ namespace TapeReelPacking.Source.Application
             string strFileName = "TeachParameters_Track" + (nTrack + 1).ToString() + ".cfg";
             string pathFile = Path.Combine(pathRecipe, currentRecipe, strFileName);
             IniFile ini = new IniFile(pathFile);
+            
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_DeviceLocationRoi)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_LocationEnable)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_ThresholdType)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_ObjectColor)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_lowerThreshold)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_upperThreshold)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_lowerThresholdInnerChip)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_upperThresholdInnerChip)), ini, ref dictTeachParam);
 
-            ReadLine_Magnus("LOCATION", "Device Location Roi", ini, ref dictTeachParam);
-            ReadLine_Magnus("LOCATION", "Location Enable", ini, ref dictTeachParam);
-            ReadLine_Magnus("LOCATION", "Threshold Method", ini, ref dictTeachParam);
-            ReadLine_Magnus("LOCATION", "Object Color", ini, ref dictTeachParam);
-            ReadLine_Magnus("LOCATION", "lower threshold", ini, ref dictTeachParam);
-            ReadLine_Magnus("LOCATION", "upper threshold", ini, ref dictTeachParam);
-            ReadLine_Magnus("LOCATION", "lower threshold Inner Chip", ini, ref dictTeachParam);
-            ReadLine_Magnus("LOCATION", "upper threshold Inner Chip", ini, ref dictTeachParam);
-
-            ReadLine_Magnus("LOCATION", "Opening Mask", ini, ref dictTeachParam);
-            ReadLine_Magnus("LOCATION", "Dilation Mask", ini, ref dictTeachParam);
-            ReadLine_Magnus("LOCATION", "Min Width Device", ini, ref dictTeachParam);
-            ReadLine_Magnus("LOCATION", "Min Height Device", ini, ref dictTeachParam);
-            ReadLine_Magnus("LOCATION", "Template Roi", ini, ref dictTeachParam);
-            ReadLine_Magnus("LOCATION", "Number Side", ini, ref dictTeachParam);
-            ReadLine_Magnus("LOCATION", "Scale Image Ratio", ini, ref dictTeachParam);
-            ReadLine_Magnus("LOCATION", "Min Score", ini, ref dictTeachParam);
-            ReadLine_Magnus("LOCATION", "Corner Index", ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_OpeningMask)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_DilationMask)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_MinWidthDevice)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_MinHeightDevice)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_TemplateRoi)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_NumberSide)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_ScaleImageRatio)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_MinScore)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_CornerIndex)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.L_NumberROILocation)), ini, ref dictTeachParam);
 
 
-            ReadLine_Magnus("OPPOSITE CHIP", "Enable", ini, ref dictTeachParam);
-            ReadLine_Magnus("OPPOSITE CHIP", "lower threshold", ini, ref dictTeachParam);
-            ReadLine_Magnus("OPPOSITE CHIP", "upper threshold", ini, ref dictTeachParam);
-            ReadLine_Magnus("OPPOSITE CHIP", "Opening Mask", ini, ref dictTeachParam);
-            ReadLine_Magnus("OPPOSITE CHIP", "Dilation Mask", ini, ref dictTeachParam);
-            ReadLine_Magnus("OPPOSITE CHIP", "Min Width Device", ini, ref dictTeachParam);
-            ReadLine_Magnus("OPPOSITE CHIP", "Min Height Device", ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.OC_EnableCheck)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.OC_lowerThreshold)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.OC_upperThreshold)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.OC_OpeningMask)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.OC_DilationMask)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.OC_MinWidthDevice)), ini, ref dictTeachParam);
+            ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(categoriesTeachParam.OC_MinHeightDevice)), ini, ref dictTeachParam);
+            //ReadLine_Magnus("DEFECT ROI", "Area Index", ini, ref dictTeachParam);
 
-            ReadLine_Magnus("DEFECT ROI", $"Number ROI Location", ini, ref dictTeachParam);
-            ReadLine_Magnus("DEFECT ROI", "Area Index", ini, ref dictTeachParam);
+            //for (int n = 0; n < TOTAL_AREA; n++)
+            //{
+            //    ReadLine_Magnus("DEFECT ROI", $"Defect ROI Locations {n + 1}", ini, ref dictTeachParam);
+            //    //ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, $"Area Enable {n + 1}", ini, ref dictTeachParam);
 
-            for (int n = 0; n < TOTAL_AREA; n++)
-            {
-                ReadLine_Magnus("DEFECT ROI", $"Defect ROI Locations {n + 1}", ini, ref dictTeachParam);
-                //ReadLine_Magnus("LABEL DEFECT", $"Area Enable {n + 1}", ini, ref dictTeachParam);
-
-                //ReadLine_Magnus("LABEL DEFECT", $"Lower Threshold {n + 1}", ini, ref dictTeachParam);
-                //ReadLine_Magnus("LABEL DEFECT", $"Upper Threshold {n + 1}", ini, ref dictTeachParam);
-                //ReadLine_Magnus("LABEL DEFECT", $"Opening Mask {n + 1}", ini, ref dictTeachParam);
-                //ReadLine_Magnus("LABEL DEFECT", $"Dilation Mask {n + 1}", ini, ref dictTeachParam);
-            }
+            //    //ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, $"Lower Threshold {n + 1}", ini, ref dictTeachParam);
+            //    //ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, $"Upper Threshold {n + 1}", ini, ref dictTeachParam);
+            //    //ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, $"Opening Mask {n + 1}", ini, ref dictTeachParam);
+            //    //ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, $"Dilation Mask {n + 1}", ini, ref dictTeachParam);
+            //}
 
 
         }
@@ -498,45 +483,45 @@ namespace TapeReelPacking.Source.Application
             IniFile ini = new IniFile(pathFile);
             InspectionCore inspectionCore = MainWindow.mainWindow.master.m_Tracks[nTrack].m_InspectionCore;
 
-            WriteLine("LOCATION", "Device Location Roi", ini, ConvertRectanglesToString(inspectionCore.m_DeviceLocationParameter.m_L_DeviceLocationRoi));
-            WriteLine("LOCATION", "Location Enable", ini, inspectionCore.m_DeviceLocationParameter.m_L_LocationEnable.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, "Device Location Roi", ini, ConvertRectanglesToString(inspectionCore.m_DeviceLocationParameter.m_L_DeviceLocationRoi));
+            WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, "Location Enable", ini, inspectionCore.m_DeviceLocationParameter.m_L_LocationEnable.ToString());
 
-            WriteLine("LOCATION", "Threshold Method", ini, inspectionCore.m_DeviceLocationParameter.m_L_ThresholdType.ToString());
-            WriteLine("LOCATION", "Object Color", ini, inspectionCore.m_DeviceLocationParameter.m_L_ObjectColor.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, "Threshold Method", ini, inspectionCore.m_DeviceLocationParameter.m_L_ThresholdType.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, "Object Color", ini, inspectionCore.m_DeviceLocationParameter.m_L_ObjectColor.ToString());
           
-            WriteLine("LOCATION", "lower threshold", ini, inspectionCore.m_DeviceLocationParameter.m_L_lowerThreshold.ToString());
-            WriteLine("LOCATION", "upper threshold", ini, inspectionCore.m_DeviceLocationParameter.m_L_upperThreshold.ToString());
-            WriteLine("LOCATION", "lower threshold Inner Chip", ini, inspectionCore.m_DeviceLocationParameter.m_L_lowerThresholdInnerChip.ToString());
-            WriteLine("LOCATION", "upper threshold Inner Chip", ini, inspectionCore.m_DeviceLocationParameter.m_L_upperThresholdInnerChip.ToString());
-            WriteLine("LOCATION", "Opening Mask", ini, inspectionCore.m_DeviceLocationParameter.m_L_OpeningMask.ToString());
-            WriteLine("LOCATION", "Dilation Mask", ini, inspectionCore.m_DeviceLocationParameter.m_L_DilationMask.ToString());
-            WriteLine("LOCATION", "Min Width Device", ini, inspectionCore.m_DeviceLocationParameter.m_L_MinWidthDevice.ToString());
-            WriteLine("LOCATION", "Min Height Device", ini, inspectionCore.m_DeviceLocationParameter.m_L_MinHeightDevice.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, "lower threshold", ini, inspectionCore.m_DeviceLocationParameter.m_L_lowerThreshold.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, "upper threshold", ini, inspectionCore.m_DeviceLocationParameter.m_L_upperThreshold.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, "lower threshold Inner Chip", ini, inspectionCore.m_DeviceLocationParameter.m_L_lowerThresholdInnerChip.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, "upper threshold Inner Chip", ini, inspectionCore.m_DeviceLocationParameter.m_L_upperThresholdInnerChip.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, "Opening Mask", ini, inspectionCore.m_DeviceLocationParameter.m_L_OpeningMask.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, "Dilation Mask", ini, inspectionCore.m_DeviceLocationParameter.m_L_DilationMask.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, "Min Width Device", ini, inspectionCore.m_DeviceLocationParameter.m_L_MinWidthDevice.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, "Min Height Device", ini, inspectionCore.m_DeviceLocationParameter.m_L_MinHeightDevice.ToString());
 
-            WriteLine("LOCATION", "Template Roi", ini, ConvertRectanglesToString(inspectionCore.m_DeviceLocationParameter.m_L_TemplateRoi));
-            //WriteLine("LOCATION", "Number Side", ini, inspectionCore.m_DeviceLocationParameter.m_L_NumberSide.ToString());
-            WriteLine("LOCATION", "Scale Image Ratio", ini, inspectionCore.m_DeviceLocationParameter.m_L_ScaleImageRatio.ToString());
-            WriteLine("LOCATION", "Min Score", ini, inspectionCore.m_DeviceLocationParameter.m_L_MinScore.ToString());
-            WriteLine("LOCATION", "Corner Index", ini, inspectionCore.m_DeviceLocationParameter.m_L_CornerIndex.ToString());
-
-
-            WriteLine("OPPOSITE CHIP", "Enable", ini, inspectionCore.m_blackChipParameter.m_OC_EnableCheck.ToString());
-            WriteLine("OPPOSITE CHIP", "lower threshold", ini, inspectionCore.m_blackChipParameter.m_OC_lowerThreshold.ToString());
-            WriteLine("OPPOSITE CHIP", "upper threshold", ini, inspectionCore.m_blackChipParameter.m_OC_upperThreshold.ToString());
-            WriteLine("OPPOSITE CHIP", "Opening Mask", ini, inspectionCore. m_blackChipParameter.m_OC_OpeningMask.ToString());
-            WriteLine("OPPOSITE CHIP", "Dilation Mask", ini, inspectionCore.m_blackChipParameter.m_OC_DilationMask.ToString());
-            WriteLine("OPPOSITE CHIP", "Min Width Device", ini, inspectionCore. m_blackChipParameter.m_OC_MinWidthDevice.ToString());
-            WriteLine("OPPOSITE CHIP", "Min Height Device", ini, inspectionCore.m_blackChipParameter.m_OC_MinHeightDevice.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, "Template Roi", ini, ConvertRectanglesToString(inspectionCore.m_DeviceLocationParameter.m_L_TemplateRoi));
+            //WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, "Number Side", ini, inspectionCore.m_DeviceLocationParameter.m_L_NumberSide.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, "Scale Image Ratio", ini, inspectionCore.m_DeviceLocationParameter.m_L_ScaleImageRatio.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, "Min Score", ini, inspectionCore.m_DeviceLocationParameter.m_L_MinScore.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, "Corner Index", ini, inspectionCore.m_DeviceLocationParameter.m_L_CornerIndex.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, $"Number ROI Location", ini, inspectionCore.m_DeviceLocationParameter.m_DR_NumberROILocation.ToString());
 
 
+            WriteLine(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, "Enable", ini, inspectionCore.m_blackChipParameter.m_OC_EnableCheck.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, "lower threshold", ini, inspectionCore.m_blackChipParameter.m_OC_lowerThreshold.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, "upper threshold", ini, inspectionCore.m_blackChipParameter.m_OC_upperThreshold.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, "Opening Mask", ini, inspectionCore. m_blackChipParameter.m_OC_OpeningMask.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, "Dilation Mask", ini, inspectionCore.m_blackChipParameter.m_OC_DilationMask.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, "Min Width Device", ini, inspectionCore. m_blackChipParameter.m_OC_MinWidthDevice.ToString());
+            WriteLine(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, "Min Height Device", ini, inspectionCore.m_blackChipParameter.m_OC_MinHeightDevice.ToString());
 
-            WriteLine("DEFECT ROI", $"Number ROI Location", ini, inspectionCore.m_DeviceLocationParameter.m_DR_NumberROILocation.ToString());
-            WriteLine("DEFECT ROI", $"Defect ROI Index", ini, inspectionCore.m_DeviceLocationParameter.m_DR_DefectROIIndex.ToString());
+
+
+            //WriteLine("DEFECT ROI", $"Defect ROI Index", ini, inspectionCore.m_DeviceLocationParameter.m_DR_DefectROIIndex.ToString());
 
             for (int nAreaIndex = 0; nAreaIndex < TOTAL_AREA; nAreaIndex++)
             {
                 
-                WriteLine("DEFECT ROI", $"Defect ROI Locations {nAreaIndex+1}", ini, ConvertRectanglesToString(inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_DR_DefectROILocations));
+                //WriteLine("DEFECT ROI", $"Defect ROI Locations {nAreaIndex+1}", ini, ConvertRectanglesToString(inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_DR_DefectROILocations));
                 WritePVIAreaParam(nTrack, nAreaIndex);
             }
 
@@ -720,11 +705,13 @@ namespace TapeReelPacking.Source.Application
                         }
                     }
 
-                    else if (type.Name == "Rectangles")
+                    else if (type.Name == "Rectangles" || type.Name == "RectanglesModel")
                     {
 
                         Rectangles rect = GetRectangles(dictParam[strParameterName]);
-                        info.SetValue(application_Category, rect);
+                        RectanglesModel rectanglesModel = new RectanglesModel();
+                        rectanglesModel.SetRectangle(rect);
+                        info.SetValue(application_Category, rectanglesModel);
                         //info.SetValue(local_Category, rect);
 
                     }
@@ -762,7 +749,7 @@ namespace TapeReelPacking.Source.Application
 
 
 
-        string ConvertRectanglesToString(Rectangles rectangles)
+        static string ConvertRectanglesToString(Rectangles rectangles)
         {
             return string.Format("{0}:{1}:{2}:{3}", rectangles.TopLeft.X, rectangles.TopLeft.Y, rectangles.Width, rectangles.Height);
         }

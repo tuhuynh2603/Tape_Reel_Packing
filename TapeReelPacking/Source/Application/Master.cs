@@ -11,18 +11,14 @@ using System.Windows.Media.Imaging;
 namespace TapeReelPacking.Source.Application
 {
     using TapeReelPacking.Source.Hardware;
-    using Microsoft.Win32;
     using System.Diagnostics;
-    using System.Diagnostics.Eventing.Reader;
-    using System.Runtime.InteropServices;
     using System.Windows;
     using static HiWinRobotInterface;
     using static TapeReelPacking.Source.Application.Track;
-    using static TapeReelPacking.Source.Hardware.SDKHrobot.Global;
-    using static OfficeOpenXml.ExcelErrorValue;
     using TapeReelPacking.UI.UserControls.ViewModel;
     using TapeReelPacking.UI.UserControls;
     using TapeReelPacking.Source.Comm;
+    using TapeReelPacking.UI.UserControls.View;
 
     public class Master
     {
@@ -33,7 +29,8 @@ namespace TapeReelPacking.Source.Application
         public int m_nActiveTrack { set; get; }
         public Application applications { set; get; } = new Application();
         public BarCodeReaderInterface m_BarcodeReader { set; get; }
-        public TeachParametersUC teachParameter { set; get; } = new TeachParametersUC();
+        public TeachParametersUC teachParameterUC { set; get; } = new TeachParametersUC();
+        public VisionParameterUC visionParametersUC { set; get; } = new VisionParameterUC();
         public MappingSetingUC mappingParameter { set; get; } = new MappingSetingUC();
 
         public static bool m_bIsTeaching { set; get; }
@@ -51,14 +48,6 @@ namespace TapeReelPacking.Source.Application
 
         public static ManualResetEvent[] m_EventInspectionOnlineThreadDone { set; get; }
         public static AutoResetEvent[] StartWaitPLCToTriggerCameraEvent { set; get; }
-
-        // public AutoDeleteImagesDlg m_AutoDeleteImagesDlg = new AutoDeleteImagesDlg();
-
-        //public delegate void DelegateCameraStream();
-        //public DelegateCameraStream delegateCameraStream;
-
-        //public delegate void GrabDelegate();
-        //public GrabDelegate grabDelegate;
         public Thread thread_RobotSequence { set; get; }
         public Thread thread_BarcodeReaderSequence { set; get; }
         public Thread[] thread_InspectSequence { set; get; }
@@ -195,7 +184,7 @@ namespace TapeReelPacking.Source.Application
                 Application.LoadTeachParamFromFileToDict(nTrack);
                 //m_Tracks[nTrack].m_InspectionCore.LoadTeachImageToInspectionCore(nTrack);
 
-                TeachParameterVM teachParameterVM = (TeachParameterVM)teachParameter.DataContext;
+                TeachParameterVM teachParameterVM = (TeachParameterVM)teachParameterUC.DataContext;
                 teachParameterVM.UpdateTeachParamFromDictToUI(Application.dictTeachParam);
                 m_Tracks[nTrack].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
 
@@ -205,8 +194,9 @@ namespace TapeReelPacking.Source.Application
                     Application.dictPVIAreaParam[nArea] = new Dictionary<string, string>();
 
                     Application.LoadAreaParamFromFileToDict(nTrack, nArea);
-                    teachParameterVM.UpdateTeachParamFromDictToUI(Application.dictPVIAreaParam[nArea]);
-                    m_Tracks[nTrack].m_InspectionCore.UpdateAreaParameterFromUIToInspectionCore(nArea);
+                    VisionParameterVM visionVM = (VisionParameterVM)visionParametersUC.DataContext;
+                    visionVM.UpdateAreaParamFromDictToUI(Application.dictPVIAreaParam[nArea], nArea);
+                    m_Tracks[nTrack].m_InspectionCore.UpdateAreaParameterFromUIToInspectionCore(Application.categoriesVisionParam, nArea);
                 }
 
 

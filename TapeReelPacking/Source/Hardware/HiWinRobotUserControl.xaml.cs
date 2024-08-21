@@ -952,163 +952,163 @@ namespace TapeReelPacking.Source.Hardware
         Thread m_CalibrationThread;
         private void button_CameraRobotCalibration_Click(object sender, RoutedEventArgs e)
         {
-            if (m_CalibrationThread == null)
-                m_CalibrationThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => CalibrationSequence()));
-            else if (!m_CalibrationThread.IsAlive)
-                m_CalibrationThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => CalibrationSequence()));
-            else
-                return;
+            //if (m_CalibrationThread == null)
+            //    m_CalibrationThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => CalibrationSequence()));
+            //else if (!m_CalibrationThread.IsAlive)
+            //    m_CalibrationThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => CalibrationSequence()));
+            //else
+            //    return;
 
-            label_Alarm.Text = "Start Calibration";
-            m_NextStepCalibration.Reset();
-            m_CalibrationThread.IsBackground = true;
-            m_CalibrationThread.Start();
+            //label_Alarm.Text = "Start Calibration";
+            //m_NextStepCalibration.Reset();
+            //m_CalibrationThread.IsBackground = true;
+            //m_CalibrationThread.Start();
         }
 
-        public void CalibrationSequence()
-        {
-            //int nAlarmCount = 0;
-            //HWinRobot.get_alarm_log_count(HiWinRobotInterface.m_RobotConnectID, ref nAlarmCount);
-            HWinRobot.clear_alarm(HiWinRobotInterface.m_RobotConnectID);
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                button_Next_Calibration.IsEnabled = true;
-            });
-            if (WaitForNextStepCalibrationEvent("Calibration sequence!. Press OK to Home Move and move to ready position") < 0)
-                return;
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                button_Next_Calibration.IsEnabled = false;
-            });
-            HomeMove();
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.READY_POSITION);
-            // Please put calibration jig to the workplace 
+        //public void CalibrationSequence()
+        //{
+        //    //int nAlarmCount = 0;
+        //    //HWinRobot.get_alarm_log_count(HiWinRobotInterface.m_RobotConnectID, ref nAlarmCount);
+        //    HWinRobot.clear_alarm(HiWinRobotInterface.m_RobotConnectID);
+        //    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        //    {
+        //        button_Next_Calibration.IsEnabled = true;
+        //    });
+        //    if (WaitForNextStepCalibrationEvent("Calibration sequence!. Press OK to Home Move and move to ready position") < 0)
+        //        return;
+        //    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        //    {
+        //        button_Next_Calibration.IsEnabled = false;
+        //    });
+        //    HomeMove();
+        //    MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.READY_POSITION);
+        //    // Please put calibration jig to the workplace 
 
 
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                button_Next_Calibration.IsEnabled = true;
-            });
-            if (WaitForNextStepCalibrationEvent("Please put calibration jig to the workplace then press Next to trigger camera 1 to get calibration position") < 0)
-                return;
+        //    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        //    {
+        //        button_Next_Calibration.IsEnabled = true;
+        //    });
+        //    if (WaitForNextStepCalibrationEvent("Please put calibration jig to the workplace then press Next to trigger camera 1 to get calibration position") < 0)
+        //        return;
 
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                button_Next_Calibration.IsEnabled = false;
-            });
-            if (MainWindow.mainWindow.master.m_Tracks[0].SingleSnap_HIKCamera() < 0)
-            {
-                MessageBox.Show("Cannot open camera 1. Please Check camera connection again! Stop calibration...", "", MessageBoxButton.OK);
-                return;
-            }
+        //    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        //    {
+        //        button_Next_Calibration.IsEnabled = false;
+        //    });
+        //    if (MainWindow.mainWindow.master.m_Tracks[0].SingleSnap_HIKCamera() < 0)
+        //    {
+        //        MessageBox.Show("Cannot open camera 1. Please Check camera connection again! Stop calibration...", "", MessageBoxButton.OK);
+        //        return;
+        //    }
 
-            System.Drawing.PointF[] vision_points;
-            System.Drawing.PointF[] robot_points = new System.Drawing.PointF[3];
-            if(MainWindow.mainWindow.master.m_Tracks[0].CalibrationGet3Points(out vision_points) < 0)
-            {
-                MessageBox.Show("Calibration sequence failed to get vision points, please check the lower and higher threshold or the lighting...", "", MessageBoxButton.OKCancel);
-                return;
-            }
+        //    System.Drawing.PointF[] vision_points;
+        //    System.Drawing.PointF[] robot_points = new System.Drawing.PointF[3];
+        //    if(MainWindow.mainWindow.master.m_Tracks[0].CalibrationGet3Points(out vision_points) < 0)
+        //    {
+        //        MessageBox.Show("Calibration sequence failed to get vision points, please check the lower and higher threshold or the lighting...", "", MessageBoxButton.OKCancel);
+        //        return;
+        //    }
 
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                button_Next_Calibration.IsEnabled = true;
-            });
-            if (WaitForNextStepCalibrationEvent("Done. Please press Next to move the robot to 1st Point.") < 0)
-                return;
+        //    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        //    {
+        //        button_Next_Calibration.IsEnabled = true;
+        //    });
+        //    if (WaitForNextStepCalibrationEvent("Done. Please press Next to move the robot to 1st Point.") < 0)
+        //        return;
 
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                button_Next_Calibration.IsEnabled = false;
-            });
-            if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_1) < 0)
-            {
-                if (MessageBox.Show("Move Failed, please click OK then reset alarm and manually move the robot to position 1", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
-                {
-                    MessageBox.Show("Calibration sequence cancel...", "", MessageBoxButton.OKCancel);
+        //    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        //    {
+        //        button_Next_Calibration.IsEnabled = false;
+        //    });
+        //    if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_1) < 0)
+        //    {
+        //        if (MessageBox.Show("Move Failed, please click OK then reset alarm and manually move the robot to position 1", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
+        //        {
+        //            MessageBox.Show("Calibration sequence cancel...", "", MessageBoxButton.OKCancel);
 
-                    return;
-                }
+        //            return;
+        //        }
 
-            }
+        //    }
 
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                button_Next_Calibration.IsEnabled = true;
-            });
-            if (WaitForNextStepCalibrationEvent(" Done. Please press Next to save and move the robot to 2nd Point.") < 0)
-                return;
+        //    MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+        //    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        //    {
+        //        button_Next_Calibration.IsEnabled = true;
+        //    });
+        //    if (WaitForNextStepCalibrationEvent(" Done. Please press Next to save and move the robot to 2nd Point.") < 0)
+        //        return;
 
-            int nPointIndex = 0;
-            double[] drobotPoint = new double[6];
-            //SequencePointData pData = MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.GetPointData(SequencePointData.CALIB_ROBOT_POSITION_1);
-            //pData.GetXYZPoint(ref drobotPoint);
-            HWinRobot.get_current_position(HiWinRobotInterface.m_RobotConnectID, drobotPoint);
-            robot_points[nPointIndex++] = new System.Drawing.PointF((float)drobotPoint[0], (float)drobotPoint[1]);
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                button_Next_Calibration.IsEnabled = false;
-            });
-            if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_2) < 0)
-            {
-                if (MessageBox.Show("Move Failed, please click OK then reset alarm and manually move the robot to position 2", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
-                {
-                    MessageBox.Show("Calibration sequence cancel...", "", MessageBoxButton.OKCancel);
+        //    int nPointIndex = 0;
+        //    double[] drobotPoint = new double[6];
+        //    //SequencePointData pData = MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.GetPointData(SequencePointData.CALIB_ROBOT_POSITION_1);
+        //    //pData.GetXYZPoint(ref drobotPoint);
+        //    HWinRobot.get_current_position(HiWinRobotInterface.m_RobotConnectID, drobotPoint);
+        //    robot_points[nPointIndex++] = new System.Drawing.PointF((float)drobotPoint[0], (float)drobotPoint[1]);
+        //    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        //    {
+        //        button_Next_Calibration.IsEnabled = false;
+        //    });
+        //    if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_2) < 0)
+        //    {
+        //        if (MessageBox.Show("Move Failed, please click OK then reset alarm and manually move the robot to position 2", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
+        //        {
+        //            MessageBox.Show("Calibration sequence cancel...", "", MessageBoxButton.OKCancel);
 
-                    return;
-                }
+        //            return;
+        //        }
 
-            }
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                button_Next_Calibration.IsEnabled = true;
-            });
-            if (WaitForNextStepCalibrationEvent(" Done. Please press Next to save and move the robot to 3rd Point.") < 0)
-                return;
+        //    }
+        //    MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+        //    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        //    {
+        //        button_Next_Calibration.IsEnabled = true;
+        //    });
+        //    if (WaitForNextStepCalibrationEvent(" Done. Please press Next to save and move the robot to 3rd Point.") < 0)
+        //        return;
 
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                button_Next_Calibration.IsEnabled = false;
-            });
-            HWinRobot.get_current_position(HiWinRobotInterface.m_RobotConnectID, drobotPoint);
-            robot_points[nPointIndex++] = new System.Drawing.PointF((float)drobotPoint[0], (float)drobotPoint[1]);
+        //    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        //    {
+        //        button_Next_Calibration.IsEnabled = false;
+        //    });
+        //    HWinRobot.get_current_position(HiWinRobotInterface.m_RobotConnectID, drobotPoint);
+        //    robot_points[nPointIndex++] = new System.Drawing.PointF((float)drobotPoint[0], (float)drobotPoint[1]);
 
-            if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_3) < 0)
-            {
-                if (MessageBox.Show("Move Failed, please click OK then reset alarm and manually move the robot to position 3", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
-                {
-                    MessageBox.Show("Calibration sequence cancel...", "", MessageBoxButton.OKCancel);
+        //    if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_3) < 0)
+        //    {
+        //        if (MessageBox.Show("Move Failed, please click OK then reset alarm and manually move the robot to position 3", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
+        //        {
+        //            MessageBox.Show("Calibration sequence cancel...", "", MessageBoxButton.OKCancel);
 
-                    return;
-                }
+        //            return;
+        //        }
 
-            }
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                button_Next_Calibration.IsEnabled = true;
-            });
-            if (WaitForNextStepCalibrationEvent(" Done. Please press Next to save the 3rd Point.") < 0)
-                return;
+        //    }
+        //    MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+        //    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        //    {
+        //        button_Next_Calibration.IsEnabled = true;
+        //    });
+        //    if (WaitForNextStepCalibrationEvent(" Done. Please press Next to save the 3rd Point.") < 0)
+        //        return;
 
-            HWinRobot.get_current_position(HiWinRobotInterface.m_RobotConnectID, drobotPoint);
-            robot_points[nPointIndex++] = new System.Drawing.PointF((float)drobotPoint[0], (float)drobotPoint[1]);
+        //    HWinRobot.get_current_position(HiWinRobotInterface.m_RobotConnectID, drobotPoint);
+        //    robot_points[nPointIndex++] = new System.Drawing.PointF((float)drobotPoint[0], (float)drobotPoint[1]);
 
-            if (MessageBox.Show("Would you like to save the calibration result ?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
-                return;
+        //    if (MessageBox.Show("Would you like to save the calibration result ?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
+        //        return;
 
-            //Docalibration();
-            Mat mat_CameraRobotTransform = Application.Track.MagnusMatrix.CalculateTransformMatrix(vision_points, robot_points);
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                button_Next_Calibration.IsEnabled = true;
-            });
-            if (WaitForNextStepCalibrationEvent("Calibration Done. Please press Next complete the sequence.") < 0)
-                return;
+        //    //Docalibration();
+        //    Mat mat_CameraRobotTransform = Application.Track.MagnusMatrix.CalculateTransformMatrix(vision_points, robot_points);
+        //    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        //    {
+        //        button_Next_Calibration.IsEnabled = true;
+        //    });
+        //    if (WaitForNextStepCalibrationEvent("Calibration Done. Please press Next complete the sequence.") < 0)
+        //        return;
 
-        }
+        //}
 
         public int SaveCalibrationData(System.Drawing.PointF[] vision_points, System.Drawing.PointF[] robot_points)
         {

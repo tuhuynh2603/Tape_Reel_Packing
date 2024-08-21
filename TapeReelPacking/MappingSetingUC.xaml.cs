@@ -81,12 +81,6 @@ namespace TapeReelPacking
     {
 
         private Dictionary<string, string> _dictMappingParam = new Dictionary<string, string>();
-
-
-
-
-
-        //public CatergoryMappingParameters categoriesMappingParam = new CatergoryMappingParameters();
         public MappingSetingUC()
         {
             InitializeComponent();
@@ -117,28 +111,12 @@ namespace TapeReelPacking
         }
         public bool UpdateMappingParamFromDictToUI(Dictionary<string, string> dictParam)
         {
-            //_dictMappingParam = dictParam;
             object category = Application.Application.categoriesMappingParam;
-            //object category_local = categoriesMappingParam;
             bool bSuccess = Application.Application.UpdateParamFromDictToUI(dictParam, ref category/*, ref category_local*/);
             Application.Application.categoriesMappingParam = (MappingSetingUCVM.CatergoryMappingParameters)category;
-            //categoriesMappingParam = (CatergoryMappingParameters)category_local;
             pgr_PropertyGrid_Mapping.Update();
             return bSuccess;
         }
-
-        //public void UpdateDictionaryParam()
-        //{
-        //    System.Reflection.PropertyInfo[] infos = Application.Application.categoriesMappingParam.GetType().GetProperties();
-        //    System.Reflection.PropertyInfo[] infosApp = Application.Application.categoriesMappingParam.GetType().GetProperties();
-
-        //    for (int i = 0; i < infos.Length; i++)
-        //    {
-        //        //infosApp[i].SetValue(Application.Application.categoriesMappingParam, infos[i].GetValue(Application.Application.categoriesMappingParam));
-        //        Type type = infos[i].PropertyType;
-        //        _dictMappingParam[infos[i].Name] = infos[i].GetValue(Application.Application.categoriesMappingParam).ToString();
-        //    }
-        //}
 
         public bool SaveParameterMappingDefault()
         {

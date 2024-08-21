@@ -106,25 +106,25 @@ namespace TapeReelPacking.Source.Application
 
         }
 
-        private void Video_ImageGrabbed(object sender, EventArgs e)
-        {
-            try
-            {
-                Array.Clear(m_imageViews[0].bufferImage, 0, m_imageViews[0].bufferImage.Length);
+        //private void Video_ImageGrabbed(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        Array.Clear(m_imageViews[0].bufferImage, 0, m_imageViews[0].bufferImage.Length);
 
-                m_cap.SetCaptureProperty(CapProp.Autofocus, 0);
-                //m_cap.SetCaptureProperty(CapProp.Focus, InspectionCore.DeviceLocationParameter.m_nStepTemplate);
-                m_cap.Retrieve(m_frame);
-                Image<Bgr, byte> imgg = m_frame.ToImage<Bgr, byte>();
-                m_imageViews[0].bufferImage = BitmapToByteArray(imgg.ToBitmap());
-                m_imageViews[0].UpdateNewImageColor(m_imageViews[0].bufferImage, imgg.ToBitmap().Width, imgg.ToBitmap().Height, 96);
-                CvInvoke.WaitKey(10);
-            }
-            catch
-            {
+        //        m_cap.SetCaptureProperty(CapProp.Autofocus, 0);
+        //        //m_cap.SetCaptureProperty(CapProp.Focus, InspectionCore.DeviceLocationParameter.m_nStepTemplate);
+        //        m_cap.Retrieve(m_frame);
+        //        Image<Bgr, byte> imgg = m_frame.ToImage<Bgr, byte>();
+        //        m_imageViews[0].bufferImage = BitmapToByteArray(imgg.ToBitmap());
+        //        m_imageViews[0].UpdateNewImageColor(m_imageViews[0].bufferImage, imgg.ToBitmap().Width, imgg.ToBitmap().Height, 96);
+        //        CvInvoke.WaitKey(10);
+        //    }
+        //    catch
+        //    {
 
-            }
-        }
+        //    }
+        //}
 
         public static byte[] BitmapToByteArray(Bitmap bitmap)
         {

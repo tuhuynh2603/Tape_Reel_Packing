@@ -949,7 +949,6 @@ namespace TapeReelPacking.Source.Hardware
         }
 
 
-        Thread m_CalibrationThread;
         private void button_CameraRobotCalibration_Click(object sender, RoutedEventArgs e)
         {
             //if (m_CalibrationThread == null)

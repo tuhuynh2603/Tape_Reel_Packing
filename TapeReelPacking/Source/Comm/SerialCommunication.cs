@@ -153,7 +153,6 @@ namespace TapeReelPacking.Source.Comm
                 Thread.Sleep(20);
 
             }
-            LogMessage.LogMessage.WriteToDebugViewer(1, "ReadThread_Fcn Endded");
         }
 
         public static string ReadData()

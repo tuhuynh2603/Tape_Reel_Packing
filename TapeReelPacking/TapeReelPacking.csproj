@@ -192,7 +192,6 @@
     </Compile>
     <Compile Include="UI\UserControls\ViewModel\DefectInfoVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\TeachParameterVM.cs" />
-    <Compile Include="UI\CommandBase.cs" />
     <Compile Include="UI\UserControls\DefectInfor.xaml.cs">
       <DependentUpon>DefectInfor.xaml</DependentUpon>
     </Compile>

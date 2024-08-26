@@ -71,8 +71,6 @@ namespace TapeReelPacking
         private LayoutAnchorablePaneGroup m_MappingPaneGroup;
         private LayoutAnchorablePane m_MappingViewPane;
         private LayoutAnchorable m_MappingViewDoc;
-        LayoutPanel m_layOut_OutPutLog;
-        LayoutPanel m_layOut_Mapping;
 
 
         private Point _startPositionDlg;
@@ -1324,6 +1322,7 @@ namespace TapeReelPacking
             grd_Dialog_Settings.Width = master.m_BarcodeReader.m_BarcodeReader.Width;
             grd_Dialog_Settings.Height = master.m_BarcodeReader.m_BarcodeReader.Height;
             grd_PopupDialog.Children.Clear();
+            master.m_BarcodeReader.m_BarcodeReader.combo_BarcodeBrank.SelectedItem = master.m_BarcodeReader.barcodeSetting.brankID;
             grd_PopupDialog.Children.Add(master.m_BarcodeReader.m_BarcodeReader);
             //grd_PopupDialog.Visibility = Visibility.Visible;
             grd_PopupDialog.Visibility = Visibility.Visible;
@@ -1367,8 +1366,6 @@ namespace TapeReelPacking
             //if (m_bEnableDebugSequence)
             //    Master.m_NextStepSequenceEvent.Set();
         }
-
-        int m_nPLCGridViewIndex = 0;
         private void btn_PLCCOMM_Setting_Checked(object sender, RoutedEventArgs e)
         {
             grd_Dialog_Settings.Margin = new Thickness(0, 160, 0, 0);
@@ -1533,7 +1530,7 @@ namespace TapeReelPacking
                 grd_Dialog_Settings.Height = m_RecipeManage.Height;
 
                 grd_PopupDialog.Children.Clear();
-                m_RecipeManage.InitComboRecipe();
+                //m_RecipeManage.InitComboRecipe();
                 grd_PopupDialog.Children.Add(m_RecipeManage);
                 grd_PopupDialog.Visibility = Visibility.Visible;
                 grd_Dialog_Settings.Visibility = Visibility.Visible;

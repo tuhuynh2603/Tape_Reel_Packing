@@ -19,6 +19,9 @@ namespace TapeReelPacking.Source.Application
     using TapeReelPacking.UI.UserControls;
     using TapeReelPacking.Source.Comm;
     using TapeReelPacking.UI.UserControls.View;
+    using TapeReelPacking.Source.Model;
+    using TapeReelPacking.Source.Repository;
+    using System.Runtime.Remoting.Contexts;
 
     public class Master
     {
@@ -29,9 +32,11 @@ namespace TapeReelPacking.Source.Application
         public int m_nActiveTrack { set; get; }
         public Application applications { set; get; } = new Application();
         public BarCodeReaderInterface m_BarcodeReader { set; get; }
-        public TeachParametersUC teachParameterUC { set; get; } = new TeachParametersUC();
+        public TeachParametersUC teachParameterUC { set; get; }  = new TeachParametersUC();
         public VisionParameterUC visionParametersUC { set; get; } = new VisionParameterUC();
         public MappingSetingUC mappingParameter { set; get; } = new MappingSetingUC();
+
+        public DatabaseContext databaseContext { set; get; } = new DatabaseContext();
 
         public static bool m_bIsTeaching { set; get; }
         public static AutoResetEvent m_NextStepTeachEvent { set; get; }
@@ -78,6 +83,8 @@ namespace TapeReelPacking.Source.Application
             Application.LoadRegistry();
 
             ContructorDocComponent();
+            ConstructModels(databaseContext);
+
             LogMessage.LogMessage.WriteToDebugViewer(2, "BarCodeReaderInterface");
 
             LoadRecipe();
@@ -85,10 +92,26 @@ namespace TapeReelPacking.Source.Application
 
 
             m_nActiveTrack = 0;
-
-
-            MainWindow.mainWindow.EnableMotorFunction();
+            mainWindow.EnableMotorFunction();
             InitThread();
+        }
+
+        CategoryTeachParameterRepository categoryTeachParameterRepository { set; get; }
+        CategoryVisionParameterRepository categoryVisionParameterRepository { set; get; }
+
+        CategoryTeachParameterService categoryTeachParameterService { set; get; }
+        CategoryVisionParameterService categoryVisionParameterService { set; get; }
+
+
+        public void ConstructModels(DatabaseContext context)
+        {
+            categoryTeachParameterRepository = new CategoryTeachParameterRepository(context);
+            categoryTeachParameterService = new CategoryTeachParameterService(categoryTeachParameterRepository);
+
+            categoryVisionParameterRepository = new CategoryVisionParameterRepository(context);
+            categoryVisionParameterService = new CategoryVisionParameterService(categoryVisionParameterRepository);
+
+            teachParameterUC = new TeachParametersUC();
         }
 
         public void InitThread()

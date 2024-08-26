@@ -9,8 +9,10 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:behaviors1="clr-namespace:TapeReelPacking.Source.Behaviors"
+             
              mc:Ignorable="d" 
-             d:DesignHeight="550" d:DesignWidth="800">
+             d:DesignHeight="550" d:DesignWidth="800"
+             >
     <UserControl.DataContext>
         <ViewModel:TeachParameterVM></ViewModel:TeachParameterVM>
     </UserControl.DataContext>
@@ -23,7 +25,7 @@
             <StackPanel Grid.Row="0">
 
                 <xceedtk:PropertyGrid  x:Name="pgr_PropertyGrid_Teach"
-                                SelectedObject="{Binding categoriesTeachParam}" 
+                                SelectedObject="{Binding CategoriesTeachParam, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                 Margin="0,0,0,30"
                                 ShowTitle="True"
                                 ShowSearchBox="false"

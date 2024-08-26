@@ -1,28 +1,41 @@
-﻿using System;
+﻿using Microsoft.Expression.Interactivity.Core;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
-    public class RecipeManageVM
+    public class RecipeManageVM:BaseVM
     {
 
-        public string m_strNewRecipe = "";
-        private string _m_strNewRecipe
-        { get; set; }
-        public CommandBase Cmd_AddNewRecipe { get; set; }
+        private string _m_strNewRecipe = "";
+        public string m_strNewRecipe{
+            get => _m_strNewRecipe;
+            set {
+                _m_strNewRecipe = value;
+                OnPropertyChanged(nameof(m_strNewRecipe));
+            } }
+
+        public ICommand Cmd_AddNewRecipe { get; set; }
 
         public RecipeManageVM()
         {
-            Cmd_AddNewRecipe = new CommandBase(AddNewRecipe);
+            Cmd_AddNewRecipe =new RelayCommand<RecipeManageVM>((p) => { return true; },
+                                     (p) =>
+                                     {
+                                         AddNewRecipe(m_strNewRecipe);
+                                     });
+            InitComboRecipe();
         }
 
 
-        public static void AddNewRecipe(string strTxt)
+        public void AddNewRecipe(string strTxt)
         {
             if (strTxt.Replace(" ", "") == "")
             {
@@ -30,7 +43,9 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                 return;
             }
 
-            if (RecipeManageView.m_dict_Recipes.ContainsKey(strTxt))
+            var recipes = comboRecipes.Where(recipe=> recipe.Contains(strTxt)).ToList();
+
+            if (recipes.Count >0)
             {
                 MessageBox.Show("This name has been used, please try with different name!");
                 return;
@@ -94,5 +109,97 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         }
 
 
+        private object _comboRecipeSelectedItem;
+
+        public object comboRecipeSelectedItem
+        {
+            get => _comboRecipeSelectedItem;
+            set
+            {
+                _comboRecipeSelectedItem = value;
+                OnPropertyChanged(nameof(comboRecipeSelectedItem));
+            }
+        }
+
+
+        private ActionCommand deleteRecipeCommand;
+
+        public ICommand DeleteRecipeCommand
+        {
+            get
+            {
+                if (deleteRecipeCommand == null)
+                {
+                    deleteRecipeCommand = new ActionCommand(DeleteRecipe);
+                }
+
+                return deleteRecipeCommand;
+            }
+        }
+
+        private void DeleteRecipe()
+        {
+        }
+
+        private ActionCommand loadRecipeCommand;
+
+        public ICommand LoadRecipeCommand
+        {
+            get
+            {
+                if (loadRecipeCommand == null)
+                {
+                    loadRecipeCommand = new ActionCommand(LoadRecipe);
+                }
+
+                return loadRecipeCommand;
+            }
+        }
+
+        private void LoadRecipe()
+        {
+            MainWindow.mainWindow.master.LoadRecipe(comboRecipeSelectedItem.ToString());
+        }
+
+        private ActionCommand closeRecipeCommand;
+
+        public ICommand CloseRecipeCommand
+        {
+            get
+            {
+                if (closeRecipeCommand == null)
+                {
+                    closeRecipeCommand = new ActionCommand(CloseRecipe);
+                }
+
+                return closeRecipeCommand;
+            }
+        }
+
+        private void CloseRecipe()
+        {
+        }
+
+        private ObservableCollection<string> _comboRecipes = new ObservableCollection<string>();
+
+        public ObservableCollection<string> comboRecipes { get => _comboRecipes; set => SetProperty(ref _comboRecipes, value); }
+
+        public void InitComboRecipe()
+        {
+            if (Source.Application.Application.pathRecipe == null)
+                return;
+            string[] oldfolders = Directory.GetDirectories(Source.Application.Application.pathRecipe);
+            for (int n = 0; n < oldfolders.Length; n++)
+            {
+                string strRight = oldfolders[n].Replace(Source.Application.Application.pathRecipe, "");
+                string[] strSplits = strRight.Split('\\');
+                string strName = strSplits[1];
+                if (strName == "")
+                    continue;
+                comboRecipes.Add(strName);
+            }
+            comboRecipeSelectedItem = comboRecipes.Where(recipe => recipe == Source.Application.Application.currentRecipe).FirstOrDefault();
+
+        }
     }
 }

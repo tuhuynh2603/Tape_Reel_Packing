@@ -15,7 +15,7 @@ using Application = TapeReelPacking.Source.Application;
 using TapeReelPacking.UI.UserControls.ViewModel;
 using System.Windows;
 using Xceed.Wpf.Toolkit.PropertyGrid;
-using static TapeReelPacking.UI.UserControls.ViewModel.TeachParameterVM;
+using TapeReelPacking.Source.Repository;
 
 namespace TapeReelPacking
 {
@@ -32,6 +32,7 @@ namespace TapeReelPacking
         public TeachParametersUC()
         {
             InitializeComponent();
+            //DataContext = new TeachParameterVM(service);
             //this.DataContext = new TeachParameterVM();
             //TeachParameterVM teachparameterVM = (TeachParameterVM)this.DataContext;
             //pgr_PropertyGrid_Teach.DataContext = Application.Application.categoriesTeachParam;

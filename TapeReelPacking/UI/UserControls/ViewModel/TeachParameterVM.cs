@@ -10,6 +10,7 @@ using System.Windows.Input;
 using TapeReelPacking.Source.Application;
 using TapeReelPacking.Source.Define;
 using TapeReelPacking.Source.Model;
+using TapeReelPacking.Source.Repository;
 using TapeReelPacking.UI.UserControls.ViewModel;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
@@ -66,7 +67,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         private CategoryTeachParameter _categoriesTeachParam;
 
-        public CategoryTeachParameter categoriesTeachParam
+        public CategoryTeachParameter CategoriesTeachParam
         {
             get => _categoriesTeachParam;
             set => SetProperty(ref _categoriesTeachParam, value);
@@ -77,15 +78,25 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         public ICommand CancelCommand { get; }
         public ICommand PropertyChangedCommand { set; get; }
 
+        CategoryTeachParameterService categoryTeachParameterService { set; get; }
+
         public TeachParameterVM()
         {
 
-
+            //categoryTeachParameterService = service;
+            
 
             SaveCommand = new RelayCommand<TeachParameterVM>((p) => { return true; },
                                          (p) =>
                                          {
                                              SaveParameterTeachDefault();
+                                             //var data = await categoryTeachParameterService.GetCategoryTeachParameterById(SelectedCameraIndex);
+                                             //if (data != null)
+                                             //{
+                                             //    await categoryTeachParameterService.UpdateCategoryTeachParameter(categoriesTeachParam);
+                                             //}
+                                             //else
+                                             //    await categoryTeachParameterService.CreateCategoryTeachParameter(categoriesTeachParam);
                                          });
 
             CancelCommand = new RelayCommand<TeachParameterVM>((p) => { return true; },
@@ -100,7 +111,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
             PropertyChangedCommand = new DelegateCommand<PropertyValueChangedEventArgs>(OnPropertyChanged);
 
-            categoriesTeachParam = Application.categoriesTeachParam;
+            CategoriesTeachParam = Application.categoriesTeachParam;
 
 
         }
@@ -143,7 +154,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             UpdateTeachParamFromDictToUI(Application.dictTeachParam);
 
             //ReloadAreaParameterUI(SelectedCameraIndex, nDefectROIIndex);
-            categoriesTeachParam = Application.categoriesTeachParam;
+            CategoriesTeachParam = Application.categoriesTeachParam;
             _isDisableOnpropertyChanged = false;
 
 
@@ -170,7 +181,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             bool bSuccess = Application.UpdateParamFromDictToUI(dictTeachParam, ref category);
             Application.categoriesTeachParam = (CategoryTeachParameter)category;
 
-            categoriesTeachParam = Application.categoriesTeachParam;
+            CategoriesTeachParam = Application.categoriesTeachParam;
 
 
             return bSuccess;

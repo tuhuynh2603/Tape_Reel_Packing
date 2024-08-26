@@ -17,32 +17,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         bool _isDisableOnpropertyChanged = false;
         public void OnPropertyChanged(PropertyValueChangedEventArgs e)
         {
-            // Access changed property and its new value
-            //if (e == null || _isDisableOnpropertyChanged)
-            //    return;
-
-            //var propertyItem = e.OriginalSource as Xceed.Wpf.Toolkit.PropertyGrid.PropertyItem;
-            //var propertyName = propertyItem?.DisplayName;
-
-            //if (!propertyName.ToString().Contains("Defect ROI Index"))
-            //    return;
-
-            ////var propertyName = e.GetType();
-            //var oldValue = e.OldValue;
-            //var newValue = e.NewValue;
-            //if (oldValue == newValue)
-            //    return;
-
-            //selectedPVIAreaIndex = (int)newValue;
-            //ReloadCameraParameterUI(SelectedCameraIndex, selectedPVIAreaIndex);
-            //// Handle the event
-            //// For example, you might log the change or update some other parts of your UI
-            //Console.WriteLine($"changed from '{oldValue}' to '{newValue}'");
         }
-
-
-
-
 
         private int selectedPVIAreaIndex = 0;
         public int SelectedPVIAreaIndex 

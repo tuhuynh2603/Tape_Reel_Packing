@@ -11,10 +11,7 @@ namespace TapeReelPacking.Source.Hardware
     class PLCCOMM_TCPIP
     {
         public CommInterface commSequence;
-        string m_IpAddress;
         public int m_Port;
-        const int BUFLEN = 255;
-        Thread CommSequenceThread;
 
     }
 }

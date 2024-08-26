@@ -159,7 +159,10 @@ namespace TapeReelPacking.Source.Define
         MODE_AUTO = 0,
         MODE_MANUAL = 1
     }
-
+    public class BarcodeSetting
+    {
+        public string brankID { set; get; } = "1";
+    }
 
     public struct DebugInfors
     {

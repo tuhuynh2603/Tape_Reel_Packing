@@ -128,13 +128,13 @@
     <Compile Include="MappingSetingUC.xaml.cs">
       <DependentUpon>MappingSetingUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\20240818174857_InitialCreate.cs" />
-    <Compile Include="Migrations\20240818174857_InitialCreate.designer.cs">
-      <DependentUpon>20240818174857_InitialCreate.cs</DependentUpon>
+    <Compile Include="Migrations\20240821102200_initData.cs" />
+    <Compile Include="Migrations\20240821102200_initData.designer.cs">
+      <DependentUpon>20240821102200_initData.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\20240818175307_InitialCreate2.cs" />
-    <Compile Include="Migrations\20240818175307_InitialCreate2.designer.cs">
-      <DependentUpon>20240818175307_InitialCreate2.cs</DependentUpon>
+    <Compile Include="Migrations\20240821105801_initData2.cs" />
+    <Compile Include="Migrations\20240821105801_initData2.designer.cs">
+      <DependentUpon>20240821105801_initData2.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\DatabaseContextModelSnapshot.cs" />
     <Compile Include="PopupUserControl.xaml.cs">
@@ -180,6 +180,10 @@
     <Compile Include="Source\Model\DatabaseContext.cs" />
     <Compile Include="Source\Model\CategoryTeachParameter.cs" />
     <Compile Include="Source\Model\Rectangles.cs" />
+    <Compile Include="Source\Repository\CategoryTeachParameterRepository.cs" />
+    <Compile Include="Source\Repository\CategoryTeachParameterService.cs" />
+    <Compile Include="Source\Repository\CategoryVisionParameterRepository.cs" />
+    <Compile Include="Source\Repository\CategoryVisionParameterService.cs" />
     <Compile Include="Source\UIImage\BitmapSourceConverter.cs" />
     <Compile Include="Source\UIImage\DrawModelRect.cs" />
     <Compile Include="Source\Ultility\ExceedToolkit.cs" />
@@ -522,6 +526,7 @@
     <Resource Include="Resources\pixel-ruler.png" />
     <Resource Include="Resources\serial-comm.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

@@ -57,29 +57,49 @@ using EasyModbus;
         public ModbusClient m_modbusClient;
         public string m_strCommAddress = "127.0.0.1";
         int m_PLCPort = 502;
-        public PLCCOMM()
-        {
-            InitializeComponent();
-            m_strCommAddress = Application.Application.GetCommInfo("PLC Comm", m_strCommAddress);
-            m_PLCPort = int.Parse(Application.Application.GetCommInfo("PLC Port", m_PLCPort.ToString()));
-            m_modbusClient = new ModbusClient(m_strCommAddress, 502);
-            updateConnectionStatus();
 
-            m_modbusClient.ConnectionTimeout = 10000;
-            //m_modbusServer.LocalIPAddress = ;
-            //m_modbusServer.Port = 502;
-            m_modbusClient.ConnectedChanged += M_modbusClient_ConnectedChanged;
-            try {
-                m_modbusClient.Connect();
-            }
-            catch
-            {
-               
-            }
+
+        async Task InitTask()
+        {
+            Task t3 = new Task(
+                () =>
+                {
+                    m_strCommAddress = Application.Application.GetCommInfo("PLC Comm", m_strCommAddress);
+                    m_PLCPort = int.Parse(Application.Application.GetCommInfo("PLC Port", m_PLCPort.ToString()));
+                    m_modbusClient = new ModbusClient(m_strCommAddress, 502);
+                    updateConnectionStatus();
+
+                    m_modbusClient.ConnectionTimeout = 10000;
+                    //m_modbusServer.LocalIPAddress = ;
+                    //m_modbusServer.Port = 502;
+                    m_modbusClient.ConnectedChanged += M_modbusClient_ConnectedChanged;
+                    try
+                    {
+                        m_modbusClient.Connect();
+                    }
+                    catch
+                    {
+
+
+                    }
+                }
+                );
+
+            t3.Start();
+            await t3;
+            Thread.Sleep(1000);
+            Console.WriteLine("aaa");
             combo_PLC_Comm_Function.Items.Add("Write Value");
             combo_PLC_Comm_Function.Items.Add("Read Value");
             m_modbusClient.ReceiveDataChanged += M_modbusClient_ReceiveDataChanged;
             label_PLC_IPAddress.Content = $"IP: {m_strCommAddress} Port: {m_PLCPort}";
+        }
+
+        public PLCCOMM()
+        {
+            InitializeComponent();
+            Task t3 = InitTask();
+            Console.WriteLine("bbb");
 
         }
 

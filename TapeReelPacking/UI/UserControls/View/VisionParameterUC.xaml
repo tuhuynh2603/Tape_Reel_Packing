@@ -64,15 +64,15 @@
 
         </Grid>
 
-        <StackPanel  Margin="50,-460,0,0" Orientation="Horizontal">
-            <ComboBox Height="25" x:Name="track_ComboBox" Foreground="Black" Width="100"
+        <StackPanel  Margin="50,-510,0,0" Orientation="Horizontal">
+            <ComboBox Height="25" x:Name="track_ComboBox" Foreground="Black" Width="120"
                   SelectedIndex="{Binding SelectedCameraIndex, Mode=TwoWay,
             UpdateSourceTrigger=PropertyChanged}">
                 <ComboBoxItem Content="Camera 1"></ComboBoxItem>
                 <ComboBoxItem Content="Camera 2"></ComboBoxItem>
             </ComboBox>
 
-            <ComboBox Height="25" x:Name="comboSelectedPVIArea" Foreground="Black"   Width="100"
+            <ComboBox Height="25" x:Name="comboSelectedPVIArea" Foreground="Black"   Width="120"
                   SelectedIndex="{Binding SelectedPVIAreaIndex, Mode=TwoWay,
             UpdateSourceTrigger=PropertyChanged}">
                 <ComboBoxItem Content="Area 1"></ComboBoxItem>

@@ -29,7 +29,7 @@ namespace TapeReelPacking.Source.Hardware
 		public int[] nReceiveMessage;
 		private MainWindow main;
 		public BarCodeReaderView m_BarcodeReader;
-
+  
 		public BarCodeReaderInterface()
 		{
 
@@ -127,8 +127,6 @@ namespace TapeReelPacking.Source.Hardware
 
 		bool bIsDownload = false;
 
-		int nDeviceID = 0;
-		string nstrFolderBackup = "Trigger";
 		public string GetBarCodeStringAndImage(out string strFullPathImageOut,  int nID, string strCurrentLot)
 		{
 			strFullPathImageOut = "";

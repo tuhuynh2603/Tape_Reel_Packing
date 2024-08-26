@@ -17,18 +17,31 @@ namespace TapeReelPacking.Source.Model
     [CategoryOrder(CategoryTeachParameter.CATEGORY_LOCATION, 0)]
     [CategoryOrder(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, 1)]
     [DisplayName("Teach Parameter")]
-    public class CategoryTeachParameter : Prism.Mvvm.BindableBase
+    public class CategoryTeachParameter
     {
 
         public const string CATEGORY_LOCATION = "LOCATION";
         public const string CATEGORY_OPPOSITE_CHIP = "OPPOSITE CHIP";
 
         [Key]
-        [Category("Id")]
-        [PropertyOrder(0)]
         [Browsable(false)]
+        public int cameraID { get; set; } // Primary key property
 
-        public int Id { get; set; } // Primary key property
+        [Browsable(false)]
+        public DateTime dateChanged { set; get; }
+
+        [Browsable(false)]
+        public ICollection<CategoryVisionParameter> categoryVisionParameter { get; set; } = null;
+
+        [Browsable(false)]
+        [Column(TypeName = "longblob")]
+        [DisplayName("Teach Image")]
+        public byte[] teachImage { get; set; }
+
+        [Browsable(false)]
+        [DisplayName("Template Image")]
+        [Column(TypeName = "longblob")]
+        public byte[] templateImage { get; set; }
 
         #region LOCATION
         [Browsable(false)]

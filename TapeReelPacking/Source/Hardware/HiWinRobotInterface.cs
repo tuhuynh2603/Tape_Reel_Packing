@@ -329,84 +329,160 @@ namespace TapeReelPacking.Source.Hardware.SDKHrobot
         public string m_strRobotIPAddress = "";
 
 
-        public HiWinRobotInterface()
+        async Task ConnectoHIKRobot(string strAddress = "127.0.0.1")
         {
-            m_strRobotIPAddress = Application.Application.GetCommInfo("Robot Comm::IpAddress", m_strRobotIPAddress);
-            ConnectoHIKRobot(m_strRobotIPAddress);
+            Task t2 = new Task(
+                () =>
+                {
+
+                    m_strRobotIPAddress = strAddress;
+                    m_RobotConnectID = -1;
+                    try
+                    {
+                        HWinRobot.disconnect(m_RobotConnectID);
+                        m_RobotConnectID = HWinRobot.open_connection(strAddress, 1, callback);
+                    }
+                    catch
+                    {
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "connect failed.");
+
+                    };
+
+                    if (m_RobotConnectID >= 0)
+                    {
+                        HWinRobot.clear_alarm(m_RobotConnectID);
+
+                        int client_L = -1, client_s = -1, client_rev = -1;
+                        int server_L = -1, server_s = -1, server_rev = -1;
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "connect successful.");
+                        StringBuilder v = new StringBuilder(100);
+                        HWinRobot.get_hrsdk_version(v);
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "HRSDK Release Ver:" + v);
+
+                        HWinRobot.get_hrsdk_sdkver(ref client_L, ref client_s, ref client_rev);
+                        HWinRobot.get_hrss_sdkver(m_RobotConnectID, ref server_L, ref server_s, ref server_rev);
+                        // if HRSSMode != 3 it mean we cannot control robot by software
+                        // Mode 2: Auto
+                        // Mode 3: External control
+                        //Mode 0, mode 1: dont know
+                        LogMessage.LogMessage.WriteToDebugViewer(1, $"HRSDK Connection Ver: {client_L}.{client_s}.{client_rev}");
+                        LogMessage.LogMessage.WriteToDebugViewer(1, $"HRSS Connection Ver: {server_L}.{server_s}.{server_rev}");
+                        if (client_L != server_L)
+                        {
+                            LogMessage.LogMessage.WriteToDebugViewer(1, "Please update software.");
+                        }
+                        else if (client_s != server_s)
+                        {
+                            LogMessage.LogMessage.WriteToDebugViewer(1, "Some APIs not support.");
+                        }
+
+                        int level = HWinRobot.get_connection_level(m_RobotConnectID);
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "level:" + level);
+
+                        HWinRobot.set_connection_level(m_RobotConnectID, 1);
+                        HWinRobot.set_operation_mode(m_RobotConnectID, (int)ROBOT_OPERATION_MODE.MODE_MANUAL);
+                        int nmode = HWinRobot.get_operation_mode(m_RobotConnectID);
+                        string strMode = nmode == (int)ROBOT_OPERATION_MODE.MODE_AUTO ? "AUTO" : "MANUAL";
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "operation mode:" + strMode);
+                        //Disconnect(device_id);
+                        //HWinRobot.set_connection_level(device_id, 1);
+                        //level = HWinRobot.get_connection_level(device_id);
+                        //LogMessage.LogMessage.WriteToDebugViewer(1, "level:" + level);
+
+                        //m_hikThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => Thread_function(0)));
+                        //m_hikThread.Start();
+                    }
+                    else
+                    {
+                        LogMessage.LogMessage.WriteToDebugViewer(1, "connect failure.");
+                    }
+
+                });
+
+            t2.Start();
+            await t2;
+
             m_hiWinRobotUserControl = new HiWinRobotUserControl(m_strRobotIPAddress);
             InitDataGridview(m_RobotConnectID, true);
             m_hikThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => Thread_function()));
             m_hikThread.IsBackground = true;
             m_hikThread.Start();
-            //dispatcherTimer.Tick += dispatcherTimer_Tick;
-            //dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 200);
-            //dispatcherTimer.Start();
+
         }
-        public void ConnectoHIKRobot(string strAddress = "127.0.0.1")
+
+        public HiWinRobotInterface()
         {
-
-            m_strRobotIPAddress = strAddress;
-            m_RobotConnectID = -1;
-            try
-            {
-                HWinRobot.disconnect(m_RobotConnectID);
-                m_RobotConnectID = HWinRobot.open_connection(strAddress, 1, callback);
-            }
-            catch
-            {
-                LogMessage.LogMessage.WriteToDebugViewer(1, "connect failed.");
-
-            };
-
-            if (m_RobotConnectID >= 0)
-            {
-                HWinRobot.clear_alarm(m_RobotConnectID);
-
-                int client_L = -1, client_s = -1, client_rev = -1;
-                int server_L = -1, server_s = -1, server_rev = -1;
-                LogMessage.LogMessage.WriteToDebugViewer(1, "connect successful.");
-                StringBuilder v = new StringBuilder(100);
-                HWinRobot.get_hrsdk_version(v);
-                LogMessage.LogMessage.WriteToDebugViewer(1, "HRSDK Release Ver:" + v);
-
-                HWinRobot.get_hrsdk_sdkver(ref client_L, ref client_s, ref client_rev);
-                HWinRobot.get_hrss_sdkver(m_RobotConnectID, ref server_L, ref server_s, ref server_rev);
-                // if HRSSMode != 3 it mean we cannot control robot by software
-                // Mode 2: Auto
-                // Mode 3: External control
-                //Mode 0, mode 1: dont know
-                LogMessage.LogMessage.WriteToDebugViewer(1, $"HRSDK Connection Ver: {client_L}.{client_s}.{client_rev}");
-                LogMessage.LogMessage.WriteToDebugViewer(1, $"HRSS Connection Ver: {server_L}.{server_s}.{server_rev}");
-                if (client_L != server_L)
-                {
-                    LogMessage.LogMessage.WriteToDebugViewer(1, "Please update software.");
-                }
-                else if (client_s != server_s)
-                {
-                    LogMessage.LogMessage.WriteToDebugViewer(1, "Some APIs not support.");
-                }
-
-                int level = HWinRobot.get_connection_level(m_RobotConnectID);
-                LogMessage.LogMessage.WriteToDebugViewer(1, "level:" + level);
-
-                HWinRobot.set_connection_level(m_RobotConnectID, 1);
-                HWinRobot.set_operation_mode(m_RobotConnectID, (int)ROBOT_OPERATION_MODE.MODE_MANUAL);
-                int nmode = HWinRobot.get_operation_mode(m_RobotConnectID);
-                string strMode = nmode == (int)ROBOT_OPERATION_MODE.MODE_AUTO ? "AUTO" : "MANUAL";
-                LogMessage.LogMessage.WriteToDebugViewer(1, "operation mode:" + strMode);
-                //Disconnect(device_id);
-                //HWinRobot.set_connection_level(device_id, 1);
-                //level = HWinRobot.get_connection_level(device_id);
-                //LogMessage.LogMessage.WriteToDebugViewer(1, "level:" + level);
-
-                //m_hikThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => Thread_function(0)));
-                //m_hikThread.Start();
-            }
-            else
-            {
-                LogMessage.LogMessage.WriteToDebugViewer(1, "connect failure.");
-            }
+            m_strRobotIPAddress = Application.Application.GetCommInfo("Robot Comm::IpAddress", m_strRobotIPAddress);
+            Task t = ConnectoHIKRobot(m_strRobotIPAddress);
         }
+
+        //public void ConnectoHIKRobot(string strAddress = "127.0.0.1")
+        //{
+
+            
+        //    m_strRobotIPAddress = strAddress;
+        //    m_RobotConnectID = -1;
+        //    try
+        //    {
+        //        HWinRobot.disconnect(m_RobotConnectID);
+        //        m_RobotConnectID = HWinRobot.open_connection(strAddress, 1, callback);
+        //    }
+        //    catch
+        //    {
+        //        LogMessage.LogMessage.WriteToDebugViewer(1, "connect failed.");
+
+        //    };
+
+        //    if (m_RobotConnectID >= 0)
+        //    {
+        //        HWinRobot.clear_alarm(m_RobotConnectID);
+
+        //        int client_L = -1, client_s = -1, client_rev = -1;
+        //        int server_L = -1, server_s = -1, server_rev = -1;
+        //        LogMessage.LogMessage.WriteToDebugViewer(1, "connect successful.");
+        //        StringBuilder v = new StringBuilder(100);
+        //        HWinRobot.get_hrsdk_version(v);
+        //        LogMessage.LogMessage.WriteToDebugViewer(1, "HRSDK Release Ver:" + v);
+
+        //        HWinRobot.get_hrsdk_sdkver(ref client_L, ref client_s, ref client_rev);
+        //        HWinRobot.get_hrss_sdkver(m_RobotConnectID, ref server_L, ref server_s, ref server_rev);
+        //        // if HRSSMode != 3 it mean we cannot control robot by software
+        //        // Mode 2: Auto
+        //        // Mode 3: External control
+        //        //Mode 0, mode 1: dont know
+        //        LogMessage.LogMessage.WriteToDebugViewer(1, $"HRSDK Connection Ver: {client_L}.{client_s}.{client_rev}");
+        //        LogMessage.LogMessage.WriteToDebugViewer(1, $"HRSS Connection Ver: {server_L}.{server_s}.{server_rev}");
+        //        if (client_L != server_L)
+        //        {
+        //            LogMessage.LogMessage.WriteToDebugViewer(1, "Please update software.");
+        //        }
+        //        else if (client_s != server_s)
+        //        {
+        //            LogMessage.LogMessage.WriteToDebugViewer(1, "Some APIs not support.");
+        //        }
+
+        //        int level = HWinRobot.get_connection_level(m_RobotConnectID);
+        //        LogMessage.LogMessage.WriteToDebugViewer(1, "level:" + level);
+
+        //        HWinRobot.set_connection_level(m_RobotConnectID, 1);
+        //        HWinRobot.set_operation_mode(m_RobotConnectID, (int)ROBOT_OPERATION_MODE.MODE_MANUAL);
+        //        int nmode = HWinRobot.get_operation_mode(m_RobotConnectID);
+        //        string strMode = nmode == (int)ROBOT_OPERATION_MODE.MODE_AUTO ? "AUTO" : "MANUAL";
+        //        LogMessage.LogMessage.WriteToDebugViewer(1, "operation mode:" + strMode);
+        //        //Disconnect(device_id);
+        //        //HWinRobot.set_connection_level(device_id, 1);
+        //        //level = HWinRobot.get_connection_level(device_id);
+        //        //LogMessage.LogMessage.WriteToDebugViewer(1, "level:" + level);
+
+        //        //m_hikThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => Thread_function(0)));
+        //        //m_hikThread.Start();
+        //    }
+        //    else
+        //    {
+        //        LogMessage.LogMessage.WriteToDebugViewer(1, "connect failure.");
+        //    }
+
+        //}
 
         public void ReconnectToHIKRobot()
         {

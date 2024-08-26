@@ -159,34 +159,6 @@ namespace TapeReelPacking.Source.Algorithm
             }
         }
 
-        //public /*static*/ void SaveTemplateImage(string strTemplateImageFile)
-        //{
-        //    try
-        //    {
-        //        CvInvoke.Imwrite(strTemplateImageFile, m_TemplateImage.Gray);
-        //    }
-        //    catch
-        //    {
-
-        //    }
-        //}
-
-        //public /*static*/ void SaveInspectImage(string strPath, string strDeviceID)
-        //{
-        //    try
-        //    {
-        //        if (Directory.Exists(strPath) == false)
-        //        {
-        //            Directory.CreateDirectory(strPath);
-        //        }
-
-        //        string strImageName = System.IO.Path.Combine(strPath, "Device_" + strDeviceID + ".bmp");
-        //        if (Directory.Exists(strPath))
-        //            CvInvoke.Imwrite(strImageName, m_SourceImage.Gray);
-
-        //    }
-        //    catch { }
-        //}
         public /*static*/ bool UpdateTeachParamFromUIToInspectionCore()
         {
 

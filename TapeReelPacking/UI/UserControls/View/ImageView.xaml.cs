@@ -235,11 +235,6 @@ namespace TapeReelPacking.UI.UserControls.View
         {
             try
             {
-                int iw = 0;
-                int ih = 0;
-                int stride = 0;
-                //bufferImage = ReadBufferFromFile(pathImage, ref iw, ref ih, ref stride);
-
                 CvImage matTemp = CvInvoke.Imread(pathImage, Emgu.CV.CvEnum.ImreadModes.Grayscale);
                 bufferImage = ConvertMonoMatToByteArray(matTemp);
 

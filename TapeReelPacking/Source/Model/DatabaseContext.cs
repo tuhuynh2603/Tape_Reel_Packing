@@ -24,6 +24,10 @@ namespace TapeReelPacking.Source.Model
         private const string _connectionString = "server=localhost;user=root;database=db1;port=3306;password=gacon05637";
         //private const string _connectionString = "server=localhost;user=root;database=mvvmlogindb;port=3306;password=gacon05637";
         public DbSet<RectanglesModel> rectanglesModel { get; set; }
+        public DbSet<CategoryTeachParameter> categoryTeachParametersModel { get; set; }
+        public DbSet<CategoryVisionParameter> categoryVisionParametersModel { get; set; }
+
+
         //public DbSet<CategoryTeachParameter> userlogins { set; get; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionssBuilder)
         {
@@ -37,29 +41,33 @@ namespace TapeReelPacking.Source.Model
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<RectanglesModel>(entity =>
-            {
-                entity.HasKey(e => e.Id);
+            modelBuilder.Entity<CategoryVisionParameter>(
+                entity =>
+                {
+                    entity.HasKey(e => new { e.cameraID, e.areaID});
+                    entity.HasOne(r => r.categoryTeachParameter)
+                        .WithMany(c => c.categoryVisionParameter)
+                        .HasForeignKey(r => r.cameraID)
+                        .OnDelete(DeleteBehavior.NoAction);
+                }
+                );
 
-                // Configure the columns
-                entity.Property(e => e.left).IsRequired();
-                entity.Property(e => e.top).IsRequired();
-                entity.Property(e => e.Width).IsRequired();
-                entity.Property(e => e.Height).IsRequired();
-                entity.Property(e => e.Angle).IsRequired();
-            });
-        }
+            //modelBuilder.Entity<CategoryVisionParameter>()
+            //.HasOne(r => r.categoryTeachParameter)
+            //.WithMany(c => c.categoryVisionParameter)
+            //.HasForeignKey(r => r.cameraID)
+            //.OnDelete(DeleteBehavior.NoAction);
+            //modelBuilder.Entity<RectanglesModel>(entity =>
+            //{
+            //    entity.HasKey(e => e.Id);
 
-        private string SerializeRectangle(RectanglesModel rect)
-        {
-            // Implement serialization logic (e.g., JSON)
-            return JsonConvert.SerializeObject(rect);
-        }
-
-        private RectanglesModel DeserializeRectangle(string json)
-        {
-            // Implement deserialization logic (e.g., JSON)
-            return JsonConvert.DeserializeObject<RectanglesModel>(json);
+            //    // Configure the columns
+            //    entity.Property(e => e.left).IsRequired();
+            //    entity.Property(e => e.top).IsRequired();
+            //    entity.Property(e => e.Width).IsRequired();
+            //    entity.Property(e => e.Height).IsRequired();
+            //    entity.Property(e => e.Angle).IsRequired();
+            //});
         }
 
     }

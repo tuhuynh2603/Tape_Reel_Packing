@@ -13,6 +13,7 @@ using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using Application = TapeReelPacking.Source.Application;
 using System.Runtime.CompilerServices;
 using TapeReelPacking.UI.UserControls.ViewModel;
+using TapeReelPacking.UI.UserControls.View;
 
 namespace TapeReelPacking
 {

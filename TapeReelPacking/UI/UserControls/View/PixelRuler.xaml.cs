@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TapeReelPacking.Source.Application;
 using TapeReelPacking.Source.LogMessage;
+using TapeReelPacking.UI.UserControls.View;
 using Application = TapeReelPacking.Source.Application.Application;
 
 namespace TapeReelPacking.UI.UserControls

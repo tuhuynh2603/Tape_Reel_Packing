@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TapeReelPacking.Source.Application;
+using TapeReelPacking.UI.UserControls.View;
 using Path = System.IO.Path;
 
 namespace TapeReelPacking.Source.Hardware
@@ -71,6 +72,8 @@ namespace TapeReelPacking.Source.Hardware
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
+            if (combo_BarcodeBrank.SelectedItem == null)
+                return;
             MainWindow.mainWindow.master.m_BarcodeReader.barcodeSetting.brankID = combo_BarcodeBrank.SelectedItem.ToString();
             MainWindow.mainWindow.master.m_BarcodeReader.WriteBarcodeSetting();
         }

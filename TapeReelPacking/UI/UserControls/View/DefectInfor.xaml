@@ -6,6 +6,7 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:behaviors1="clr-namespace:TapeReelPacking.Source.Behaviors"
              xmlns:viewmodel="clr-namespace:TapeReelPacking.UI.UserControls.ViewModel"
+             xmlns:view="clr-namespace:TapeReelPacking.UI.UserControls.View"
              mc:Ignorable="d" 
              Width="500" Height="500"
              UseLayoutRounding="True" Foreground="White">
@@ -77,5 +78,6 @@
                 </ListView>
             <!--</Border>-->
         </ScrollViewer>
+
     </Grid>
 </UserControl>

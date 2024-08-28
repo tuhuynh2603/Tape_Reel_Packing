@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "8MLGvSDH+0o=",
+  "dgSpecHash": "coHe2nGT+98=",
   "success": true,
   "projectFilePath": "C:\\Wisely\\C#\\Tape_Reel_Packing\\TapeReelPacking\\TapeReelPacking.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\huynh\\.nuget\\packages\\bouncycastle\\1.8.9\\bouncycastle.1.8.9.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\bouncycastle.cryptography\\2.3.1\\bouncycastle.cryptography.2.3.1.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\commonservicelocator\\2.0.2\\commonservicelocator.2.0.2.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\dragablz\\0.0.3.234\\dragablz.0.0.3.234.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\dynamiclanguageruntime\\1.3.4\\dynamiclanguageruntime.1.3.4.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\easymodbustcp\\5.6.0\\easymodbustcp.5.6.0.nupkg.sha512",
@@ -56,6 +57,7 @@
     "C:\\Users\\huynh\\.nuget\\packages\\microsoft.identitymodel.tokens\\5.5.0\\microsoft.identitymodel.tokens.5.5.0.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\microsoft.io.recyclablememorystream\\1.4.1\\microsoft.io.recyclablememorystream.1.4.1.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\microsoft.sdk.expression.blend\\1.0.0\\microsoft.sdk.expression.blend.1.0.0.nupkg.sha512",
+    "C:\\Users\\huynh\\.nuget\\packages\\mvvmlightlibs\\5.4.1.1\\mvvmlightlibs.5.4.1.1.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\mysql.data\\9.0.0\\mysql.data.9.0.0.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\mysql.entityframeworkcore\\3.1.32\\mysql.entityframeworkcore.3.1.32.nupkg.sha512",
     "C:\\Users\\huynh\\.nuget\\packages\\mysqlconnector\\0.61.0\\mysqlconnector.0.61.0.nupkg.sha512",

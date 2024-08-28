@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\App.xaml
-22902469382
+252133175045
 
-70-531385838
-216-2146138200
-MainWindow.xaml;MappingSetingUC.xaml;PopupUserControl.xaml;ResourceControl.xaml;Source\Hardware\BarCodeReaderView.xaml;Source\Hardware\ETHERNETIP_View.xaml;Source\Hardware\HIKControlCameraView.xaml;Source\Hardware\HiWinRobotUserControl.xaml;Source\Hardware\PLCCOMM.xaml;TeachParametersUC.xaml;UI\UserControls\DefectInfor.xaml;UI\UserControls\LoginUser.xaml;UI\UserControls\LotBarcodeDataTable.xaml;UI\UserControls\OutputLogView.xaml;UI\UserControls\PixelRuler.xaml;UI\UserControls\RecipeManageView.xaml;UI\UserControls\View\ImageView.xaml;UI\UserControls\View\SerialCommunicationView.xaml;UI\UserControls\View\StatisticView.xaml;UI\UserControls\View\TitleBar.xaml;UI\UserControls\View\VisionParameterUC.xaml;UI\UserControls\WarningMessageBox.xaml;
+79428109232
+2201867656945
+UI\UserControls\View\MainWindow.xaml;UI\UserControls\View\MappingCanvasView.xaml;UI\UserControls\View\MappingSetingUC.xaml;UI\UserControls\View\PopupUserControl.xaml;ResourceControl.xaml;Source\Hardware\BarCodeReaderView.xaml;Source\Hardware\ETHERNETIP_View.xaml;Source\Hardware\HIKControlCameraView.xaml;Source\Hardware\HiWinRobotUserControl.xaml;Source\Hardware\PLCCOMM.xaml;UI\UserControls\View\SummaryTemplateView.xaml;UI\UserControls\View\TeachParametersUC.xaml;UI\UserControls\View\DefectInfor.xaml;UI\UserControls\View\LoginUser.xaml;UI\UserControls\View\LotBarcodeDataTable.xaml;UI\UserControls\View\OutputLogView.xaml;UI\UserControls\View\PixelRuler.xaml;UI\UserControls\View\RecipeManageView.xaml;UI\UserControls\View\ImageView.xaml;UI\UserControls\View\MapingRectangleView.xaml;UI\UserControls\View\SerialCommunicationView.xaml;UI\UserControls\View\StatisticView.xaml;UI\UserControls\View\TitleBar.xaml;UI\UserControls\View\VisionParameterUC.xaml;UI\UserControls\View\WarningMessageBox.xaml;
 
 False
 

@@ -14,7 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using EasyModbus;
-    namespace TapeReelPacking.Source.Hardware
+using TapeReelPacking.UI.UserControls.View;
+namespace TapeReelPacking.Source.Hardware
 {
     /// <summary>
     /// Interaction logic for PLCCOMM.xaml

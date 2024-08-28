@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using static TapeReelPacking.Source.Hardware.SDKHrobot.HiWinRobotInterface;
+using TapeReelPacking.UI.UserControls.View;
 
 namespace TapeReelPacking.Source.Hardware
 {

@@ -29,10 +29,10 @@ namespace TapeReelPacking
         //public CategoryTeachParameter categoriesTeachParam = new CategoryTeachParameter();
         //public int nDefectROIIndex = 0;
 
-        public TeachParametersUC()
+        public TeachParametersUC(CategoryTeachParameterService service)
         {
             InitializeComponent();
-            //DataContext = new TeachParameterVM(service);
+            DataContext = new TeachParameterVM(service);
             //this.DataContext = new TeachParameterVM();
             //TeachParameterVM teachparameterVM = (TeachParameterVM)this.DataContext;
             //pgr_PropertyGrid_Teach.DataContext = Application.Application.categoriesTeachParam;

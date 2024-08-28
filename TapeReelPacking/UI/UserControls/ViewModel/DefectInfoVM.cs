@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using TapeReelPacking.Source.Application;
 using TapeReelPacking.Source.Define;
+using TapeReelPacking.UI.UserControls.View;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {

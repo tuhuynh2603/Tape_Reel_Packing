@@ -9,6 +9,7 @@ using Keyence.AutoID.SDK;
 using TapeReelPacking.Source.Application;
 using System.IO;
 using TapeReelPacking.UI.UserControls.ViewModel;
+using TapeReelPacking.UI.UserControls.View;
 
 namespace TapeReelPacking.Source.Hardware
 {

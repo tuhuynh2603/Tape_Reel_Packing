@@ -22,6 +22,7 @@ namespace TapeReelPacking.Source.Application
     using TapeReelPacking.Source.Model;
     using TapeReelPacking.Source.Repository;
     using System.Runtime.Remoting.Contexts;
+    using static TapeReelPacking.UI.UserControls.ViewModel.MappingCanvasVM;
 
     public class Master
     {
@@ -32,7 +33,7 @@ namespace TapeReelPacking.Source.Application
         public int m_nActiveTrack { set; get; }
         public Application applications { set; get; } = new Application();
         public BarCodeReaderInterface m_BarcodeReader { set; get; }
-        public TeachParametersUC teachParameterUC { set; get; }  = new TeachParametersUC();
+        public TeachParametersUC teachParameterUC { set; get; }
         public VisionParameterUC visionParametersUC { set; get; } = new VisionParameterUC();
         public MappingSetingUC mappingParameter { set; get; } = new MappingSetingUC();
 
@@ -107,11 +108,9 @@ namespace TapeReelPacking.Source.Application
         {
             categoryTeachParameterRepository = new CategoryTeachParameterRepository(context);
             categoryTeachParameterService = new CategoryTeachParameterService(categoryTeachParameterRepository);
-
             categoryVisionParameterRepository = new CategoryVisionParameterRepository(context);
             categoryVisionParameterService = new CategoryVisionParameterService(categoryVisionParameterRepository);
-
-            teachParameterUC = new TeachParametersUC();
+            teachParameterUC = new TeachParametersUC(categoryTeachParameterService);
         }
 
         public void InitThread()
@@ -958,7 +957,7 @@ namespace TapeReelPacking.Source.Application
                         startLot_dateTime = DateTime.Now;
                         Application.m_strCurrentLot = string.Format("{0}{1}{2}_{3}{4}{5}", startLot_dateTime.ToString("yyyy"), startLot_dateTime.ToString("MM"), startLot_dateTime.ToString("dd"), startLot_dateTime.ToString("HH"), startLot_dateTime.ToString("mm"), startLot_dateTime.ToString("ss"));
                         if (Application.m_strStartLotDay != Application.m_strCurrentLot.Split('_')[0])
-                            MainWindow.mainWindow.m_staticView.ClearStatistic();
+                            StatisticVM.clearStatisticDelegate?.Invoke();
                         Application.m_strStartLotDay = Application.m_strCurrentLot.Split('_')[0];
                         Application.SetStringRegistry(Application.m_strCurrentLot_Registry, Application.m_strCurrentLot);
                         //MainWindow.mainWindow.m_staticView.ClearStatistic();
@@ -975,7 +974,7 @@ namespace TapeReelPacking.Source.Application
                             VisionResultData.SaveSequenceResultToExcel(Application.m_strCurrentLot, nT, new VisionResultData());
                             //VisionResultData.SaveSequenceResultToExcel(Application.m_strCurrentLot, nT, new VisionResultData(), true);
 
-                            MainWindow.mainWindow.m_staticView.m_nPageID[nT] = 0;
+                            MappingCanvasVM.setMappingPageDelegate?.Invoke(nT, 0);
                             MainWindow.mainWindow.LoadStatistic(nT, false);
                             //InspectEvent[nT].Reset();
                             //InspectDoneEvent[nT].Reset();
@@ -2450,8 +2449,8 @@ namespace TapeReelPacking.Source.Application
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        MainWindow.mainWindow.m_staticView.UpdateMappingResult(data, nTrack, data.m_nDeviceIndexOnReel);
-                        MainWindow.mainWindow.m_staticView.UpdateValueStatistic(data.m_nResult, nTrack);
+                        updateMappingResultDelegate?.Invoke(data, nTrack, data.m_nDeviceIndexOnReel);
+                        StatisticVM.updateValueStatisticDelegate?.Invoke(data.m_nResult, nTrack);
                     });
 
                 }

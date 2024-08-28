@@ -17,6 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using static TapeReelPacking.Source.Application.Master;
+using TapeReelPacking.UI.UserControls.View;
 
 namespace TapeReelPacking.UI.UserControls
 {

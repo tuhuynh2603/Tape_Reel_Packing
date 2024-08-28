@@ -20,7 +20,7 @@ using Xceed.Wpf.AvalonDock.Layout;
 using Application = TapeReelPacking.Source.Application.Application;
 using TapeReelPacking.UI.UserControls.ViewModel;
 
-namespace TapeReelPacking
+namespace TapeReelPacking.UI.UserControls.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -271,7 +271,7 @@ namespace TapeReelPacking
 
             mainWindow = this;
             master = new Master(this);
-            outputLogView = new OutputLogView(this);
+            outputLogView = new OutputLogView();
             m_staticView = new StatisticView(this);
             m_SerialCommunicationView = new SerialCommunicationView();
 
@@ -421,7 +421,7 @@ namespace TapeReelPacking
                 {
                     for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)
                     {
-                        m_staticView.UpdateValueStatistic(master.m_Tracks[nT].m_VisionResultDatas[n].m_nResult, nT);
+                        StatisticVM.updateValueStatisticDelegate?.Invoke(master.m_Tracks[nT].m_VisionResultDatas[n].m_nResult, nT);
                     }
                 });
             }
@@ -430,8 +430,9 @@ namespace TapeReelPacking
 
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                m_staticView.ResetMappingResult(nT);
-                m_staticView.UpdateMappingResultPage(nT);
+
+                MappingCanvasVM.updateMappingResultPageDelegate?.Invoke(nT);
+                MappingCanvasVM.updateMappingResultPageDelegate?.Invoke(nT);
                 //for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)
                 //{
                 //    m_staticView.UpdateMappingResult(master.m_Tracks[nT].m_VisionResultDatas[n], nT, n);
@@ -1030,7 +1031,7 @@ namespace TapeReelPacking
                 || m_nTotalDevicePerLot != Source.Application.Application.categoriesMappingParam.M_NumberDevicePerLot)
             {
                 master.LoadRecipe();
-                m_staticView.InitCanvasMapping();
+                MappingCanvasVM.initCanvasMappingDelegate?.Invoke();
             }
 
             grd_PopupDialog.Visibility = Visibility.Collapsed;
@@ -1084,7 +1085,7 @@ namespace TapeReelPacking
         public static bool isRobotControllerOpen = false;
         private void btn_Clear_Comm_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.mainWindow.outputLogView.ClearOutputLog();
+            //MainWindow.mainWindow.outputLogView.ClearOutputLog();
         }
 
 
@@ -1099,7 +1100,7 @@ namespace TapeReelPacking
                 return;
             //LogMessage.WriteToDebugViewer(5 + 0, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
-            outputLogView.AddLineOutputLog(text, nStyle);
+            OutputLogVM.AddLineOutputLog(text, nStyle);
             //LogMessage.WriteToDebugViewer(5 + 0, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
 
         }

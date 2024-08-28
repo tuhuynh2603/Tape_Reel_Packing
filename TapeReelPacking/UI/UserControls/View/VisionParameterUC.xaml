@@ -6,7 +6,8 @@
              xmlns:ViewModel="clr-namespace:TapeReelPacking.UI.UserControls.ViewModel"
              xmlns:xceedtk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:behaviors1="clr-namespace:TapeReelPacking.Source.Behaviors"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.DataContext>

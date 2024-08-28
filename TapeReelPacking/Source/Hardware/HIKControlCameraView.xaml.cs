@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using TapeReelPacking.UI.UserControls.View;
 
 namespace TapeReelPacking.Source.Hardware
 {

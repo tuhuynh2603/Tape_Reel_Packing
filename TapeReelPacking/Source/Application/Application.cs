@@ -14,6 +14,7 @@ using System.Windows.Media;
 using TapeReelPacking.UI.UserControls.ViewModel;
 using TapeReelPacking.Source.Model;
 using Rectangles = TapeReelPacking.Source.Define.Rectangles;
+using TapeReelPacking.UI.UserControls.View;
 
 namespace TapeReelPacking.Source.Application
 {

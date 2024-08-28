@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.IO.Ports;
 using TapeReelPacking.Source.Define;
 using TapeReelPacking.Source.Application;
+using TapeReelPacking.UI.UserControls.View;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {

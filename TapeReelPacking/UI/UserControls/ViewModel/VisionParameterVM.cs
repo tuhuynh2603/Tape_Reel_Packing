@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using TapeReelPacking.Source.Application;
 using TapeReelPacking.Source.Model;
+using TapeReelPacking.UI.UserControls.View;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
@@ -82,7 +83,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                              });
 
             PropertyChangedCommand = new DelegateCommand<PropertyValueChangedEventArgs>(OnPropertyChanged);
-
+            categoriesVisionParam = null;
             categoriesVisionParam = Application.categoriesVisionParam;
 
 
@@ -126,6 +127,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             //m_Tracks[nTrack].m_InspectionCore.LoadTeachImageToInspectionCore(nTrack);
             UpdateAreaParamFromDictToUI(Application.dictPVIAreaParam[nArea], nArea);
             ReloadAreaParameterUI(nTrack, nArea);
+            categoriesVisionParam = null;
             categoriesVisionParam = Application.categoriesVisionParam;
             _isDisableOnpropertyChanged = false;
 
@@ -152,7 +154,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
             bool bSuccess = Application.UpdateParamFromDictToUI(dictParam, ref category);
             //Application.categoriesTeachParam = (CategoryTeachParameter)category;
-
+            categoriesVisionParam = null;
             categoriesVisionParam = (CategoryVisionParameter)category;
 
 

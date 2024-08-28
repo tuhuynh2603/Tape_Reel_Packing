@@ -4,10 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TapeReelPacking.UI.UserControls"
+             xmlns:viewmodel="clr-namespace:TapeReelPacking.UI.UserControls.ViewModel"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
+             xmlns:behavior="clr-namespace:TapeReelPacking.Source.Behaviors"
              mc:Ignorable="d" 
              Background="Transparent"
              BorderBrush="Transparent"
              d:DesignHeight="500" d:DesignWidth="450">
+    <UserControl.DataContext>
+        <viewmodel:OutputLogVM/>
+    </UserControl.DataContext>
     <UserControl.Resources>
         <BorderGapMaskConverter x:Key="BorderGapMaskConverter"/>
         <Style x:Key="GroupBoxStyle1" TargetType="{x:Type GroupBox}">
@@ -57,32 +63,20 @@
             </Setter>
         </Style>
     </UserControl.Resources>
+
     <Grid>
         <GroupBox Margin="0 0 0 0"
                   Style="{DynamicResource GroupBoxStyle1}">
             <Grid>
-                <FlowDocumentScrollViewer x:Name="flowDocumentSVOutputlog" Background="Transparent"
-                                      Foreground="#FF9D4242" 
-                                      SelectionBrush="#FF4092D3" 
-                                      BorderBrush="Transparent"
-                                      >
-                    <FlowDocument x:Name="outputLog" Foreground="White" PagePadding="5"
-                                  Background="Transparent"
-                                  FontFamily="Microsoft New Tai Lue"
-                                  
-                                  FontSize="12" >
-
-                        <FlowDocument.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="Copy All" Command="Copy"/>
-                                <MenuItem Header="Delete All" 
-                                          Name="SentDelete"
-                                          Click="SentDelete_Click"/>
-                            </ContextMenu>
-                        </FlowDocument.ContextMenu>
-                        
-                    </FlowDocument >
-                </FlowDocumentScrollViewer>
+            <FlowDocumentScrollViewer x:Name="flowDocumentSVOutputlog" 
+                        Background="Transparent"
+                        SelectionBrush="#FF4092D3" 
+                        BorderBrush="Transparent" Document="{Binding OutputLog}">
+                <i:Interaction.Behaviors>
+                    <behavior:ScrollToEndBehavior />
+                </i:Interaction.Behaviors>
+                    
+            </FlowDocumentScrollViewer>
             </Grid>
         </GroupBox>
     </Grid>

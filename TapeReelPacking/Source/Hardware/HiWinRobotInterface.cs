@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using LicenseContext = OfficeOpenXml.LicenseContext;
 using TapeReelPacking.Source.Application;
+using TapeReelPacking.UI.UserControls.View;
 
 namespace TapeReelPacking.Source.Hardware.SDKHrobot
 {

@@ -11,6 +11,7 @@ using TapeReelPacking.Source.Application;
 using TapeReelPacking.Source.Define;
 using TapeReelPacking.Source.Model;
 using TapeReelPacking.Source.Repository;
+using TapeReelPacking.UI.UserControls.View;
 using TapeReelPacking.UI.UserControls.ViewModel;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
@@ -67,10 +68,14 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         private CategoryTeachParameter _categoriesTeachParam;
 
-        public CategoryTeachParameter CategoriesTeachParam
+        public CategoryTeachParameter categoriesTeachParam
         {
             get => _categoriesTeachParam;
-            set => SetProperty(ref _categoriesTeachParam, value);
+            set
+            {
+                _categoriesTeachParam = value;
+                OnPropertyChanged(nameof(categoriesTeachParam));
+            }
         }
 
 
@@ -80,23 +85,23 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         CategoryTeachParameterService categoryTeachParameterService { set; get; }
 
-        public TeachParameterVM()
+        public TeachParameterVM(CategoryTeachParameterService service)
         {
 
-            //categoryTeachParameterService = service;
+            categoryTeachParameterService = service;
             
 
             SaveCommand = new RelayCommand<TeachParameterVM>((p) => { return true; },
-                                         (p) =>
+                                         async (p) =>
                                          {
                                              SaveParameterTeachDefault();
-                                             //var data = await categoryTeachParameterService.GetCategoryTeachParameterById(SelectedCameraIndex);
-                                             //if (data != null)
-                                             //{
-                                             //    await categoryTeachParameterService.UpdateCategoryTeachParameter(categoriesTeachParam);
-                                             //}
-                                             //else
-                                             //    await categoryTeachParameterService.CreateCategoryTeachParameter(categoriesTeachParam);
+                                             var data = await categoryTeachParameterService.GetCategoryTeachParameterById(SelectedCameraIndex);
+                                             if (data != null)
+                                             {
+                                                 await categoryTeachParameterService.UpdateCategoryTeachParameter(categoriesTeachParam);
+                                             }
+                                             else
+                                                 await categoryTeachParameterService.CreateCategoryTeachParameter(categoriesTeachParam);
                                          });
 
             CancelCommand = new RelayCommand<TeachParameterVM>((p) => { return true; },
@@ -111,8 +116,8 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
             PropertyChangedCommand = new DelegateCommand<PropertyValueChangedEventArgs>(OnPropertyChanged);
 
-            CategoriesTeachParam = Application.categoriesTeachParam;
-
+            categoriesTeachParam = null;
+            categoriesTeachParam = Application.categoriesTeachParam;
 
         }
 
@@ -154,7 +159,8 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             UpdateTeachParamFromDictToUI(Application.dictTeachParam);
 
             //ReloadAreaParameterUI(SelectedCameraIndex, nDefectROIIndex);
-            CategoriesTeachParam = Application.categoriesTeachParam;
+            categoriesTeachParam = null;
+            categoriesTeachParam = Application.categoriesTeachParam;
             _isDisableOnpropertyChanged = false;
 
 
@@ -181,7 +187,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             bool bSuccess = Application.UpdateParamFromDictToUI(dictTeachParam, ref category);
             Application.categoriesTeachParam = (CategoryTeachParameter)category;
 
-            CategoriesTeachParam = Application.categoriesTeachParam;
+            categoriesTeachParam = Application.categoriesTeachParam;
 
 
             return bSuccess;

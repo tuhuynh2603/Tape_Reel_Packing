@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using TapeReelPacking.UI.UserControls.View;
 
 namespace TapeReelPacking.Source.Comm
 {

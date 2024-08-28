@@ -12,6 +12,7 @@ using TapeReelPacking.Source.Define;
 using TapeReelPacking.Source.Application;
 using Application = TapeReelPacking.Source.Application.Application;
 using TapeReelPacking.Source.LogMessage;
+using TapeReelPacking.UI.UserControls.View;
 
 namespace TapeReelPacking.UI.UserControls
 {

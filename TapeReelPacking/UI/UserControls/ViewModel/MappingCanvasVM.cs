@@ -1,19 +1,10 @@
 ﻿using Microsoft.Expression.Interactivity.Core;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using System.Windows.Media;
-using TapeReelPacking.Source.Model;
-using TapeReelPacking.UI.UserControls.View;
 using TapeReelPacking.Source.Define;
-using System.Security.Policy;
-using Org.BouncyCastle.Bcpg;
+using TapeReelPacking.UI.UserControls.View;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
@@ -58,7 +49,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             mappingCanvasHeight = h;
         }
 
-        private void SetMappingPage(int nTrack, int nPage) => m_nPageID[nTrack] = nPage; 
+        private void SetMappingPage(int nTrack, int nPage) => m_nPageID[nTrack] = nPage;
         public MappingCanvasVM()
         {
             InitCanvasMapping();
@@ -110,7 +101,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                         rec.imageSource = new BitmapImage(new Uri(path, UriKind.Relative));
                         rec.imageWidth = 0.95 * m_nWidthMappingRect;
                         rec.imageHeight = 0.95 * m_nWidthMappingRect;
-                        rec.mappingID = nDeviceX + 1+ nDeviceY * MainWindow.mainWindow.m_nDeviceX + m_nPageID[nTrack] * MainWindow.mainWindow.m_nDeviceX * MainWindow.mainWindow.m_nDeviceY;
+                        rec.mappingID = nDeviceX + 1 + nDeviceY * MainWindow.mainWindow.m_nDeviceX + m_nPageID[nTrack] * MainWindow.mainWindow.m_nDeviceX * MainWindow.mainWindow.m_nDeviceY;
                         rec.fontMappingSize = 0.95 * m_nWidthMappingRect / 3;
                         rec.minMappingWidth = 0.95 * m_nWidthMappingRect;
                         rec.minMappingHeight = 0.95 * m_nWidthMappingRect;
@@ -119,7 +110,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                         rec.labelLeft = m_nStepMappingRect * nDeviceX + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1);
                         rec.labelTop = m_nStepMappingRect * nDeviceY + 0.95 * m_nWidthMappingRect / 9;
                         mappingRectangles.Add(rec);
-                        
+
                     }
                 }
             }
@@ -127,8 +118,8 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             //mappingRectangles = null;
             //mappingRectangles = mappingRectangles;
 
-            if (MainWindow.mainWindow!=null)
-               MainWindow.mainWindow.loadAllStatistic(false);
+            if (MainWindow.mainWindow != null)
+                MainWindow.mainWindow.loadAllStatistic(false);
 
         }
 
@@ -346,22 +337,23 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         public string txtPage1 { get => txtPage11; set => SetProperty(ref txtPage11, value); }
 
         private string txtPage21 = "1";
-        private int [] m_nPageID { set; get; } = { 0,0 };
+        private int[] m_nPageID { set; get; } = { 0, 0 };
         private int m_nNumberMappingPage;
 
         public string txtPage2 { get => txtPage21; set => SetProperty(ref txtPage21, value); }
 
         private double mappingCanvasWidth = 200;
         public double MappingCanvasWidth
-        { 
+        {
             get => mappingCanvasWidth;
-            set => SetProperty(ref mappingCanvasWidth, value); 
+            set => SetProperty(ref mappingCanvasWidth, value);
         }
 
         private double mappingCanvasHeight = 300;
-        public double MappingCanvasHeight {
-            get => mappingCanvasHeight; 
-            set => SetProperty(ref mappingCanvasHeight, value); 
+        public double MappingCanvasHeight
+        {
+            get => mappingCanvasHeight;
+            set => SetProperty(ref mappingCanvasHeight, value);
         }
 
 

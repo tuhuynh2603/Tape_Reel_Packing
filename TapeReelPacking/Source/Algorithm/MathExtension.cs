@@ -1,6 +1,5 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
-using System;
 using System.Runtime.InteropServices;
 
 namespace TapeReelPacking.Source.Algorithm

@@ -13,20 +13,7 @@ namespace TapeReelPacking.Source.Model
     {
         public const string CAETEGORYORDER_LABEL_DEFECT = "LABEL DEFECT";
 
-        //[Key]
-        [Browsable(false)]
-        public int areaID { get; set; }
 
-
-        // Foreign key
-        [Browsable(false)]
-        public int cameraID { get; set; }
-        public CategoryTeachParameter categoryTeachParameter { get; set; }
-        //
-
-
-        [Browsable(false)]
-        public DateTime dateChanged { set; get; }
 
         [Browsable(false)]
         [Category(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT)]
@@ -51,7 +38,7 @@ namespace TapeReelPacking.Source.Model
         [Range(0, 255)]
         [DefaultValue(0)]
         [Description("")]
-        [PropertyOrder(2)]
+        [PropertyOrder(1)]
         public int LD_lowerThreshold { set; get; }
 
         [Browsable(true)]
@@ -60,7 +47,7 @@ namespace TapeReelPacking.Source.Model
         [Range(0, 255)]
         [DefaultValue(255)]
         [Description("")]
-        [PropertyOrder(3)]
+        [PropertyOrder(2)]
         public int LD_upperThreshold { set; get; }
 
         [Browsable(true)]
@@ -69,7 +56,7 @@ namespace TapeReelPacking.Source.Model
         [Range(0, 100)]
         [DefaultValue(0)]
         [Description("")]
-        [PropertyOrder(4)]
+        [PropertyOrder(3)]
         public int LD_OpeningMask { set; get; }
 
         [Browsable(true)]
@@ -78,7 +65,7 @@ namespace TapeReelPacking.Source.Model
         [Range(0, 100)]
         [DefaultValue(0)]
         [Description("")]
-        [PropertyOrder(5)]
+        [PropertyOrder(4)]
         public int LD_DilationMask { set; get; }
 
         [Browsable(true)]
@@ -87,7 +74,23 @@ namespace TapeReelPacking.Source.Model
         [Range(0, 100)]
         [DefaultValue(50)]
         [Description("")]
-        [PropertyOrder(6)]
+        [PropertyOrder(5)]
         public int LD_ObjectCoverPercent { set; get; }
+
+
+        //[Key]
+        [Browsable(false)]
+        public int areaID { get; set; }
+
+
+        // Foreign key
+        [Browsable(false)]
+        public int cameraID { get; set; }
+        public CategoryTeachParameter categoryTeachParameter { get; set; }
+        //
+
+
+        [Browsable(false)]
+        public DateTime dateChanged { set; get; }
     }
 }

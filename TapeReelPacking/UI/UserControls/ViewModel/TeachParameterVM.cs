@@ -1,56 +1,24 @@
-﻿using Prism.Commands;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows.Input;
+using TapeReelPacking.Source.Algorithm;
 using TapeReelPacking.Source.Application;
-using TapeReelPacking.Source.Define;
+using TapeReelPacking.Source.Helper;
 using TapeReelPacking.Source.Model;
 using TapeReelPacking.Source.Repository;
 using TapeReelPacking.UI.UserControls.View;
-using TapeReelPacking.UI.UserControls.ViewModel;
-using Xceed.Wpf.Toolkit.PropertyGrid;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
-    public class TeachParameterVM :BaseVM
+    public class TeachParameterVM : BaseVM
     {
-
-        bool _isDisableOnpropertyChanged = false;
-        public void OnPropertyChanged(PropertyValueChangedEventArgs e)
-        {
-            // Access changed property and its new value
-            if (e == null || _isDisableOnpropertyChanged)
-                return;
-
-            var propertyItem = e.OriginalSource as Xceed.Wpf.Toolkit.PropertyGrid.PropertyItem;
-            var propertyName = propertyItem?.DisplayName;
-
-            if (!propertyName.ToString().Contains("Defect ROI Index"))
-                return;
-
-            //var propertyName = e.GetType();
-            var oldValue = e.OldValue;
-            var newValue = e.NewValue;
-            if (oldValue == newValue)
-                return;
-
-            nDefectROIIndex = (int)newValue;
-            ReloadTeachParameterUI(SelectedCameraIndex, nDefectROIIndex);
-            // Handle the event
-            // For example, you might log the change or update some other parts of your UI
-            Console.WriteLine($"changed from '{oldValue}' to '{newValue}'");
-        }
 
 
         public int nDefectROIIndex = 0;
 
-        private int _SelectedCameraIndex;
+        private int _SelectedCameraIndex = -1;
         public int SelectedCameraIndex
         {
             get => _SelectedCameraIndex;
@@ -59,7 +27,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                 if (_SelectedCameraIndex != value)
                 {
                     _SelectedCameraIndex = value;
-                    ReloadTeachParameterUI(SelectedCameraIndex, nDefectROIIndex);
+                    categoriesTeachParam = ReloadTeachParameterUI(SelectedCameraIndex);
                     OnPropertyChanged(nameof(SelectedCameraIndex));
                     // Add logic to handle camera selection change if necessary
                 }
@@ -67,7 +35,6 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         }
 
         private CategoryTeachParameter _categoriesTeachParam;
-
         public CategoryTeachParameter categoriesTeachParam
         {
             get => _categoriesTeachParam;
@@ -89,111 +56,68 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         {
 
             categoryTeachParameterService = service;
-            
+
 
             SaveCommand = new RelayCommand<TeachParameterVM>((p) => { return true; },
                                          async (p) =>
                                          {
-                                             SaveParameterTeachDefault();
-                                             var data = await categoryTeachParameterService.GetCategoryTeachParameterById(SelectedCameraIndex);
-                                             if (data != null)
-                                             {
-                                                 await categoryTeachParameterService.UpdateCategoryTeachParameter(categoriesTeachParam);
-                                             }
-                                             else
-                                                 await categoryTeachParameterService.CreateCategoryTeachParameter(categoriesTeachParam);
+                                             SaveTeachParameter();
+                                             //var data = await categoryTeachParameterService.GetCategoryTeachParameterById(SelectedCameraIndex);
+                                             //if (data != null)
+                                             //{
+                                             //    await categoryTeachParameterService.UpdateCategoryTeachParameter(categoriesTeachParam);
+                                             //}
+                                             //else
+                                             //    await categoryTeachParameterService.CreateCategoryTeachParameter(categoriesTeachParam);
                                          });
 
             CancelCommand = new RelayCommand<TeachParameterVM>((p) => { return true; },
                              (p) =>
                              {
-                                 UpdateTeachParamFromDictToUI(Application.dictTeachParam);
-
-
-                                 MainWindow mainWindow = (MainWindow)System.Windows.Application.Current.MainWindow;
-                                 mainWindow.teach_parameters_btn.IsChecked = false;
+                                 categoriesTeachParam = ReloadTeachParameterUI(SelectedCameraIndex);
                              });
 
-            PropertyChangedCommand = new DelegateCommand<PropertyValueChangedEventArgs>(OnPropertyChanged);
-
-            categoriesTeachParam = null;
-            categoriesTeachParam = Application.categoriesTeachParam;
-
+            initTeachParamDelegate = InitCategory;
         }
 
 
+        public delegate void InitTeachParam(int nTrack);
 
+        public static InitTeachParam initTeachParamDelegate;
 
+        public void InitCategory(int nTrack)
+        {
+            SelectedCameraIndex = nTrack;
+        }
 
-        public bool SaveParameterTeachDefault()
+        public bool SaveTeachParameter()
         {
             try
             {
-                Mouse.OverrideCursor = Cursors.Wait;
-                //LoadTeachParamFromUIToDict();
+                //Mouse.OverrideCursor = Cursors.Wait;
                 MainWindow mainWindow = (MainWindow)System.Windows.Application.Current.MainWindow;
-                mainWindow.master.m_Tracks[SelectedCameraIndex].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
-                //mainWindow.master.m_Tracks[SelectedCameraIndex].m_InspectionCore.UpdateAreaParameterFromUIToInspectionCore((int)Application.categoriesTeachParam.DR_DefectROIIndex);
+                mainWindow.master.m_Tracks[SelectedCameraIndex].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore(categoriesTeachParam);
                 mainWindow.master.WriteTeachParam(SelectedCameraIndex);
-                Application.LoadTeachParamFromFileToDict(SelectedCameraIndex);
-                //Application.LoadAreaParamFromFileToDict(SelectedCameraIndex, (int)Application.categoriesTeachParam.DR_DefectROIIndex);
-
-
-                Mouse.OverrideCursor = null;
-                //mainWindow.teach_parameters_btn.IsChecked = false;
+                //Mouse.OverrideCursor = null;
                 return true;
             }
             catch (Exception)
             {
                 return false;
             }
+
         }
 
-        public void ReloadTeachParameterUI(int nTrack, int nArea = 0)
+        public static CategoryTeachParameter ReloadTeachParameterUI(int nTrack)
         {
-            _isDisableOnpropertyChanged = true;
+            Dictionary<string, string> dictTeachParam;
 
-            Application.dictTeachParam.Clear();
-            Application.LoadTeachParamFromFileToDict(nTrack);
-            //m_Tracks[nTrack].m_InspectionCore.LoadTeachImageToInspectionCore(nTrack);
-            UpdateTeachParamFromDictToUI(Application.dictTeachParam);
-
-            //ReloadAreaParameterUI(SelectedCameraIndex, nDefectROIIndex);
-            categoriesTeachParam = null;
-            categoriesTeachParam = Application.categoriesTeachParam;
-            _isDisableOnpropertyChanged = false;
-
+            dictTeachParam = LoadTeachParamFromFileToDict(nTrack);
+            CategoryTeachParameter category = new CategoryTeachParameter();
+            FileHelper.UpdateParamFromDictToUI(dictTeachParam, category);
+            return category;
 
         }
-
-        public void ReloadAreaParameterUI(int nTrack, int nArea = 0)
-        {
-            Application.dictTeachParam.Clear();
-            Application.LoadAreaParamFromFileToDict(nTrack, nDefectROIIndex);
-            //m_Tracks[nTrack].m_InspectionCore.LoadTeachImageToInspectionCore(nTrack);
-            UpdateTeachParamFromDictToUI(Application.dictPVIAreaParam[nDefectROIIndex]);
-            //pgr_PropertyGrid_Teach.Update();
-        }
-
-
-        public bool UpdateTeachParamFromDictToUI(Dictionary<string, string> dictTeachParam)
-        {
-            if (dictTeachParam == null)
-                return false;
-            //_dictTeachParam = dictTeachParam;
-            object category = Application.categoriesTeachParam;
-            //object category_local = categoriesTeachParam;
-
-            bool bSuccess = Application.UpdateParamFromDictToUI(dictTeachParam, ref category);
-            Application.categoriesTeachParam = (CategoryTeachParameter)category;
-
-            categoriesTeachParam = Application.categoriesTeachParam;
-
-
-            return bSuccess;
-        }
-
-
         public class AreaComboBox : IItemsSource
         {
             Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection m_ComboBox_Area = new Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection();
@@ -209,6 +133,103 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                 return m_ComboBox_Area;
             }
         }
+
+
+        public static Dictionary<string, string> LoadTeachParamFromFileToDict(int nTrack)
+        {
+            if (Application.currentRecipe == null || Application.pathRecipe == null)
+                return null;
+
+
+            Dictionary<string, string> dictTeachParam = new Dictionary<string, string>();
+            string strFileName = "TeachParameters_Track" + (nTrack + 1).ToString() + ".cfg";
+            string pathFile = Path.Combine(Application.pathRecipe, Application.currentRecipe, strFileName);
+            IniFile ini = new IniFile(pathFile);
+
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_DeviceLocationRoi)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_LocationEnable)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_ThresholdType)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_ObjectColor)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_lowerThreshold)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_upperThreshold)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_lowerThresholdInnerChip)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_upperThresholdInnerChip)), ini, ref dictTeachParam);
+
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_OpeningMask)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_DilationMask)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_MinWidthDevice)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_MinHeightDevice)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_TemplateRoi)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_NumberSide)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_ScaleImageRatio)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_MinScore)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_CornerIndex)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_NumberROILocation)), ini, ref dictTeachParam);
+
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_EnableCheck)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_lowerThreshold)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_upperThreshold)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_OpeningMask)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_DilationMask)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_MinWidthDevice)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_MinHeightDevice)), ini, ref dictTeachParam);
+            return dictTeachParam;
+        }
+
+        public static void WriteTeachParam(int nTrack)
+        {
+
+            string strFileName = "TeachParameters_Track" + (nTrack + 1).ToString() + ".cfg";
+            string pathFile = Path.Combine(Application.pathRecipe, Application.currentRecipe, strFileName);
+
+            string strDateTime = string.Format("({0}.{1}.{2}_{3}.{4}.{5})", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+            string backup_path = Path.Combine(Application.pathRecipe, Application.currentRecipe, "Backup_Teach Parameter");
+            if (!Directory.Exists(backup_path))
+                Directory.CreateDirectory(backup_path);
+
+            string backup_fullpath = Path.Combine(backup_path, $"TeachParameters_Track{nTrack + 1} {strDateTime}" + ".cfg");
+            FileInfo file = new FileInfo(pathFile);
+
+            if (!file.Exists)
+                file.Create();
+
+            file.MoveTo(backup_fullpath);
+            file.Create();
+
+            IniFile ini = new IniFile(pathFile);
+            InspectionCore inspectionCore = MainWindow.mainWindow.master.m_Tracks[nTrack].m_InspectionCore;
+
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_DeviceLocationRoi)), ini, TypeConverterHelper.ConvertRectanglesToString(inspectionCore.m_DeviceLocationParameter.m_L_DeviceLocationRoi));
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_LocationEnable)), ini, inspectionCore.m_DeviceLocationParameter.m_L_LocationEnable.ToString());
+
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_ThresholdType)), ini, inspectionCore.m_DeviceLocationParameter.m_L_ThresholdType.ToString());
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_ObjectColor)), ini, inspectionCore.m_DeviceLocationParameter.m_L_ObjectColor.ToString());
+
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_lowerThreshold)), ini, inspectionCore.m_DeviceLocationParameter.m_L_lowerThreshold.ToString());
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_upperThreshold)), ini, inspectionCore.m_DeviceLocationParameter.m_L_upperThreshold.ToString());
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_lowerThresholdInnerChip)), ini, inspectionCore.m_DeviceLocationParameter.m_L_lowerThresholdInnerChip.ToString());
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_upperThresholdInnerChip)), ini, inspectionCore.m_DeviceLocationParameter.m_L_upperThresholdInnerChip.ToString());
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_OpeningMask)), ini, inspectionCore.m_DeviceLocationParameter.m_L_OpeningMask.ToString());
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_DilationMask)), ini, inspectionCore.m_DeviceLocationParameter.m_L_DilationMask.ToString());
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_MinWidthDevice)), ini, inspectionCore.m_DeviceLocationParameter.m_L_MinWidthDevice.ToString());
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_MinHeightDevice)), ini, inspectionCore.m_DeviceLocationParameter.m_L_MinHeightDevice.ToString());
+
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_TemplateRoi)), ini, TypeConverterHelper.ConvertRectanglesToString(inspectionCore.m_DeviceLocationParameter.m_L_TemplateRoi));
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_ScaleImageRatio)), ini, inspectionCore.m_DeviceLocationParameter.m_L_ScaleImageRatio.ToString());
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_MinScore)), ini, inspectionCore.m_DeviceLocationParameter.m_L_MinScore.ToString());
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_CornerIndex)), ini, inspectionCore.m_DeviceLocationParameter.m_L_CornerIndex.ToString());
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_NumberROILocation)), ini, inspectionCore.m_DeviceLocationParameter.m_DR_NumberROILocation.ToString());
+
+
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_EnableCheck)), ini, inspectionCore.m_blackChipParameter.m_OC_EnableCheck.ToString());
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_lowerThreshold)), ini, inspectionCore.m_blackChipParameter.m_OC_lowerThreshold.ToString());
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_upperThreshold)), ini, inspectionCore.m_blackChipParameter.m_OC_upperThreshold.ToString());
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_OpeningMask)), ini, inspectionCore.m_blackChipParameter.m_OC_OpeningMask.ToString());
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_DilationMask)), ini, inspectionCore.m_blackChipParameter.m_OC_DilationMask.ToString());
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_MinWidthDevice)), ini, inspectionCore.m_blackChipParameter.m_OC_MinWidthDevice.ToString());
+            FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_MinHeightDevice)), ini, inspectionCore.m_blackChipParameter.m_OC_MinHeightDevice.ToString());
+        }
+
         /// <summary>
         /// Model For PropertyGrid
         /// </summary>

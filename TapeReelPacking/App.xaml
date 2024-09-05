@@ -4,6 +4,10 @@
              xmlns:local="clr-namespace:TapeReelPacking.UI.UserControls.View"
              StartupUri="UI/UserControls/View/MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="UI/UserControls/Styles/RibbonStyle.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -69,3 +69,5 @@ C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking.e
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking.pdb
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\View\SummaryTemplateView.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\View\SummaryTemplateView.baml
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\Styles\RibbonStyle.baml
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\App.baml

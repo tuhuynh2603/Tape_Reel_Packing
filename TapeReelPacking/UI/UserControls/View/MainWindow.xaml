@@ -9,21 +9,21 @@
         xmlns:local="clr-namespace:TapeReelPacking"
         xmlns:view="clr-namespace:TapeReelPacking.UI.UserControls.View" 
         xmlns:taskmanager="clr-namespace:TapeReelPacking.UI.UserControls"
-        xmlns:viewmodel="clr-namespace:TapeReelPacking.UI.UserControls.ViewModel"
+        xmlns:viewmodel="clr-namespace:TapeReelPacking.UI.UserControls.ViewModel" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
         d:DesignHeight="900" d:DesignWidth="1600"
         WindowState="Maximized" WindowStyle="None"
         Title="MainWindow">
 
 
-    <Window.Resources>
+    <!--<Window.Resources>
         <Grid x:Key="runSequenceImage" Margin="3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="3*"></RowDefinition>
-                <!--<RowDefinition Height="1*"></RowDefinition>-->
+                --><!--<RowDefinition Height="1*"></RowDefinition>--><!--
             </Grid.RowDefinitions>
             <Image Grid.Row="0"  Source="..\..\..\Resources\StartButton.png"></Image>
-            <!--<TextBlock Grid.Row="1" Text="Run" Foreground="Yellow" TextAlignment="Center" FontSize="20"></TextBlock>-->
+            --><!--<TextBlock Grid.Row="1" Text="Run" Foreground="Yellow" TextAlignment="Center" FontSize="20"></TextBlock>--><!--
         </Grid>
 
         <Grid x:Key="debugSequenceImage" Margin="3">
@@ -56,10 +56,10 @@
         <Grid x:Key="ImidiateStopImage" Margin="3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="3*"></RowDefinition>
-                <!--<RowDefinition Height="1*"></RowDefinition>-->
+                --><!--<RowDefinition Height="1*"></RowDefinition>--><!--
             </Grid.RowDefinitions>
             <Image Grid.Row="0"  Source="..\..\..\Resources\StopButton.png"></Image>
-            <!--<TextBlock Grid.Row="1" Text="Imidiate Stop" Foreground="Yellow" TextAlignment="Center" FontSize="20"></TextBlock>-->
+            --><!--<TextBlock Grid.Row="1" Text="Imidiate Stop" Foreground="Yellow" TextAlignment="Center" FontSize="20"></TextBlock>--><!--
         </Grid>
 
 
@@ -87,10 +87,10 @@
         <Grid x:Key="EmergencyStopImage" Margin="3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="3*"></RowDefinition>
-                <!--<RowDefinition Height="1*"></RowDefinition>-->
+                --><!--<RowDefinition Height="1*"></RowDefinition>--><!--
             </Grid.RowDefinitions>
             <Image Margin="2" Grid.Row="0"  Source="..\..\..\Resources\EmergencyButton.png"></Image>
-            <!--<TextBlock Grid.Row="1" Text="Emergency Stop" Foreground="Yellow" TextAlignment="Center" FontSize="20"></TextBlock>-->
+            --><!--<TextBlock Grid.Row="1" Text="Emergency Stop" Foreground="Yellow" TextAlignment="Center" FontSize="20"></TextBlock>--><!--
         </Grid>
 
         <Grid x:Key="ResetImage" Margin="3">
@@ -104,19 +104,19 @@
 
 
 
-        <!--Background button-->
+        --><!--Background button--><!--
         <LinearGradientBrush x:Key="BgButton" EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
             <GradientStop Color="#FF03D4F2" Offset="0.439"/>
             <GradientStop Color="#FF17717E" Offset="0.808"/>
         </LinearGradientBrush>
-        <!--Open Dialog Settings-->
+        --><!--Open Dialog Settings--><!--
         <Storyboard x:Key="sb_OpenDialogUC">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="grd_Dialog_Settings">
                 <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
                 <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="{Binding Path=DialogUCHeight,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
-        <!--Close Dialog Settings-->
+        --><!--Close Dialog Settings--><!--
         <Storyboard x:Key="sb_CloseDialogUC">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="grd_Dialog_Settings">
                 <EasingDoubleKeyFrame KeyTime="0" Value="{Binding Path=DialogUCHeight,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -239,11 +239,11 @@
             <LinearGradientBrush.GradientStops>
                 <GradientStop Color="#FF03D4F2" Offset="0.439"/>
                 <GradientStop Color="#FF17717E" Offset="0.808"/>
-                <!--<GradientStop Offset="0.4" Color="LightGoldenrodYellow"/>
-                <GradientStop Offset="0.6" Color="BurlyWood"/>-->
+                --><!--<GradientStop Offset="0.4" Color="LightGoldenrodYellow"/>
+                <GradientStop Offset="0.6" Color="BurlyWood"/>--><!--
             </LinearGradientBrush.GradientStops>
         </LinearGradientBrush>
-        <!-- TabItem Style-->
+        --><!-- TabItem Style--><!--
         <Style TargetType="{x:Type TabItem}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -284,7 +284,7 @@
         <RoutedUICommand x:Key="Routed_btn_Clear_Comm_Click"/>
         <RoutedUICommand x:Key="Routed_btn_ShowOverlay_Click"/>
 
-    </Window.Resources>
+    </Window.Resources>-->
 
 
     <Window.CommandBindings>
@@ -308,9 +308,6 @@
         <KeyBinding x:Name="KeyBinding_Esc"   Key="Esc" Command="{StaticResource Routed_btn_abort_teach_Click}"></KeyBinding>
         <KeyBinding x:Name="KeyBinding_X_Shift"   Key="X" Modifiers="Shift" Command="{StaticResource Routed_btn_Clear_Comm_Click}"></KeyBinding>
         <KeyBinding x:Name="KeyBinding_O"   Key="O" Command="{StaticResource Routed_btn_ShowOverlay_Click}"></KeyBinding>
-
-
-
     </Window.InputBindings>
 
 
@@ -366,13 +363,19 @@
                                                         VerticalAlignment="Center"  />
 
                                 <TextBlock  x:Name="text_LotID"
-                                                          
+
                                                             MouseLeftButtonDown="text_LotID_MouseLeftButtonDown"
                                                             Text="{Binding Path=m_strCurrentLotID,  Mode=TwoWay, UpdateSourceTrigger= PropertyChanged}"
                                                             Width="Auto" MinWidth="150" Foreground="WhiteSmoke"
                                                             Background="DarkSlateGray"
                                                             FontSize="20" FontWeight="Bold"
                                                             VerticalAlignment="Center">
+                                    
+                                                            <!--<i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                                                    <i:InvokeCommandAction Command="{Binding text_LotID_MouseLeftButtonDown}" />
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>-->
 
                                 </TextBlock>
                                 <!--Recipe Name-->

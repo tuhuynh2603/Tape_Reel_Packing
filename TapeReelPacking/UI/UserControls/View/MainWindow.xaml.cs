@@ -893,10 +893,13 @@ namespace TapeReelPacking.UI.UserControls.View
             master.teachParameterUC.Width = 300;
             master.teachParameterUC.Height = 600;
             //master.m_Tracks[0].m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autofocus, 1);
-            master.teachParameterUC.track_ComboBox.SelectedIndex = activeImageDock.trackID;
-            TeachParameterVM teachParameterVM = (TeachParameterVM)mainWindow.master.teachParameterUC.DataContext;
+            //master.teachParameterUC.track_ComboBox.SelectedIndex = activeImageDock.trackID;
+            //TeachParameterVM teachParameterVM = (TeachParameterVM)mainWindow.master.teachParameterUC.DataContext;
 
-            teachParameterVM.ReloadTeachParameterUI(activeImageDock.trackID);
+
+            TeachParameterVM.initTeachParamDelegate?.Invoke(activeImageDock.trackID);
+
+            //teachParameterVM.categoriesTeachParam = TeachParameterVM.ReloadTeachParameterUI(activeImageDock.trackID);
             grd_PopupDialog.Children.Add(master.teachParameterUC);
             //grd_PopupDialog.Children.Add(master.m_Tracks[]);
             tab_controls.SelectedIndex = currentTabIndex;
@@ -1829,12 +1832,12 @@ namespace TapeReelPacking.UI.UserControls.View
             grd_Dialog_Settings.HorizontalAlignment = HorizontalAlignment.Left;
             master.visionParametersUC.Width = 300;
             master.visionParametersUC.Height = 600;
-            master.visionParametersUC.track_ComboBox.SelectedIndex = activeImageDock.trackID;
-            master.visionParametersUC.comboSelectedPVIArea.SelectedIndex = 0;
+            //master.visionParametersUC.track_ComboBox.SelectedIndex = activeImageDock.trackID;
+            //master.visionParametersUC.comboSelectedPVIArea.SelectedIndex = 0;
 
-            VisionParameterVM areaParameter = (VisionParameterVM)master.visionParametersUC.DataContext;
-
-            areaParameter.ReloadCameraParameterUI(activeImageDock.trackID);
+            //VisionParameterVM areaParameter = (VisionParameterVM)master.visionParametersUC.DataContext;
+            //areaParameter.categoriesVisionParam = VisionParameterVM.ReloadAreaParameterUI(activeImageDock.trackID);
+            VisionParameterVM.initCategoryDelegate?.Invoke(activeImageDock.trackID, 0);
             grd_PopupDialog.Children.Add(master.visionParametersUC);
             tab_controls.SelectedIndex = currentTabIndex;
             grd_Dialog_Settings.Visibility = Visibility.Visible;

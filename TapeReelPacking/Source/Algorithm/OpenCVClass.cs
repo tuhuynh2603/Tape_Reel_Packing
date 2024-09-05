@@ -1,12 +1,11 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
-using TapeReelPacking.Source.Define;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using TapeReelPacking.Source.Define;
 using static TapeReelPacking.Source.Define.Rectangles;
 using CvContourArray = Emgu.CV.Util.VectorOfVectorOfPoint;
 using CvImage = Emgu.CV.Mat;
@@ -511,7 +510,7 @@ namespace TapeReelPacking.Source.Algorithm
             result = rotatedImage;
             return true;
         }
-        public static CvImage RotateShiftImage(ref CvImage source,PointF centerPoint, float angleRotate, float fShiftX, float fShiftY)
+        public static CvImage RotateShiftImage(ref CvImage source, PointF centerPoint, float angleRotate, float fShiftX, float fShiftY)
         {
             CvImage rotatedImage = new CvImage();
             CvImage mapMatrix = new CvImage();
@@ -520,8 +519,8 @@ namespace TapeReelPacking.Source.Algorithm
             float fX = (float)mapMatrix.GetValue(0, 2);
             fX += (float)fShiftX;
 
-            float fY = (float) mapMatrix.GetValue(1, 2);
-            fY  += (float)fShiftY;
+            float fY = (float)mapMatrix.GetValue(1, 2);
+            fY += (float)fShiftY;
 
             mapMatrix.SetValue(0, 2, fX);
             mapMatrix.SetValue(1, 2, fY);
@@ -832,7 +831,7 @@ namespace TapeReelPacking.Source.Algorithm
             //CvInvoke.Add(imgGray, new UMat(imgGray.Size, DepthType.Cv8U, 1), result, null);
             int nMin = minThreshold;
             if (minThreshold == 0)
-                nMin = - 1;
+                nMin = -1;
 
             CvInvoke.Threshold(imgGray, lowerThreshMat, nMin, 255, Emgu.CV.CvEnum.ThresholdType.Binary);
             CvInvoke.Threshold(imgGray, upperThreshMat, (double)maxThreshold, 255, Emgu.CV.CvEnum.ThresholdType.BinaryInv);
@@ -1362,7 +1361,7 @@ namespace TapeReelPacking.Source.Algorithm
             regionCrop.ROI = rectangleRoi;
             return true;
         }
-        public static bool getTemplateIns(ref CvImage templateIns, ref Image<Gray, byte> RegionRoi, ref CvImage templateTeach, ref Rectangle rectangleTemplateIns,ref Size imageSize)
+        public static bool getTemplateIns(ref CvImage templateIns, ref Image<Gray, byte> RegionRoi, ref CvImage templateTeach, ref Rectangle rectangleTemplateIns, ref Size imageSize)
 
         {
             CvImage region = new CvImage();
@@ -1580,7 +1579,7 @@ namespace TapeReelPacking.Source.Algorithm
                 int nTime = (radius - nLastRadiusSize) / nSmallRadius;
                 result = source.Clone();
                 CvImage kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(2 * nSmallRadius + 1, 2 * nSmallRadius + 1), new Point(nSmallRadius, nSmallRadius));
-                CvInvoke.MorphologyEx(result, result, MorphOp.Erode, kernel, new Point(-1, -1), iter* nTime, BorderType.Constant, CvInvoke.MorphologyDefaultBorderValue);
+                CvInvoke.MorphologyEx(result, result, MorphOp.Erode, kernel, new Point(-1, -1), iter * nTime, BorderType.Constant, CvInvoke.MorphologyDefaultBorderValue);
 
                 //for (int n = 0; n < nTime; n++)
                 //{

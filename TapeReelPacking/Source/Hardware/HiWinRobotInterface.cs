@@ -13,6 +13,7 @@ using System.Windows.Media;
 using LicenseContext = OfficeOpenXml.LicenseContext;
 using TapeReelPacking.Source.Application;
 using TapeReelPacking.UI.UserControls.View;
+using TapeReelPacking.Source.Helper;
 
 namespace TapeReelPacking.Source.Hardware.SDKHrobot
 {
@@ -413,7 +414,7 @@ namespace TapeReelPacking.Source.Hardware.SDKHrobot
 
         public HiWinRobotInterface()
         {
-            m_strRobotIPAddress = Application.Application.GetCommInfo("Robot Comm::IpAddress", m_strRobotIPAddress);
+            m_strRobotIPAddress = FileHelper.GetCommInfo("Robot Comm::IpAddress", m_strRobotIPAddress, Application.Application.pathRegistry);
             Task t = ConnectoHIKRobot(m_strRobotIPAddress);
         }
 

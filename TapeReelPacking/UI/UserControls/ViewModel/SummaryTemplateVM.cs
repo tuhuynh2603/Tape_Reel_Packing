@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TapeReelPacking.UI.UserControls.ViewModel
+﻿namespace TapeReelPacking.UI.UserControls.ViewModel
 {
-    public class SummaryTemplateVM:BaseVM
+    public class SummaryTemplateVM : BaseVM
     {
 
 
@@ -24,8 +18,8 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         private string nameSummary1;
 
-        public string nameSummary 
-        { 
+        public string nameSummary
+        {
             get => nameSummary1;
             set
             {
@@ -36,7 +30,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         private System.Windows.Media.Brush color1;
 
-        public System.Windows.Media.Brush color 
+        public System.Windows.Media.Brush color
         {
             get => color1;
             set
@@ -48,9 +42,9 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         private double valueSummary_Camera21;
 
-        public double valueSummary_Camera2 
-        { 
-            
+        public double valueSummary_Camera2
+        {
+
             get => valueSummary_Camera21;
             set
             {

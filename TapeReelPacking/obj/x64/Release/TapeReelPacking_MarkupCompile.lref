@@ -1,6 +1,7 @@
-﻿
-
+﻿C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\GeneratedInternalTypeHelper.g.cs
+FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\App.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\MainWindow.xaml;;
+FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\MappingCanvasView.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\MappingSetingUC.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\PopupUserControl.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\ResourceControl.xaml;;
@@ -8,6 +9,7 @@ FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\Source\Hardware\ETHERNETIP_View.
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\Source\Hardware\HIKControlCameraView.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\Source\Hardware\HiWinRobotUserControl.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\Source\Hardware\PLCCOMM.xaml;;
+FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\SummaryTemplateView.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\TeachParametersUC.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\DefectInfor.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\LoginUser.xaml;;
@@ -17,11 +19,9 @@ FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\PixelRuler.
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\RecipeManageView.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\ImageView.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\MapingRectangleView.xaml;;
-FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\MappingCanvasView.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\SerialCommunicationView.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\StatisticView.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\TitleBar.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\VisionParameterUC.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\WarningMessageBox.xaml;;
-FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\SummaryTemplateView.xaml;;
 

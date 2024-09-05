@@ -202,23 +202,18 @@ namespace TapeReelPacking.Source.Application
             #region Load Teach Paramter
             for (int nTrack = 0; nTrack < Application.m_nTrack; nTrack++)
             {
-                Application.dictTeachParam.Clear();
-                Application.LoadTeachParamFromFileToDict(nTrack);
                 //m_Tracks[nTrack].m_InspectionCore.LoadTeachImageToInspectionCore(nTrack);
 
-                TeachParameterVM teachParameterVM = (TeachParameterVM)teachParameterUC.DataContext;
-                teachParameterVM.UpdateTeachParamFromDictToUI(Application.dictTeachParam);
-                m_Tracks[nTrack].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
+                CategoryTeachParameter categoryTeachParameter = TeachParameterVM.ReloadTeachParameterUI(nTrack);
+                m_Tracks[nTrack].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore(categoryTeachParameter);
 
 
                 for (int nArea = 0; nArea < Application.TOTAL_AREA; nArea++)
                 {
-                    Application.dictPVIAreaParam[nArea] = new Dictionary<string, string>();
 
-                    Application.LoadAreaParamFromFileToDict(nTrack, nArea);
-                    VisionParameterVM visionVM = (VisionParameterVM)visionParametersUC.DataContext;
-                    visionVM.UpdateAreaParamFromDictToUI(Application.dictPVIAreaParam[nArea], nArea);
-                    m_Tracks[nTrack].m_InspectionCore.UpdateAreaParameterFromUIToInspectionCore(Application.categoriesVisionParam, nArea);
+                    //VisionParameterVM visionVM = (VisionParameterVM)visionParametersUC.DataContext;
+                    CategoryVisionParameter visionParam =   VisionParameterVM.ReloadAreaParameterUI(nTrack, nArea); 
+                    m_Tracks[nTrack].m_InspectionCore.UpdateAreaParameterFromUIToInspectionCore(visionParam, nArea);
                 }
 
 
@@ -2492,7 +2487,7 @@ namespace TapeReelPacking.Source.Application
         {
             try
             {
-                applications.WriteTeachParam(nTrack);
+                TeachParameterVM.WriteTeachParam(nTrack);
             }
             catch (Exception)
             {

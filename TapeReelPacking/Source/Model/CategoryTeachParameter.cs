@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TapeReelPacking.Source.Define;
-using TapeReelPacking.UI.UserControls.ViewModel;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace TapeReelPacking.Source.Model
@@ -22,26 +18,6 @@ namespace TapeReelPacking.Source.Model
 
         public const string CATEGORY_LOCATION = "LOCATION";
         public const string CATEGORY_OPPOSITE_CHIP = "OPPOSITE CHIP";
-
-        [Key]
-        [Browsable(false)]
-        public int cameraID { get; set; } // Primary key property
-
-        [Browsable(false)]
-        public DateTime dateChanged { set; get; }
-
-        [Browsable(false)]
-        public ICollection<CategoryVisionParameter> categoryVisionParameter { get; set; } = null;
-
-        [Browsable(false)]
-        [Column(TypeName = "longblob")]
-        [DisplayName("Teach Image")]
-        public byte[] teachImage { get; set; }
-
-        [Browsable(false)]
-        [DisplayName("Template Image")]
-        [Column(TypeName = "longblob")]
-        public byte[] templateImage { get; set; }
 
         #region LOCATION
         [Browsable(false)]
@@ -66,7 +42,11 @@ namespace TapeReelPacking.Source.Model
         [DefaultValue(THRESHOLD_TYPE.BINARY_THRESHOLD)]
         [Description("Threshold method")]
         [PropertyOrder(2)]
-        public THRESHOLD_TYPE L_ThresholdType { get; set; }
+        public THRESHOLD_TYPE L_ThresholdType
+        {
+            get;
+            set;
+        }
 
         [Browsable(true)]
         [Category(CategoryTeachParameter.CATEGORY_LOCATION)]
@@ -276,6 +256,30 @@ namespace TapeReelPacking.Source.Model
 
 
         #endregion
+
+
+        [Key]
+        [Browsable(false)]
+        public int cameraID { get; set; } // Primary key property
+
+        [Browsable(false)]
+        public DateTime dateChanged { set; get; }
+
+        [Browsable(false)]
+        public ICollection<CategoryVisionParameter> categoryVisionParameter { get; set; } = null;
+
+        [Browsable(false)]
+        [Column(TypeName = "longblob")]
+        [DisplayName("Teach Image")]
+        public byte[] teachImage { get; set; }
+
+        [Browsable(false)]
+        [DisplayName("Template Image")]
+        [Column(TypeName = "longblob")]
+
+        public byte[] templateImage { get; set; }
+
+
     }
 
 }

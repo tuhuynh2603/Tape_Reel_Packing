@@ -5,6 +5,9 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using TapeReelPacking.Source.Define;
+using TapeReelPacking.Source.Helper;
+using TapeReelPacking.Source.Model;
 using TapeReelPacking.UI.UserControls.View;
 
 namespace TapeReelPacking.Source.Hardware
@@ -15,6 +18,10 @@ namespace TapeReelPacking.Source.Hardware
 
     public partial class HIKControlCameraView : UserControl
     {
+
+        private static CameraParameter cameraParameter = new CameraParameter();
+
+
         MyCamera.MV_CC_DEVICE_INFO_LIST m_stDeviceList = new MyCamera.MV_CC_DEVICE_INFO_LIST();
         public MyCamera m_MyCamera = new MyCamera();
         public bool m_bGrabbing = false;
@@ -28,6 +35,8 @@ namespace TapeReelPacking.Source.Hardware
             //this.Closing += Window_Closing;
 
             DeviceListAcq();
+
+            CameraHelper.LoadCamSetting(nTrack, cameraParameter);
             MainWindow.mainWindow.UpdateCameraConnectionStatus(nTrack, InitializeCamera(strCameraID));
             m_strCameraSerial = strCameraID;
             m_nTrack = nTrack;
@@ -260,15 +269,15 @@ namespace TapeReelPacking.Source.Hardware
             m_MyCamera.MV_CC_SetEnumValue_NET("AcquisitionMode", (uint)MyCamera.MV_CAM_ACQUISITION_MODE.MV_ACQ_MODE_CONTINUOUS);
             m_MyCamera.MV_CC_SetEnumValue_NET("TriggerMode", (uint)MyCamera.MV_CAM_TRIGGER_MODE.MV_TRIGGER_MODE_ON);
             m_MyCamera.MV_CC_SetEnumValue_NET("TriggerSource", (uint)MyCamera.MV_CAM_TRIGGER_SOURCE.MV_TRIGGER_SOURCE_SOFTWARE);
-            if(!SetParameterToCamera(Application.Application.cameraSettingParam.exposureTime, Application.Application.cameraSettingParam.gain, Application.Application.cameraSettingParam.frameRate))
+            if(!SetParameterToCamera(cameraParameter.exposureTime, cameraParameter.gain, cameraParameter.frameRate))
             {
                 float expose = 0;
                 float gain = 0;
                 float frameRate = 0;
                 GetCameraParameter(ref expose, ref gain, ref frameRate);
-                Application.Application.cameraSettingParam.gain = gain;
-                Application.Application.cameraSettingParam.exposureTime = expose;
-                Application.Application.cameraSettingParam.frameRate = frameRate;
+                cameraParameter.gain = gain;
+                cameraParameter.exposureTime = expose;
+                cameraParameter.frameRate = frameRate;
                 ShowErrorMsg($"Failed! gain{gain} expose {expose} frameRate {frameRate}", (int)MyCamera.MV_ALG_E_PARAM_VALUE);
 
                 //Application.Application.WriteCamSetting(m_nTrack);
@@ -534,10 +543,10 @@ namespace TapeReelPacking.Source.Hardware
             var result = MessageBox.Show("Would you like to save camera parameters ?", "", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
             {
-                Application.Application.cameraSettingParam.gain = float.Parse(tbGain.Text);
-                Application.Application.cameraSettingParam.exposureTime = float.Parse(tbExposure.Text);
-                Application.Application.cameraSettingParam.frameRate = float.Parse(tbFrameRate.Text);
-                Application.Application.WriteCamSetting(m_nTrack);
+                cameraParameter.gain = float.Parse(tbGain.Text);
+                cameraParameter.exposureTime = float.Parse(tbExposure.Text);
+                cameraParameter.frameRate = float.Parse(tbFrameRate.Text);
+                CameraHelper.WriteCamSetting(m_nTrack, cameraParameter);
             }
         }
 

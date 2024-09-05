@@ -14,6 +14,7 @@ using Application = TapeReelPacking.Source.Application;
 using System.Runtime.CompilerServices;
 using TapeReelPacking.UI.UserControls.ViewModel;
 using TapeReelPacking.UI.UserControls.View;
+using TapeReelPacking.Source.Helper;
 
 namespace TapeReelPacking
 {
@@ -111,10 +112,8 @@ namespace TapeReelPacking
             return list;
         }
         public bool UpdateMappingParamFromDictToUI(Dictionary<string, string> dictParam)
-        {
-            object category = Application.Application.categoriesMappingParam;
-            bool bSuccess = Application.Application.UpdateParamFromDictToUI(dictParam, ref category/*, ref category_local*/);
-            Application.Application.categoriesMappingParam = (MappingSetingUCVM.CatergoryMappingParameters)category;
+        {            
+            bool bSuccess = FileHelper.UpdateParamFromDictToUI<MappingSetingUCVM.CatergoryMappingParameters>(dictParam, Application.Application.categoriesMappingParam);
             pgr_PropertyGrid_Mapping.Update();
             return bSuccess;
         }

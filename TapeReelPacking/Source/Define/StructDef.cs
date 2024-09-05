@@ -180,14 +180,6 @@ namespace TapeReelPacking.Source.Define
         public int height { get; set; }
     }
 
-    public struct CameraSettingParam
-    {
-        public bool softwareTrigger;
-        public float exposureTime;
-        public float frameRate;
-        public float gain;
-    }
-
     public static class DefautTeachingSequence
     {
         public static System.Windows.Media.Brush ColorContentTeahing = System.Windows.Media.Brushes.Cyan;

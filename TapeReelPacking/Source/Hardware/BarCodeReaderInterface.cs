@@ -10,6 +10,7 @@ using TapeReelPacking.Source.Application;
 using System.IO;
 using TapeReelPacking.UI.UserControls.ViewModel;
 using TapeReelPacking.UI.UserControls.View;
+using TapeReelPacking.Source.Helper;
 
 namespace TapeReelPacking.Source.Hardware
 {
@@ -44,7 +45,7 @@ namespace TapeReelPacking.Source.Hardware
             updateConnectionStatus(false);
 
             string defaults = "127.0.0.1";
-            barCodeipAddress = Application.Application.GetCommInfo("Barcode Comm::IpAddress", defaults);
+            barCodeipAddress = FileHelper.GetCommInfo("Barcode Comm::IpAddress", defaults,Application.Application.pathRegistry);
 
             m_nicList = m_searcher.ListUpNic();
             if (m_nicList != null)

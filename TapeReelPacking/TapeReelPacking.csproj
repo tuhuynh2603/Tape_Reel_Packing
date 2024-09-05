@@ -125,6 +125,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Source\Helper\CameraHelper.cs" />
+    <Compile Include="Source\Helper\FileHelper.cs" />
+    <Compile Include="Source\Helper\TypeConverterHelper.cs" />
+    <Compile Include="Source\Interface\IParameter.cs" />
+    <Compile Include="Source\Model\CameraParameter.cs" />
     <Compile Include="UI\UserControls\ViewModel\StatisticVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\SummaryTemplateVM.cs" />
     <Compile Include="UI\UserControls\View\MappingCanvasView.xaml.cs">
@@ -249,6 +254,10 @@
     <Compile Include="UI\UserControls\View\WarningMessageBox.xaml.cs">
       <DependentUpon>WarningMessageBox.xaml</DependentUpon>
     </Compile>
+    <Page Include="UI\UserControls\Styles\RibbonStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\UserControls\View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

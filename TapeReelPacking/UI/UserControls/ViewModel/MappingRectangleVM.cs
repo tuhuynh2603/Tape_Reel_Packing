@@ -1,10 +1,5 @@
 ﻿using Microsoft.Expression.Interactivity.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -15,7 +10,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 {
     public class MappingRectangleVM : BaseVM
     {
-        public int trackID {set;get;}
+        public int trackID { set; get; }
 
         private ImageSource imageSource1 = new BitmapImage(new Uri(@"/Resources/gray-chip.png", UriKind.Relative));
 
@@ -62,9 +57,9 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         public double labelTop { get => labelTop1; set => SetProperty(ref labelTop1, value); }
 
         private System.Windows.Visibility isBorderVisible1 = System.Windows.Visibility.Visible;
-        public System.Windows.Visibility isBorderVisible 
-        { 
-            get => isBorderVisible1; 
+        public System.Windows.Visibility isBorderVisible
+        {
+            get => isBorderVisible1;
             set
             {
                 isBorderVisible1 = value;

@@ -95,7 +95,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                 });
 
                 bIsSelected = false;
-
+ 
                 return;
             }
 

@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections.ObjectModel;
-
-using System.Windows.Input;
-using System.Windows.Controls;
+﻿using System.Collections.ObjectModel;
 using System.IO.Ports;
-using TapeReelPacking.Source.Define;
+using System.Windows.Controls;
+using System.Windows.Input;
 using TapeReelPacking.Source.Application;
+using TapeReelPacking.Source.Helper;
 using TapeReelPacking.UI.UserControls.View;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
 
-    public class SerialCommunicationVM:BaseVM
+    public class SerialCommunicationVM : BaseVM
     {
 
         public ICommand DrowDownListCommCommand { get; set; }
@@ -34,8 +28,8 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         public ObservableCollection<string> ListCOMM
         {
             get { return _ListCOMM; }
-            set 
-            { 
+            set
+            {
                 _ListCOMM = value;
                 OnPropertyChanged("listCOMM");
             }
@@ -90,7 +84,8 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         public string txtDataWriteString
         {
             get { return _txtDataWriteString; }
-            set {
+            set
+            {
                 _txtDataWriteString = value;
                 OnPropertyChanged();
             }
@@ -99,7 +94,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         private string _txt_DataReadString;
         public string txt_DataReadString
         {
-            get =>_txt_DataReadString;
+            get => _txt_DataReadString;
             set
             {
                 _txt_DataReadString = value;
@@ -125,8 +120,8 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         public System.Threading.Thread threadSendLotData;
         public SerialCommunicationVM()
         {
-            selectedCommLoad = Source.Application.Application.GetCommInfo("Serial Communication COM", "COM5");
-            selectedBauRate = int.Parse(Source.Application.Application.GetCommInfo("Serial Communication BauRate", "115200"));
+            selectedCommLoad = FileHelper.GetCommInfo("Serial Communication COM", "COM5", Application.pathRegistry);
+            selectedBauRate = int.Parse(FileHelper.GetCommInfo("Serial Communication BauRate", "115200", Application.pathRegistry));
             m_serialCommunication = new Source.Comm.SerialCommunication(selectedCommLoad.ToString(), (int)selectedBauRate);
             InitCOMM();
             InitBauRate();
@@ -140,12 +135,12 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                                          (p) =>
                                          {
                                          });
-        
+
 
             btn_ConnectSerial_Click = new RelayCommand<UserControl>((p) => { return true; },
                                          (p) =>
                                          {
-                                             if(selectedCommLoad !=null && selectedBauRate != null)
+                                             if (selectedCommLoad != null && selectedBauRate != null)
                                                  m_serialCommunication.InitializeConnection(selectedCommLoad.ToString(), int.Parse(selectedBauRate.ToString()));
                                          });
 
@@ -164,7 +159,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             btn_DisconnectSerial_Click = new RelayCommand<UserControl>((p) => { return true; },
                                          (p) =>
                                          {
-                                                 m_serialCommunication.Disconnect();
+                                             m_serialCommunication.Disconnect();
                                          });
 
             btn_SendLastLot_Click = new RelayCommand<UserControl>((p) => { return true; },
@@ -172,7 +167,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                                          {
                                              if (threadSendLotData == null)
                                              {
-                                                 threadSendLotData = new System.Threading.Thread(new System.Threading.ThreadStart(() => 
+                                                 threadSendLotData = new System.Threading.Thread(new System.Threading.ThreadStart(() =>
                                                  {
                                                      bSendLotEnable = false;
                                                      MainWindow.mainWindow.master.sendLastLotDataToPID();
@@ -180,11 +175,11 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                                                  }
                                                  ));
                                                  threadSendLotData.Start();
-                                                 return ;
+                                                 return;
                                              }
                                              else if (!threadSendLotData.IsAlive)
                                              {
-                                                 threadSendLotData = new System.Threading.Thread(new System.Threading.ThreadStart(() => 
+                                                 threadSendLotData = new System.Threading.Thread(new System.Threading.ThreadStart(() =>
                                                  {
                                                      bSendLotEnable = false;
                                                      MainWindow.mainWindow.master.sendLastLotDataToPID();
@@ -195,10 +190,10 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                                                  return;
                                              }
 
-                                         });          
+                                         });
         }
 
-        
+
         public void InitCOMM()
         {
             ListCOMM = new ObservableCollection<string>();

@@ -1,19 +1,13 @@
-﻿using TapeReelPacking.Source.Application;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Application = TapeReelPacking.Source.Application.Application;
+using TapeReelPacking.Source.Application;
 using TapeReelPacking.UI.UserControls.View;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
-    class TitleBarVM: BaseVM
+    class TitleBarVM : BaseVM
     {
 
         #region ICommand
@@ -53,7 +47,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                                                                     {
 
 
-                                                                        if (MessageBox.Show("Close App?","", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                                                                        if (MessageBox.Show("Close App?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                                                                         {
                                                                             if (MainWindow.mainWindow.m_bSequenceRunning)
                                                                             {

@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using static TapeReelPacking.Source.Hardware.SDKHrobot.HiWinRobotInterface;
 using TapeReelPacking.UI.UserControls.View;
+using TapeReelPacking.Source.Helper;
 
 namespace TapeReelPacking.Source.Hardware
 {
@@ -670,7 +671,7 @@ namespace TapeReelPacking.Source.Hardware
             if (MainWindow.mainWindow.master == null)
                 return;
 
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.m_strRobotIPAddress = Application.Application.GetCommInfo("Robot Comm::IpAddress", MainWindow.mainWindow.master.m_hiWinRobotInterface.m_strRobotIPAddress);
+            MainWindow.mainWindow.master.m_hiWinRobotInterface.m_strRobotIPAddress = FileHelper.GetCommInfo("Robot Comm::IpAddress", MainWindow.mainWindow.master.m_hiWinRobotInterface.m_strRobotIPAddress, Application.Application.pathRegistry);
             txtRobotIPAddress = MainWindow.mainWindow.master.m_hiWinRobotInterface.m_strRobotIPAddress;
         }
 

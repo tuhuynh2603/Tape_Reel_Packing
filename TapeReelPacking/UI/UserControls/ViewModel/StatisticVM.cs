@@ -1,28 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 using TapeReelPacking.Source.Define;
-using TapeReelPacking.UI.UserControls.View;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
-    public class StatisticVM:BaseVM
+    public class StatisticVM : BaseVM
     {
 
         private ObservableCollection<SummaryTemplateVM> _listSummary;
 
-        public ObservableCollection<SummaryTemplateVM> listSummary { 
+        public ObservableCollection<SummaryTemplateVM> listSummary
+        {
             get => _listSummary;
-            set 
-            { 
+            set
+            {
                 _listSummary = value;
                 OnPropertyChanged(nameof(listSummary));
             }
-         }
+        }
 
         public delegate void UpdateValueStatisticDelegate(int result, int nTrack);
         public static UpdateValueStatisticDelegate updateValueStatisticDelegate;

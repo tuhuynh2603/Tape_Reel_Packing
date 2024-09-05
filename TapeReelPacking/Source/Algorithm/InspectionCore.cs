@@ -2,18 +2,17 @@
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.WPF;
-using TapeReelPacking.Source.Define;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using TapeReelPacking.Source.Define;
+using CvContourArray = Emgu.CV.Util.VectorOfVectorOfPoint;
 using CvImage = Emgu.CV.Mat;
 using CvPointArray = Emgu.CV.Util.VectorOfPoint;
-using CvContourArray = Emgu.CV.Util.VectorOfVectorOfPoint;
 
 namespace TapeReelPacking.Source.Algorithm
 {
@@ -159,61 +158,61 @@ namespace TapeReelPacking.Source.Algorithm
             }
         }
 
-        public /*static*/ bool UpdateTeachParamFromUIToInspectionCore()
+        public /*static*/ bool UpdateTeachParamFromUIToInspectionCore(CategoryTeachParameter categoriesTeachParam)
         {
 
-            m_DeviceLocationParameter.m_L_ThresholdType = Source.Application.Application.categoriesTeachParam.L_ThresholdType;
-            m_DeviceLocationParameter.m_L_LocationEnable = Source.Application.Application.categoriesTeachParam.L_LocationEnable;
-            m_DeviceLocationParameter.m_L_ObjectColor = Source.Application.Application.categoriesTeachParam.L_ObjectColor;
+            m_DeviceLocationParameter.m_L_ThresholdType = categoriesTeachParam.L_ThresholdType;
+            m_DeviceLocationParameter.m_L_LocationEnable = categoriesTeachParam.L_LocationEnable;
+            m_DeviceLocationParameter.m_L_ObjectColor = categoriesTeachParam.L_ObjectColor;
 
 
-            m_DeviceLocationParameter.m_L_lowerThreshold = Source.Application.Application.categoriesTeachParam.L_lowerThreshold;
-            m_DeviceLocationParameter.m_L_upperThreshold = Source.Application.Application.categoriesTeachParam.L_upperThreshold;
+            m_DeviceLocationParameter.m_L_lowerThreshold = categoriesTeachParam.L_lowerThreshold;
+            m_DeviceLocationParameter.m_L_upperThreshold = categoriesTeachParam.L_upperThreshold;
 
-            m_DeviceLocationParameter.m_L_lowerThresholdInnerChip = Source.Application.Application.categoriesTeachParam.L_lowerThresholdInnerChip;
-            m_DeviceLocationParameter.m_L_upperThresholdInnerChip = Source.Application.Application.categoriesTeachParam.L_upperThresholdInnerChip;
+            m_DeviceLocationParameter.m_L_lowerThresholdInnerChip = categoriesTeachParam.L_lowerThresholdInnerChip;
+            m_DeviceLocationParameter.m_L_upperThresholdInnerChip = categoriesTeachParam.L_upperThresholdInnerChip;
 
 
-            if (Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.Width > globalImageSize.Width
-                || Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.GetRectangle().TopLeft.X >= globalImageSize.Width
-                || Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.GetRectangle().TopLeft.Y >= globalImageSize.Height)
-                Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.SetRectangle(new Rectangles(new System.Windows.Point(globalImageSize.Width / 2, globalImageSize.Height / 2), 300, 300));
+            if (categoriesTeachParam.L_DeviceLocationRoi.Width > globalImageSize.Width
+                || categoriesTeachParam.L_DeviceLocationRoi.GetRectangle().TopLeft.X >= globalImageSize.Width
+                || categoriesTeachParam.L_DeviceLocationRoi.GetRectangle().TopLeft.Y >= globalImageSize.Height)
+                categoriesTeachParam.L_DeviceLocationRoi.SetRectangle(new Rectangles(new System.Windows.Point(globalImageSize.Width / 2, globalImageSize.Height / 2), 300, 300));
 
-            m_DeviceLocationParameter.m_L_DeviceLocationRoi = Source.Application.Application.categoriesTeachParam.L_DeviceLocationRoi.GetRectangle();
+            m_DeviceLocationParameter.m_L_DeviceLocationRoi = categoriesTeachParam.L_DeviceLocationRoi.GetRectangle();
 
-            m_DeviceLocationParameter.m_L_OpeningMask = Source.Application.Application.categoriesTeachParam.L_OpeningMask;
-            m_DeviceLocationParameter.m_L_DilationMask = Source.Application.Application.categoriesTeachParam.L_DilationMask;
-            m_DeviceLocationParameter.m_L_MinWidthDevice = Source.Application.Application.categoriesTeachParam.L_MinWidthDevice;
-            m_DeviceLocationParameter.m_L_MinHeightDevice = Source.Application.Application.categoriesTeachParam.L_MinHeightDevice;
+            m_DeviceLocationParameter.m_L_OpeningMask = categoriesTeachParam.L_OpeningMask;
+            m_DeviceLocationParameter.m_L_DilationMask = categoriesTeachParam.L_DilationMask;
+            m_DeviceLocationParameter.m_L_MinWidthDevice = categoriesTeachParam.L_MinWidthDevice;
+            m_DeviceLocationParameter.m_L_MinHeightDevice = categoriesTeachParam.L_MinHeightDevice;
 
-            if (Source.Application.Application.categoriesTeachParam.L_TemplateRoi.Width > globalImageSize.Width ||
-                Source.Application.Application.categoriesTeachParam.L_TemplateRoi.GetRectangle().TopLeft.X >= globalImageSize.Width
-                || Source.Application.Application.categoriesTeachParam.L_TemplateRoi.GetRectangle().TopLeft.Y >= globalImageSize.Height)
-                Source.Application.Application.categoriesTeachParam.L_TemplateRoi.SetRectangle(new Rectangles(new System.Windows.Point(globalImageSize.Width / 2, globalImageSize.Height / 2), 300, 300));
-            
-            m_DeviceLocationParameter.m_L_TemplateRoi = Source.Application.Application.categoriesTeachParam.L_TemplateRoi.GetRectangle();
+            if (categoriesTeachParam.L_TemplateRoi.Width > globalImageSize.Width ||
+                categoriesTeachParam.L_TemplateRoi.GetRectangle().TopLeft.X >= globalImageSize.Width
+                || categoriesTeachParam.L_TemplateRoi.GetRectangle().TopLeft.Y >= globalImageSize.Height)
+                categoriesTeachParam.L_TemplateRoi.SetRectangle(new Rectangles(new System.Windows.Point(globalImageSize.Width / 2, globalImageSize.Height / 2), 300, 300));
 
-            m_DeviceLocationParameter.m_L_StepTemplate = Source.Application.Application.categoriesTeachParam.L_NumberSide;
-            m_DeviceLocationParameter.m_L_ScaleImageRatio = Source.Application.Application.categoriesTeachParam.L_ScaleImageRatio;
-            m_DeviceLocationParameter.m_L_MinScore = Source.Application.Application.categoriesTeachParam.L_MinScore;
-            m_DeviceLocationParameter.m_L_CornerIndex = Source.Application.Application.categoriesTeachParam.L_CornerIndex;
+            m_DeviceLocationParameter.m_L_TemplateRoi = categoriesTeachParam.L_TemplateRoi.GetRectangle();
+
+            m_DeviceLocationParameter.m_L_StepTemplate = categoriesTeachParam.L_NumberSide;
+            m_DeviceLocationParameter.m_L_ScaleImageRatio = categoriesTeachParam.L_ScaleImageRatio;
+            m_DeviceLocationParameter.m_L_MinScore = categoriesTeachParam.L_MinScore;
+            m_DeviceLocationParameter.m_L_CornerIndex = categoriesTeachParam.L_CornerIndex;
             //master.m_Tracks[0].m_imageViews[0].SaveTeachImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "teachImage_1.bmp"));
             //master.m_Tracks[0].m_imageViews[0].saveTemplateImage(System.IO.Path.Combine(Source.Application.Application.pathRecipe, Source.Application.Application.currentRecipe, "templateImage_1.bmp"));
 
 
 
-            m_blackChipParameter.m_OC_EnableCheck = Source.Application.Application.categoriesTeachParam.OC_EnableCheck;
-            m_blackChipParameter.m_OC_lowerThreshold = Source.Application.Application.categoriesTeachParam.OC_lowerThreshold;
-            m_blackChipParameter.m_OC_upperThreshold = Source.Application.Application.categoriesTeachParam.OC_upperThreshold;
-            m_blackChipParameter.m_OC_OpeningMask = Source.Application.Application.categoriesTeachParam.OC_OpeningMask;
-            m_blackChipParameter.m_OC_DilationMask = Source.Application.Application.categoriesTeachParam.OC_DilationMask;
-            m_blackChipParameter.m_OC_MinWidthDevice = Source.Application.Application.categoriesTeachParam.OC_MinWidthDevice;
-            m_blackChipParameter.m_OC_MinHeightDevice = Source.Application.Application.categoriesTeachParam.OC_MinHeightDevice;
+            m_blackChipParameter.m_OC_EnableCheck = categoriesTeachParam.OC_EnableCheck;
+            m_blackChipParameter.m_OC_lowerThreshold = categoriesTeachParam.OC_lowerThreshold;
+            m_blackChipParameter.m_OC_upperThreshold = categoriesTeachParam.OC_upperThreshold;
+            m_blackChipParameter.m_OC_OpeningMask = categoriesTeachParam.OC_OpeningMask;
+            m_blackChipParameter.m_OC_DilationMask = categoriesTeachParam.OC_DilationMask;
+            m_blackChipParameter.m_OC_MinWidthDevice = categoriesTeachParam.OC_MinWidthDevice;
+            m_blackChipParameter.m_OC_MinHeightDevice = categoriesTeachParam.OC_MinHeightDevice;
 
 
 
 
-            m_DeviceLocationParameter.m_DR_NumberROILocation = Source.Application.Application.categoriesTeachParam.L_NumberROILocation;
+            m_DeviceLocationParameter.m_DR_NumberROILocation = categoriesTeachParam.L_NumberROILocation;
 
             //for (int nArea = 0; nArea < Application.TOTAL_AREA; nArea++)
             //{
@@ -229,9 +228,7 @@ namespace TapeReelPacking.Source.Algorithm
             //}
             return true;
         }
-
-
-        public bool UpdateAreaParameterFromUIToInspectionCore(CategoryVisionParameter areaParam , int nArea)
+        public bool UpdateAreaParameterFromUIToInspectionCore(CategoryVisionParameter areaParam, int nArea)
         {
 
 
@@ -851,9 +848,9 @@ namespace TapeReelPacking.Source.Algorithm
                     CvImage mat_BiggestInnerChipRegion_temp = new CvImage();
                     MagnusOpenCVLib.SelectBiggestRegion(ref mat_InnerChipOpeningRegion, ref mat_BiggestInnerChipRegion_temp);
                     PushBackDebugInfors(imgSource, mat_BiggestInnerChipRegion_temp, "Inner Chip Region after select BiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
-                    
 
-                   // Find none zero first, if zero => return
+
+                    // Find none zero first, if zero => return
                     CvInvoke.FindNonZero(mat_BiggestInnerChipRegion_temp, point_regions);
                     if (point_regions.Size == 0)
                         break;
@@ -1129,7 +1126,7 @@ namespace TapeReelPacking.Source.Algorithm
             // Need add Offset Inner
             int nInnerOffset = -3;
             CvImage rec_regionChipFillup_Offset = new CvImage();
-            if(nInnerOffset > 0)
+            if (nInnerOffset > 0)
                 MagnusOpenCVLib.ErodeRectangle(ref rec_regionChipFillup, ref rec_regionChipFillup_Offset, Math.Abs(nInnerOffset), Math.Abs(nInnerOffset));
             else
                 MagnusOpenCVLib.DilationRectangle(ref rec_regionChipFillup, ref rec_regionChipFillup_Offset, Math.Abs(nInnerOffset), Math.Abs(nInnerOffset));
@@ -1180,7 +1177,7 @@ namespace TapeReelPacking.Source.Algorithm
 
         public void LabelMarking_Inspection(CvImage imgSourceInput, int nPVIAreaIndex, PointF pCenter, PointF pCorner, ref int nResultOutput, ref List<ArrayOverLay> list_arrayOverlay, ref List<DebugInfors> debugInfors, bool bEnableDebug)
         {
-            if(m_SurfaceDefectParameter[nPVIAreaIndex].m_DR_AreaEnable == false)
+            if (m_SurfaceDefectParameter[nPVIAreaIndex].m_DR_AreaEnable == false)
             {
                 nResultOutput = -(int)ERROR_CODE.PASS;
                 return;
@@ -1206,7 +1203,7 @@ namespace TapeReelPacking.Source.Algorithm
 
             PushBackDebugInfors(imgSourceInput, imgSourceInput, $"pCorner {pCorner.X}, {pCorner.Y}, pCornerTeach {pCornerTeach.X}, {pCornerTeach.Y}", bEnableDebug, ref debugInfors);
             PushBackDebugInfors(imgSourceInput, imgSourceInput, $"pCenter {pCenter.X}, {pCenter.Y}, pCenterTeach {pCenterTeach.X},  {pCenterTeach.Y}", bEnableDebug, ref debugInfors);
-            
+
             double fShiftX = pCenter.X - m_DeviceLocationResult.m_dCenterDevicePoint.X * dScale;
             double fShiftY = pCenter.Y - m_DeviceLocationResult.m_dCenterDevicePoint.Y * dScale;
 
@@ -1272,7 +1269,7 @@ namespace TapeReelPacking.Source.Algorithm
                 nResultOutput = -(int)ERROR_CODE.PASS;
                 AddRegionOverlay(ref list_arrayOverlay, shiftRegion, Colors.Green);
             }
-                
+
 
         }
         public int Calibration_Get3Points(CvImage imgSourceInput, out PointF[] points, ref List<ArrayOverLay> list_arrayOverlay)

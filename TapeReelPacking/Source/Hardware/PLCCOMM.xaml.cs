@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using EasyModbus;
+using TapeReelPacking.Source.Helper;
 using TapeReelPacking.UI.UserControls.View;
 namespace TapeReelPacking.Source.Hardware
 {
@@ -65,8 +66,8 @@ namespace TapeReelPacking.Source.Hardware
             Task t3 = new Task(
                 () =>
                 {
-                    m_strCommAddress = Application.Application.GetCommInfo("PLC Comm", m_strCommAddress);
-                    m_PLCPort = int.Parse(Application.Application.GetCommInfo("PLC Port", m_PLCPort.ToString()));
+                    m_strCommAddress = FileHelper.GetCommInfo("PLC Comm", m_strCommAddress, Application.Application.pathRegistry);
+                    m_PLCPort = int.Parse(FileHelper.GetCommInfo("PLC Port", m_PLCPort.ToString(), Application.Application.pathRegistry));
                     m_modbusClient = new ModbusClient(m_strCommAddress, 502);
                     updateConnectionStatus();
 

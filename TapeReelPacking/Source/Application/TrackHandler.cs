@@ -26,6 +26,7 @@ namespace TapeReelPacking.Source.Application
 {
     using TapeReelPacking.Source.LogMessage;
     using System.Windows.Markup;
+    using TapeReelPacking.Source.Helper;
 
     public class Track
     {
@@ -72,7 +73,6 @@ namespace TapeReelPacking.Source.Application
             m_Width = width;
             m_Height = height;
 
-            Application.LoadCamSetting(indexTrack);
             if (serieCam != "none" && serieCam != "")
                 m_hIKControlCameraView = new HIKControlCameraView(serieCam, indexTrack);
             m_strSeriCamera = serieCam;
@@ -436,12 +436,7 @@ namespace TapeReelPacking.Source.Application
                 }
             }
         }
-
-
-
-
         #endregion
-
         public void DrawInspectionResult(ref int nResult, ref PointF pCenter, ref double dAngle)
         {
             //Stopwatch timeIns = new Stopwatch();

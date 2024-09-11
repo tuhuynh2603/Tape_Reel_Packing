@@ -1,10 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO.Ports;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using TapeReelPacking.Source.Application;
 using TapeReelPacking.Source.Helper;
 using TapeReelPacking.UI.UserControls.View;
+using Application = TapeReelPacking.Source.Application.Application;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
@@ -12,6 +14,16 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
     public class SerialCommunicationVM : BaseVM
     {
 
+        private Visibility _isVisible = Visibility.Collapsed;
+        public Visibility isVisible
+        {
+            get => _isVisible;
+            set
+            {
+                _isVisible = value;
+                OnPropertyChanged(nameof(isVisible));
+            }
+        }
         public ICommand DrowDownListCommCommand { get; set; }
         public ICommand DrowDownListBauRateCommand { get; set; }
         public ICommand btn_ConnectSerial_Click { get; set; }
@@ -170,7 +182,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                                                  threadSendLotData = new System.Threading.Thread(new System.Threading.ThreadStart(() =>
                                                  {
                                                      bSendLotEnable = false;
-                                                     MainWindow.mainWindow.master.sendLastLotDataToPID();
+                                                     MainWindowVM.master.sendLastLotDataToPID();
                                                      bSendLotEnable = true;
                                                  }
                                                  ));
@@ -182,7 +194,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                                                  threadSendLotData = new System.Threading.Thread(new System.Threading.ThreadStart(() =>
                                                  {
                                                      bSendLotEnable = false;
-                                                     MainWindow.mainWindow.master.sendLastLotDataToPID();
+                                                     MainWindowVM.master.sendLastLotDataToPID();
                                                      bSendLotEnable = true;
                                                  }
                                                  ));

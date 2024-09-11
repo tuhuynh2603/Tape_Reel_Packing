@@ -8,7 +8,7 @@
         xmlns:wfHost="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"     
         mc:Ignorable="d"
         Name="cameraControl" Height="180" Width="300">
-    <Grid x:Name="cameraGrid" Background="WhiteSmoke">
+    <Grid x:Name="cameraGrid" Background="WhiteSmoke" Visibility="{Binding isVisible}">
         <Grid.RowDefinitions>
             <RowDefinition Height="25">
             </RowDefinition>

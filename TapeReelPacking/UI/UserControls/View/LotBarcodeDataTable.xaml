@@ -1,15 +1,16 @@
-﻿<UserControl x:Class="TapeReelPacking.UI.UserControls.LotBarcodeDataTable"
+﻿<UserControl x:Class="TapeReelPacking.UI.UserControls.View.LotBarcodeDataTable"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TapeReelPacking.UI.UserControls"
-             mc:Ignorable="d" 
-             d:DesignHeight="450"  Height="585">
-    <Grid>
+             mc:Ignorable="d"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center">
+    <Grid Visibility="{Binding isVisible}" Height="500">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="400"/>
         </Grid.ColumnDefinitions>
 
         <Border Grid.Column="0" BorderBrush="White" BorderThickness="0,0,3,0" Background="Black">

@@ -6,7 +6,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="105" d:DesignWidth="400"
              >
-    <Grid Background="LightGray" Width="400">
+    <Grid Background="LightGray" Width="400" Visibility="{Binding isVisible}">
         <Grid.RowDefinitions>
             <RowDefinition Height="35"></RowDefinition>
             <RowDefinition Height="35"></RowDefinition>

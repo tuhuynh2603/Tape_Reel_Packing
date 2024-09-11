@@ -16,69 +16,12 @@ using TapeReelPacking.UI.UserControls.ViewModel;
 using TapeReelPacking.UI.UserControls.View;
 using TapeReelPacking.Source.Helper;
 
-namespace TapeReelPacking
+namespace TapeReelPacking.UI.UserControls.View
 {
     /// <summary>
     /// Interaction logic for MappingSetingUC.xaml
     /// </summary>
     /// 
-    public class MappingSetingUCVM : BaseVM
-    {
-
-        private CatergoryMappingParameters _dataMapping;
-        public CatergoryMappingParameters categoriesMappingParam
-        {
-            set
-            {
-                _dataMapping = value;
-                OnPropertyChanged(nameof(categoriesMappingParam));
-            }
-            get => _dataMapping;
-        }
-
-        public MappingSetingUCVM()
-        {
-            categoriesMappingParam = Application.Application.categoriesMappingParam;
-        }
-
-        [CategoryOrder("MAPPING", 0)]
-        [DisplayName("Mapping Setting")]
-        public class CatergoryMappingParameters
-        {
-
-            #region MAPPING
-            [Browsable(true)]
-            [Category("MAPPING")]
-            [DisplayName("Number Device X")]
-            [Range(10, 100)]
-            [DefaultValue(10)]
-            [Description("")]
-            [PropertyOrder(0)]
-            public int M_NumberDeviceX { get; set; }
-            [Browsable(true)]
-            [Category("MAPPING")]
-            [DisplayName("Number Device Y")]
-            [Range(1, 100)]
-            [DefaultValue(10)]
-            [Description("")]
-            [PropertyOrder(1)]
-            public int M_NumberDeviceY { get; set; }
-
-            [Browsable(true)]
-            [Category("MAPPING")]
-            [DisplayName("Number Device Per Lot")]
-            [Range(1, 10000)]
-            [DefaultValue(1000)]
-            [Description("")]
-            [PropertyOrder(2)]
-            public int M_NumberDevicePerLot { get; set; }
-            #endregion
-
-        }
-
-
-    }
-
     public partial class MappingSetingUC : UserControl
     {
 
@@ -125,7 +68,7 @@ namespace TapeReelPacking
                 Mouse.OverrideCursor = Cursors.Wait;
                 //UpdateDictionaryParam();
                 MainWindow mainWindow = (MainWindow)System.Windows.Application.Current.MainWindow;
-                mainWindow.master.WriteMappingParam();
+                MainWindowVM.master.WriteMappingParam();
                 Application.Application.LoadMappingParamFromFile();
                 Mouse.OverrideCursor = null;
                 mainWindow.btn_mapping_parameters.IsChecked = false;

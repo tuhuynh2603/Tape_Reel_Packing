@@ -1,5 +1,6 @@
-﻿C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\GeneratedInternalTypeHelper.g.cs
+﻿
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\App.xaml;;
+FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\RibbonTabItems\InspectionTab.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\MainWindow.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\MappingCanvasView.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\MappingSetingUC.xaml;;
@@ -11,7 +12,7 @@ FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\Source\Hardware\HiWinRobotUserCo
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\Source\Hardware\PLCCOMM.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\SummaryTemplateView.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\TeachParametersUC.xaml;;
-FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\DefectInfor.xaml;;
+FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\StepDebugView.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\LoginUser.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\LotBarcodeDataTable.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\OutputLogView.xaml;;

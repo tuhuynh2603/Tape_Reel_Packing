@@ -23,7 +23,7 @@ namespace TapeReelPacking.UI.UserControls.View
     public partial class StatisticView : UserControl
     {
 
-        public StatisticView(MainWindow mainWindow)
+        public StatisticView()
         {
             InitializeComponent();
 

@@ -27,6 +27,8 @@ namespace TapeReelPacking.Source.Application
     using TapeReelPacking.Source.LogMessage;
     using System.Windows.Markup;
     using TapeReelPacking.Source.Helper;
+    using TapeReelPacking.UI.UserControls.ViewModel;
+    using System.Collections.ObjectModel;
 
     public class Track
     {
@@ -50,14 +52,13 @@ namespace TapeReelPacking.Source.Application
         public VideoCapture m_cap;
         public Thread threadInspectOnline;
 
-        public List<DebugInfors> m_StepDebugInfors;
+        public ObservableCollection<DebugInfors> m_StepDebugInfors;
         public List<ArrayOverLay> m_ArrayOverLay;
-        public Track(int indexTrack, int numdoc, string serieCam, MainWindow app, int width = 3840, int height = 2748)
+        public Track(int indexTrack, int numdoc, string serieCam, int width = 3840, int height = 2748)
         {
-            m_StepDebugInfors = new List<DebugInfors>();
+            m_StepDebugInfors = new ObservableCollection<DebugInfors>();
             m_ArrayOverLay = new List<ArrayOverLay>();
             m_nTrackID = indexTrack;
-            mainWindow = app;
             m_imageViews = new ImageView[numdoc];
             m_VisionResultDatas = new VisionResultData[100000];
             m_VisionResultDatas_Total = new VisionResultData[100000];
@@ -72,10 +73,9 @@ namespace TapeReelPacking.Source.Application
 
             m_Width = width;
             m_Height = height;
-
+            m_strSeriCamera = serieCam;
             if (serieCam != "none" && serieCam != "")
                 m_hIKControlCameraView = new HIKControlCameraView(serieCam, indexTrack);
-            m_strSeriCamera = serieCam;
             //m_cap = new VideoCapture(0);
             //m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, m_Width);
             //m_cap.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, m_Height);
@@ -174,7 +174,7 @@ namespace TapeReelPacking.Source.Application
         {
             if (!m_hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
             {
-                MainWindow.mainWindow.UpdateCameraConnectionStatus(m_nTrackID, m_hIKControlCameraView.InitializeCamera(m_strSeriCamera));
+                MainWindowVM.updateCameraConnectionStatusDelegate?.Invoke(m_nTrackID, m_hIKControlCameraView.InitializeCamera(m_strSeriCamera));
             }
 
             int nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StartGrabbing_NET();
@@ -183,10 +183,10 @@ namespace TapeReelPacking.Source.Application
                 m_hIKControlCameraView.m_bGrabbing = false;
                 return 0;
             }
-            while (MainWindow.mainWindow.bEnableGrabCycle)
+            while (MainWindowVM.bEnableGrabCycle)
             {
-                if (MainWindow.mainWindow == null)
-                    return -1;
+                //if (MainWindow.mainWindow == null)
+                //    return -1;
 
                 int nWidth = 0, nHeight = 0;
 
@@ -223,7 +223,7 @@ namespace TapeReelPacking.Source.Application
         public int SingleSnap_HIKCamera()
         {
             if (!m_hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
-                MainWindow.mainWindow.UpdateCameraConnectionStatus(m_nTrackID, m_hIKControlCameraView.InitializeCamera(m_strSeriCamera));
+                MainWindowVM.updateCameraConnectionStatusDelegate?.Invoke(m_nTrackID, m_hIKControlCameraView.InitializeCamera(m_strSeriCamera));
 
             int nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StartGrabbing_NET();
             if (MyCamera.MV_OK != nRet)
@@ -443,7 +443,7 @@ namespace TapeReelPacking.Source.Application
 
             //timeIns.Restart();
             SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
-            if (!MainWindow.mainWindow.m_bSequenceRunning)
+            if (!MainWindowVM.m_bSequenceRunning)
             {
                 foreach (ArrayOverLay overlay in m_ArrayOverLay)
                 {
@@ -509,7 +509,7 @@ namespace TapeReelPacking.Source.Application
             {
                 //Track _track = m_track;
 
-                if (MainWindow.mainWindow.m_bEnableDebug)
+                if (InspectionTabVM.m_bEnableDebug)
                     m_StepDebugInfors.Clear();
 
                 m_ArrayOverLay.Clear();
@@ -521,7 +521,7 @@ namespace TapeReelPacking.Source.Application
                 int nResult;
                 PointF pCenter = new PointF(0, 0);
                 PointF pCorner = new PointF(0, 0);
-                nResult = m_InspectionCore.Inspect(ref m_InspectionCore.m_TeachImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, ref m_StepDebugInfors, false);
+                nResult = m_InspectionCore.Inspect(ref m_InspectionCore.m_TeachImage, ref m_ArrayOverLay, ref pCenter, ref pCorner,m_StepDebugInfors, false);
                 //Draw Result
                 //if (nResult == 0)
                 //{
@@ -576,16 +576,18 @@ namespace TapeReelPacking.Source.Application
 
             return nResult;
         }
-        public int DebugFunction(ref Track m_track)
+        public int DebugFunction()
         {
             PointF pCenter = new PointF();
             PointF pCorner = new PointF();
 
 
-            int nResult = Inspect(ref m_track, out pCenter, out pCorner);
+            int nResult = Inspect(out pCenter, out pCorner);
             double dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(pCenter, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint);
             //Todo need to later after adding the calib function to calculate the transform matrix
-            PointF robotPoint = MagnusMatrix.ApplyTransformation(MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.m_MatCameraRobotTransform, pCenter);
+            if (MainWindowVM.master.m_hiWinRobotInterface.m_hiWinRobotUserControl == null)
+                return 0 ;
+            PointF robotPoint = MagnusMatrix.ApplyTransformation(MainWindowVM.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.m_MatCameraRobotTransform, pCenter);
             //Draw Result
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
@@ -596,11 +598,11 @@ namespace TapeReelPacking.Source.Application
             return nResult;
         }
 
-        public int Inspect(ref Track m_track, out PointF pCenterOut, out PointF pCornerOut)
+        public int Inspect( out PointF pCenterOut, out PointF pCornerOut)
         {
             //Track _track = m_track;
 
-            if (MainWindow.mainWindow.m_bEnableDebug)
+            if (InspectionTabVM.m_bEnableDebug)
                 m_StepDebugInfors.Clear();
 
             m_ArrayOverLay.Clear();
@@ -613,7 +615,7 @@ namespace TapeReelPacking.Source.Application
             //double nAngleOutput = 0;
             PointF pCenter = new PointF(0, 0);
             PointF pCorner = new PointF(0, 0);
-            nResult = m_InspectionCore.Inspect(ref m_InspectionCore.m_SourceImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, ref m_StepDebugInfors, MainWindow.mainWindow.m_bEnableDebug);
+            nResult = m_InspectionCore.Inspect(ref m_InspectionCore.m_SourceImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, m_StepDebugInfors, InspectionTabVM.m_bEnableDebug);
             pCenterOut = pCenter;
             pCornerOut = pCorner;
 
@@ -634,8 +636,8 @@ namespace TapeReelPacking.Source.Application
             bool bAlreadySetEvent = false;
             while (true)
             {
-                if (!MainWindow.m_IsWindowOpen || MainWindow.mainWindow == null)
-                    break;
+                //if (!MainWindow.m_IsWindowOpen || MainWindow.mainWindow == null)
+                //    break;
 
                 try
                 {
@@ -654,8 +656,8 @@ namespace TapeReelPacking.Source.Application
                     Master.InspectEvent[m_nTrackID].WaitOne();
                     Master.InspectEvent[m_nTrackID].Reset();
                     bAlreadySetEvent = false;
-                    if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
-                        break;
+                    //if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
+                    //    break;
 
 
                     nDeviceID = m_CurrentSequenceDeviceID;
@@ -666,7 +668,7 @@ namespace TapeReelPacking.Source.Application
 
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($" {strCameraName[m_nTrackID]}: Capture Failed!", (int)ERROR_CODE.LABEL_FAIL);
+                            OutputLogVM.AddLineOutputLog($" {strCameraName[m_nTrackID]}: Capture Failed!", (int)ERROR_CODE.LABEL_FAIL);
 
                         });
                         m_InspectionOnlineThreadVisionResult.m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
@@ -681,36 +683,36 @@ namespace TapeReelPacking.Source.Application
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        //((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($" {m_nTrackID} Load image to Inspection Core!");
+                        //OutputLogVM.AddLineOutputLog($" {m_nTrackID} Load image to Inspection Core!");
                         m_InspectionCore.LoadImageToInspection(m_imageViews[0].btmSource);
-                        //((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($" {m_nTrackID}  Load image to Inspection Core Done!");
+                        //OutputLogVM.AddLineOutputLog($" {m_nTrackID}  Load image to Inspection Core Done!");
 
                     });
 
                     //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     //{
-                    //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"  {m_nTrackID}  Inspect");
+                    //    OutputLogVM.AddLineOutputLog($"  {m_nTrackID}  Inspect");
 
                     //});
-                    m_SequenceVisionResult = Inspect(ref mainWindow.master.m_Tracks[m_nTrackID], out pCenter, out pCorner);
+                    m_SequenceVisionResult = Inspect( out pCenter, out pCorner);
                     m_Center_Vision = pCenter;
                     m_dDeltaAngleInspection = MagnusMatrix.CalculateShiftXYAngle(m_Center_Vision, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint);
                     m_InspectionOnlineThreadVisionResult.m_nResult = m_SequenceVisionResult;
                     if (m_SequenceVisionResult == -(int)ERROR_CODE.PASS)
-                        m_InspectionOnlineThreadVisionResult.m_strFullImagePath = mainWindow.master.createImageFilePathToSave(nDeviceID, m_SequenceVisionResult, "Camera", Application.m_strCurrentLot);
+                        m_InspectionOnlineThreadVisionResult.m_strFullImagePath = MainWindowVM.master.createImageFilePathToSave(nDeviceID, m_SequenceVisionResult, "Camera", Application.m_strCurrentLot);
                     else
-                        m_InspectionOnlineThreadVisionResult.m_strFullImagePath = mainWindow.master.createImageFilePathToSave(nDeviceIDFail++, m_SequenceVisionResult, "Camera", Application.m_strCurrentLot);
+                        m_InspectionOnlineThreadVisionResult.m_strFullImagePath = MainWindowVM.master.createImageFilePathToSave(nDeviceIDFail++, m_SequenceVisionResult, "Camera", Application.m_strCurrentLot);
 
                     Master.InspectDoneEvent[m_nTrackID].Set();
                     bAlreadySetEvent = true;
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, "Total inspection time: " + timeIns.ElapsedMilliseconds.ToString());
                     //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     //{
-                    //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($" {strCameraName[m_nTrackID]}:  Inspect Done. {timeIns.ElapsedMilliseconds}");
+                    //    OutputLogVM.AddLineOutputLog($" {strCameraName[m_nTrackID]}:  Inspect Done. {timeIns.ElapsedMilliseconds}");
 
                     //});
 
-                    if (Application.m_bEnableSavingOnlineImage && m_nTrackID == 0 && MainWindow.mainWindow.m_bSequenceRunning)
+                    if (Application.m_bEnableSavingOnlineImage && m_nTrackID == 0 && MainWindowVM.m_bSequenceRunning)
                     {
 
                         //LogMessage.WriteToDebugViewer(5 + m_nTrackID, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
@@ -737,8 +739,8 @@ namespace TapeReelPacking.Source.Application
 
 
 
-                InspectionDone:
-                    //m_Center_Vision = pCenter;
+                InspectionDone: 
+                    //m_Center_V                          ision = pCenter;
                     //double dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(m_Center_Vision, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint);
                     //m_dDeltaAngleInspection = dDeltaAngle;
                     //Master.InspectDoneEvent[m_nTrackID].Set();
@@ -757,7 +759,7 @@ namespace TapeReelPacking.Source.Application
                     LogMessage.WriteToDebugViewer(5 + m_nTrackID, "Inspection Thread PROCESS ERROR: " + e.ToString());
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($" {strCameraName[m_nTrackID]}: Inspection Thread PROCESS ERROR", (int)ERROR_CODE.LABEL_FAIL);
+                        OutputLogVM.AddLineOutputLog($" {strCameraName[m_nTrackID]}: Inspection Thread PROCESS ERROR", (int)ERROR_CODE.LABEL_FAIL);
 
                     });
                     if (!bAlreadySetEvent)
@@ -785,7 +787,7 @@ namespace TapeReelPacking.Source.Application
         public void func_InspectOfflineThread(string strFolderPath)
         {
 
-            if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.m_bSequenceRunning)
+            if (!InspectionTabVM.bEnableOfflineInspection || MainWindowVM.m_bSequenceRunning)
                 return;
 
             //CheckInspectionOnlineThread();
@@ -797,16 +799,16 @@ namespace TapeReelPacking.Source.Application
 
             // Loop through the items and print their names
 
-            while (MainWindow.mainWindow.bEnableOfflineInspection && !mainWindow.m_bSequenceRunning)
+            while (InspectionTabVM.bEnableOfflineInspection && !MainWindowVM.m_bSequenceRunning)
             {
                 try
                 {
                     while (!Master.m_OfflineTriggerSnapEvent[m_nTrackID].WaitOne(10))
                     {
-                        if (MainWindow.mainWindow == null)
-                            return;
+                        //if (MainWindow.mainWindow == null)
+                        //    return;
 
-                        if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.m_bSequenceRunning)
+                        if (!InspectionTabVM.bEnableOfflineInspection || MainWindowVM.m_bSequenceRunning)
                             return;
 
                     }
@@ -836,10 +838,10 @@ namespace TapeReelPacking.Source.Application
                     Master.InspectDoneEvent[m_nTrackID].Reset();
                     while (!Master.InspectDoneEvent[m_nTrackID].WaitOne(10))
                     {
-                        if (MainWindow.mainWindow == null)
-                            return;
+                        //if (MainWindow.mainWindow == null)
+                        //    return;
 
-                        if (!MainWindow.mainWindow.bEnableOfflineInspection || MainWindow.mainWindow.m_bSequenceRunning)
+                        if (!InspectionTabVM.bEnableOfflineInspection || MainWindowVM.m_bSequenceRunning)
                             return;
                     }
                     Master.InspectDoneEvent[m_nTrackID].Reset();
@@ -955,7 +957,7 @@ namespace TapeReelPacking.Source.Application
                 m_hIKControlCameraView.m_MyCamera.MV_CC_DestroyDevice_NET();
 
                 //if (!m_hIKControlCameraView.m_MyCamera.MV_CC_IsDeviceConnected_NET())
-                MainWindow.mainWindow.UpdateCameraConnectionStatus(m_nTrackID, m_hIKControlCameraView.InitializeCamera(m_strSeriCamera));
+                MainWindowVM.updateCameraConnectionStatusDelegate?.Invoke(m_nTrackID, m_hIKControlCameraView.InitializeCamera(m_strSeriCamera));
                 int nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StartGrabbing_NET();
                 //if (MyCamera.MV_OK != nRet)
                 //{
@@ -972,15 +974,15 @@ namespace TapeReelPacking.Source.Application
             while (true/*MainWindow.mainWindow.m_bSequenceRunning*/)
             {
 
-                if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
-                    break;
+                //if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
+                //    break;
 
                 LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Get event HarTrigger ");
                 Master.m_hardwareTriggerSnapEvent[m_nTrackID].WaitOne();
                 Master.m_hardwareTriggerSnapEvent[m_nTrackID].Reset();
                 bAlreadySetEvent = false;
-                if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
-                    break;
+                //if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
+                //    break;
 
                 LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Get event HarTrigger done ");
 
@@ -1000,7 +1002,7 @@ namespace TapeReelPacking.Source.Application
                             nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
                             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                             {
-                                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Trigger Software Failed!.", (int)ERROR_CODE.LABEL_FAIL);
+                                OutputLogVM.AddLineOutputLog("Trigger Software Failed!.", (int)ERROR_CODE.LABEL_FAIL);
 
                             });
                             m_InspectionOnlineThreadVisionResult.m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
@@ -1015,7 +1017,7 @@ namespace TapeReelPacking.Source.Application
                             nRet = m_hIKControlCameraView.m_MyCamera.MV_CC_StopGrabbing_NET();
                             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                             {
-                                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($" {strCameraName[m_nTrackID]}: Capture and Get Image buffer Failed!.", (int)ERROR_CODE.LABEL_FAIL);
+                                OutputLogVM.AddLineOutputLog($" {strCameraName[m_nTrackID]}: Capture and Get Image buffer Failed!.", (int)ERROR_CODE.LABEL_FAIL);
 
                             });
                             m_InspectionOnlineThreadVisionResult.m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
@@ -1030,7 +1032,7 @@ namespace TapeReelPacking.Source.Application
                         //Scan Barcode
                         LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Get barcode ");
 
-                        strBarcodeResult = MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut, nDeviceID, Application.m_strCurrentLot);
+                        strBarcodeResult = MainWindowVM.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut, nDeviceID, Application.m_strCurrentLot);
                         LogMessage.WriteToDebugViewer(7 + m_nTrackID, "Get barcode Done ");
 
                     }
@@ -1044,7 +1046,7 @@ namespace TapeReelPacking.Source.Application
                     {
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"{strCameraName[m_nTrackID]}: Vision TIME OUT!", (int)ERROR_CODE.LABEL_FAIL);
+                            OutputLogVM.AddLineOutputLog($"{strCameraName[m_nTrackID]}: Vision TIME OUT!", (int)ERROR_CODE.LABEL_FAIL);
 
                         });
                         m_InspectionOnlineThreadVisionResult.m_nResult = -(int)ERROR_CODE.NO_PATTERN_FOUND;
@@ -1089,7 +1091,7 @@ namespace TapeReelPacking.Source.Application
 
                         //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         //{
-                        //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Save Excel Done!");
+                        //    OutputLogVM.AddLineOutputLog("Barcode Save Excel Done!");
 
                         //});
 
@@ -1098,7 +1100,7 @@ namespace TapeReelPacking.Source.Application
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"{strCameraName[m_nTrackID]}: Device {nDeviceID + 1}, Result = {m_InspectionOnlineThreadVisionResult.m_nResult}.  {timeIns.ElapsedMilliseconds} (ms)", m_InspectionOnlineThreadVisionResult.m_nResult);
+                        OutputLogVM.AddLineOutputLog($"{strCameraName[m_nTrackID]}: Device {nDeviceID + 1}, Result = {m_InspectionOnlineThreadVisionResult.m_nResult}.  {timeIns.ElapsedMilliseconds} (ms)", m_InspectionOnlineThreadVisionResult.m_nResult);
 
                     });
                     timeIns.Restart();
@@ -1107,7 +1109,7 @@ namespace TapeReelPacking.Source.Application
                 {
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Function_Inspection Online Thread FAILED!", (int)ERROR_CODE.LABEL_FAIL);
+                        OutputLogVM.AddLineOutputLog("Function_Inspection Online Thread FAILED!", (int)ERROR_CODE.LABEL_FAIL);
                     });
 
                     if (!bAlreadySetEvent)

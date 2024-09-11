@@ -73,7 +73,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         }
 
 
-        public static void AddLineOutputLog(string text, int nStyle)
+        public static void AddLineOutputLog(string text, int nStyle = (int)ERROR_CODE.PASS)
         {
             DateTime currentTime = DateTime.Now;
             string strOutputLog = currentTime.ToString("HH:mm:ss.fff") + "  " + text;

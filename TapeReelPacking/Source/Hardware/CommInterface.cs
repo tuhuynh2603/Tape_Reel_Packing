@@ -70,13 +70,13 @@ namespace TapeReelPacking.Source.Hardware
                     }
                     else
                     {
-                        //MainWindow.mainWindow.master.commPLC.UpdataStatePLC(CommPLC.commSequence.port, false);
+                        //MainWindowVM.master.commPLC.UpdataStatePLC(CommPLC.commSequence.port, false);
                         //DebugMessage.WriteToDebugViewer(8, string.Format("Disconnect At Port " + CommPLC.commSequence.port.ToString()));
                     }
                 }
                 catch
                 {
-                    //MainWindow.mainWindow.master.commPLC.UpdataStatePLC(CommPLC.commSequence.port, false);
+                    //MainWindowVM.master.commPLC.UpdataStatePLC(CommPLC.commSequence.port, false);
                     //DebugMessage.WriteToDebugViewer(8, string.Format("Disconnect At Port " + CommPLC.commSequence.port.ToString()));
                 }
                 try
@@ -109,7 +109,7 @@ namespace TapeReelPacking.Source.Hardware
                         //DateTime.Now.Minute.ToString() + ":" +
                         //DateTime.Now.Second.ToString() + ":" +
                         //DateTime.Now.Millisecond.ToString() + "  ";
-                        //MainWindow.mainWindow.master.commLog.VisionToPLCLog(timeTriggerToPLC + Application.ConvertByteArrayToString(buff));
+                        //MainWindowVM.master.commLog.VisionToPLCLog(timeTriggerToPLC + Application.ConvertByteArrayToString(buff));
 
                         //string txtdebug = $"Port{port}: ";
                         //for (int i = 0; i < buff.Length; i++)
@@ -122,8 +122,8 @@ namespace TapeReelPacking.Source.Hardware
                     }
                     else
                     {
-                        //if (MainWindow.mainWindow.master != null)
-                        //MainWindow.mainWindow.master.commPLC.UpdataStatePLC(CommPLC.commLotInfo.port, false);
+                        //if (MainWindowVM.master != null)
+                        //MainWindowVM.master.commPLC.UpdataStatePLC(CommPLC.commLotInfo.port, false);
                         //DebugMessage.WriteToDebugViewer(8, string.Format("Disconnect At Port " + CommPLC.commLotInfo.port.ToString()));
                         LogMessage.LogMessage.WriteToDebugViewer(8, string.Format("Sent Failed at " + IPaddress + ":" + port.ToString()));
 
@@ -131,8 +131,8 @@ namespace TapeReelPacking.Source.Hardware
                 }
                 catch
                 {
-                    //if (MainWindow.mainWindow.master != null)
-                    //    MainWindow.mainWindow.master.commPLC.UpdataStatePLC(CommPLC.commLotInfo.port, false);
+                    //if (MainWindowVM.master != null)
+                    //    MainWindowVM.master.commPLC.UpdataStatePLC(CommPLC.commLotInfo.port, false);
                     LogMessage.LogMessage.WriteToDebugViewer(8, string.Format("Sent Failed at " + IPaddress + ":" + port.ToString()));
                 }
                 try

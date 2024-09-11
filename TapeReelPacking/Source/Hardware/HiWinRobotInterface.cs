@@ -14,6 +14,7 @@ using LicenseContext = OfficeOpenXml.LicenseContext;
 using TapeReelPacking.Source.Application;
 using TapeReelPacking.UI.UserControls.View;
 using TapeReelPacking.Source.Helper;
+using TapeReelPacking.UI.UserControls.ViewModel;
 
 namespace TapeReelPacking.Source.Hardware.SDKHrobot
 {
@@ -328,7 +329,7 @@ namespace TapeReelPacking.Source.Hardware.SDKHrobot
         }
 
         public HiWinRobotUserControl m_hiWinRobotUserControl;
-        public string m_strRobotIPAddress = "";
+        public static string m_strRobotIPAddress = "";
 
 
         async Task ConnectoHIKRobot(string strAddress = "127.0.0.1")
@@ -404,7 +405,7 @@ namespace TapeReelPacking.Source.Hardware.SDKHrobot
             t2.Start();
             await t2;
 
-            m_hiWinRobotUserControl = new HiWinRobotUserControl(m_strRobotIPAddress);
+            m_hiWinRobotUserControl = new HiWinRobotUserControl();
             InitDataGridview(m_RobotConnectID, true);
             m_hikThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => Thread_function()));
             m_hikThread.IsBackground = true;
@@ -639,9 +640,9 @@ namespace TapeReelPacking.Source.Hardware.SDKHrobot
 
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                if (MainWindow.mainWindow == null)
-                    return;
-                if (MainWindow.mainWindow.master == null)
+                //if (MainWindow.mainWindow == null)
+                //    return;
+                if (MainWindowVM.master == null)
                     return;
                 if (bEnableUpddate[0] || m_hiWinRobotUserControl.dataGrid_robot_Position.ItemsSource == null)
                 {
@@ -712,12 +713,12 @@ namespace TapeReelPacking.Source.Hardware.SDKHrobot
 
                         //int nHRSSModeTemp = -1;
                         //int.TryParse(info[0], out nHRSSModeTemp);
-                        ////if (MainWindow.mainWindow.master != null && nHRSSModeTemp != MainWindow.mainWindow.master.m_hiWinRobotInterface.m_HRSSMode)
+                        ////if (MainWindowVM.master != null && nHRSSModeTemp != MainWindowVM.master.m_hiWinRobotInterface.m_HRSSMode)
                         ////{
-                        ////    MainWindow.mainWindow.master.m_hiWinRobotInterface.m_HRSSMode = nHRSSModeTemp;
-                        ////    if (MainWindow.mainWindow.master.m_hiWinRobotInterface.m_HRSSMode == 3)
+                        ////    MainWindowVM.master.m_hiWinRobotInterface.m_HRSSMode = nHRSSModeTemp;
+                        ////    if (MainWindowVM.master.m_hiWinRobotInterface.m_HRSSMode == 3)
                         ////    {
-                        ////        MainWindow.mainWindow.master.m_hiWinRobotInterface.m_bMustConnectAgain = true;
+                        ////        MainWindowVM.master.m_hiWinRobotInterface.m_bMustConnectAgain = true;
                         ////    }
                         ////}
                         //LogMessage.LogMessage.WriteToDebugViewer(1,"[Notify] HRSS Mode: " + info[0]);
@@ -904,7 +905,7 @@ namespace TapeReelPacking.Source.Hardware.SDKHrobot
             int nRobotIDBackup = -999;
             while (true)
             {
-                if (MainWindow.mainWindow.master == null)
+                if (MainWindowVM.master == null)
                 {
                     Thread.Sleep(1000);
 
@@ -917,10 +918,10 @@ namespace TapeReelPacking.Source.Hardware.SDKHrobot
                     continue;
                 }
 
-                if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
-                    break;
+                //if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
+                //    break;
                 //Connect button
-                if (MainWindow.isRobotControllerOpen)
+                //if (MainWindowVM.grd_HiwinRobotUserVisible)
                 {
 
 
@@ -968,17 +969,17 @@ namespace TapeReelPacking.Source.Hardware.SDKHrobot
                       {
                           m_hiWinRobotUserControl.button_RobotConnect.Content = "Connected";
                           m_hiWinRobotUserControl.button_RobotConnect.Background = new SolidColorBrush(Colors.Green);
-                          MainWindow.mainWindow.label_Robot_Status.Background = new SolidColorBrush(Colors.Green);
-                          MainWindow.mainWindow.label_Robot_Status.Content = m_strRobotIPAddress;
-                          MainWindow.mainWindow.color_RobotStatus = "Black";
+                          //MainWindow.mainWindow.label_Robot_Status.Background = new SolidColorBrush(Colors.Green);
+                          //MainWindow.mainWindow.label_Robot_Status.Content = m_strRobotIPAddress;
+                          //MainWindow.mainWindow.color_RobotStatus = "Black";
                       }
                       else
                       {
                           m_hiWinRobotUserControl.button_RobotConnect.Content = "Disconnected";
                           m_hiWinRobotUserControl.button_RobotConnect.Background = new SolidColorBrush(Colors.Red);
-                          MainWindow.mainWindow.color_RobotStatus = "Black";
-                          MainWindow.mainWindow.label_Robot_Status.Content = m_strRobotIPAddress;
-                          MainWindow.mainWindow.label_Robot_Status.Background = new SolidColorBrush(Colors.Red);
+                          //MainWindow.mainWindow.color_RobotStatus = "Black";
+                          //MainWindow.mainWindow.label_Robot_Status.Content = m_strRobotIPAddress;
+                          //MainWindow.mainWindow.label_Robot_Status.Background = new SolidColorBrush(Colors.Red);
                       }
                   });
                 }
@@ -1228,8 +1229,8 @@ namespace TapeReelPacking.Source.Hardware.SDKHrobot
 
         public static void HomeMove()
         {
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.StopMotor();
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+            MainWindowVM.master.m_hiWinRobotInterface.StopMotor();
+            MainWindowVM.master.m_hiWinRobotInterface.wait_for_stop_motion();
             HWinRobot.jog_home(m_RobotConnectID);
         }
         public void CloseConnection()

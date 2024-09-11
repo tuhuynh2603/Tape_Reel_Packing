@@ -15,8 +15,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TapeReelPacking.Source.Define;
+using TapeReelPacking.UI.UserControls.ViewModel;
 
-namespace TapeReelPacking.UI.UserControls
+namespace TapeReelPacking.UI.UserControls.View
 {
     /// <summary>
     /// Interaction logic for LotBarcodeDataTable.xaml
@@ -29,8 +30,8 @@ namespace TapeReelPacking.UI.UserControls
         public LotBarcodeDataTable()
         {
             InitializeComponent();
+            this.DataContext = new LotBarcodeDatatableVM();
         }
-
         private void DatePicker_Date_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             DateTime datetimePicked = (DateTime)DatePicker_Date.SelectedDate;

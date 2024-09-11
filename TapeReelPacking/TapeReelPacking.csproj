@@ -125,13 +125,29 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Source\Behaviors\DragBehavior.cs" />
+    <Compile Include="Source\Behaviors\FocusBehavior.cs" />
     <Compile Include="Source\Helper\CameraHelper.cs" />
     <Compile Include="Source\Helper\FileHelper.cs" />
     <Compile Include="Source\Helper\TypeConverterHelper.cs" />
     <Compile Include="Source\Interface\IParameter.cs" />
     <Compile Include="Source\Model\CameraParameter.cs" />
+    <Compile Include="UI\UserControls\RibbonTabItems\InspectionTab.xaml.cs">
+      <DependentUpon>InspectionTab.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\UserControls\ViewModel\BarcodeReaderVM.cs" />
+    <Compile Include="UI\UserControls\ViewModel\HIKControlCameraVM.cs" />
+    <Compile Include="UI\UserControls\ViewModel\HIKRobotVM.cs" />
+    <Compile Include="UI\UserControls\ViewModel\InspectionTabVM.cs" />
+    <Compile Include="UI\UserControls\ViewModel\LoginUserVM.cs" />
+    <Compile Include="UI\UserControls\ViewModel\LotBarcodeDatatableVM.cs" />
+    <Compile Include="UI\UserControls\ViewModel\MainWindowVM.cs" />
+    <Compile Include="UI\UserControls\ViewModel\MappingSettingUCVM.cs" />
+    <Compile Include="UI\UserControls\ViewModel\PixelRulerVM.cs" />
+    <Compile Include="UI\UserControls\ViewModel\PLCCOMMVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\StatisticVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\SummaryTemplateVM.cs" />
+    <Compile Include="UI\UserControls\ViewModel\WarningMessageBoxVM.cs" />
     <Compile Include="UI\UserControls\View\MappingCanvasView.xaml.cs">
       <DependentUpon>MappingCanvasView.xaml</DependentUpon>
     </Compile>
@@ -205,12 +221,12 @@
       <DependentUpon>TeachParametersUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\UserControls\ViewModel\MappingCanvasVM.cs" />
-    <Compile Include="UI\UserControls\ViewModel\DefectInfoVM.cs" />
+    <Compile Include="UI\UserControls\ViewModel\StepDebugVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\MappingRectangleVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\OutputLogVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\TeachParameterVM.cs" />
-    <Compile Include="UI\UserControls\View\DefectInfor.xaml.cs">
-      <DependentUpon>DefectInfor.xaml</DependentUpon>
+    <Compile Include="UI\UserControls\View\StepDebugView.xaml.cs">
+      <DependentUpon>StepDebugView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\UserControls\View\LoginUser.xaml.cs">
       <DependentUpon>LoginUser.xaml</DependentUpon>
@@ -254,6 +270,10 @@
     <Compile Include="UI\UserControls\View\WarningMessageBox.xaml.cs">
       <DependentUpon>WarningMessageBox.xaml</DependentUpon>
     </Compile>
+    <Page Include="UI\UserControls\RibbonTabItems\InspectionTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\UserControls\Styles\RibbonStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -314,7 +334,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\UserControls\View\DefectInfor.xaml">
+    <Page Include="UI\UserControls\View\StepDebugView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

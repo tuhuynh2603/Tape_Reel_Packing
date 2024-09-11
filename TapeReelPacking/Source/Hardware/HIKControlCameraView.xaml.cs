@@ -9,6 +9,7 @@ using TapeReelPacking.Source.Define;
 using TapeReelPacking.Source.Helper;
 using TapeReelPacking.Source.Model;
 using TapeReelPacking.UI.UserControls.View;
+using TapeReelPacking.UI.UserControls.ViewModel;
 
 namespace TapeReelPacking.Source.Hardware
 {
@@ -26,8 +27,8 @@ namespace TapeReelPacking.Source.Hardware
         public MyCamera m_MyCamera = new MyCamera();
         public bool m_bGrabbing = false;
         //Thread m_hReceiveThread = null;
-        string m_strCameraSerial;
-        int m_nTrack;
+        public string m_strCameraSerial;
+        public int m_nTrack;
         public bool m_bIsConnected = false;
         public HIKControlCameraView(string strCameraID, int nTrack)
         {
@@ -37,11 +38,31 @@ namespace TapeReelPacking.Source.Hardware
             DeviceListAcq();
 
             CameraHelper.LoadCamSetting(nTrack, cameraParameter);
-            MainWindow.mainWindow.UpdateCameraConnectionStatus(nTrack, InitializeCamera(strCameraID));
+            MainWindowVM.updateCameraConnectionStatusDelegate?.Invoke(nTrack, InitializeCamera(strCameraID));
             m_strCameraSerial = strCameraID;
             m_nTrack = nTrack;
             // ch:设置采集连续模式 | en:Set Continues Aquisition Mode
 
+        }
+        public HIKControlCameraView()
+        {
+            InitializeComponent();
+            //this.Closing += Window_Closing;
+
+            DeviceListAcq();
+
+
+
+            // ch:设置采集连续模式 | en:Set Continues Aquisition Mode
+
+        }
+
+        public void InitCameraSetting(string strCameraID, int nTrack)
+        {
+            CameraHelper.LoadCamSetting(nTrack, cameraParameter);
+            MainWindowVM.updateCameraConnectionStatusDelegate?.Invoke(nTrack, InitializeCamera(strCameraID));
+            m_strCameraSerial = strCameraID;
+            m_nTrack = nTrack;
         }
 
         // ch:显示错误信息 | en:Show error message
@@ -144,7 +165,7 @@ namespace TapeReelPacking.Source.Hardware
                 return;
             }
 
-            MainWindow.mainWindow.UpdateCameraConnectionStatus(m_nTrack, InitializeCamera(m_strCameraSerial));
+            MainWindowVM.updateCameraConnectionStatusDelegate?.Invoke(m_nTrack, InitializeCamera(m_strCameraSerial));
             // ch:设置采集连续模式 | en:Set Continues Aquisition Mode
             //bnGetParam_Click(null, null);
 

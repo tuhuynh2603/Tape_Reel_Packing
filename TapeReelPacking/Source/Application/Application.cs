@@ -50,8 +50,8 @@ namespace TapeReelPacking.Source.Application
         public static int[] m_Width = { 3840, 680 };
         public static int[] m_Height = { 2748, 512 };
         static RegistryKey registerPreferences;
-
-        public Application()
+        MainWindowVM _mainWindowVM { set; get; }    
+        public Application(MainWindowVM mainWindowVM)
         {
             if (!CheckMuTexProcess())
             {
@@ -60,6 +60,8 @@ namespace TapeReelPacking.Source.Application
             }
             RegistryKey reg = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
             reg.SetValue("HD Tape And Reel Packing Vision", System.Windows.Forms.Application.ExecutablePath.ToString());
+
+            _mainWindowVM = mainWindowVM;
         }
 
         #region KILL PROCCESS
@@ -157,7 +159,7 @@ namespace TapeReelPacking.Source.Application
 
             string strLotTemp = string.Format("{0}{1}{2}_{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
             m_strCurrentLot = GetStringRegistry(m_strCurrentLot_Registry, strLotTemp);
-            MainWindow.mainWindow.m_strCurrentLotID = m_strCurrentLot;
+            //_mainWindowVM.m_strCurrentLotID = m_strCurrentLot;
             m_strStartLotDay = m_strCurrentLot.Split('_')[0];
 
             #region Load Folder Save Image
@@ -197,24 +199,6 @@ namespace TapeReelPacking.Source.Application
             registerPreferences.SetValue("Recipe Name", currentRecipe);
         }
 
-        public static string UserDefault;
-        public static string LevelDefault;
-        public static string PwsDefault;
-
-        private string nameUserDefault;
-        private string levelUserDefault;
-        private string pwsUserDefault;
-
-        public void acountDefault()
-        {
-            UserDefault = "Engineer";
-            LevelDefault = "Engineer";
-            PwsDefault = "6_XZ_VVc25>?";
-
-            nameUserDefault = "Name=" + UserDefault;
-            levelUserDefault = "Level=" + LevelDefault;
-            pwsUserDefault = "Pswd=" + PwsDefault;
-        }
 
         public static void LoadMappingParamFromFile()
         {
@@ -237,89 +221,7 @@ namespace TapeReelPacking.Source.Application
         }
 
 
-        #region Acount
-        public DataTable tableAccount = new DataTable();
-        public static LoginUser loginUser = new LoginUser();
-        public void ReadLogAccount()
-        {
-            DataColumn column = new DataColumn();
 
-            tableAccount = new DataTable();
-            column.ColumnName = "username";
-            column.DataType = typeof(string);
-            column.Unique = true;
-            tableAccount.Columns.Add(column);
-
-            column = new DataColumn();
-            column.ColumnName = "access";
-            column.DataType = typeof(AccessLevel);
-            column.Unique = false;
-            tableAccount.Columns.Add(column);
-
-            column = new DataColumn();
-            column.ColumnName = "password";
-            column.DataType = typeof(string);
-            column.Unique = false;
-            tableAccount.Columns.Add(column);
-
-            Directory.CreateDirectory(pathRecipe);
-            string pathFile = Path.Combine(pathRecipe, "LogAccount.lgn");
-            if (!File.Exists(pathFile))
-            {
-                // pw: Engineer
-                string[] fileAccount =
-                {
-                    "[NUM USER]",
-                    "NoOfUsers=1",
-                    "",
-                    "[User0]",
-                   nameUserDefault,
-                   levelUserDefault,
-                   pwsUserDefault,
-                };
-
-                using (StreamWriter Files = new StreamWriter(pathFile))
-                {
-                    foreach (string line in fileAccount)
-                        Files.WriteLine(line);
-                }
-                // To do: convert datatable
-                GetTableAccount(tableAccount, fileAccount);
-                loginUser.tableAccount = tableAccount;
-            }
-            else
-            {
-                string[] fileAccount = File.ReadAllLines(pathFile);
-                GetTableAccount(tableAccount, fileAccount);
-                loginUser.tableAccount = tableAccount;
-
-            }
-        }
-        public void GetTableAccount(DataTable tableacount, string[] accounts)
-        {
-            DataRow row;
-            foreach (string line in accounts)
-            {
-                if (line.Contains("[User"))
-                {
-                    int pos = Array.IndexOf(accounts, line);
-                    row = tableacount.NewRow();
-                    row["username"] = accounts[++pos].Split('=')[1];
-                    row["access"] = StringToAccessLevel(accounts[++pos].Split('=')[1]);
-                    row["password"] = accounts[++pos].Split('=')[1];
-                    tableacount.Rows.Add(row);
-                }
-            }
-        }
-        private AccessLevel StringToAccessLevel(string level)
-        {
-            if (string.Compare(level, "Engineer", true) == 0) return AccessLevel.Engineer;
-            else if (string.Compare(level, "Operator", true) == 0) return AccessLevel.Operator;
-            else if (string.Compare(level, "User", true) == 0) return AccessLevel.User;
-            else return AccessLevel.None;
-        }
-
-        #endregion
 
         public static int LineNumber([System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0)
         {

@@ -90,13 +90,13 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         private void CanvasMouseLeftButtonDown()
         {
             isBorderVisible = System.Windows.Visibility.Visible;
-            if (MainWindow.mainWindow.m_bSequenceRunning)
+            if (MainWindowVM.m_bSequenceRunning)
                 return;
 
-            //MainWindow.mainWindow.master.m_Tracks[nTrackId].CheckInspectionOnlineThread();
-            MainWindow.mainWindow.master.m_Tracks[trackID].m_nCurrentClickMappingID = int.Parse(mappingID.ToString()) - 1;
+            //MainWindowVM.master.m_Tracks[nTrackId].CheckInspectionOnlineThread();
+            MainWindowVM.master.m_Tracks[trackID].m_nCurrentClickMappingID = int.Parse(mappingID.ToString()) - 1;
 
-            if (MainWindow.mainWindow.bEnableOfflineInspection)
+            if (InspectionTabVM.bEnableOfflineInspection)
                 Master.m_OfflineTriggerSnapEvent[trackID].Set();
             else
                 Master.InspectEvent[trackID].Set();

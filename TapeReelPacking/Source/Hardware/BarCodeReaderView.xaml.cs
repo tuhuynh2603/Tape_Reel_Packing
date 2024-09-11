@@ -16,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TapeReelPacking.Source.Application;
 using TapeReelPacking.UI.UserControls.View;
+using TapeReelPacking.UI.UserControls.ViewModel;
 using Path = System.IO.Path;
 
 namespace TapeReelPacking.Source.Hardware
@@ -38,7 +39,7 @@ namespace TapeReelPacking.Source.Hardware
             InitializeComponent();
             combo_BarcodeBrank.Items.Add("1");
             combo_BarcodeBrank.Items.Add("2");
-            //combo_BarcodeBrank.SelectedItem = MainWindow.mainWindow.master.m_BarcodeReader.barcodeSetting.brankID;
+            //combo_BarcodeBrank.SelectedItem = MainWindowVM.master.m_BarcodeReader.barcodeSetting.brankID;
             //combo_commandSendToBarCode.Items.Add("LOFF");
 
         }
@@ -47,7 +48,7 @@ namespace TapeReelPacking.Source.Hardware
 
 
             //string strFullPathImageOut = "";
-            //MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut);
+            //MainWindowVM.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut);
         }
 
         private void button_Clear_Click(object sender, RoutedEventArgs e)
@@ -67,15 +68,15 @@ namespace TapeReelPacking.Source.Hardware
                 strLot = string.Format("{0}{1}{2}+{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
             }
 
-            label_DataReceived.Content = MainWindow.mainWindow.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut, nDeviceIDTemp, strLot);
+            label_DataReceived.Content = MainWindowVM.master.m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut, nDeviceIDTemp, strLot);
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             if (combo_BarcodeBrank.SelectedItem == null)
                 return;
-            MainWindow.mainWindow.master.m_BarcodeReader.barcodeSetting.brankID = combo_BarcodeBrank.SelectedItem.ToString();
-            MainWindow.mainWindow.master.m_BarcodeReader.WriteBarcodeSetting();
+            MainWindowVM.master.m_BarcodeReader.barcodeSetting.brankID = combo_BarcodeBrank.SelectedItem.ToString();
+            MainWindowVM.master.m_BarcodeReader.WriteBarcodeSetting();
         }
 
         private void combo_BarcodeBrank_SelectionChanged(object sender, SelectionChangedEventArgs e)

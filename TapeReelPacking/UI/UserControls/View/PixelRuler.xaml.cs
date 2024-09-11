@@ -15,9 +15,11 @@ using System.Windows.Shapes;
 using TapeReelPacking.Source.Application;
 using TapeReelPacking.Source.LogMessage;
 using TapeReelPacking.UI.UserControls.View;
+using TapeReelPacking.UI.UserControls.ViewModel;
+using static TapeReelPacking.Source.Hardware.SDKHrobot.Global;
 using Application = TapeReelPacking.Source.Application.Application;
 
-namespace TapeReelPacking.UI.UserControls
+namespace TapeReelPacking.UI.UserControls.View
 {
 	/// <summary>
 	/// Interaction logic for PixelRuler.xaml
@@ -34,7 +36,9 @@ namespace TapeReelPacking.UI.UserControls
 		public PixelRuler()
 		{
 			InitializeComponent();
-		}
+			initPixelRuleDelegate = InitPixelRule;
+
+        }
 
 		private int width = 0;
 		private int height = 0;
@@ -85,6 +89,8 @@ namespace TapeReelPacking.UI.UserControls
 			if (currentDock.Children.Contains(currentGrid))
 				currentDock.Children.Remove(currentGrid);
 		}
+
+
 		Polyline polyline;
 		Grid currentGrid;
 		Grid currentDock;
@@ -117,7 +123,7 @@ namespace TapeReelPacking.UI.UserControls
 		int count = 0;
 		public void Pixe_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			int trackID = MainWindow.activeImageDock.trackID;
+			int trackID = MainWindowVM.activeImageDock.trackID;
 			//int docID = 0;
 			var dock = sender as Grid;
 			if (dock != currentDock)
@@ -152,9 +158,9 @@ namespace TapeReelPacking.UI.UserControls
 		{
 			double resX = 0.0;
 			double resY = 0.0;
-			trackID = MainWindow.activeImageDock.trackID;
-			width = MainWindow.mainWindow.master.m_Tracks[trackID].m_imageViews[0]._imageWidth;
-			height = MainWindow.mainWindow.master.m_Tracks[trackID].m_imageViews[0]._imageHeight;
+			trackID = MainWindowVM.activeImageDock.trackID;
+			width = MainWindowVM.master.m_Tracks[trackID].m_imageViews[0]._imageWidth;
+			height = MainWindowVM.master.m_Tracks[trackID].m_imageViews[0]._imageHeight;
 			//ToDO need to determine the resolutoion both camera
 			if (trackID == 0)
 			{
@@ -212,8 +218,32 @@ namespace TapeReelPacking.UI.UserControls
 		}
 		private void CloseRuler(object sender, RoutedEventArgs e)
 		{
-			((MainWindow)System.Windows.Application.Current.MainWindow).btn_Pixel_Ruler.IsChecked = false;
-		}
+            InitPixelRule(Visibility.Collapsed);
+
+        }
+
+
+		public delegate void InitPixelRuleDelegate(Visibility bIsVisible);
+		public static InitPixelRuleDelegate initPixelRuleDelegate;
+
+
+        public void InitPixelRule(Visibility bIsVisible)
+		{
+            if (bIsVisible != Visibility.Visible)
+            {
+                Finish();
+                return;
+            }
+
+            
+            Grid[] tempGrid = new Grid[Source.Application.Application.m_nTrack];
+            for (int index_track = 0; index_track < Source.Application.Application.m_nTrack; index_track++)
+            {
+                tempGrid[index_track] = MainWindowVM.master.m_Tracks[index_track].m_imageViews[0].grd_Dock;
+            }
+
+            SetUp(tempGrid, true);
+        }
 
 	}
 }

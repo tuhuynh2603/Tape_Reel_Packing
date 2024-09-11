@@ -1,20 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows;
 using System.Windows.Input;
 using TapeReelPacking.Source.Algorithm;
 using TapeReelPacking.Source.Application;
 using TapeReelPacking.Source.Helper;
 using TapeReelPacking.Source.Interface;
 using TapeReelPacking.Source.Model;
+using TapeReelPacking.Source.Repository;
 using TapeReelPacking.UI.UserControls.View;
+using Application = TapeReelPacking.Source.Application.Application;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
     public class VisionParameterVM : BaseVM, IParameter
     {
 
+        private Visibility _isVisible = Visibility.Collapsed;
 
+        public Visibility isVisible
+        {
+            get => _isVisible;
+            set
+            {
+                _isVisible = value;
+                OnPropertyChanged(nameof(isVisible));
+            }
+        }
 
         private int selectedPVIAreaIndex = 0;
         public int SelectedPVIAreaIndex
@@ -60,10 +73,15 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         public ICommand CancelCommand { get; }
         public ICommand PropertyChangedCommand { set; get; }
 
-        public VisionParameterVM()
+
+        CategoryVisionParameterService categoryVisionParameterService { set; get; }
+        private MainWindowVM _mainWindowVM { get; set; }
+
+        public VisionParameterVM(MainWindowVM mainVM, CategoryVisionParameterService service)
         {
 
-
+            categoryVisionParameterService = service;
+            _mainWindowVM = mainVM;
 
             SaveCommand = new RelayCommand<TeachParameterVM>((p) => { return true; },
                                          (p) =>
@@ -101,7 +119,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             try
             {
                 //Mouse.OverrideCursor = Cursors.Wait;
-                MainWindow.mainWindow.master.m_Tracks[nTrack].m_InspectionCore.UpdateAreaParameterFromUIToInspectionCore(categoryVisionParameter, nArea);
+                MainWindowVM.master.m_Tracks[nTrack].m_InspectionCore.UpdateAreaParameterFromUIToInspectionCore(categoryVisionParameter, nArea);
                 WritePVIAreaParam(nTrack, nArea);
                 return true;
             }
@@ -170,7 +188,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             file.Create();
 
             IniFile ini = new IniFile(pathFile);
-            InspectionCore inspectionCore = MainWindow.mainWindow.master.m_Tracks[nTrack].m_InspectionCore;
+            InspectionCore inspectionCore = MainWindowVM.master.m_Tracks[nTrack].m_InspectionCore;
             FileHelper.WriteLine(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_AreaEnable)), ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_DR_AreaEnable.ToString());
             FileHelper.WriteLine(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_lowerThreshold)), ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_LD_lowerThreshold.ToString());
             FileHelper.WriteLine(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_upperThreshold)), ini, inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_LD_upperThreshold.ToString());
@@ -180,6 +198,8 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             FileHelper.WriteLine(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_DefectROILocation)), ini, TypeConverterHelper.ConvertRectanglesToString(inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_DR_DefectROILocations));
 
         }
+
+
 
 
     }

@@ -11,6 +11,7 @@ using System.Windows.Shapes;
 using CvContourArray = Emgu.CV.Util.VectorOfVectorOfPoint;
 using CvPointArray = Emgu.CV.Util.VectorOfPoint;
 using Point = System.Drawing.Point;
+using TapeReelPacking.UI.UserControls.ViewModel;
 
 namespace TapeReelPacking.Source.DrawingOverlay
 {
@@ -100,8 +101,8 @@ namespace TapeReelPacking.Source.DrawingOverlay
                 double scaleHeight = 0;
                 GridOverlay.Dispatcher.Invoke(delegate
                 {
-                    int width_track = MainWindow.mainWindow.master.m_Tracks[ntrackID].m_imageViews[0]._imageWidth;
-                    int height_track = MainWindow.mainWindow.master.m_Tracks[ntrackID].m_imageViews[0]._imageHeight;
+                    int width_track = MainWindowVM.master.m_Tracks[ntrackID].m_imageViews[0]._imageWidth;
+                    int height_track = MainWindowVM.master.m_Tracks[ntrackID].m_imageViews[0]._imageHeight;
                     scaleWidth = GridOverlay.Width / width_track;
                     scaleHeight = GridOverlay.Height / height_track;
                 });

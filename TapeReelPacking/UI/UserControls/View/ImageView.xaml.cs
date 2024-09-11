@@ -791,13 +791,15 @@ namespace TapeReelPacking.UI.UserControls.View
             int index = diY * (stride) + diX;
 
             System.Drawing.PointF robotPoint = new System.Drawing.PointF(0, 0);
-            if (MainWindow.mainWindow.master != null)
-                robotPoint = Track.MagnusMatrix.ApplyTransformation(MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.m_MatCameraRobotTransform,  new System.Drawing.PointF(diX , diY));
+            if (MainWindowVM.master.m_hiWinRobotInterface.m_hiWinRobotUserControl == null)
+                return;
+            if (MainWindowVM.master != null)
+                robotPoint = Track.MagnusMatrix.ApplyTransformation(MainWindowVM.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.m_MatCameraRobotTransform,  new System.Drawing.PointF(diX , diY));
 
             byte red = bufferImage[index < 0 ? 0 : index > size - 1 ? 0 : index];   // index overside
-            ((MainWindow)(System.Windows.Application.Current.MainWindow)).UpdateGrayValue(trackID,
-                                                                            "[" + diX.ToString() + ", " + diY.ToString() + "]" + " Robot[" + ((int)robotPoint.X).ToString() + ", " + ((int)robotPoint.Y).ToString() + "]" ,
-                                                                            "[" + red.ToString() + "]");
+            MainWindowVM.UpdateGrayValue(trackID,
+                                                "[" + diX.ToString() + ", " + diY.ToString() + "]" + " Robot[" + ((int)robotPoint.X).ToString() + ", " + ((int)robotPoint.Y).ToString() + "]" ,
+                                                "[" + red.ToString() + "]");
             //}
         }
         #endregion
@@ -955,12 +957,12 @@ namespace TapeReelPacking.UI.UserControls.View
                 nameImage = _nameImage;
                 //Color Image
                 //BitmapImage bitmap = new BitmapImage();
-                //bitmap = MainWindow.mainWindow.master.LoadBitmap(strImagePath);
+                //bitmap = MainWindowVM.master.LoadBitmap(strImagePath);
                 //UpdateNewImage(bitmap);
                 UpdateNewImageMono(strImagePath);
                 GridOverlay.Children.Clear();
                 UpdateTextOverlay("", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
-                MainWindow.mainWindow.UpdateTitleDoc(0, "teachImage.bmp", true);
+                MainWindowVM.updateTitleDocDelegate?.Invoke(0, "teachImage.bmp", true);
             }
         }
 
@@ -1043,13 +1045,13 @@ namespace TapeReelPacking.UI.UserControls.View
         {
             while (!Master.m_NextStepTeachEvent.WaitOne(100))
             {
-                if (MainWindow.mainWindow == null || !Master.m_bIsTeaching)
+                if (!Master.m_bIsTeaching)
                 {
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
                         controlWin.Visibility = Visibility.Collapsed;
-                        MainWindow.mainWindow.SetDisableTeachButton();
-                        MainWindow.mainWindow.master.loadTeachImageToUI(trackID);
+                        InspectionTabVM.setDisableTeachButtonDelegate?.Invoke();
+                        MainWindowVM.master.loadTeachImageToUI(trackID);
                         Master.m_bIsTeaching = false;
 
                     });
@@ -1066,7 +1068,7 @@ namespace TapeReelPacking.UI.UserControls.View
             Master.m_NextStepTeachEvent.Reset();
             //Source.Application.Application.LoadTeachParamFromFileToDict(nTeachTrackID);
 
-            //MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
+            //MainWindowVM.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore();
             List<CategoryVisionParameter> areaParams = new List<CategoryVisionParameter>();
             CategoryTeachParameter categoryTeachParameter = new CategoryTeachParameter();
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
@@ -1076,7 +1078,7 @@ namespace TapeReelPacking.UI.UserControls.View
                 ClearOverlay();
                 loadTeachImageToUI(nTeachTrackID);
                 categoryTeachParameter = TeachParameterVM.ReloadTeachParameterUI(nTeachTrackID);
-                MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore(categoryTeachParameter);
+                MainWindowVM.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore(categoryTeachParameter);
 
 
                 // update Vision area ROI 
@@ -1087,10 +1089,10 @@ namespace TapeReelPacking.UI.UserControls.View
                     {
 
                         areaParams.Add(VisionParameterVM.ReloadAreaParameterUI(nTeachTrackID, nPVIArea));
-                        MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateAreaParameterFromUIToInspectionCore(areaParams[nPVIArea], nPVIArea);
+                        MainWindowVM.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateAreaParameterFromUIToInspectionCore(areaParams[nPVIArea], nPVIArea);
                     });
 
-                    L_PVIArea.Add(MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.m_SurfaceDefectParameter[nPVIArea].m_DR_DefectROILocations);
+                    L_PVIArea.Add(MainWindowVM.master.m_Tracks[nTeachTrackID].m_InspectionCore.m_SurfaceDefectParameter[nPVIArea].m_DR_DefectROILocations);
 
                 }
 
@@ -1098,7 +1100,7 @@ namespace TapeReelPacking.UI.UserControls.View
 
             // now only teach device location so only TP_roiNo
             int nCurrentStep = 0;
-            Rectangles L_DeviceLocationRoi_Temp = MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.m_DeviceLocationParameter.m_L_DeviceLocationRoi;
+            Rectangles L_DeviceLocationRoi_Temp = MainWindowVM.master.m_Tracks[nTeachTrackID].m_InspectionCore.m_DeviceLocationParameter.m_L_DeviceLocationRoi;
 
             if (true)
             {
@@ -1131,7 +1133,7 @@ namespace TapeReelPacking.UI.UserControls.View
             }
             if (true)
             {
-                for (int nPVIArea = 0; nPVIArea < MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.m_DeviceLocationParameter.m_DR_NumberROILocation; nPVIArea++)
+                for (int nPVIArea = 0; nPVIArea < MainWindowVM.master.m_Tracks[nTeachTrackID].m_InspectionCore.m_DeviceLocationParameter.m_DR_NumberROILocation; nPVIArea++)
                 {
                     Rectangles lPVIAreaTemp = L_PVIArea[nPVIArea];
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
@@ -1167,7 +1169,7 @@ namespace TapeReelPacking.UI.UserControls.View
 
 
                     areaParams[n].LD_DefectROILocation.SetRectangle(L_PVIArea[n]);
-                    MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateAreaParameterFromUIToInspectionCore(areaParams[n], n);
+                    MainWindowVM.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateAreaParameterFromUIToInspectionCore(areaParams[n], n);
                 }
 
             }
@@ -1179,7 +1181,7 @@ namespace TapeReelPacking.UI.UserControls.View
                 {
                     UpdateTextOverlay("[" + (nCurrentStep + 1).ToString() /*+ "/" + ((int)(TEACHSTEP.TEACH_TOTALSTEP)).ToString()*/ + "] Please Locate Device BoundingBox", "", DefautTeachingSequence.ColorContentTeached, DefautTeachingSequence.ColorExplaintionTeahing);
                     controlWin.Visibility = Visibility.Visible;
-                    SetControlWin(MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.m_DeviceLocationParameter.m_L_TemplateRoi);
+                    SetControlWin(MainWindowVM.master.m_Tracks[nTeachTrackID].m_InspectionCore.m_DeviceLocationParameter.m_L_TemplateRoi);
                 });
 
                 if (waitNextTeachStep() < 0)
@@ -1198,11 +1200,11 @@ namespace TapeReelPacking.UI.UserControls.View
                     //double dScoreOutput = 0.0;
                     //int L_CornerIndex_Temp = 0;
                     //System.Drawing.Rectangle rectMatchingPosition = new System.Drawing.Rectangle();
-                    //MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.AutoTeachDatumLocation(ref p_Regionpolygon, L_DeviceLocationRoi_Temp, L_TemplateRoi_Temp, ref mat_DeviceLocationRegion, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput, ref L_CornerIndex_Temp);
+                    //MainWindowVM.master.m_Tracks[nTeachTrackID].m_InspectionCore.AutoTeachDatumLocation(ref p_Regionpolygon, L_DeviceLocationRoi_Temp, L_TemplateRoi_Temp, ref mat_DeviceLocationRegion, ref rectMatchingPosition, ref nAngleOutput, ref dScoreOutput, ref L_CornerIndex_Temp);
                     categoryTeachParameter.L_TemplateRoi.SetRectangle(L_TemplateRoi_Temp);
-                    MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore(categoryTeachParameter);
-                    MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.LoadTeachImageToInspectionCore(nTeachTrackID);
-                    MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].AutoTeach(ref MainWindow.mainWindow.master.m_Tracks[nTeachTrackID], true);
+                    MainWindowVM.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore(categoryTeachParameter);
+                    MainWindowVM.master.m_Tracks[nTeachTrackID].m_InspectionCore.LoadTeachImageToInspectionCore(nTeachTrackID);
+                    MainWindowVM.master.m_Tracks[nTeachTrackID].AutoTeach(ref MainWindowVM.master.m_Tracks[nTeachTrackID], true);
                     //SolidColorBrush color = new SolidColorBrush(Colors.Yellow);
                     //DrawPolygonOverlay(ref p_Regionpolygon, color, 1);
                     //DrawRegionOverlay(mat_DeviceLocationRegion, color);
@@ -1221,11 +1223,11 @@ namespace TapeReelPacking.UI.UserControls.View
             if (result == MessageBoxResult.Yes)
             {
 
-                MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore(categoryTeachParameter);
+                MainWindowVM.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore(categoryTeachParameter);
 
-                MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.SetTemplateImage();
-                MainWindow.mainWindow.master.SaveTemplateImage(nTeachTrackID);
-                MainWindow.mainWindow.master.WriteTeachParam(nTeachTrackID);
+                MainWindowVM.master.m_Tracks[nTeachTrackID].m_InspectionCore.SetTemplateImage();
+                MainWindowVM.master.SaveTemplateImage(nTeachTrackID);
+                MainWindowVM.master.WriteTeachParam(nTeachTrackID);
 
                 for (int nAreaIndex = 0; nAreaIndex < Application.TOTAL_AREA; nAreaIndex++)
                 {
@@ -1241,16 +1243,16 @@ namespace TapeReelPacking.UI.UserControls.View
                     categoryTeachParameter = TeachParameterVM.ReloadTeachParameterUI(nTeachTrackID);
                 });
 
-                MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore(categoryTeachParameter);
-                MainWindow.mainWindow.master.m_Tracks[nTeachTrackID].m_InspectionCore.LoadTeachImageToInspectionCore(nTeachTrackID);
-                //MainWindow.mainWindow.master.LoadRecipe();
+                MainWindowVM.master.m_Tracks[nTeachTrackID].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore(categoryTeachParameter);
+                MainWindowVM.master.m_Tracks[nTeachTrackID].m_InspectionCore.LoadTeachImageToInspectionCore(nTeachTrackID);
+                //MainWindowVM.master.LoadRecipe();
             }
 
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
                 ClearOverlay();
-                MainWindow.mainWindow.SetDisableTeachButton();
-                MainWindow.mainWindow.master.loadTeachImageToUI(nTeachTrackID);
+                InspectionTabVM.setDisableTeachButtonDelegate?.Invoke();
+                MainWindowVM.master.loadTeachImageToUI(nTeachTrackID);
                 Master.m_bIsTeaching = false;
 
             });
@@ -1329,17 +1331,17 @@ namespace TapeReelPacking.UI.UserControls.View
 
         private void getChosenDoc(object sender, MouseButtonEventArgs e)
         {
-            MainWindow.activeImageDock = sender as ImageView;
+            MainWindowVM.activeImageDock = sender as ImageView;
             //MainWindow.activeImageDock = this;
-            if (MainWindow.activeImageDock.enableGray == 0)
-                MainWindow.mainWindow.btn_Binarize.IsChecked = false;
-            else
-                MainWindow.mainWindow.btn_Binarize.IsChecked = true;
+            //if (MainWindowVM.activeImageDock.enableGray == 0)
+            //    MainWindowVM.btn_Binarize.IsChecked = false;
+            //else
+            //    MainWindow.mainWindow.btn_Binarize.IsChecked = true;
         }
 
         private void ImageDoc_DoubleClick(object sender, MouseButtonEventArgs e)
         {
-            MainWindow.mainWindow.ZoomDocPanel(trackID);
+            MainWindowVM.zoomDocPanelDelegate?.Invoke(trackID);
             //getChosenDoc()
         }
 

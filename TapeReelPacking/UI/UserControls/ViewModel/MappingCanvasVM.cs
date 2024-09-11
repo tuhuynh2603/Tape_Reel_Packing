@@ -1,6 +1,7 @@
 ﻿using Microsoft.Expression.Interactivity.Core;
 using System;
 using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using TapeReelPacking.Source.Define;
@@ -62,16 +63,19 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             // Example data
         }
 
+        int m_nDeviceX = 5;
+        int m_nDeviceY = 5;
+        int m_nTotalDevicePerLot = 1000;
         public void InitCanvasMapping()
         {
             if (MainWindow.mainWindow == null)
                 return;
 
-            MainWindow.mainWindow.m_nDeviceX = Source.Application.Application.categoriesMappingParam.M_NumberDeviceX;
-            MainWindow.mainWindow.m_nDeviceY = Source.Application.Application.categoriesMappingParam.M_NumberDeviceY;
-            MainWindow.mainWindow.m_nTotalDevicePerLot = Source.Application.Application.categoriesMappingParam.M_NumberDevicePerLot;
-            int nMaxDeviceStep = MainWindow.mainWindow.m_nDeviceX > MainWindow.mainWindow.m_nDeviceY ? MainWindow.mainWindow.m_nDeviceX : MainWindow.mainWindow.m_nDeviceY;
-            double dPage = Math.Ceiling((MainWindow.mainWindow.m_nTotalDevicePerLot * 1.0) / (MainWindow.mainWindow.m_nDeviceX * 1.0) / MainWindow.mainWindow.m_nDeviceY * 1.0);
+            m_nDeviceX = Source.Application.Application.categoriesMappingParam.M_NumberDeviceX;
+            m_nDeviceY = Source.Application.Application.categoriesMappingParam.M_NumberDeviceY;
+            m_nTotalDevicePerLot = Source.Application.Application.categoriesMappingParam.M_NumberDevicePerLot;
+            int nMaxDeviceStep = m_nDeviceX > m_nDeviceY ? m_nDeviceX : m_nDeviceY;
+            double dPage = Math.Ceiling((m_nTotalDevicePerLot * 1.0) / (m_nDeviceX * 1.0) / m_nDeviceY * 1.0);
             m_nNumberMappingPage = (int)dPage;
 
             int nWidthgrid = MappingCanvasWidth > 0 ? (int)MappingCanvasWidth : 500;
@@ -91,9 +95,9 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             for (int nTrack = 0; nTrack < 2; nTrack++)
             {
 
-                for (int nDeviceX = 0; nDeviceX < MainWindow.mainWindow.m_nDeviceX; nDeviceX++)
+                for (int nDeviceX = 0; nDeviceX < m_nDeviceX; nDeviceX++)
                 {
-                    for (int nDeviceY = 0; nDeviceY < MainWindow.mainWindow.m_nDeviceY; nDeviceY++)
+                    for (int nDeviceY = 0; nDeviceY < m_nDeviceY; nDeviceY++)
                     {
 
                         rec = new MappingRectangleVM();
@@ -101,13 +105,13 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                         rec.imageSource = new BitmapImage(new Uri(path, UriKind.Relative));
                         rec.imageWidth = 0.95 * m_nWidthMappingRect;
                         rec.imageHeight = 0.95 * m_nWidthMappingRect;
-                        rec.mappingID = nDeviceX + 1 + nDeviceY * MainWindow.mainWindow.m_nDeviceX + m_nPageID[nTrack] * MainWindow.mainWindow.m_nDeviceX * MainWindow.mainWindow.m_nDeviceY;
+                        rec.mappingID = nDeviceX + 1 + nDeviceY * m_nDeviceX + m_nPageID[nTrack] * m_nDeviceX * m_nDeviceY;
                         rec.fontMappingSize = 0.95 * m_nWidthMappingRect / 3;
                         rec.minMappingWidth = 0.95 * m_nWidthMappingRect;
                         rec.minMappingHeight = 0.95 * m_nWidthMappingRect;
-                        rec.imageLeft = m_nStepMappingRect * nDeviceX + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1);
+                        rec.imageLeft = m_nStepMappingRect * nDeviceX + nTrack * m_nWidthMappingRect * (m_nDeviceX + 1);
                         rec.imageTop = m_nStepMappingRect * nDeviceY;
-                        rec.labelLeft = m_nStepMappingRect * nDeviceX + nTrack * m_nWidthMappingRect * (MainWindow.mainWindow.m_nDeviceX + 1);
+                        rec.labelLeft = m_nStepMappingRect * nDeviceX + nTrack * m_nWidthMappingRect * (m_nDeviceX + 1);
                         rec.labelTop = m_nStepMappingRect * nDeviceY + 0.95 * m_nWidthMappingRect / 9;
                         mappingRectangles.Add(rec);
 
@@ -118,14 +122,19 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             //mappingRectangles = null;
             //mappingRectangles = mappingRectangles;
 
-            if (MainWindow.mainWindow != null)
-                MainWindow.mainWindow.loadAllStatistic(false);
+            if (MainWindowVM.mainWindow != null)
+                MainWindowVM.loadAllStatisticDelegate?.Invoke(false);
 
         }
 
 
         public void UpdateMappingResultPage(int nTrack)
         {
+
+
+            if (mappingRectangles == null)
+                return;
+
             string path = @"/Resources/gray-chip.png";
             string pathFail = @"/Resources/red-chip.png";
             string pathPass = @"/Resources/green-chip.png";
@@ -133,10 +142,10 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             int nResultTotal;
             //for(int nTrack = 0; nTrack < 2; nTrack++)
             //{
-            int nDevice = MainWindow.mainWindow.m_nDeviceX * MainWindow.mainWindow.m_nDeviceY;
-            for (int nID = 0; nID < MainWindow.mainWindow.m_nDeviceX * MainWindow.mainWindow.m_nDeviceY; nID++)
+            int nDevice = m_nDeviceX * m_nDeviceY;
+            for (int nID = 0; nID < m_nDeviceX * m_nDeviceY; nID++)
             {
-                nResultTotal = MainWindow.mainWindow.master.m_Tracks[nTrack].m_VisionResultDatas[nID + m_nPageID[nTrack] * nDevice].m_nResult;
+                nResultTotal = MainWindowVM.master.m_Tracks[nTrack].m_VisionResultDatas[nID + m_nPageID[nTrack] * nDevice].m_nResult;
 
                 switch (nResultTotal)
                 {
@@ -170,7 +179,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         public void UpdateMappingResult(VisionResultData resultData, int nTrack, int nDeviceID)
         {
-            int nDevice = MainWindow.mainWindow.m_nDeviceX * MainWindow.mainWindow.m_nDeviceY;
+            int nDevice = m_nDeviceX * m_nDeviceY;
 
             if (nDeviceID >= (m_nPageID[nTrack] + 1) * nDevice)
             {
@@ -197,7 +206,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         public void ResetMappingResult(int nTrackID = (int)TRACK_TYPE.TRACK_CAM1)
         {
-            int nDevice = MainWindow.mainWindow.m_nDeviceX * MainWindow.mainWindow.m_nDeviceY;
+            int nDevice = m_nDeviceX * m_nDeviceY;
 
             string path = @"/Resources/gray-chip.png";
             for (int nID = 0; nID < nDevice; nID++)

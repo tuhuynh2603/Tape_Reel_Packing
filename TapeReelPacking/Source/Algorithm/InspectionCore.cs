@@ -16,6 +16,7 @@ using CvPointArray = Emgu.CV.Util.VectorOfPoint;
 
 namespace TapeReelPacking.Source.Algorithm
 {
+    using System.Collections.ObjectModel;
     using TapeReelPacking.Source.Application;
     using TapeReelPacking.Source.Model;
 
@@ -262,7 +263,7 @@ namespace TapeReelPacking.Source.Algorithm
             return true;
         }
 
-        public /*static*/ void PushBackDebugInfors(CvImage debugImage, CvImage debugRegion, string debugMessage, bool bEnableDebug, ref List<DebugInfors> debugInfors)
+        public /*static*/ void PushBackDebugInfors(CvImage debugImage, CvImage debugRegion, string debugMessage, bool bEnableDebug, ObservableCollection<DebugInfors> debugInfors)
         {
             if (!bEnableDebug)
             {
@@ -292,18 +293,18 @@ namespace TapeReelPacking.Source.Algorithm
 
         }
 
-        public /*static*/ int Inspect(ref ImageTarget InspectImage, ref List<ArrayOverLay> list_arrayOverlay, ref PointF pCenter, ref PointF pCorner, ref List<DebugInfors> debugInfors, bool bEnableDebug = false)
+        public /*static*/ int Inspect(ref ImageTarget InspectImage, ref List<ArrayOverLay> list_arrayOverlay, ref PointF pCenter, ref PointF pCorner, ObservableCollection<DebugInfors> debugInfors, bool bEnableDebug = false)
         {
             int nError;
             Stopwatch timeIns = new Stopwatch();
             timeIns.Start();
             //double dScale = 3;
             nError = FindDeviceLocation_Zoom(ref InspectImage.Gray,
-                                             ref list_arrayOverlay, ref pCenter, ref pCorner, ref debugInfors, bEnableDebug);
+                                             ref list_arrayOverlay, ref pCenter, ref pCorner,debugInfors, bEnableDebug);
 
             //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             //{
-            //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Inspection time: " + timeIns.ElapsedMilliseconds.ToString(), nError);
+            //    OutputLogVM.AddLineOutputLog("Inspection time: " + timeIns.ElapsedMilliseconds.ToString(), nError);
 
             //});
             timeIns.Restart();
@@ -479,7 +480,7 @@ namespace TapeReelPacking.Source.Algorithm
         }
 
 
-        public int FindBlackChip(ref CvImage imgSource, ref CvImage mat_RegionInspectionROI, ref PointF pCenter, ref List<ArrayOverLay> list_arrayOverlay, ref List<DebugInfors> debugInfors, bool bEnableDebug = false)
+        public int FindBlackChip(ref CvImage imgSource, ref CvImage mat_RegionInspectionROI, ref PointF pCenter, ref List<ArrayOverLay> list_arrayOverlay, ObservableCollection<DebugInfors> debugInfors, bool bEnableDebug = false)
         {
             Stopwatch timeIns = new Stopwatch();
 
@@ -498,39 +499,39 @@ namespace TapeReelPacking.Source.Algorithm
 
             CvImage blurredImage = new CvImage();
             CvInvoke.GaussianBlur(imgSource, blurredImage, new Size(9, 9), 0);
-            PushBackDebugInfors(blurredImage, img_thresholdRegion, "Check Black Chip Region: Blur Image. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(blurredImage, img_thresholdRegion, "Check Black Chip Region: Blur Image. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             MagnusOpenCVLib.Threshold2(ref blurredImage, ref img_thresholdRegion, m_nLowerBlackChipThreshold, m_nUpperBlackChipThreshold);
             CvInvoke.BitwiseAnd(mat_RegionInspectionROI, img_thresholdRegion, img_thresholdRegion);
-            PushBackDebugInfors(imgSource, img_thresholdRegion, "Check Black Chip Region: img_thresholdRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSource, img_thresholdRegion, "Check Black Chip Region: img_thresholdRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             //CvImage img_FillUpRegionWithSize = new CvImage();
 
             //MagnusOpenCVLib.FillUpSmallShapes(ref img_thresholdRegion, ref img_FillUpRegionWithSize, 0, 3);
-            //PushBackDebugInfors(imgSource, img_FillUpRegionWithSize, "Check Black Chip Region: FillUp with size. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            //PushBackDebugInfors(imgSource, img_FillUpRegionWithSize, "Check Black Chip Region: FillUp with size. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             //timeIns.Restart();
 
             CvImage img_OpeningRegion = new CvImage();
             MagnusOpenCVLib.OpenningCircle_Magnus(ref img_thresholdRegion, ref img_OpeningRegion, m_nOpeningBlackChipThreshold);
-            PushBackDebugInfors(imgSource, img_OpeningRegion, "Check Black Chip Region: After Openning Mask. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSource, img_OpeningRegion, "Check Black Chip Region: After Openning Mask. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
             CvImage img_FillUpRegion = new CvImage();
 
             MagnusOpenCVLib.FillUp(ref img_OpeningRegion, ref img_FillUpRegion);
-            PushBackDebugInfors(imgSource, img_FillUpRegion, "Check Black Chip Region: FillUp. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSource, img_FillUpRegion, "Check Black Chip Region: FillUp. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             CvImage img_OpeningRegion2 = new CvImage();
             MagnusOpenCVLib.DilationCircle_Magnus(ref img_FillUpRegion, ref img_OpeningRegion2, m_nOpeningBlackChipThreshold2);
-            PushBackDebugInfors(imgSource, img_OpeningRegion2, "Check Black Chip Region: After Dilation. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSource, img_OpeningRegion2, "Check Black Chip Region: After Dilation. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
 
             CvImage img_BiggestRegion = new CvImage();
             MagnusOpenCVLib.SelectBiggestRegion(ref img_OpeningRegion2, ref img_BiggestRegion);
-            PushBackDebugInfors(imgSource, img_BiggestRegion, "Check Black Chip Region: img_BiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSource, img_BiggestRegion, "Check Black Chip Region: img_BiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
             CvPointArray point_regions = new CvPointArray();
 
@@ -551,18 +552,18 @@ namespace TapeReelPacking.Source.Algorithm
 
             CvImage distanceTransform = new CvImage();
             CvInvoke.DistanceTransform(img_BiggestRegion, distanceTransform, null, DistType.L2, 5);
-            PushBackDebugInfors(distanceTransform, distanceTransform, "Check Black Chip Region: distanceTransform. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(distanceTransform, distanceTransform, "Check Black Chip Region: distanceTransform. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             CvImage normalizedDistanceTransform = new CvImage();
             CvInvoke.Normalize(distanceTransform, normalizedDistanceTransform, 0, 255, NormType.MinMax, DepthType.Cv8U);
 
-            PushBackDebugInfors(normalizedDistanceTransform, normalizedDistanceTransform, "Check Black Chip Region: Normalize. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(normalizedDistanceTransform, normalizedDistanceTransform, "Check Black Chip Region: Normalize. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             CvImage img_thresholdTransformRegion = new CvImage();
             MagnusOpenCVLib.Threshold2(ref normalizedDistanceTransform, ref img_thresholdTransformRegion, 245, 255);
-            PushBackDebugInfors(imgSource, img_thresholdTransformRegion, "Check Black Chip Region: img_thresholdTransformRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSource, img_thresholdTransformRegion, "Check Black Chip Region: img_thresholdTransformRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
 
@@ -578,7 +579,7 @@ namespace TapeReelPacking.Source.Algorithm
 
             MagnusOpenCVLib.ExtractExternalContours(ref img_thresholdTransformRegion, ref result, ref contourArray);
             //MagnusOpenCVLib.ConvexHull(contourArray, ref contourArrayHull, ref result, imgSource.Size);
-            PushBackDebugInfors(imgSource, result, "Check Black Chip Region: ConvexHull. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSource, result, "Check Black Chip Region: ConvexHull. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
             List<PointF> listContourPoints = new List<PointF>();
             for (int n = 0; n < contourArray.Size; n++)
@@ -599,7 +600,7 @@ namespace TapeReelPacking.Source.Algorithm
             //    CvInvoke.Rectangle(region_Rect, r, new MCvScalar(255), -1);
             //}
 
-            //PushBackDebugInfors(imgSource, region_Rect, "Check Black Chip Region: region_Rect. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            //PushBackDebugInfors(imgSource, region_Rect, "Check Black Chip Region: region_Rect. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             //timeIns.Restart();
 
 
@@ -652,7 +653,7 @@ namespace TapeReelPacking.Source.Algorithm
                                                                            (int)(4));
 
             CvInvoke.Rectangle(mat_point, rect_center, new MCvScalar(255), -1);
-            PushBackDebugInfors(imgSource, mat_point, "Center Chip Region . (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSource, mat_point, "Center Chip Region . (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
             AddRegionOverlay(ref list_arrayOverlay, mat_point, Colors.Yellow);
 
@@ -661,7 +662,7 @@ namespace TapeReelPacking.Source.Algorithm
             return -(int)ERROR_CODE.OPPOSITE_CHIP;
         }
 
-        public /*static*/ int FindDeviceLocation_Zoom(ref CvImage imgSource, ref List<ArrayOverLay> list_arrayOverlay, ref PointF pCenter, ref PointF pCorner, ref List<DebugInfors> debugInfors, bool bEnableDebug = false)
+        public /*static*/ int FindDeviceLocation_Zoom(ref CvImage imgSource, ref List<ArrayOverLay> list_arrayOverlay, ref PointF pCenter, ref PointF pCorner, ObservableCollection<DebugInfors> debugInfors, bool bEnableDebug = false)
         {
             Stopwatch timeIns = new Stopwatch();
             int nErrorTemp = -(int)ERROR_CODE.NO_PATTERN_FOUND;
@@ -694,26 +695,26 @@ namespace TapeReelPacking.Source.Algorithm
             region_SearchDeviceLocation = CvImage.Zeros(zoomedInImage.Height, zoomedInImage.Width, DepthType.Cv8U, 1);
             CvInvoke.Rectangle(region_SearchDeviceLocation, rectDeviceLocation, new MCvScalar(255), -1);
 
-            PushBackDebugInfors(zoomedInImage, region_SearchDeviceLocation, "Region_SearchDeviceLocationt. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(zoomedInImage, region_SearchDeviceLocation, "Region_SearchDeviceLocationt. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             if (m_DeviceLocationParameter.m_L_ThresholdType.GetHashCode() == (int)THRESHOLD_TYPE.BINARY_THRESHOLD)
             {
 
                 MagnusOpenCVLib.Threshold2(ref blurredImage, ref img_thresholdRegion, m_DeviceLocationParameter.m_L_lowerThreshold, m_DeviceLocationParameter.m_L_upperThreshold);
-                PushBackDebugInfors(imgSource, img_thresholdRegion, "img_thresholdRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                PushBackDebugInfors(imgSource, img_thresholdRegion, "img_thresholdRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 timeIns.Restart();
 
                 //CvImage mat_IntersectionRegion = new CvImage();
                 CvInvoke.BitwiseAnd(img_thresholdRegion, region_SearchDeviceLocation, img_thresholdRegion);
-                PushBackDebugInfors(imgSource, img_thresholdRegion, "region after Intersection with Device Location ROI (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                PushBackDebugInfors(imgSource, img_thresholdRegion, "region after Intersection with Device Location ROI (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 timeIns.Restart();
             }
             else//if (m_DeviceLocationParameter.m_L_ThresholdType.GetHashCode() == (int)THRESHOLD_TYPE.VAR_THRESHOLD)
             {
                 //CvImage region_VarThreshold = new CvImage();
                 MagnusOpenCVLib.VarThresholding(ref blurredImage, ref img_thresholdRegion, (int)m_DeviceLocationParameter.m_L_ObjectColor, 2 * ((int)(m_DeviceLocationParameter.m_L_MinWidthDevice / 10)) + 3, ref region_SearchDeviceLocation, m_DeviceLocationParameter.m_L_upperThreshold);
-                PushBackDebugInfors(imgSource, img_thresholdRegion, "VarThresholding. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                PushBackDebugInfors(imgSource, img_thresholdRegion, "VarThresholding. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 timeIns.Restart();
             }
 
@@ -730,58 +731,58 @@ namespace TapeReelPacking.Source.Algorithm
 
                 CvImage img_MophoRegion = new CvImage();
                 MagnusOpenCVLib.OpeningCircle(ref img_thresholdRegion, ref img_MophoRegion, 2);
-                PushBackDebugInfors(imgSource, img_MophoRegion, "Outer region after Opening. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                PushBackDebugInfors(imgSource, img_MophoRegion, "Outer region after Opening. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 timeIns.Restart();
 
                 CvImage img_MophoRegionEnd = new CvImage();
 
                 MagnusOpenCVLib.ClosingCircle_Magnus(ref img_MophoRegion, ref img_MophoRegionEnd, m_DeviceLocationParameter.m_L_DilationMask);
-                PushBackDebugInfors(imgSource, img_MophoRegionEnd, "Outer region after ClosingCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                PushBackDebugInfors(imgSource, img_MophoRegionEnd, "Outer region after ClosingCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 timeIns.Restart();
 
                 //MagnusOpenCVLib.ClosingCircle(ref img_MophoRegion, ref img_MophoRegionEnd, m_DeviceLocationParameter.m_L_DilationMask);
-                //PushBackDebugInfors(imgSource, img_MophoRegionEnd, "Outer region after ClosingCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                //PushBackDebugInfors(imgSource, img_MophoRegionEnd, "Outer region after ClosingCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 //timeIns.Restart();
 
                 ////if ( (int)(m_DeviceLocationParameter.m_L_DilationMask) < 6)
                 ////{
                 ////    MagnusOpenCVLib.ClosingCircle(ref img_MophoRegion, ref img_MophoRegionEnd, m_DeviceLocationParameter.m_L_DilationMask);
-                ////    PushBackDebugInfors(imgSource, img_MophoRegionEnd, "Outer region after ClosingCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                ////    PushBackDebugInfors(imgSource, img_MophoRegionEnd, "Outer region after ClosingCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 ////    timeIns.Restart();
                 ////}
                 ////else
                 ////{
                 //    CvImage img_MophoRegion2 = new CvImage();
                 //    MagnusOpenCVLib.DilationCircle(ref img_MophoRegion, ref img_MophoRegion2, (int)(m_DeviceLocationParameter.m_L_DilationMask / 3));
-                //    //PushBackDebugInfors(imgSource, img_MophoRegion2, "Outer region after ClosingCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                //    //PushBackDebugInfors(imgSource, img_MophoRegion2, "Outer region after ClosingCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 //    //timeIns.Restart();
 
                 //    CvImage img_MophoRegion3 = new CvImage();
                 //    MagnusOpenCVLib.DilationCircle(ref img_MophoRegion2, ref img_MophoRegion3, (int)(m_DeviceLocationParameter.m_L_DilationMask / 3));
-                //    //PushBackDebugInfors(imgSource, img_MophoRegion3, "Outer region after ClosingCircle 1. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                //    //PushBackDebugInfors(imgSource, img_MophoRegion3, "Outer region after ClosingCircle 1. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 //    //timeIns.Restart();
 
 
                 //    CvImage img_MophoRegion4 = new CvImage();
                 //    MagnusOpenCVLib.DilationCircle(ref img_MophoRegion3, ref img_MophoRegion4, (int)(m_DeviceLocationParameter.m_L_DilationMask / 3));
-                //    //PushBackDebugInfors(imgSource, img_MophoRegion4, "Outer region after ClosingCircle 2. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                //    //PushBackDebugInfors(imgSource, img_MophoRegion4, "Outer region after ClosingCircle 2. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 //    //timeIns.Restart();
 
 
                 //    CvImage img_MophoRegion5 = new CvImage();
                 //    MagnusOpenCVLib.ErosionCircle(ref img_MophoRegion4, ref img_MophoRegion5, (int)(m_DeviceLocationParameter.m_L_DilationMask / 3));
-                //    //PushBackDebugInfors(imgSource, img_MophoRegion5, "Outer region after ClosingCircle 3. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                //    //PushBackDebugInfors(imgSource, img_MophoRegion5, "Outer region after ClosingCircle 3. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 //    //timeIns.Restart();
 
 
                 //    CvImage img_MophoRegion6 = new CvImage();
                 //    MagnusOpenCVLib.ErosionCircle(ref img_MophoRegion5, ref img_MophoRegion6, (int)(m_DeviceLocationParameter.m_L_DilationMask / 3));
-                //    //PushBackDebugInfors(imgSource, img_MophoRegion6, "Outer region after ClosingCircle 3. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                //    //PushBackDebugInfors(imgSource, img_MophoRegion6, "Outer region after ClosingCircle 3. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 //    //timeIns.Restart();
 
                 //    CvImage img_MophoRegion7 = new CvImage();
                 //    MagnusOpenCVLib.ErosionCircle(ref img_MophoRegion6, ref img_MophoRegionEnd, (int)(m_DeviceLocationParameter.m_L_DilationMask / 3));
-                //    PushBackDebugInfors(imgSource, img_MophoRegionEnd, "Outer region after ClosingCircle 3. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                //    PushBackDebugInfors(imgSource, img_MophoRegionEnd, "Outer region after ClosingCircle 3. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 //    timeIns.Restart();
                 //    //}
 
@@ -790,7 +791,7 @@ namespace TapeReelPacking.Source.Algorithm
                 CvImage mat_selectedtRegions = new CvImage();
 
                 MagnusOpenCVLib.SelectRegion(ref img_MophoRegionEnd, ref mat_selectedtRegions, ref rect_SelectRectangle, (int)(m_DeviceLocationParameter.m_L_MinWidthDevice * m_DeviceLocationParameter.m_L_ScaleImageRatio), (int)(m_DeviceLocationParameter.m_L_MinHeightDevice * m_DeviceLocationParameter.m_L_ScaleImageRatio));
-                PushBackDebugInfors(imgSource, mat_selectedtRegions, "Outer region after SelectRegion with Width and Height. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                PushBackDebugInfors(imgSource, mat_selectedtRegions, "Outer region after SelectRegion with Width and Height. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 timeIns.Restart();
 
                 CvInvoke.FindNonZero(mat_selectedtRegions, point_regions);
@@ -799,14 +800,14 @@ namespace TapeReelPacking.Source.Algorithm
 
                 CvImage mat_FillUpBlackRegion = new CvImage();
                 MagnusOpenCVLib.FillUp(ref mat_selectedtRegions, ref mat_FillUpBlackRegion);
-                PushBackDebugInfors(imgSource, mat_FillUpBlackRegion, "Outer region after FillUp Select Region. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                PushBackDebugInfors(imgSource, mat_FillUpBlackRegion, "Outer region after FillUp Select Region. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 timeIns.Restart();
 
                 // Add offset Outer = 3
                 int nInnerOffset = 5;
                 CvImage mat_OffsetOuterRegion = new CvImage();
                 MagnusOpenCVLib.ErosionCircle(ref mat_FillUpBlackRegion, ref mat_OffsetOuterRegion, nInnerOffset);
-                PushBackDebugInfors(imgSource, mat_OffsetOuterRegion, "Outer region after offset. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                PushBackDebugInfors(imgSource, mat_OffsetOuterRegion, "Outer region after offset. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 timeIns.Restart();
 
 
@@ -814,21 +815,21 @@ namespace TapeReelPacking.Source.Algorithm
                 ////  segment single chip region
                 CvImage img_thresholdInnerRegion = new CvImage();
                 MagnusOpenCVLib.Threshold2(ref zoomedInImage, ref img_thresholdInnerRegion, m_DeviceLocationParameter.m_L_lowerThresholdInnerChip, m_DeviceLocationParameter.m_L_upperThresholdInnerChip);
-                PushBackDebugInfors(imgSource, img_thresholdInnerRegion, "Inner threshold Region. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                PushBackDebugInfors(imgSource, img_thresholdInnerRegion, "Inner threshold Region. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 timeIns.Restart();
                 CvImage mat_InnerChipRegion = new CvImage();
                 CvInvoke.BitwiseAnd(img_thresholdInnerRegion, mat_OffsetOuterRegion, mat_InnerChipRegion);
-                PushBackDebugInfors(imgSource, mat_InnerChipRegion, "Inner threshold region after Intersection with Black FillUp Region (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                PushBackDebugInfors(imgSource, mat_InnerChipRegion, "Inner threshold region after Intersection with Black FillUp Region (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 timeIns.Restart();
 
                 CvImage mat_InnerChipFillUpRegion = new CvImage();
                 MagnusOpenCVLib.FillUp(ref mat_InnerChipRegion, ref mat_InnerChipFillUpRegion);
-                PushBackDebugInfors(imgSource, mat_InnerChipFillUpRegion, "Inner Chip Region after FillUp. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                PushBackDebugInfors(imgSource, mat_InnerChipFillUpRegion, "Inner Chip Region after FillUp. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 timeIns.Restart();
 
                 CvImage mat_InnerChipOpeningRegion = new CvImage();
                 MagnusOpenCVLib.OpeningCircle(ref mat_InnerChipFillUpRegion, ref mat_InnerChipOpeningRegion, m_DeviceLocationParameter.m_L_OpeningMask);
-                PushBackDebugInfors(imgSource, mat_InnerChipOpeningRegion, "Inner Chip Region after Opening. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                PushBackDebugInfors(imgSource, mat_InnerChipOpeningRegion, "Inner Chip Region after Opening. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 timeIns.Restart();
 
                 CvImage mat_BiggestInnerChipRegion;
@@ -847,7 +848,7 @@ namespace TapeReelPacking.Source.Algorithm
                     timeIns.Restart();
                     CvImage mat_BiggestInnerChipRegion_temp = new CvImage();
                     MagnusOpenCVLib.SelectBiggestRegion(ref mat_InnerChipOpeningRegion, ref mat_BiggestInnerChipRegion_temp);
-                    PushBackDebugInfors(imgSource, mat_BiggestInnerChipRegion_temp, "Inner Chip Region after select BiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                    PushBackDebugInfors(imgSource, mat_BiggestInnerChipRegion_temp, "Inner Chip Region after select BiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
 
 
                     // Find none zero first, if zero => return
@@ -869,12 +870,12 @@ namespace TapeReelPacking.Source.Algorithm
                     timeIns.Restart();
                     mat_BiggestInnerChipRegion = new CvImage();
                     MagnusOpenCVLib.OpenningCircle_Magnus(ref mat_BiggestInnerChipRegion_temp, ref mat_BiggestInnerChipRegion, (int)(m_DeviceLocationParameter.m_L_MinWidthDevice * m_DeviceLocationParameter.m_L_ScaleImageRatio / 4));
-                    PushBackDebugInfors(imgSource, mat_BiggestInnerChipRegion, "biggest Chip Region after opening. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                    PushBackDebugInfors(imgSource, mat_BiggestInnerChipRegion, "biggest Chip Region after opening. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                     timeIns.Restart();
 
 
                     CvInvoke.BitwiseXor(mat_InnerChipOpeningRegion, mat_BiggestInnerChipRegion_temp, mat_InnerChipOpeningRegion);
-                    PushBackDebugInfors(imgSource, mat_InnerChipOpeningRegion, "Inner Chip Region after Remove Biggest region. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                    PushBackDebugInfors(imgSource, mat_InnerChipOpeningRegion, "Inner Chip Region after Remove Biggest region. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                     timeIns.Restart();
 
 
@@ -892,7 +893,7 @@ namespace TapeReelPacking.Source.Algorithm
                     if (Math.Abs(rotateRect_Device.Size.Width / rotateRect_Device.Size.Height - m_DeviceLocationParameter.m_L_TemplateRoi.Width / m_DeviceLocationParameter.m_L_TemplateRoi.Height) > 0.2)
                         continue;
 
-                    int nError = FindNearestPoints_Debug(zoomedInImage, rotateRect_Device, ref cornerPointTemp, ref list_arrayOverlay, ref debugInfors, bEnableDebug);
+                    int nError = FindNearestPoints_Debug(zoomedInImage, rotateRect_Device, ref cornerPointTemp, ref list_arrayOverlay,debugInfors, bEnableDebug);
                     Point pCenterTemp = new Point((int)rotateRect_Device.Center.X, (int)rotateRect_Device.Center.Y);
                     if (nError < 0)
                     {
@@ -931,20 +932,20 @@ namespace TapeReelPacking.Source.Algorithm
             {
                 CvImage img_MophoRegion = new CvImage();
                 MagnusOpenCVLib.OpeningCircle(ref img_thresholdRegion, ref img_MophoRegion, m_DeviceLocationParameter.m_L_OpeningMask);
-                PushBackDebugInfors(imgSource, img_MophoRegion, "Outer region after Opening. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                PushBackDebugInfors(imgSource, img_MophoRegion, "Outer region after Opening. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 timeIns.Restart();
 
 
                 CvImage img_MophoRegion2 = new CvImage();
                 MagnusOpenCVLib.ClosingCircle(ref img_MophoRegion, ref img_MophoRegion2, m_DeviceLocationParameter.m_L_DilationMask);
-                PushBackDebugInfors(imgSource, img_MophoRegion2, "Outer region after ClosingCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                PushBackDebugInfors(imgSource, img_MophoRegion2, "Outer region after ClosingCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 timeIns.Restart();
 
                 List<Rectangle> rect_SelectRectangle = new List<Rectangle>();
                 CvImage mat_BiggestInnerChipRegion = new CvImage();
 
                 MagnusOpenCVLib.SelectBiggestRegion(ref img_MophoRegion2, ref mat_BiggestInnerChipRegion);
-                PushBackDebugInfors(imgSource, mat_BiggestInnerChipRegion, "Inner Chip Region after select BiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+                PushBackDebugInfors(imgSource, mat_BiggestInnerChipRegion, "Inner Chip Region after select BiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
                 timeIns.Restart();
 
                 CvInvoke.FindNonZero(mat_BiggestInnerChipRegion, point_regions);
@@ -972,7 +973,7 @@ namespace TapeReelPacking.Source.Algorithm
                         break;
                     }
                 }
-                //p_CornerPoint_Temp = FindNearestPoints_Debug(zoomedInImage, rotateRect_Device, ref list_arrayOverlay, ref debugInfors, bEnableDebug);
+                //p_CornerPoint_Temp = FindNearestPoints_Debug(zoomedInImage, rotateRect_Device, ref list_arrayOverlay,debugInfors, bEnableDebug);
                 //if (p_CornerPoint_Temp.X + p_CornerPoint_Temp.Y == 0)
                 //    return -(int)ERROR_CODE.LABEL_FAIL;
 
@@ -990,7 +991,7 @@ namespace TapeReelPacking.Source.Algorithm
                 for (int nPVIAreaIndex = 0; nPVIAreaIndex < m_DeviceLocationParameter.m_DR_NumberROILocation; nPVIAreaIndex++)
                 {
                     nResult[nPVIAreaIndex] = 0;
-                    LabelMarking_Inspection(zoomedInImage, nPVIAreaIndex, p_CenterPoint_Temp, p_CornerPoint_Temp, ref nResult[nPVIAreaIndex], ref list_arrayOverlay, ref debugInfors, bEnableDebug);
+                    LabelMarking_Inspection(zoomedInImage, nPVIAreaIndex, p_CenterPoint_Temp, p_CornerPoint_Temp, ref nResult[nPVIAreaIndex], ref list_arrayOverlay,debugInfors, bEnableDebug);
                     if (nResult[nPVIAreaIndex] < 0)
                     {
                         nErrorTemp = nResult[nPVIAreaIndex];
@@ -1017,7 +1018,7 @@ namespace TapeReelPacking.Source.Algorithm
                 // Black Chip
                 PointF pCenterBlackChip = new PointF(0, 0);
                 int nErrorBlackChip = -(int)ERROR_CODE.PASS;
-                nErrorBlackChip = FindBlackChip(ref zoomedInImage, ref region_SearchDeviceLocation, ref pCenterBlackChip, ref list_arrayOverlay, ref debugInfors, bEnableDebug);
+                nErrorBlackChip = FindBlackChip(ref zoomedInImage, ref region_SearchDeviceLocation, ref pCenterBlackChip, ref list_arrayOverlay,debugInfors, bEnableDebug);
 
                 //CvInvoke.WaitKey(0);
 
@@ -1055,14 +1056,14 @@ namespace TapeReelPacking.Source.Algorithm
             Point pCenterOverLay = new Point((int)(pCenter.X * m_DeviceLocationParameter.m_L_ScaleImageRatio), (int)(pCenter.Y * m_DeviceLocationParameter.m_L_ScaleImageRatio));
 
             CvInvoke.Circle(mat_point, pCenterOverLay, 11, new MCvScalar(255), 3);
-            PushBackDebugInfors(imgSource, mat_point, "Center Chip Region . (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSource, mat_point, "Center Chip Region . (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
             AddRegionOverlay(ref list_arrayOverlay, mat_point, Colors.Blue);
 
             return nErrorTemp;
         }
 
-        public int FindNearestPoints_Debug(CvImage imgSourceInput, RotatedRect rotateRect_Device, ref PointF pCornerOut, ref List<ArrayOverLay> list_arrayOverlay, ref List<DebugInfors> debugInfors, bool bEnableDebug)
+        public int FindNearestPoints_Debug(CvImage imgSourceInput, RotatedRect rotateRect_Device, ref PointF pCornerOut, ref List<ArrayOverLay> list_arrayOverlay, ObservableCollection<DebugInfors> debugInfors, bool bEnableDebug)
         {
             Stopwatch timeIns = new Stopwatch();
             CvPointArray regionPoints = new CvPointArray();
@@ -1076,12 +1077,12 @@ namespace TapeReelPacking.Source.Algorithm
             MagnusOpenCVLib.GenRectangle2(rec_region2, rotateRect_Device, new MCvScalar(255), 1);
 
 
-            PushBackDebugInfors(imgSourceInput, rec_region2, "Inner region after GenRectangle2. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, rec_region2, "Inner region after GenRectangle2. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             AddRegionOverlay(ref list_arrayOverlay, rec_region2, Colors.Yellow);
 
             CvImage rec_regionChipFillup = new CvImage();
             MagnusOpenCVLib.FillUp(ref rec_region2, ref rec_regionChipFillup);
-            PushBackDebugInfors(imgSourceInput, rec_regionChipFillup, "Inner region after FillUp. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, rec_regionChipFillup, "Inner region after FillUp. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
 
             ////////////////////////////////
             // Begin Attract corner of chip///
@@ -1091,22 +1092,22 @@ namespace TapeReelPacking.Source.Algorithm
             timeIns.Restart();
             MagnusOpenCVLib.Threshold2(ref imgSourceInput, ref mat_Thresholdregion, m_DeviceLocationParameter.m_L_lowerThresholdInnerChip, m_DeviceLocationParameter.m_L_upperThresholdInnerChip);
             CvInvoke.BitwiseAnd(mat_Thresholdregion, rec_regionChipFillup, mat_Thresholdregion);
-            PushBackDebugInfors(imgSourceInput, mat_Thresholdregion, "Inner rect Threshold region . (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, mat_Thresholdregion, "Inner rect Threshold region . (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             CvImage mat_ThresholdFillupRegion = new CvImage();
             MagnusOpenCVLib.FillUp(ref mat_Thresholdregion, ref mat_ThresholdFillupRegion);
-            PushBackDebugInfors(imgSourceInput, mat_ThresholdFillupRegion, "Inner Threshold Region after FillUp. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, mat_ThresholdFillupRegion, "Inner Threshold Region after FillUp. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             CvImage mat_openingRegionTemp = new CvImage();
             MagnusOpenCVLib.OpeningCircle(ref mat_ThresholdFillupRegion, ref mat_openingRegionTemp, (int)(m_DeviceLocationParameter.m_L_OpeningMask * m_DeviceLocationParameter.m_L_ScaleImageRatio) + 1);
-            PushBackDebugInfors(imgSourceInput, mat_openingRegionTemp, "Inner Region after OpeningCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, mat_openingRegionTemp, "Inner Region after OpeningCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             CvImage mat_BiggestRegion = new CvImage();
             MagnusOpenCVLib.SelectBiggestRegion(ref mat_openingRegionTemp, ref mat_BiggestRegion);
-            PushBackDebugInfors(imgSourceInput, mat_BiggestRegion, "Inner Region after SelectBiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, mat_BiggestRegion, "Inner Region after SelectBiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             CvInvoke.FindNonZero(mat_BiggestRegion, regionPoints);
@@ -1120,7 +1121,7 @@ namespace TapeReelPacking.Source.Algorithm
             //Detect Special Chip corner
             CvImage mat_CornerChipRegion = new CvImage();
             CvInvoke.BitwiseXor(rec_regionChipFillup, mat_BiggestRegion, mat_CornerChipRegion);
-            PushBackDebugInfors(imgSourceInput, mat_CornerChipRegion, "Corner Chip Region after sub inner region and inner rect. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, mat_CornerChipRegion, "Corner Chip Region after sub inner region and inner rect. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             // Need add Offset Inner
@@ -1131,20 +1132,20 @@ namespace TapeReelPacking.Source.Algorithm
             else
                 MagnusOpenCVLib.DilationRectangle(ref rec_regionChipFillup, ref rec_regionChipFillup_Offset, Math.Abs(nInnerOffset), Math.Abs(nInnerOffset));
 
-            PushBackDebugInfors(imgSourceInput, rec_regionChipFillup_Offset, "Rectangle Chip after offset 5 pixel. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, rec_regionChipFillup_Offset, "Rectangle Chip after offset 5 pixel. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
             CvInvoke.BitwiseAnd(rec_regionChipFillup_Offset, mat_CornerChipRegion, mat_CornerChipRegion);
-            PushBackDebugInfors(imgSourceInput, mat_CornerChipRegion, "Corner Chip Region after intersection with offset rectangle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, mat_CornerChipRegion, "Corner Chip Region after intersection with offset rectangle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             CvImage mat_openingCornerRegion = new CvImage();
             MagnusOpenCVLib.OpeningCircle(ref mat_CornerChipRegion, ref mat_openingCornerRegion, (int)(m_DeviceLocationParameter.m_L_OpeningMask * m_DeviceLocationParameter.m_L_ScaleImageRatio / 2 + 1));
-            PushBackDebugInfors(imgSourceInput, mat_openingCornerRegion, "Corner Chip Region after OpeningCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, mat_openingCornerRegion, "Corner Chip Region after OpeningCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             CvImage mat_CornerBiggestRegion = new CvImage();
             MagnusOpenCVLib.SelectBiggestRegion(ref mat_openingCornerRegion, ref mat_CornerBiggestRegion);
-            PushBackDebugInfors(imgSourceInput, mat_CornerBiggestRegion, "Corner Chip Region after SelectBiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, mat_CornerBiggestRegion, "Corner Chip Region after SelectBiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
 
@@ -1167,7 +1168,7 @@ namespace TapeReelPacking.Source.Algorithm
                     minDistance = distance_Square;
                 }
             }
-            PushBackDebugInfors(imgSourceInput, mat_CornerBiggestRegion, $"Corner Chip {pCornerOut.X}, {pCornerOut.Y} Region after SelectBiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, mat_CornerBiggestRegion, $"Corner Chip {pCornerOut.X}, {pCornerOut.Y} Region after SelectBiggestRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             pCornerOut = points[nminIndex];
@@ -1175,7 +1176,7 @@ namespace TapeReelPacking.Source.Algorithm
         }
 
 
-        public void LabelMarking_Inspection(CvImage imgSourceInput, int nPVIAreaIndex, PointF pCenter, PointF pCorner, ref int nResultOutput, ref List<ArrayOverLay> list_arrayOverlay, ref List<DebugInfors> debugInfors, bool bEnableDebug)
+        public void LabelMarking_Inspection(CvImage imgSourceInput, int nPVIAreaIndex, PointF pCenter, PointF pCorner, ref int nResultOutput, ref List<ArrayOverLay> list_arrayOverlay, ObservableCollection<DebugInfors> debugInfors, bool bEnableDebug)
         {
             if (m_SurfaceDefectParameter[nPVIAreaIndex].m_DR_AreaEnable == false)
             {
@@ -1201,14 +1202,14 @@ namespace TapeReelPacking.Source.Algorithm
 
             double dDeltaAngle = Track.MagnusMatrix.CalculateShiftXYAngle(pCenter, pCorner, pCenterTeach, pCornerTeach);
 
-            PushBackDebugInfors(imgSourceInput, imgSourceInput, $"pCorner {pCorner.X}, {pCorner.Y}, pCornerTeach {pCornerTeach.X}, {pCornerTeach.Y}", bEnableDebug, ref debugInfors);
-            PushBackDebugInfors(imgSourceInput, imgSourceInput, $"pCenter {pCenter.X}, {pCenter.Y}, pCenterTeach {pCenterTeach.X},  {pCenterTeach.Y}", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, imgSourceInput, $"pCorner {pCorner.X}, {pCorner.Y}, pCornerTeach {pCornerTeach.X}, {pCornerTeach.Y}", bEnableDebug,debugInfors);
+            PushBackDebugInfors(imgSourceInput, imgSourceInput, $"pCenter {pCenter.X}, {pCenter.Y}, pCenterTeach {pCenterTeach.X},  {pCenterTeach.Y}", bEnableDebug,debugInfors);
 
             double fShiftX = pCenter.X - m_DeviceLocationResult.m_dCenterDevicePoint.X * dScale;
             double fShiftY = pCenter.Y - m_DeviceLocationResult.m_dCenterDevicePoint.Y * dScale;
 
             CvImage shiftImage = MagnusOpenCVLib.RotateShiftImage(ref imgSourceInput, pCenter, (float)dDeltaAngle, -(float)fShiftX, -(float)fShiftY);
-            PushBackDebugInfors(shiftImage, region_PVIArea, $"Area {nPVIAreaIndex + 1} shift Image. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(shiftImage, region_PVIArea, $"Area {nPVIAreaIndex + 1} shift Image. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             //dDeltaAngle = Track.MagnusMatrix.CalculateShiftXYAngle(pCenterTeach, pCornerTeach, pCenter, pCorner);
@@ -1217,29 +1218,29 @@ namespace TapeReelPacking.Source.Algorithm
 
             PointF pCenterTemp = new PointF(rectPVIArea.X + rectPVIArea.Width / 2, rectPVIArea.Y + rectPVIArea.Height / 2);
             CvImage shiftRegion = MagnusOpenCVLib.RotateShiftImage(ref region_PVIArea, pCenterTeach, -(float)dDeltaAngle, (float)fShiftX, (float)fShiftY);
-            PushBackDebugInfors(imgSourceInput, shiftRegion, $"Area {nPVIAreaIndex + 1} shift Image. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, shiftRegion, $"Area {nPVIAreaIndex + 1} shift Image. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             //CvImage AbsDiffImage = new CvImage();
             //CvInvoke.AbsDiff(m_TeachImage.Gray, shiftImage, AbsDiffImage);
-            //PushBackDebugInfors(AbsDiffImage, region_PVIArea, $"Area {nPVIAreaIndex + 1} Subtract teach and inspection image. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            //PushBackDebugInfors(AbsDiffImage, region_PVIArea, $"Area {nPVIAreaIndex + 1} Subtract teach and inspection image. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             //timeIns.Restart();
 
             // Image Processing
             CvImage img_thresholdRegion = new CvImage();
             MagnusOpenCVLib.Threshold2(ref imgSourceInput, ref img_thresholdRegion, m_SurfaceDefectParameter[nPVIAreaIndex].m_LD_lowerThreshold, m_SurfaceDefectParameter[nPVIAreaIndex].m_LD_upperThreshold);
-            PushBackDebugInfors(imgSourceInput, img_thresholdRegion, $"Area {nPVIAreaIndex + 1} img_thresholdRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, img_thresholdRegion, $"Area {nPVIAreaIndex + 1} img_thresholdRegion. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             //CvImage mat_IntersectionRegion = new CvImage();
             CvInvoke.BitwiseAnd(img_thresholdRegion, shiftRegion, img_thresholdRegion);
-            PushBackDebugInfors(imgSourceInput, img_thresholdRegion, $"Area {nPVIAreaIndex + 1} region after Intersection with teach region (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, img_thresholdRegion, $"Area {nPVIAreaIndex + 1} region after Intersection with teach region (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
 
             CvImage img_MophoRegion = new CvImage();
             MagnusOpenCVLib.ClosingCircle(ref img_thresholdRegion, ref img_MophoRegion, m_SurfaceDefectParameter[nPVIAreaIndex].m_LD_DilationMask);
-            PushBackDebugInfors(imgSourceInput, img_MophoRegion, $"Area {nPVIAreaIndex + 1}  region after ClosingCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, img_MophoRegion, $"Area {nPVIAreaIndex + 1}  region after ClosingCircle. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
             CvImage img_MophoRegion2 = new CvImage();
@@ -1248,7 +1249,7 @@ namespace TapeReelPacking.Source.Algorithm
             List<int> Cols = new List<int>();
             int nArea = MagnusOpenCVLib.GetArea(ref img_MophoRegion2);
             //MagnusOpenCVLib.GetRegionPoints(ref img_MophoRegion2, Rows, Cols);
-            PushBackDebugInfors(imgSourceInput, img_MophoRegion2, $"Area {nPVIAreaIndex + 1}  region after Opening. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug, ref debugInfors);
+            PushBackDebugInfors(imgSourceInput, img_MophoRegion2, $"Area {nPVIAreaIndex + 1}  region after Opening. (" + timeIns.ElapsedMilliseconds.ToString() + " ms)", bEnableDebug,debugInfors);
             timeIns.Restart();
 
 
@@ -1492,7 +1493,7 @@ namespace TapeReelPacking.Source.Algorithm
             ////pPolygon.Add(po4);
             ////pPolygon.Add(pCenter);
             ////List<Point> p_Regionpolygon_temp = RotatePolygon(pPolygon, -nAngleOutput, pCenter.X, pCenter.Y);
-            //FindNearestPoints_Debug(m_TeachImage.Gray, ref mat_DeviceLocationRegion, rotateRect_Device, ref debugInfors, bEnableDebug);
+            //FindNearestPoints_Debug(m_TeachImage.Gray, ref mat_DeviceLocationRegion, rotateRect_Device,debugInfors, bEnableDebug);
 
             //nCornerIndex = FindNearestPoints_Debug(m_TeachImage.Gray, ref mat_DeviceLocationRegion, rectMatchingPosition, p_Regionpolygon_temp, -(float)nAngleOutput, null, false);
             return 0;

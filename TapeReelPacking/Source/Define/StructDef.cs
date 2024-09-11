@@ -164,13 +164,18 @@ namespace TapeReelPacking.Source.Define
         public string brankID { set; get; } = "1";
     }
 
-    public struct DebugInfors
+    public class DebugInfors:stepDebugMessage
     {
         public Mat mat_Image { get; set; }
         public Mat mat_Region { get; set; }
+
+    };
+    public class stepDebugMessage
+    {
         public string str_Message { get; set; }
         public string str_Step { get; set; }
-    };
+    }
+
 
     public struct LocationReference
     {
@@ -294,7 +299,7 @@ namespace TapeReelPacking.Source.Define
                 //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 //{
 
-                //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Track{nTrack} Save To Excel Fail {e}!.", (int)ERROR_CODE.LABEL_FAIL);
+                //    OutputLogVM.AddLineOutputLog($"Track{nTrack} Save To Excel Fail {e}!.", (int)ERROR_CODE.LABEL_FAIL);
                 //});
             }
 
@@ -396,7 +401,7 @@ namespace TapeReelPacking.Source.Define
                 //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 //{
 
-                //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Track{nTrack} Save To Excel Fail {e}!.", (int)ERROR_CODE.LABEL_FAIL);
+                //    OutputLogVM.AddLineOutputLog($"Track{nTrack} Save To Excel Fail {e}!.", (int)ERROR_CODE.LABEL_FAIL);
                 //});
             }
         }
@@ -491,7 +496,7 @@ namespace TapeReelPacking.Source.Define
                 //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 //{
 
-                //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Track{nTrack} Save To Excel Fail {e}!.", (int)ERROR_CODE.LABEL_FAIL);
+                //    OutputLogVM.AddLineOutputLog($"Track{nTrack} Save To Excel Fail {e}!.", (int)ERROR_CODE.LABEL_FAIL);
                 //});
             }
 

@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using EasyModbus;
 using TapeReelPacking.Source.Helper;
 using TapeReelPacking.UI.UserControls.View;
+using TapeReelPacking.UI.UserControls.ViewModel;
 namespace TapeReelPacking.Source.Hardware
 {
     /// <summary>
@@ -120,16 +121,16 @@ namespace TapeReelPacking.Source.Hardware
             {
                 if (m_modbusClient.Connected)
                 {
-                    MainWindow.mainWindow.label_PLCCOMM_Status.Background = new SolidColorBrush(Colors.Green);
-                    MainWindow.mainWindow.label_PLCCOMM_Status.Content = $"{m_strCommAddress}:{m_PLCPort}";
-                    MainWindow.mainWindow.label_PLCCOMM_Status.Foreground = new SolidColorBrush(Colors.Black);
+                    //MainWindow.mainWindow.label_PLCCOMM_Status.Background = new SolidColorBrush(Colors.Green);
+                    //MainWindow.mainWindow.label_PLCCOMM_Status.Content = $"{m_strCommAddress}:{m_PLCPort}";
+                    //MainWindow.mainWindow.label_PLCCOMM_Status.Foreground = new SolidColorBrush(Colors.Black);
                     button_PLC_Connect.Background = new SolidColorBrush(Colors.Green);
                 }
                 else
                 {
-                    MainWindow.mainWindow.label_PLCCOMM_Status.Background = new SolidColorBrush(Colors.Red);
-                    MainWindow.mainWindow.label_PLCCOMM_Status.Content = $"{m_strCommAddress}:{m_PLCPort}";
-                    MainWindow.mainWindow.label_PLCCOMM_Status.Foreground = new SolidColorBrush(Colors.Black);
+                    //MainWindow.mainWindow.label_PLCCOMM_Status.Background = new SolidColorBrush(Colors.Red);
+                    //MainWindow.mainWindow.label_PLCCOMM_Status.Content = $"{m_strCommAddress}:{m_PLCPort}";
+                    //MainWindow.mainWindow.label_PLCCOMM_Status.Foreground = new SolidColorBrush(Colors.Black);
                     button_PLC_Connect.Background = new SolidColorBrush(Colors.Red);
 
                 }
@@ -145,7 +146,7 @@ namespace TapeReelPacking.Source.Hardware
         private void btn_SendToPLC_Click(object sender, RoutedEventArgs e)
         {
             int iadr = -1;
-            int nTrack = MainWindow.activeImageDock.trackID;
+            int nTrack = MainWindowVM.activeImageDock.trackID;
 
             if (text_MemoryAdress.Text.Length > 0)
             {
@@ -328,7 +329,7 @@ namespace TapeReelPacking.Source.Hardware
 
         private void button_PLC_Connect_Click(object sender, RoutedEventArgs e)
         {
-            int nTrack = MainWindow.activeImageDock.trackID;
+            int nTrack = MainWindowVM.activeImageDock.trackID;
             if (!m_modbusClient.Connected)
                 try
                 {

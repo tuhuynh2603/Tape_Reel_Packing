@@ -71,14 +71,14 @@ namespace TapeReelPacking.Source.Comm
                     return;
 
 
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                {
+                //System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                //{
 
-                    MainWindow.mainWindow.label_Serial_Comm.Background = new SolidColorBrush(Colors.Red);
-                    MainWindow.mainWindow.label_Serial_Comm.Content = $"{strComm}";
-                    MainWindow.mainWindow.label_Serial_Comm.Foreground = new SolidColorBrush(Colors.Black);
+                //    MainWindow.mainWindow.label_Serial_Comm.Background = new SolidColorBrush(Colors.Red);
+                //    MainWindow.mainWindow.label_Serial_Comm.Content = $"{strComm}";
+                //    MainWindow.mainWindow.label_Serial_Comm.Foreground = new SolidColorBrush(Colors.Black);
 
-                });
+                //});
             };
 
         }

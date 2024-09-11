@@ -17,14 +17,15 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TapeReelPacking.UI.UserControls.ViewModel;
 
-namespace TapeReelPacking.UI.UserControls
+namespace TapeReelPacking.UI.UserControls.View
 {
     /// <summary>
     /// Interaction logic for DefectInfor.xaml
     /// </summary>
-    public partial class DefectInfor : UserControl
+    public partial class StepDebugView : UserControl
     {
-        public DefectInfor()
+
+        public StepDebugView()
         {
             InitializeComponent();
         }
@@ -40,5 +41,7 @@ namespace TapeReelPacking.UI.UserControls
             scv_StepDebugScrollView.ScrollToVerticalOffset(scv_StepDebugScrollView.VerticalOffset - e.Delta);
             e.Handled = true;
         }
+
+
     }
 }

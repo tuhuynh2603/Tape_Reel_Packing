@@ -10,8 +10,8 @@
     <UserControl.DataContext>
         <viewmodel:RecipeManageVM></viewmodel:RecipeManageVM>
     </UserControl.DataContext>
-    
-    <Grid Background="DarkSlateGray">
+
+    <Grid Background="DarkSlateGray" Visibility="{Binding isVisible}">
         <GroupBox Margin="3,0,3,3" Header="Recipe Setting" Foreground="White" FontSize="15">
             <StackPanel Orientation="Vertical" Margin="0,10,5,0">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

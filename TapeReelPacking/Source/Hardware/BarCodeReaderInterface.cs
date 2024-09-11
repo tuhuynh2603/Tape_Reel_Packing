@@ -94,21 +94,21 @@ namespace TapeReelPacking.Source.Hardware
 
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                if (bIsConnected)
-                {
-                    m_BarcodeReader.label_ReaderIP_Address.Content = $"{m_reader.IpAddress}";
-                    m_BarcodeReader.Save.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
-                    MainWindow.mainWindow.label_Barcode_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
-                    MainWindow.mainWindow.label_Barcode_Status.Content = $"{m_reader.IpAddress}";
-                }
-                else
-                {
-                    m_BarcodeReader.label_ReaderIP_Address.Content = $"{m_reader.IpAddress}";
-                    m_BarcodeReader.Save.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Red);
-                    MainWindow.mainWindow.label_Barcode_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Red);
-                    MainWindow.mainWindow.label_Barcode_Status.Content = $"{m_reader.IpAddress}";
+                //if (bIsConnected)
+                //{
+                //    m_BarcodeReader.label_ReaderIP_Address.Content = $"{m_reader.IpAddress}";
+                //    m_BarcodeReader.Save.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
+                //    MainWindow.mainWindow.label_Barcode_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
+                //    MainWindow.mainWindow.label_Barcode_Status.Content = $"{m_reader.IpAddress}";
+                //}
+                //else
+                //{
+                //    m_BarcodeReader.label_ReaderIP_Address.Content = $"{m_reader.IpAddress}";
+                //    m_BarcodeReader.Save.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Red);
+                //    MainWindow.mainWindow.label_Barcode_Status.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Red);
+                //    MainWindow.mainWindow.label_Barcode_Status.Content = $"{m_reader.IpAddress}";
 
-                }
+                //}
             });
         }
 
@@ -161,7 +161,7 @@ namespace TapeReelPacking.Source.Hardware
                 nResult = -(int)ERROR_CODE.PROCESS_ERROR;
             }
 
-            strImageFullName = MainWindow.mainWindow.master.createImageFilePathToSave(nID, nResult, "Barcode", strCurrentLot, strDeviceID);
+            strImageFullName = MainWindowVM.master.createImageFilePathToSave(nID, nResult, "Barcode", strCurrentLot, strDeviceID);
             strFullPathImageOut = strImageFullName;
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
@@ -174,7 +174,7 @@ namespace TapeReelPacking.Source.Hardware
 
                 m_liveviewForm.DownloadRecentImage(strImageFullName);
 
-                MainWindow.mainWindow.master.m_Tracks[1].m_imageViews[0].UpdateNewImageMono(strImageFullName);
+                MainWindowVM.master.m_Tracks[1].m_imageViews[0].UpdateNewImageMono(strImageFullName);
             });
             bIsDownload = false;
             return strDeviceID;
@@ -182,7 +182,7 @@ namespace TapeReelPacking.Source.Hardware
 
         void LoadInforPortNumber()
         {
-            MainWindow.mainWindow.label_Barcode_Status.Content = barCodeipAddress;
+           // MainWindow.mainWindow.label_Barcode_Status.Content = barCodeipAddress;
         }
         public static string GetCommInfo(string key, string defaults)
         {

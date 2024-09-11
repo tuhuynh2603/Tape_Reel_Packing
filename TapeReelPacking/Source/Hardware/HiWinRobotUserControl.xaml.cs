@@ -12,13 +12,14 @@ using System.Windows.Media;
 using static TapeReelPacking.Source.Hardware.SDKHrobot.HiWinRobotInterface;
 using TapeReelPacking.UI.UserControls.View;
 using TapeReelPacking.Source.Helper;
+using TapeReelPacking.UI.UserControls.ViewModel;
 
 namespace TapeReelPacking.Source.Hardware
 {
     /// <summary>
     /// Interaction logic for HiWinRobotUserControl.xaml
     /// </summary>
-    public partial class HiWinRobotUserControl : UserControl, INotifyPropertyChanged
+    public partial class HiWinRobotUserControl : UserControl
     {
         public enum MOVETYPES
         {
@@ -27,10 +28,10 @@ namespace TapeReelPacking.Source.Hardware
         }
 
         public static string m_strAlarmMessage = "";
-        public HiWinRobotUserControl(string strIPAddress)
+        public HiWinRobotUserControl()
         {
             InitializeComponent();
-            _m_txtRobotIPAddress = strIPAddress;
+            _m_txtRobotIPAddress = HiWinRobotInterface.m_strRobotIPAddress;
 
             combo_JogType.Items.Clear();
             combo_JogType.Items.Add("XYZ");
@@ -261,7 +262,7 @@ namespace TapeReelPacking.Source.Hardware
 
         private void toggle_ServoOnOff_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.StopMotor();
+            MainWindowVM.master.m_hiWinRobotInterface.StopMotor();
             LogMessage.LogMessage.WriteToDebugViewer(2, "Stop Move");
 
             int bServoOnOff = HWinRobot.get_motor_state(HiWinRobotInterface.m_RobotConnectID);
@@ -303,7 +304,7 @@ namespace TapeReelPacking.Source.Hardware
             m_List_sequencePointData.Add(HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, d_XYZvalue, d_Jointvalue, m_List_sequencePointData.Count, ""));
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                if (MainWindow.mainWindow.master == null)
+                if (MainWindowVM.master == null)
                     return;
                 dataGrid_all_robot_Positions.ItemsSource = null;
                 dataGrid_all_robot_Positions.ItemsSource = m_List_sequencePointData;
@@ -324,7 +325,7 @@ namespace TapeReelPacking.Source.Hardware
             m_List_sequencePointData.RemoveAt(dataGrid_all_robot_Positions.SelectedIndex);
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                if (MainWindow.mainWindow.master == null)
+                if (MainWindowVM.master == null)
                     return;
                 dataGrid_all_robot_Positions.ItemsSource = null;
                 dataGrid_all_robot_Positions.ItemsSource = m_List_sequencePointData;
@@ -347,7 +348,7 @@ namespace TapeReelPacking.Source.Hardware
             m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex] = HiWinRobotInterface.AddSequencePointInfo(HiWinRobotInterface.m_RobotConnectID, d_XYZvalue, d_Jointvalue, m_List_sequencePointData.Count, m_List_sequencePointData[dataGrid_all_robot_Positions.SelectedIndex].m_PointComment);
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                if (MainWindow.mainWindow.master == null)
+                if (MainWindowVM.master == null)
                     return;
                 dataGrid_all_robot_Positions.ItemsSource = null;
                 dataGrid_all_robot_Positions.ItemsSource = m_List_sequencePointData;
@@ -463,7 +464,7 @@ namespace TapeReelPacking.Source.Hardware
 
         private void button_Stop_Moving_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.StopMotor();
+            MainWindowVM.master.m_hiWinRobotInterface.StopMotor();
             LogMessage.LogMessage.WriteToDebugViewer(2, "Stop Move Clicked");
         }
 
@@ -548,7 +549,7 @@ namespace TapeReelPacking.Source.Hardware
                 if (HWinRobot.get_motion_state(HiWinRobotInterface.m_RobotConnectID) != 1)
                     return;
 
-                //MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(HiWinRobotInterface.m_DeviceID);
+                //MainWindowVM.master.m_hiWinRobotInterface.wait_for_stop_motion(HiWinRobotInterface.m_DeviceID);
                 if (combo_MoveTypes.SelectedIndex == (int)MOVETYPES.AbsoluteMove)
                 {
                     if (combo_JogType.SelectedIndex == (int)JOG_TYPE.JOG_XYZ)
@@ -592,7 +593,7 @@ namespace TapeReelPacking.Source.Hardware
                 }
                 //dValue[nMotorID] += (Double)(Math.Abs(m_nStepRelativeValue) / 1000.0) * ndirection;
 
-                //MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion(HiWinRobotInterface.m_DeviceID);
+                //MainWindowVM.master.m_hiWinRobotInterface.wait_for_stop_motion(HiWinRobotInterface.m_DeviceID);
                 //double[] dValue2 = { 2, 0, 0, 0, 0, 1};
                 //HWinRobot.ptp_rel_pos(HiWinRobotInterface.m_DeviceID, 0, dValue2);
             });
@@ -668,11 +669,11 @@ namespace TapeReelPacking.Source.Hardware
         private void button_RobotConnect_Checked(object sender, RoutedEventArgs e)
         {
             b_button_RobotConnect = (bool)button_RobotConnect.IsChecked;
-            if (MainWindow.mainWindow.master == null)
+            if (MainWindowVM.master == null)
                 return;
 
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.m_strRobotIPAddress = FileHelper.GetCommInfo("Robot Comm::IpAddress", MainWindow.mainWindow.master.m_hiWinRobotInterface.m_strRobotIPAddress, Application.Application.pathRegistry);
-            txtRobotIPAddress = MainWindow.mainWindow.master.m_hiWinRobotInterface.m_strRobotIPAddress;
+            HiWinRobotInterface.m_strRobotIPAddress = FileHelper.GetCommInfo("Robot Comm::IpAddress", HiWinRobotInterface.m_strRobotIPAddress, Application.Application.pathRegistry);
+            txtRobotIPAddress = HiWinRobotInterface.m_strRobotIPAddress;
         }
 
         private void button_RobotConnect_Unchecked(object sender, RoutedEventArgs e)
@@ -704,7 +705,7 @@ namespace TapeReelPacking.Source.Hardware
 
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                if (MainWindow.mainWindow.master == null)
+                if (MainWindowVM.master == null)
                     return;
                 dataGrid_all_robot_Positions.ItemsSource = null;
                 dataGrid_all_robot_Positions.ItemsSource = m_List_sequencePointData;
@@ -748,7 +749,7 @@ namespace TapeReelPacking.Source.Hardware
 
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                if (MainWindow.mainWindow.master == null)
+                if (MainWindowVM.master == null)
                     return;
                 dataGrid_all_robot_Positions.ItemsSource = null;
                 dataGrid_all_robot_Positions.ItemsSource = m_List_sequencePointData;
@@ -793,7 +794,7 @@ namespace TapeReelPacking.Source.Hardware
 
             //System.Windows.Application.Current.Dispatcher.Invoke(() =>
             //{
-            //    if (MainWindow.mainWindow.master == null)
+            //    if (MainWindowVM.master == null)
             //        return;
             //    dataGrid_all_robot_Positions.ItemsSource = null;
             //    dataGrid_all_robot_Positions.ItemsSource = m_List_sequencePointData;
@@ -851,7 +852,7 @@ namespace TapeReelPacking.Source.Hardware
 
             //System.Windows.Application.Current.Dispatcher.Invoke(() =>
             //{
-            //    if (MainWindow.mainWindow.master == null)
+            //    if (MainWindowVM.master == null)
             //        return;
             //    dataGrid_all_robot_Positions.ItemsSource = null;
             //    dataGrid_all_robot_Positions.ItemsSource = m_List_sequencePointData;
@@ -890,8 +891,8 @@ namespace TapeReelPacking.Source.Hardware
             if (HiWinRobotInterface.m_RobotConnectID >= 0)
                 HWinRobot.set_operation_mode(HiWinRobotInterface.m_RobotConnectID, (int)ROBOT_OPERATION_MODE.MODE_MANUAL);
             //HWinRobot.disconnect(HiWinRobotInterface.m_DeviceID);
-            //if(MainWindow.mainWindow.master !=null)
-            //    MainWindow.mainWindow.master.m_hiWinRobotInterface.ReconnectToHIKRobot();
+            //if(MainWindowVM.master !=null)
+            //    MainWindowVM.master.m_hiWinRobotInterface.ReconnectToHIKRobot();
         }
 
         private void check_Auto_Checked(object sender, RoutedEventArgs e)
@@ -899,8 +900,8 @@ namespace TapeReelPacking.Source.Hardware
             if (HiWinRobotInterface.m_RobotConnectID >= 0)
                 HWinRobot.set_operation_mode(HiWinRobotInterface.m_RobotConnectID, (int)ROBOT_OPERATION_MODE.MODE_AUTO);
             //HWinRobot.disconnect(HiWinRobotInterface.m_DeviceID);
-            //if (MainWindow.mainWindow.master != null)
-            //    MainWindow.mainWindow.master.m_hiWinRobotInterface.ReconnectToHIKRobot();
+            //if (MainWindowVM.master != null)
+            //    MainWindowVM.master.m_hiWinRobotInterface.ReconnectToHIKRobot();
         }
 
         private void dataGrid_robot_Output_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -936,8 +937,8 @@ namespace TapeReelPacking.Source.Hardware
 
             while (!m_NextStepCalibration.WaitOne(10))
             {
-                if (MainWindow.mainWindow == null)
-                    return -1;
+                //if (MainWindow.mainWindow == null)
+                //    return -1;
             }
             return 0;
         }
@@ -982,7 +983,7 @@ namespace TapeReelPacking.Source.Hardware
         //        button_Next_Calibration.IsEnabled = false;
         //    });
         //    HomeMove();
-        //    MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.READY_POSITION);
+        //    MainWindowVM.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.READY_POSITION);
         //    // Please put calibration jig to the workplace 
 
 
@@ -997,7 +998,7 @@ namespace TapeReelPacking.Source.Hardware
         //    {
         //        button_Next_Calibration.IsEnabled = false;
         //    });
-        //    if (MainWindow.mainWindow.master.m_Tracks[0].SingleSnap_HIKCamera() < 0)
+        //    if (MainWindowVM.master.m_Tracks[0].SingleSnap_HIKCamera() < 0)
         //    {
         //        MessageBox.Show("Cannot open camera 1. Please Check camera connection again! Stop calibration...", "", MessageBoxButton.OK);
         //        return;
@@ -1005,7 +1006,7 @@ namespace TapeReelPacking.Source.Hardware
 
         //    System.Drawing.PointF[] vision_points;
         //    System.Drawing.PointF[] robot_points = new System.Drawing.PointF[3];
-        //    if(MainWindow.mainWindow.master.m_Tracks[0].CalibrationGet3Points(out vision_points) < 0)
+        //    if(MainWindowVM.master.m_Tracks[0].CalibrationGet3Points(out vision_points) < 0)
         //    {
         //        MessageBox.Show("Calibration sequence failed to get vision points, please check the lower and higher threshold or the lighting...", "", MessageBoxButton.OKCancel);
         //        return;
@@ -1022,7 +1023,7 @@ namespace TapeReelPacking.Source.Hardware
         //    {
         //        button_Next_Calibration.IsEnabled = false;
         //    });
-        //    if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_1) < 0)
+        //    if (MainWindowVM.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_1) < 0)
         //    {
         //        if (MessageBox.Show("Move Failed, please click OK then reset alarm and manually move the robot to position 1", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
         //        {
@@ -1033,7 +1034,7 @@ namespace TapeReelPacking.Source.Hardware
 
         //    }
 
-        //    MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+        //    MainWindowVM.master.m_hiWinRobotInterface.wait_for_stop_motion();
         //    System.Windows.Application.Current.Dispatcher.Invoke(() =>
         //    {
         //        button_Next_Calibration.IsEnabled = true;
@@ -1043,7 +1044,7 @@ namespace TapeReelPacking.Source.Hardware
 
         //    int nPointIndex = 0;
         //    double[] drobotPoint = new double[6];
-        //    //SequencePointData pData = MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.GetPointData(SequencePointData.CALIB_ROBOT_POSITION_1);
+        //    //SequencePointData pData = MainWindowVM.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.GetPointData(SequencePointData.CALIB_ROBOT_POSITION_1);
         //    //pData.GetXYZPoint(ref drobotPoint);
         //    HWinRobot.get_current_position(HiWinRobotInterface.m_RobotConnectID, drobotPoint);
         //    robot_points[nPointIndex++] = new System.Drawing.PointF((float)drobotPoint[0], (float)drobotPoint[1]);
@@ -1051,7 +1052,7 @@ namespace TapeReelPacking.Source.Hardware
         //    {
         //        button_Next_Calibration.IsEnabled = false;
         //    });
-        //    if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_2) < 0)
+        //    if (MainWindowVM.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_2) < 0)
         //    {
         //        if (MessageBox.Show("Move Failed, please click OK then reset alarm and manually move the robot to position 2", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
         //        {
@@ -1061,7 +1062,7 @@ namespace TapeReelPacking.Source.Hardware
         //        }
 
         //    }
-        //    MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+        //    MainWindowVM.master.m_hiWinRobotInterface.wait_for_stop_motion();
         //    System.Windows.Application.Current.Dispatcher.Invoke(() =>
         //    {
         //        button_Next_Calibration.IsEnabled = true;
@@ -1076,7 +1077,7 @@ namespace TapeReelPacking.Source.Hardware
         //    HWinRobot.get_current_position(HiWinRobotInterface.m_RobotConnectID, drobotPoint);
         //    robot_points[nPointIndex++] = new System.Drawing.PointF((float)drobotPoint[0], (float)drobotPoint[1]);
 
-        //    if (MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_3) < 0)
+        //    if (MainWindowVM.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(SequencePointData.CALIB_ROBOT_POSITION_3) < 0)
         //    {
         //        if (MessageBox.Show("Move Failed, please click OK then reset alarm and manually move the robot to position 3", "", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
         //        {
@@ -1086,7 +1087,7 @@ namespace TapeReelPacking.Source.Hardware
         //        }
 
         //    }
-        //    MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+        //    MainWindowVM.master.m_hiWinRobotInterface.wait_for_stop_motion();
         //    System.Windows.Application.Current.Dispatcher.Invoke(() =>
         //    {
         //        button_Next_Calibration.IsEnabled = true;

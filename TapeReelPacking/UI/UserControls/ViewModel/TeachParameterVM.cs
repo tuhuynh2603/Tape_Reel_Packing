@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows;
 using System.Windows.Input;
 using TapeReelPacking.Source.Algorithm;
 using TapeReelPacking.Source.Application;
@@ -9,11 +10,23 @@ using TapeReelPacking.Source.Model;
 using TapeReelPacking.Source.Repository;
 using TapeReelPacking.UI.UserControls.View;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
+using Application = TapeReelPacking.Source.Application.Application;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
     public class TeachParameterVM : BaseVM
     {
+
+        private Visibility _isVisible = Visibility.Collapsed;
+        public Visibility isVisible
+        {
+            get => _isVisible;
+            set
+            {
+                _isVisible = value;
+                OnPropertyChanged(nameof(isVisible));
+            }
+        }
 
 
         public int nDefectROIIndex = 0;
@@ -24,15 +37,17 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             get => _SelectedCameraIndex;
             set
             {
-                if (_SelectedCameraIndex != value)
-                {
+                //if (_SelectedCameraIndex != value)
+                //{
                     _SelectedCameraIndex = value;
                     categoriesTeachParam = ReloadTeachParameterUI(SelectedCameraIndex);
                     OnPropertyChanged(nameof(SelectedCameraIndex));
                     // Add logic to handle camera selection change if necessary
-                }
+               // }
             }
         }
+
+
 
         private CategoryTeachParameter _categoriesTeachParam;
         public CategoryTeachParameter categoriesTeachParam
@@ -51,10 +66,10 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         public ICommand PropertyChangedCommand { set; get; }
 
         CategoryTeachParameterService categoryTeachParameterService { set; get; }
-
-        public TeachParameterVM(CategoryTeachParameterService service)
+        private MainWindowVM _mainWindowVM { get; set; }
+        public TeachParameterVM(MainWindowVM mainWindowVM, CategoryTeachParameterService service)
         {
-
+            _mainWindowVM = mainWindowVM;
             categoryTeachParameterService = service;
 
 
@@ -78,6 +93,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                              });
 
             initTeachParamDelegate = InitCategory;
+            InitCategory(0);
         }
 
 
@@ -88,6 +104,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         public void InitCategory(int nTrack)
         {
             SelectedCameraIndex = nTrack;
+            categoriesTeachParam = ReloadTeachParameterUI(SelectedCameraIndex);
         }
 
         public bool SaveTeachParameter()
@@ -95,9 +112,8 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             try
             {
                 //Mouse.OverrideCursor = Cursors.Wait;
-                MainWindow mainWindow = (MainWindow)System.Windows.Application.Current.MainWindow;
-                mainWindow.master.m_Tracks[SelectedCameraIndex].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore(categoriesTeachParam);
-                mainWindow.master.WriteTeachParam(SelectedCameraIndex);
+                MainWindowVM.master.m_Tracks[SelectedCameraIndex].m_InspectionCore.UpdateTeachParamFromUIToInspectionCore(categoriesTeachParam);
+                MainWindowVM.master.WriteTeachParam(SelectedCameraIndex);
                 //Mouse.OverrideCursor = null;
                 return true;
             }
@@ -197,7 +213,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             file.Create();
 
             IniFile ini = new IniFile(pathFile);
-            InspectionCore inspectionCore = MainWindow.mainWindow.master.m_Tracks[nTrack].m_InspectionCore;
+            InspectionCore inspectionCore = MainWindowVM.master.m_Tracks[nTrack].m_InspectionCore;
 
             FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_DeviceLocationRoi)), ini, TypeConverterHelper.ConvertRectanglesToString(inspectionCore.m_DeviceLocationParameter.m_L_DeviceLocationRoi));
             FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_LocationEnable)), ini, inspectionCore.m_DeviceLocationParameter.m_L_LocationEnable.ToString());
@@ -229,6 +245,8 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_MinWidthDevice)), ini, inspectionCore.m_blackChipParameter.m_OC_MinWidthDevice.ToString());
             FileHelper.WriteLine(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_MinHeightDevice)), ini, inspectionCore.m_blackChipParameter.m_OC_MinHeightDevice.ToString());
         }
+
+
 
         /// <summary>
         /// Model For PropertyGrid

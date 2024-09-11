@@ -23,21 +23,20 @@ namespace TapeReelPacking.Source.Application
     using TapeReelPacking.Source.Repository;
     using System.Runtime.Remoting.Contexts;
     using static TapeReelPacking.UI.UserControls.ViewModel.MappingCanvasVM;
+    using System.Windows.Forms;
+    using MessageBox = System.Windows.Forms.MessageBox;
 
     public class Master
     {
         //private int width, height, dpi;
-
-        private MainWindow mainWindow { set; get; }
         public Track[] m_Tracks { set; get; }
         public int m_nActiveTrack { set; get; }
-        public Application applications { set; get; } = new Application();
+        public Application applications { set; get; }
         public BarCodeReaderInterface m_BarcodeReader { set; get; }
-        public TeachParametersUC teachParameterUC { set; get; }
-        public VisionParameterUC visionParametersUC { set; get; } = new VisionParameterUC();
+        //public TeachParametersUC teachParameterUC { set; get; }
+        //public VisionParameterUC visionParametersUC { set; get; } = new VisionParameterUC();
         public MappingSetingUC mappingParameter { set; get; } = new MappingSetingUC();
 
-        public DatabaseContext databaseContext { set; get; } = new DatabaseContext();
 
         public static bool m_bIsTeaching { set; get; }
         public static AutoResetEvent m_NextStepTeachEvent { set; get; }
@@ -74,9 +73,12 @@ namespace TapeReelPacking.Source.Application
         public HiWinRobotInterface m_hiWinRobotInterface { set; get; }
         public PLCCOMM m_plcComm { set; get; }
         #region Contructor Master
-        public Master(MainWindow app)
+
+        private MainWindowVM m_MainWindowVM { set; get; }
+        public Master(MainWindowVM mainVM)
         {
-            mainWindow = app;
+            applications = new Application(mainVM);
+            m_MainWindowVM = mainVM;
             m_NextStepTeachEvent = new AutoResetEvent(false);
             m_bIsTeaching = false;
 
@@ -84,34 +86,14 @@ namespace TapeReelPacking.Source.Application
             Application.LoadRegistry();
 
             ContructorDocComponent();
-            ConstructModels(databaseContext);
-
             LogMessage.LogMessage.WriteToDebugViewer(2, "BarCodeReaderInterface");
 
             LoadRecipe();
-            ReadLogAccount();
-
 
             m_nActiveTrack = 0;
-            mainWindow.EnableMotorFunction();
             InitThread();
         }
 
-        CategoryTeachParameterRepository categoryTeachParameterRepository { set; get; }
-        CategoryVisionParameterRepository categoryVisionParameterRepository { set; get; }
-
-        CategoryTeachParameterService categoryTeachParameterService { set; get; }
-        CategoryVisionParameterService categoryVisionParameterService { set; get; }
-
-
-        public void ConstructModels(DatabaseContext context)
-        {
-            categoryTeachParameterRepository = new CategoryTeachParameterRepository(context);
-            categoryTeachParameterService = new CategoryTeachParameterService(categoryTeachParameterRepository);
-            categoryVisionParameterRepository = new CategoryVisionParameterRepository(context);
-            categoryVisionParameterService = new CategoryVisionParameterService(categoryVisionParameterRepository);
-            teachParameterUC = new TeachParametersUC(categoryTeachParameterService);
-        }
 
         public void InitThread()
         {
@@ -152,20 +134,6 @@ namespace TapeReelPacking.Source.Application
             }
         }
 
-        public void ReadLogAccount()
-        {
-            applications.acountDefault();
-            try
-            {
-                applications.ReadLogAccount();
-                LogMessage.LogMessage.WriteToDebugViewer(2, string.Format("Read Log Account Success "));
-            }
-            catch (Exception)
-            {
-                LogMessage.LogMessage.WriteToDebugViewer(2, string.Format("Read Log Account Failed "));
-            }
-        }
-
 
 
         public void DeleteMaster()
@@ -190,7 +158,7 @@ namespace TapeReelPacking.Source.Application
 
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                MainWindow.mainWindow.btn_LoadRecipe.Content = Application.currentRecipe;
+               //MainWindow.mainWindow.btn_LoadRecipe.Content = Application.currentRecipe;
             });
 
 
@@ -263,7 +231,7 @@ namespace TapeReelPacking.Source.Application
 
                 list_arrayOverlay[index_track] = new List<ArrayOverLay>();
 
-                m_Tracks[index_track] = new Track(index_track, 1, Application.m_strCameraSerial[index_track], mainWindow, Application.m_Width[index_track], Application.m_Height[index_track]);
+                m_Tracks[index_track] = new Track(index_track, 1, Application.m_strCameraSerial[index_track], Application.m_Width[index_track], Application.m_Height[index_track]);
             }
         }
         #endregion
@@ -424,9 +392,6 @@ namespace TapeReelPacking.Source.Application
         string m_folderPath = @"C:\";
         internal void RunOfflineSequenceThread(int nTrackID)
         {
-            if (!mainWindow.bEnableOfflineInspection)
-                return;
-
             if (m_folderPath == @"C:\" || m_folderPath == "")
                 m_folderPath = Application.pathImageSave;
             // Set the initial directory for the dialog box
@@ -508,7 +473,6 @@ namespace TapeReelPacking.Source.Application
             if (RobotIOStatus.m_EmergencyStatus + RobotIOStatus.m_ImidiateStatus == 0)
                 HWinRobot.set_motor_state(HiWinRobotInterface.m_RobotConnectID, 1);
 
-            MainWindow.mainWindow.EnableMotorFunction();
         ResetSequence_Step1:
             int nError = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
             Master.m_EventInspectionOnlineThreadDone[0].Reset();
@@ -519,12 +483,12 @@ namespace TapeReelPacking.Source.Application
 
             // Stop Motor
             m_hiWinRobotInterface.StopMotor();
-            if (MainWindow.mainWindow.m_bEnableDebugSequence)
+            if (MainWindowVM.m_bEnableDebugSequence)
                 HWinRobot.set_operation_mode(m_RobotConnectID, (int)ROBOT_OPERATION_MODE.MODE_MANUAL);
             else
                 HWinRobot.set_operation_mode(m_RobotConnectID, (int)ROBOT_OPERATION_MODE.MODE_AUTO);
 
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+           MainWindowVM.master.m_hiWinRobotInterface.wait_for_stop_motion();
             nError = WaitForNextStepSequenceEvent("Reset Sequence: Stop motor Done. Press Next to Move to place position");
             if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT) return -1;
 
@@ -544,12 +508,12 @@ namespace TapeReelPacking.Source.Application
 
         ResetSequence_Step2:
             // Move Z up 20mm before move to home
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.MoveZMotorUp(20);
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+           MainWindowVM.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.MoveZMotorUp(20);
+           MainWindowVM.master.m_hiWinRobotInterface.wait_for_stop_motion();
             Thread.Sleep(500);
 
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.PRE_FAILED_BLACK_PLACE_POSITION, true);
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+           MainWindowVM.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.PRE_FAILED_BLACK_PLACE_POSITION, true);
+           MainWindowVM.master.m_hiWinRobotInterface.wait_for_stop_motion();
             nError = WaitForNextStepSequenceEvent("Reset Sequence: Moving done. Press Next to put the device to position");
             if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT) return -1;
             else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE)
@@ -607,10 +571,10 @@ namespace TapeReelPacking.Source.Application
         //}
 
         ResetSequence_Step5:
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.READY_POSITION, false);
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.READY_POSITION, true);
-            MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+           MainWindowVM.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.READY_POSITION, false);
+           MainWindowVM.master.m_hiWinRobotInterface.wait_for_stop_motion();
+           MainWindowVM.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.READY_POSITION, true);
+           MainWindowVM.master.m_hiWinRobotInterface.wait_for_stop_motion();
             nError = WaitForNextStepSequenceEvent("Reset Sequence: Press Next to Complete Reset Sequence");
             if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT) return -1;
             else if (nError == (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE)
@@ -637,7 +601,6 @@ namespace TapeReelPacking.Source.Application
                 }
             }
 
-            MainWindow.mainWindow.EnableMotorFunction();
             return 0;
         }
 
@@ -690,8 +653,8 @@ namespace TapeReelPacking.Source.Application
 
             while (true)
             {
-                if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
-                    break;
+                //if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
+                //    break;
 
                 Thread.Sleep(50);
 
@@ -731,7 +694,7 @@ namespace TapeReelPacking.Source.Application
                             m_hiWinRobotInterface.ReconnectToHIKRobot();
                             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                             {
-                                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Robot Disconnected! Reconnecting... = {RobotIOStatus.m_EmergencyStatus}!", (int)ERROR_CODE.LABEL_FAIL);
+                                OutputLogVM.AddLineOutputLog($"Robot Disconnected! Reconnecting... = {RobotIOStatus.m_EmergencyStatus}!", (int)ERROR_CODE.LABEL_FAIL);
                             });
                             Thread.Sleep(1000);
 
@@ -739,7 +702,7 @@ namespace TapeReelPacking.Source.Application
                             {
                                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                                 {
-                                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Robot Connected.. = {RobotIOStatus.m_EmergencyStatus}!", (int)ERROR_CODE.LABEL_FAIL);
+                                    OutputLogVM.AddLineOutputLog($"Robot Connected.. = {RobotIOStatus.m_EmergencyStatus}!", (int)ERROR_CODE.LABEL_FAIL);
                                 });
                                 continue;
                             }
@@ -756,23 +719,25 @@ namespace TapeReelPacking.Source.Application
                         string strMess = "Imidiate Stop Button clicked!";
                         m_hiWinRobotInterface.StopMotor();
                         HiWinRobotInterface.SetMotorState(0);
-                        MainWindow.mainWindow.PopupWarningMessageBox(strMess, WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
-                        //Thread.Sleep(100);
+
+
+                            WarningMessageBoxVM.popupWarningMessageBoxDelegate?.Invoke(strMess, WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
+                            //Thread.Sleep(100);
                     }
 
-                    else if (!MainWindow.mainWindow.m_bEnableDebugSequence)
+                    else if (!MainWindowVM.m_bEnableDebugSequence)
                     {
                         if (RobotIOStatus.m_DoorOpennedStatus == 1)
                         {
                             //m_IsDoorOpennedAction = true;
-                            if (MainWindow.mainWindow.m_bSequenceRunning)
+                            if (MainWindowVM.m_bSequenceRunning)
                             {
                                 m_bNeedToImidiateStop = true;
                                 m_hiWinRobotInterface.StopMotor();
                                 HiWinRobotInterface.SetMotorState(0);
-                                //MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+                                //MainWindowVM.master.m_hiWinRobotInterface.wait_for_stop_motion();
                                 string strMess = "Door is openned!";
-                                MainWindow.mainWindow.PopupWarningMessageBox(strMess, WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
+                               WarningMessageBoxVM.popupWarningMessageBoxDelegate?.Invoke(strMess, WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
                             }
                         }
                     }
@@ -786,7 +751,7 @@ namespace TapeReelPacking.Source.Application
 
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Door Signal Status changed Status = {bDoorStatus_Backup}!", (int)ERROR_CODE.LABEL_FAIL);
+                            OutputLogVM.AddLineOutputLog($"Door Signal Status changed Status = {bDoorStatus_Backup}!", (int)ERROR_CODE.LABEL_FAIL);
                         });
                     }
                     bDoorStatus_Backup = RobotIOStatus.m_DoorOpennedStatus;
@@ -798,34 +763,28 @@ namespace TapeReelPacking.Source.Application
                         m_hiWinRobotInterface.StopMotor();
                         HiWinRobotInterface.SetMotorState(0);
                         string strMess = "Emergency Button clicked, please release them  then reset the sequence!";
-                        MainWindow.mainWindow.PopupWarningMessageBox(strMess, WARNINGMESSAGE.MESSAGE_EMERGENCY);
-                        //Thread.Sleep(100);
-                        // Disable all motor function;
+                       WarningMessageBoxVM.popupWarningMessageBoxDelegate?.Invoke(strMess, WARNINGMESSAGE.MESSAGE_EMERGENCY);
+
                     }
 
                     if (RobotIOStatus.m_RunMachineStatus == 1)
                     {
-                        //m_RunMachineStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.RUNSEQUENCE_STATUS);
-                        //if (m_RunMachineStatus == 1)
-                        //{
+
                         RobotIOStatus.m_EmergencyStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.EMERGENCY_STATUS) | RobotIOStatus.m_EmergencyStatus_Simulate;
-                        //RobotIOStatus.m_ImidiateStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.IMIDIATE_STOP_STATUS) | RobotIOStatus.m_ImidiateStatus_Simulate;
 
                         if (RobotIOStatus.m_EmergencyStatus == 0)
-                            MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_EMERGENCY, false);
+                           WarningMessageBoxVM.popupWarningMessageBoxDelegate?.Invoke("", WARNINGMESSAGE.MESSAGE_EMERGENCY, false);
 
 
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            MainWindow.mainWindow.Run_Sequence();
+                            m_MainWindowVM.Run_Sequence();
                         });
                         //}
                         Thread.Sleep(2000);
 
                     }
 
-                    if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
-                        break;
 
                     if (m_plcComm == null)
                         continue;
@@ -835,54 +794,50 @@ namespace TapeReelPacking.Source.Application
 
                     if (bEmergencyStatus_Backup != RobotIOStatus.m_EmergencyStatus)
                     {
-                        //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_EMERGENCY_STATUS, RobotIOStatus.m_EmergencyStatus);
                         bEmergencyStatus_Backup = RobotIOStatus.m_EmergencyStatus;
                         LogMessage.LogMessage.WriteToDebugViewer(9, $"Emergency Status changed Status = {RobotIOStatus.m_EmergencyStatus}!");
 
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Emergency Status changed Status = {RobotIOStatus.m_EmergencyStatus}!", (int)ERROR_CODE.LABEL_FAIL);
+                            OutputLogVM.AddLineOutputLog($"Emergency Status changed Status = {RobotIOStatus.m_EmergencyStatus}!", (int)ERROR_CODE.LABEL_FAIL);
                         });
                     }
 
                     if (bImidiateStatus_Backup != RobotIOStatus.m_ImidiateStatus)
                     {
-                        //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_IMIDIATE_STATUS, RobotIOStatus.m_ImidiateStatus);
                         bImidiateStatus_Backup = RobotIOStatus.m_ImidiateStatus;
 
                         LogMessage.LogMessage.WriteToDebugViewer(9, $"Imidiate button Status changed Status = {RobotIOStatus.m_ImidiateStatus}!");
 
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Imidiate button Status changed Status = {RobotIOStatus.m_ImidiateStatus}!", (int)ERROR_CODE.LABEL_FAIL);
+                            OutputLogVM.AddLineOutputLog($"Imidiate button Status changed Status = {RobotIOStatus.m_ImidiateStatus}!", (int)ERROR_CODE.LABEL_FAIL);
                         });
                     }
-                    bool bIsShow = MainWindow.mainWindow.IsPopupWarningMessageBoxOpenned();
-                    //LogMessage.LogMessage.WriteToDebugViewer(9, $"PopupWarning Dialog Status = {bIsShow}!");
+
+                    bool bIsShow = m_MainWindowVM.mWarningMessageBoxVM.isVisible == Visibility.Collapsed? false:true;
+
                     if (bResetStatus_Backup != RobotIOStatus.m_ResetMachineStatus || bIsShow)
                     {
-                        //m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_STATUS, m_ResetMachineStatus);
 
                         RobotIOStatus.m_EmergencyStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.EMERGENCY_STATUS) | RobotIOStatus.m_EmergencyStatus_Simulate;
 
-                        //if (RobotIOStatus.m_EmergencyStatus == 0)
-                        //    MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_EMERGENCY, false);
+
 
 
                         if (RobotIOStatus.m_ResetMachineStatus == 1)
                         {
-                            MainWindow.mainWindow.m_WarningMessageBoxUC.ContinueSequenceButtonClicked(WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
+                          WarningMessageBoxVM.continueSequenceButtonClickedDelegate?.Invoke(WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
 
                         }
-                        //if (RobotIOStatus.m_EmergencyStatus + RobotIOStatus.m_ImidiateStatus == 0)
-                        //    MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_EMERGENCY, false);
+
                         if (bResetStatus_Backup != RobotIOStatus.m_ResetMachineStatus)
                         {
                             LogMessage.LogMessage.WriteToDebugViewer(9, $"Reset button Status changed Status = {RobotIOStatus.m_ResetMachineStatus}!");
 
                             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                             {
-                                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Reset button Status changed Status = {RobotIOStatus.m_ResetMachineStatus}!", (int)ERROR_CODE.LABEL_FAIL);
+                               OutputLogVM.AddLineOutputLog($"Reset button Status changed Status = {RobotIOStatus.m_ResetMachineStatus}!", (int)ERROR_CODE.LABEL_FAIL);
                             });
                         }
                     }
@@ -907,7 +862,7 @@ namespace TapeReelPacking.Source.Application
 
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Busy when sending lot data to PID machine, cannot create lot!!!", (int)ERROR_CODE.LABEL_FAIL);
+                            OutputLogVM.AddLineOutputLog("Busy when sending lot data to PID machine, cannot create lot!!!", (int)ERROR_CODE.LABEL_FAIL);
                         });
                         continue;
                     }
@@ -919,7 +874,7 @@ namespace TapeReelPacking.Source.Application
 
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("TimeOut when reading data from PID! Please check the PID machine status before running sequence", (int)ERROR_CODE.LABEL_FAIL);
+                            OutputLogVM.AddLineOutputLog("TimeOut when reading data from PID! Please check the PID machine status before running sequence", (int)ERROR_CODE.LABEL_FAIL);
                         });
 
                         WaitForNextStepSequenceEvent("TimeOut when reading data from PID! Please check the PID machine status before running sequence", true);
@@ -933,7 +888,7 @@ namespace TapeReelPacking.Source.Application
 
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"{strReceived_ACK}. Please check the PID machine status before running sequence", (int)ERROR_CODE.LABEL_FAIL);
+                            OutputLogVM.AddLineOutputLog($"{strReceived_ACK}. Please check the PID machine status before running sequence", (int)ERROR_CODE.LABEL_FAIL);
                         });
 
                         WaitForNextStepSequenceEvent("STATUS_ERROR. Please check the PID machine status before running sequence", true);
@@ -948,7 +903,7 @@ namespace TapeReelPacking.Source.Application
                     LogMessage.LogMessage.WriteToDebugViewer(9, $"Reset Lot");
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Reset Lot", (int)ERROR_CODE.LABEL_FAIL);
+                        OutputLogVM.AddLineOutputLog($"Reset Lot", (int)ERROR_CODE.LABEL_FAIL);
                         startLot_dateTime = DateTime.Now;
                         Application.m_strCurrentLot = string.Format("{0}{1}{2}_{3}{4}{5}", startLot_dateTime.ToString("yyyy"), startLot_dateTime.ToString("MM"), startLot_dateTime.ToString("dd"), startLot_dateTime.ToString("HH"), startLot_dateTime.ToString("mm"), startLot_dateTime.ToString("ss"));
                         if (Application.m_strStartLotDay != Application.m_strCurrentLot.Split('_')[0])
@@ -970,7 +925,7 @@ namespace TapeReelPacking.Source.Application
                             //VisionResultData.SaveSequenceResultToExcel(Application.m_strCurrentLot, nT, new VisionResultData(), true);
 
                             MappingCanvasVM.setMappingPageDelegate?.Invoke(nT, 0);
-                            MainWindow.mainWindow.LoadStatistic(nT, false);
+                            m_MainWindowVM.LoadStatistic(nT, false);
                             //InspectEvent[nT].Reset();
                             //InspectDoneEvent[nT].Reset();
                             //m_hardwareTriggerSnapEvent[nT].Reset();
@@ -980,29 +935,30 @@ namespace TapeReelPacking.Source.Application
 
                         }
 
-                        //lock (MainWindow.mainWindow.master.m_Tracks[0])
+                        //lock (MainWindowVM.master.m_Tracks[0])
                         //{
-                        //    MainWindow.mainWindow.LoadStatistic(0, true);
+                        //   MainWindow.mainWindow.LoadStatistic(0, true);
                         //}
                         //Thread.Sleep(250);
 
-                        //lock (MainWindow.mainWindow.master.m_Tracks[1])
+                        //lock (MainWindowVM.master.m_Tracks[1])
                         //{
-                        //    MainWindow.mainWindow.LoadStatistic(1, true);
+                        //   MainWindow.mainWindow.LoadStatistic(1, true);
                         //}
                         //Thread.Sleep(250);
 
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Create New Lot ID: {Application.m_strCurrentLot} ", (int)ERROR_CODE.LABEL_FAIL);
+                        OutputLogVM.AddLineOutputLog($"Create New Lot ID: {Application.m_strCurrentLot} ", (int)ERROR_CODE.LABEL_FAIL);
 
                         if (true)
                         {
-                            MainWindow.mainWindow.m_strCurrentLotID = Application.m_strCurrentLot;
+                            //MainWindowVM mainvm = (MainWindowVM)MainWindow.mainWindow.DataContext;
+                            m_MainWindowVM.m_strCurrentLotID = Application.m_strCurrentLot;
                         }
 
                         else
                         {
 
-                            MessageBox.Show("Please KeyIn the Lot ID (on the top) then press Continue");
+                            System.Windows.Forms.MessageBox.Show("Please KeyIn the Lot ID (on the top) then press Continue");
                         }
                     });
                     m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_RESET_LOT_ACK, 1);
@@ -1024,24 +980,24 @@ namespace TapeReelPacking.Source.Application
 
             if (m_bNeedToImidiateStop)
             {
-                //MainWindow.mainWindow.PopupWarningMessageBox(strDebugMessage, WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
+                //WarningMessageBoxVM.popupWarningMessageBoxDelegate?.Invoke(strDebugMessage, WARNINGMESSAGE.MESSAGE_IMIDIATESTOP);
                 while (!m_NextStepSequenceEvent.WaitOne(10))
                 {
-                    if (MainWindow.mainWindow == null)
-                        return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
+                    //if (MainWindow.mainWindow == null)
+                    //    return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
 
                     if (RobotIOStatus.m_EmergencyStatus == 1)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
                 }
                 //Show Dialog
             }
-            else if (MainWindow.mainWindow.m_bEnableDebugSequence)
+            else if (MainWindowVM.m_bEnableDebugSequence)
             {
-                MainWindow.mainWindow.PopupWarningMessageBox(strDebugMessage, WARNINGMESSAGE.MESSAGE_STEPDEBUG);
+               WarningMessageBoxVM.popupWarningMessageBoxDelegate?.Invoke(strDebugMessage, WARNINGMESSAGE.MESSAGE_STEPDEBUG);
                 while (!m_NextStepSequenceEvent.WaitOne(10))
                 {
-                    if (MainWindow.mainWindow == null)
-                        return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
+                    //if (MainWindow.mainWindow == null)
+                    //    return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
 
                     if (RobotIOStatus.m_EmergencyStatus == 1 || RobotIOStatus.m_ImidiateStatus == 1)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
@@ -1049,11 +1005,11 @@ namespace TapeReelPacking.Source.Application
             }
             else if (bPopUpInformation)
             {
-                MainWindow.mainWindow.PopupWarningMessageBox(strDebugMessage, WARNINGMESSAGE.MESSAGE_INFORMATION);
+               WarningMessageBoxVM.popupWarningMessageBoxDelegate?.Invoke(strDebugMessage, WARNINGMESSAGE.MESSAGE_INFORMATION);
                 while (!m_NextStepSequenceEvent.WaitOne(10))
                 {
-                    if (MainWindow.mainWindow == null)
-                        return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
+                    //if (MainWindow.mainWindow == null)
+                    //    return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
 
                     if (RobotIOStatus.m_EmergencyStatus == 1 || RobotIOStatus.m_ImidiateStatus == 1)
                         return (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
@@ -1093,7 +1049,7 @@ namespace TapeReelPacking.Source.Application
 
             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Run Sequence Thead...", (int)ERROR_CODE.LABEL_FAIL);
+                OutputLogVM.AddLineOutputLog("Run Sequence Thead...", (int)ERROR_CODE.LABEL_FAIL);
                 //MainWindow.mainWindow.LoadStatistic(0,true);
             });
             //m_SequenceMode = (int)SEQUENCE_MODE.MODE_AUTO;
@@ -1103,7 +1059,7 @@ namespace TapeReelPacking.Source.Application
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
 
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Begin sequence... AUTO MODE");
+                    OutputLogVM.AddLineOutputLog($"Begin sequence... AUTO MODE");
                 });
 
                 RobotSequence();
@@ -1119,12 +1075,12 @@ namespace TapeReelPacking.Source.Application
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
 
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Begin sequence... MANUAL MODE");
+                    OutputLogVM.AddLineOutputLog($"Begin sequence... MANUAL MODE");
                 });
 
                 while (true)
                 {
-                    if (!MainWindow.mainWindow.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
+                    if (!MainWindowVM.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
                     {
                         break;
                     }
@@ -1138,12 +1094,12 @@ namespace TapeReelPacking.Source.Application
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
 
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Begin sequence... MANUAL MODE");
+                    OutputLogVM.AddLineOutputLog($"Begin sequence... MANUAL MODE");
                 });
 
                 while (true)
                 {
-                    if (!MainWindow.mainWindow.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
+                    if (!MainWindowVM.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
                     {
                         break;
                     }
@@ -1164,13 +1120,17 @@ namespace TapeReelPacking.Source.Application
                 Thread.Sleep(500);
                 m_CompletedReelStatus = HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_COMPLETED_LOT);
 
-                if (!MainWindow.mainWindow.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
+                if (!MainWindowVM.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
                 {
                     m_bRobotSequenceStatus = false;
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        MainWindow.mainWindow.btn_run_sequence.IsChecked = false;
-                        MainWindow.mainWindow.m_bSequenceRunning = false;
+
+
+
+                       MainWindowVM.btn_runChecked = false;
+                        //MainWindowVM mainvm = (MainWindowVM)MainWindow.mainWindow.DataContext;
+                        MainWindowVM.m_bSequenceRunning = false;
                     });
                     return;
                 }
@@ -1230,14 +1190,14 @@ namespace TapeReelPacking.Source.Application
                     m_bRobotSequenceStatus = false;
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        MainWindow.mainWindow.btn_run_sequence.IsChecked = false;
-                        MainWindow.mainWindow.m_bSequenceRunning = false;
+                        MainWindowVM.btn_runChecked = false;
+                       MainWindowVM.m_bSequenceRunning = false;
                     });
                     return -1;
                 }
 
                 nTimeout += 100;
-                MainWindow.mainWindow.PopupWarningMessageBox("Waiting 'ReelData,N,LotID_OK//Error' from PID...", WARNINGMESSAGE.MESSAGE_INFORMATION);
+               WarningMessageBoxVM.popupWarningMessageBoxDelegate?.Invoke("Waiting 'ReelData,N,LotID_OK//Error' from PID...", WARNINGMESSAGE.MESSAGE_INFORMATION);
                 if (nTimeout >= 5000)
                 {
                     nTimeout = 0;
@@ -1250,7 +1210,7 @@ namespace TapeReelPacking.Source.Application
                 }
 
             }
-            MainWindow.mainWindow.PopupWarningMessageBox("Waiting 'ReelData,N,LotID_OK//Error' from PID...", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
+           WarningMessageBoxVM.popupWarningMessageBoxDelegate?.Invoke("Waiting 'ReelData,N,LotID_OK//Error' from PID...", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
 
             SerialCommunication.m_SerialDataReceivedEvent.Reset();
             // Check whether data sent and received are same or not
@@ -1260,7 +1220,7 @@ namespace TapeReelPacking.Source.Application
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
 
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Data received from PID is wrong format. ", (int)ERROR_CODE.LABEL_FAIL);
+                    OutputLogVM.AddLineOutputLog("Data received from PID is wrong format. ", (int)ERROR_CODE.LABEL_FAIL);
                 });
                 SerialCommunication.WriteData("DATA_ERROR");
                 string strString = "Data received from PID is wrong format.  Press 'Continue' to resend or 'Abort' to end sequence.";
@@ -1287,7 +1247,7 @@ namespace TapeReelPacking.Source.Application
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
 
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Mismatching Data Between Client And TR Machine Failed! Please Check the Connection.", (int)ERROR_CODE.LABEL_FAIL);
+                    OutputLogVM.AddLineOutputLog("Mismatching Data Between Client And TR Machine Failed! Please Check the Connection.", (int)ERROR_CODE.LABEL_FAIL);
                 });
                 SerialCommunication.WriteData("DATA_ERROR");
 
@@ -1305,7 +1265,7 @@ namespace TapeReelPacking.Source.Application
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
 
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Received Error From PID.", (int)ERROR_CODE.LABEL_FAIL);
+                    OutputLogVM.AddLineOutputLog("Received Error From PID.", (int)ERROR_CODE.LABEL_FAIL);
                 });
 
                 string strString = "Timeout when Reading Data from PID. Press 'Continue' to resend or 'Abort' to end sequence.";
@@ -1328,13 +1288,13 @@ namespace TapeReelPacking.Source.Application
                     m_bRobotSequenceStatus = false;
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        MainWindow.mainWindow.btn_run_sequence.IsChecked = false;
-                        MainWindow.mainWindow.m_bSequenceRunning = false;
+                       MainWindowVM.btn_runChecked = false;
+                       MainWindowVM.m_bSequenceRunning = false;
                     });
                     return -1;
                 }
 
-                MainWindow.mainWindow.PopupWarningMessageBox("Waiting 'ACK' from PID...", WARNINGMESSAGE.MESSAGE_INFORMATION);
+               WarningMessageBoxVM.popupWarningMessageBoxDelegate?.Invoke("Waiting 'ACK' from PID...", WARNINGMESSAGE.MESSAGE_INFORMATION);
 
                 nTimeout += 100;
                 if (nTimeout >= 50000)
@@ -1350,7 +1310,7 @@ namespace TapeReelPacking.Source.Application
                         return -1;
                 }
             }
-            MainWindow.mainWindow.PopupWarningMessageBox("Waiting 'ACK' from PID...", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
+           WarningMessageBoxVM.popupWarningMessageBoxDelegate?.Invoke("Waiting 'ACK' from PID...", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
 
             SerialCommunication.m_SerialDataReceivedEvent.Reset();
             string strReceived_ACK = SerialCommunication.ReadData();
@@ -1362,7 +1322,7 @@ namespace TapeReelPacking.Source.Application
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
 
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Received ACK_Error From Client. End Sequence.", (int)ERROR_CODE.LABEL_FAIL);
+                    OutputLogVM.AddLineOutputLog("Received ACK_Error From Client. End Sequence.", (int)ERROR_CODE.LABEL_FAIL);
                 });
 
                 return -1;
@@ -1403,7 +1363,7 @@ namespace TapeReelPacking.Source.Application
             while (RobotIOStatus.m_RunMachineStatus == 1)
             {
                 LogMessage.LogMessage.WriteToDebugViewer(9, "Waiting for PLC Running Sequence Signal Off...");
-                if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || RobotIOStatus.m_EmergencyStatus == 1 || RobotIOStatus.m_EndLotStatus == 1)
+                if (!MainWindowVM.m_bSequenceRunning && !InspectionTabVM.bEnableOfflineInspection || RobotIOStatus.m_EmergencyStatus == 1 || RobotIOStatus.m_EndLotStatus == 1)
                     return;
 
                 Thread.Sleep(500);
@@ -1414,7 +1374,7 @@ namespace TapeReelPacking.Source.Application
             while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_PACKING_PROCESS_READY) != 1)
             {
                 // Need popup Dialog if waiting too long 
-                if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || RobotIOStatus.m_EmergencyStatus == 1 || RobotIOStatus.m_EndLotStatus == 1)
+                if (!MainWindowVM.m_bSequenceRunning && !InspectionTabVM.bEnableOfflineInspection || RobotIOStatus.m_EmergencyStatus == 1 || RobotIOStatus.m_EndLotStatus == 1)
                     return;
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, "Waiting for PLC ready Signal....");
@@ -1432,13 +1392,13 @@ namespace TapeReelPacking.Source.Application
             //HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_READY_CONVEYOR_ON, false);
 
             nError = WaitForNextStepSequenceEvent("Begin Sequence: Press Next to trigger camera 1");
-            if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+            if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE || RobotIOStatus.m_EndLotStatus == 1 )
                 return;
 
             //Application.SetIntRegistry(Application.m_strCurrentDeviceID_Registry[0], m_Tracks[0].m_CurrentSequenceDeviceID);
 
             m_nWaitEventInspectionOnlineThreadStatus = 0;
-            if (func_CameraTriggerThread() < 0 || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen || m_SequenceMode_With_Or_No_Robot == 1)
+            if (func_CameraTriggerThread() < 0 || RobotIOStatus.m_EndLotStatus == 1 || m_SequenceMode_With_Or_No_Robot == 1)
             {
                 return;
             }
@@ -1451,10 +1411,10 @@ namespace TapeReelPacking.Source.Application
             timeIns.Start();
 
             //int nChipCount = 0;
-            while (MainWindow.mainWindow.m_bSequenceRunning || MainWindow.mainWindow.bEnableOfflineInspection || m_bMachineNotReadyNeedToReset)
+            while (MainWindowVM.m_bSequenceRunning || InspectionTabVM.bEnableOfflineInspection || m_bMachineNotReadyNeedToReset)
             {
 
-                if (MainWindow.mainWindow == null || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen || m_SequenceMode_With_Or_No_Robot == 1)
+                if (RobotIOStatus.m_EndLotStatus == 1 || m_SequenceMode_With_Or_No_Robot == 1)
                     return;
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, "Begin Sequence");
@@ -1466,10 +1426,8 @@ namespace TapeReelPacking.Source.Application
 
                 while (m_nWaitEventInspectionOnlineThreadStatus == 0)
                 {
-                    if (MainWindow.mainWindow == null)
-                        return;
 
-                    if (!MainWindow.mainWindow.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || m_SequenceMode_With_Or_No_Robot == 1)
+                    if (!MainWindowVM.m_bSequenceRunning || m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || m_SequenceMode_With_Or_No_Robot == 1)
                     {
                         return;
                     }
@@ -1480,7 +1438,7 @@ namespace TapeReelPacking.Source.Application
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
 
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("PLC Button Run is pressed. Restarting the Robot sequence....", (int)ERROR_CODE.LABEL_FAIL);
+                            OutputLogVM.AddLineOutputLog("PLC Button Run is pressed. Restarting the Robot sequence....", (int)ERROR_CODE.LABEL_FAIL);
                         });
                         Thread.Sleep(3000);
                         goto _Start_Lot;
@@ -1496,7 +1454,7 @@ namespace TapeReelPacking.Source.Application
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
 
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("PLC Button Run is pressed. Restarting the Robot sequence....", (int)ERROR_CODE.LABEL_FAIL);
+                        OutputLogVM.AddLineOutputLog("PLC Button Run is pressed. Restarting the Robot sequence....", (int)ERROR_CODE.LABEL_FAIL);
                     });
                     Thread.Sleep(3000);
                     goto _Start_Lot;
@@ -1517,7 +1475,7 @@ namespace TapeReelPacking.Source.Application
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
 
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Device not Found. Image processing Failed!.", (int)ERROR_CODE.LABEL_FAIL);
+                        OutputLogVM.AddLineOutputLog("Device not Found. Image processing Failed!.", (int)ERROR_CODE.LABEL_FAIL);
                     });
 
 
@@ -1530,7 +1488,7 @@ namespace TapeReelPacking.Source.Application
                     HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
 
                     nError = WaitForNextStepSequenceEvent("Inspection Failed (Device Not found)! Please press 'RUN' on UI or PLC  to restart the sequence!", true);
-                    if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                    if (nError == (int)SEQUENCE_OPTION.SEQUENCE_ABORT || RobotIOStatus.m_EndLotStatus == 1 )
                         return;
                     goto StartSequence;
                     //return;
@@ -1556,7 +1514,7 @@ namespace TapeReelPacking.Source.Application
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Move to Pre Pick position");
 
-                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
                     return;
 
                 visionResultDataTemp.m_nDeviceIndexOnReel = m_Tracks[0].m_InspectionOnlineThreadVisionResult.m_nDeviceIndexOnReel;
@@ -1565,9 +1523,9 @@ namespace TapeReelPacking.Source.Application
                 visionResultDataTemp.m_strFullImagePath = m_Tracks[0].m_InspectionOnlineThreadVisionResult.m_strFullImagePath;
                 visionResultDataTemp.m_strDatetime = m_Tracks[0].m_InspectionOnlineThreadVisionResult.m_strDatetime;
 
-                robotPoint = MagnusMatrix.ApplyTransformation(MainWindow.mainWindow.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.m_MatCameraRobotTransform, m_Tracks[0].m_Center_Vision);
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection);
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+                robotPoint = MagnusMatrix.ApplyTransformation(MainWindowVM.master.m_hiWinRobotInterface.m_hiWinRobotUserControl.m_MatCameraRobotTransform, m_Tracks[0].m_Center_Vision);
+               MainWindowVM.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection);
+               MainWindowVM.master.m_hiWinRobotInterface.wait_for_stop_motion();
                 nError = WaitForNextStepSequenceEvent("Move to Pre Pick position done. Press Next to turn on vaccum");
                 if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
                     goto Check_StepSequence;
@@ -1579,7 +1537,7 @@ namespace TapeReelPacking.Source.Application
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Turn on vaccum");
 
 
-                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
                     return;
                 // Turn on vaccum
 
@@ -1599,15 +1557,15 @@ namespace TapeReelPacking.Source.Application
 
                 //System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 //{
-                //    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
+                //    OutputLogVM.AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
                 //});
 
-                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
                     return;
                 // Move to Pick position (move Down Z motor)
 
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection);
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+               MainWindowVM.master.m_hiWinRobotInterface.MoveTo_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection);
+               MainWindowVM.master.m_hiWinRobotInterface.wait_for_stop_motion();
 
                 // Move to  Pre pick  position again (move Up Z motor)
                 // From now, if Air PressureStatus signal is 0, we consider it as the chip has been through, so we arlamp it
@@ -1621,10 +1579,10 @@ namespace TapeReelPacking.Source.Application
                 nCurrentSequenceStep = 6;
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Move To Pre Pick Pos");
 
-                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
                     return;
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection);
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+               MainWindowVM.master.m_hiWinRobotInterface.MoveTo_PRE_PICK_POSITION(robotPoint, -m_Tracks[0].m_dDeltaAngleInspection);
+               MainWindowVM.master.m_hiWinRobotInterface.wait_for_stop_motion();
 
                 nError = WaitForNextStepSequenceEvent("Move to prepick position done. Press Next to turn on conveyor and waiting for Air Pressure Signal");
                 if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
@@ -1644,7 +1602,7 @@ namespace TapeReelPacking.Source.Application
 
                 while (nStatus == 0)
                 {
-                    if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || RobotIOStatus.m_EndLotStatus == 1)
+                    if (!MainWindowVM.m_bSequenceRunning && !InspectionTabVM.bEnableOfflineInspection || RobotIOStatus.m_EndLotStatus == 1)
                     {
                         return;
                     }
@@ -1660,7 +1618,7 @@ namespace TapeReelPacking.Source.Application
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
 
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Air Pressure got problem! {nStatus}", (int)ERROR_CODE.LABEL_FAIL);
+                            OutputLogVM.AddLineOutputLog($"Air Pressure got problem! {nStatus}", (int)ERROR_CODE.LABEL_FAIL);
                         });
 
                         //WaitForNextStepSequenceEvent("Air Pressure got problem!",true);
@@ -1680,7 +1638,7 @@ namespace TapeReelPacking.Source.Application
                 nCurrentSequenceStep = 8;
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Move To Pass fail position");
 
-                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
                     return;
                 // Move To Pass fail position
                 //nCamera1InspectionResult = (int)ERROR_CODE.PASS;
@@ -1692,8 +1650,8 @@ namespace TapeReelPacking.Source.Application
                 else
                     strPrePosition = SequencePointData.PRE_FAILED_PLACE_POSITION;
 
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(strPrePosition);
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+               MainWindowVM.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(strPrePosition);
+               MainWindowVM.master.m_hiWinRobotInterface.wait_for_stop_motion();
                 // Trigger camera  1 
 
                 nError = WaitForNextStepSequenceEvent("Move To Pass fail position Done. Press Next to trigger camera 1");
@@ -1707,7 +1665,7 @@ namespace TapeReelPacking.Source.Application
                 nCurrentSequenceStep = 9;
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Trigger Camera 1");
 
-                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
                     return;
 
                 // If not yet trigger camera 1, trigger again
@@ -1741,7 +1699,7 @@ namespace TapeReelPacking.Source.Application
                     LogMessage.LogMessage.WriteToDebugViewer(9, $"{Application.LineNumber()}: {Application.PrintCallerName()}");
                     while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_ALLOW_TO_PLACE) != 1)
                     {
-                        if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || RobotIOStatus.m_EndLotStatus == 1)
+                        if (!MainWindowVM.m_bSequenceRunning && !InspectionTabVM.bEnableOfflineInspection || RobotIOStatus.m_EndLotStatus == 1)
                         {
                             return;
                         }
@@ -1752,7 +1710,7 @@ namespace TapeReelPacking.Source.Application
                             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                             {
 
-                                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("PLC Button Run is pressed. Restarting the Robot sequence....", (int)ERROR_CODE.LABEL_FAIL);
+                                OutputLogVM.AddLineOutputLog("PLC Button Run is pressed. Restarting the Robot sequence....", (int)ERROR_CODE.LABEL_FAIL);
                             });
                             Thread.Sleep(3000);
                             goto _Start_Lot;
@@ -1772,7 +1730,7 @@ namespace TapeReelPacking.Source.Application
                 nCurrentSequenceStep = 11;
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Put device to the tray");
 
-                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
                     return;
                 /////////////////Step 9: put device to the tray (turn off vaccum)
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
@@ -1801,7 +1759,7 @@ namespace TapeReelPacking.Source.Application
                     if (RobotIOStatus.m_IsLastChipStatus > 0)
                     {
 
-                        if (MainWindow.mainWindow.m_bSequenceRunning)
+                        if (MainWindowVM.m_bSequenceRunning)
                         {
 
                             lock (m_UpdateResultQueue[0])
@@ -1827,7 +1785,7 @@ namespace TapeReelPacking.Source.Application
 
 
 
-                if (MainWindow.mainWindow.m_bSequenceRunning)
+                if (MainWindowVM.m_bSequenceRunning)
                 {
 
                     lock (m_UpdateResultQueue[0])
@@ -1858,12 +1816,12 @@ namespace TapeReelPacking.Source.Application
             _Step_12:
                 nCurrentSequenceStep = 12;
 
-                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
                     return;
 
                 _Step_13:
                 nCurrentSequenceStep = 13;
-                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
                     return;
 
                 _Step_14:
@@ -1871,18 +1829,18 @@ namespace TapeReelPacking.Source.Application
 
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"Step {nCurrentSequenceStep} : Turn of Air. End Sequence");
 
-                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1 || !MainWindow.m_IsWindowOpen)
+                if (m_bMachineNotReadyNeedToReset || RobotIOStatus.m_EndLotStatus == 1)
                     return;
                 // Move to ready position and turn off vaccum
 
                 if (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CHIPFOUND) != 1)
                 {
-                    MainWindow.mainWindow.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.READY_POSITION);
+                   MainWindowVM.master.m_hiWinRobotInterface.MoveTo_STATIC_POSITION(HiWinRobotInterface.SequencePointData.READY_POSITION);
                 }
 
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_ON, false);
                 HWinRobot.set_digital_output(HiWinRobotInterface.m_RobotConnectID, (int)OUTPUT_IOROBOT.ROBOT_AIR_OFF, false);
-                MainWindow.mainWindow.master.m_hiWinRobotInterface.wait_for_stop_motion();
+               MainWindowVM.master.m_hiWinRobotInterface.wait_for_stop_motion();
 
                 nError = WaitForNextStepSequenceEvent("Sequence completed! Press Next to continue sequence...");
                 if (nError != (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE)
@@ -1895,7 +1853,7 @@ namespace TapeReelPacking.Source.Application
 
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
-                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Total Sequence time {timeIns_fullSequence.ElapsedMilliseconds} (ms): ");
+                    OutputLogVM.AddLineOutputLog($"Total Sequence time {timeIns_fullSequence.ElapsedMilliseconds} (ms): ");
                 });
                 LogMessage.LogMessage.WriteToDebugViewer(9, $"End sequence. Total time: ({timeIns_fullSequence.ElapsedMilliseconds} ms)");
                 timeIns_fullSequence.Restart();
@@ -1908,7 +1866,7 @@ namespace TapeReelPacking.Source.Application
                         case (int)SEQUENCE_OPTION.SEQUENCE_ABORT:
                             System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                             {
-                                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
+                                OutputLogVM.AddLineOutputLog($"Current Step {nCurrentSequenceStep} ");
                             });
                             return;
 
@@ -1978,7 +1936,7 @@ namespace TapeReelPacking.Source.Application
             while (HWinRobot.get_digital_input(HiWinRobotInterface.m_RobotConnectID, (int)INPUT_IOROBOT.PLC_CHIPFOUND) != 1)
             {
 
-                if (!MainWindow.mainWindow.m_bSequenceRunning && !MainWindow.mainWindow.bEnableOfflineInspection || RobotIOStatus.m_EmergencyStatus == 1)
+                if (!MainWindowVM.m_bSequenceRunning && !InspectionTabVM.bEnableOfflineInspection || RobotIOStatus.m_EmergencyStatus == 1)
                 {
                     return -1;
                 }
@@ -2080,8 +2038,8 @@ namespace TapeReelPacking.Source.Application
                         if (m_SequenceMode == (int)SEQUENCE_MODE.MODE_MANUAL)
                             goto startBarcodeSequence;
 
-                        if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
-                            goto EndThread;
+                        //if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
+                        //    goto EndThread;
                         Thread.Sleep(30);
                         nTimeOut++;
                         if (nTimeOut > 10)
@@ -2095,7 +2053,7 @@ namespace TapeReelPacking.Source.Application
                         //    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         //    {
 
-                        //        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("PLC Button Run is pressed. Restarting the Barcode sequence....", (int)ERROR_CODE.LABEL_FAIL);
+                        //        OutputLogVM.AddLineOutputLog("PLC Button Run is pressed. Restarting the Barcode sequence....", (int)ERROR_CODE.LABEL_FAIL);
                         //    });
                         //    Thread.Sleep(3000);
                         //    goto startBarcodeSequence;
@@ -2108,8 +2066,8 @@ namespace TapeReelPacking.Source.Application
                     LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Wait PLC Barcode Trigger {(int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_TRIGGER}!   Device {m_Tracks[1].m_CurrentSequenceDeviceID}");
                     while (m_plcComm.ReadPLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_TRIGGER) != 1)
                     {
-                        if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
-                            goto EndThread;
+                        //if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
+                        //    goto EndThread;
                         Thread.Sleep(100);
                     }
                     m_plcComm.WritePLCRegister((int)PLCCOMM.PLC_ADDRESS.PLC_MANUAL_BARCODE_TRIGGER, 0);
@@ -2166,7 +2124,7 @@ namespace TapeReelPacking.Source.Application
 
                 System.Drawing.PointF pCenter = new System.Drawing.PointF(0, 0);
                 System.Drawing.PointF pCorner = new System.Drawing.PointF(0, 0);
-                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = m_Tracks[1].Inspect(ref mainWindow.master.m_Tracks[1], out pCenter, out pCorner);
+                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = m_Tracks[1].Inspect(out pCenter, out pCorner);
 
 
                 if (strBarcodeResult.Contains("Dummy") || strBarcodeResult.Length < 1)
@@ -2183,7 +2141,7 @@ namespace TapeReelPacking.Source.Application
                 //{
                 //    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 //    {
-                //        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Reader Sequence Ended!", (int)ERROR_CODE.LABEL_FAIL);
+                //        OutputLogVM.AddLineOutputLog("Barcode Reader Sequence Ended!", (int)ERROR_CODE.LABEL_FAIL);
 
                 //    });
                 //    continue;
@@ -2203,7 +2161,7 @@ namespace TapeReelPacking.Source.Application
                         m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath = strFailImage;
                         System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Barcode Reader: Scanned same device. Result FAILED!  Device {m_Tracks[1].m_CurrentSequenceDeviceID}", (int)ERROR_CODE.LABEL_FAIL);
+                            OutputLogVM.AddLineOutputLog($"Barcode Reader: Scanned same device. Result FAILED!  Device {m_Tracks[1].m_CurrentSequenceDeviceID}", (int)ERROR_CODE.LABEL_FAIL);
 
                         });
                     }
@@ -2215,7 +2173,7 @@ namespace TapeReelPacking.Source.Application
                     bFailSendToPLC = true;
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Barcode Reader: Result FAILED!  Device {m_Tracks[1].m_CurrentSequenceDeviceID}", (int)ERROR_CODE.LABEL_FAIL);
+                        OutputLogVM.AddLineOutputLog($"Barcode Reader: Result FAILED!  Device {m_Tracks[1].m_CurrentSequenceDeviceID}", (int)ERROR_CODE.LABEL_FAIL);
 
                     });
                 }
@@ -2245,7 +2203,7 @@ namespace TapeReelPacking.Source.Application
                 LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Send result to PLC Done {(int)PLCCOMM.PLC_ADDRESS.PLC_BARCODE_RESULT}  . Result: {bFailSendToPLC}  Device {m_Tracks[1].m_CurrentSequenceDeviceID}");
 
                 //LogMessage.LogMessage.WriteToDebugViewer(8, $"{ Application.LineNumber()}: {Application.PrintCallerName()}");
-                if (MainWindow.mainWindow.m_bSequenceRunning || m_SequenceMode == (int)SEQUENCE_MODE.MODE_MANUAL)
+                if (MainWindowVM.m_bSequenceRunning || m_SequenceMode == (int)SEQUENCE_MODE.MODE_MANUAL)
                 {
 
                     if (m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult == -(int)ERROR_CODE.PASS)
@@ -2285,7 +2243,7 @@ namespace TapeReelPacking.Source.Application
                             {
                                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                                 {
-                                    ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Barcode Reader: Get Count Signal Failed !  Device {m_Tracks[1].m_CurrentSequenceDeviceID}", (int)ERROR_CODE.LABEL_FAIL);
+                                    OutputLogVM.AddLineOutputLog($"Barcode Reader: Get Count Signal Failed !  Device {m_Tracks[1].m_CurrentSequenceDeviceID}", (int)ERROR_CODE.LABEL_FAIL);
 
                                 });
 
@@ -2341,8 +2299,8 @@ namespace TapeReelPacking.Source.Application
         {
             while (true)
             {
-                if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
-                    break;
+                //if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
+                //    break;
 
                 Thread.Sleep(50);
                 ImageSaveData data = new ImageSaveData();
@@ -2412,8 +2370,8 @@ namespace TapeReelPacking.Source.Application
             VisionResultData data = new VisionResultData();
             while (true)
             {
-                if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
-                    break;
+                //if (MainWindow.mainWindow == null || !MainWindow.m_IsWindowOpen)
+                //    break;
 
                 Thread.Sleep(50);
                 lock (m_UpdateResultQueue[nTrack])
@@ -2464,13 +2422,13 @@ namespace TapeReelPacking.Source.Application
         {
             if (m_TeachThread == null)
             {
-                m_TeachThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].func_TeachSequence(MainWindow.activeImageDock.trackID)));
+                m_TeachThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[MainWindowVM.activeImageDock.trackID].m_imageViews[0].func_TeachSequence(MainWindowVM.activeImageDock.trackID)));
                 m_TeachThread.SetApartmentState(ApartmentState.STA);
             }
             else
             {
                 m_TeachThread = null;
-                m_TeachThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].func_TeachSequence(MainWindow.activeImageDock.trackID)));
+                m_TeachThread = new System.Threading.Thread(new System.Threading.ThreadStart(() => m_Tracks[MainWindowVM.activeImageDock.trackID].m_imageViews[0].func_TeachSequence(MainWindowVM.activeImageDock.trackID)));
                 m_TeachThread.SetApartmentState(ApartmentState.STA);
             }
             m_TeachThread.IsBackground = true;
@@ -2514,25 +2472,25 @@ namespace TapeReelPacking.Source.Application
             //m_hiWinRobotInterface.m_hiWinRobotUserControl.check_Manual.IsChecked = true;
             //m_hiWinRobotInterface.m_hiWinRobotUserControl.check_Auto.IsChecked = false;
 
-            if (bIschecked)
-            {
-                MainWindow.mainWindow.grd_Defect.Height = 650;// m_hiWinRobotInterface.m_hiWinRobotUserControl.Height;
-                MainWindow.mainWindow.grd_Defect.Width = 800;// m_hiWinRobotInterface.m_hiWinRobotUserControl.Width;
+            //if (bIschecked)
+            //{
+            //   MainWindow.mainWindow.grd_Defect.Height = 650;// m_hiWinRobotInterface.m_hiWinRobotUserControl.Height;
+            //   MainWindow.mainWindow.grd_Defect.Width = 800;// m_hiWinRobotInterface.m_hiWinRobotUserControl.Width;
 
-                MainWindow.mainWindow.grd_Defect.Children.Clear();
-                MainWindow.mainWindow.grd_Defect.Children.Add(m_hiWinRobotInterface.m_hiWinRobotUserControl);
-                //defectInfor.SvDefect.CanContentScroll = true;
-                //MainWindow.mainWindow.grd_Defect.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-                //MainWindow.mainWindow.grd_Defect.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-                MainWindow.mainWindow.grd_Defect.Visibility = Visibility.Visible;
+            //   MainWindow.mainWindow.grd_Defect.Children.Clear();
+            //   MainWindow.mainWindow.grd_Defect.Children.Add(m_hiWinRobotInterface.m_hiWinRobotUserControl);
+            //    //defectInfor.SvDefect.CanContentScroll = true;
+            //    //MainWindow.mainWindow.grd_Defect.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            //    //MainWindow.mainWindow.grd_Defect.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            //   MainWindow.mainWindow.grd_Defect.Visibility = Visibility.Visible;
 
-                MainWindow.mainWindow.grd_Defect_Settings.Visibility = System.Windows.Visibility.Visible;
-            }
-            else
-            {
-                MainWindow.mainWindow.grd_Defect.Children.Clear();
-                MainWindow.mainWindow.grd_Defect_Settings.Visibility = System.Windows.Visibility.Collapsed;
-            }
+            //   MainWindow.mainWindow.grd_Defect_Settings.Visibility = System.Windows.Visibility.Visible;
+            //}
+            //else
+            //{
+            //   MainWindow.mainWindow.grd_Defect.Children.Clear();
+            //   MainWindow.mainWindow.grd_Defect_Settings.Visibility = System.Windows.Visibility.Collapsed;
+            //}
         }
 
         public static void ReleaseEventAndThread()

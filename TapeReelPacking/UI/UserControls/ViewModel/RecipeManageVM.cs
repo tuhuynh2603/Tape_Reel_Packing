@@ -15,6 +15,17 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
     public class RecipeManageVM:BaseVM
     {
 
+        private Visibility _isVisible = Visibility.Collapsed;
+        public Visibility isVisible
+        {
+            get => _isVisible;
+            set
+            {
+                _isVisible = value;
+                OnPropertyChanged(nameof(isVisible));
+            }
+        }
+
         private string _m_strNewRecipe = "";
         public string m_strNewRecipe{
             get => _m_strNewRecipe;
@@ -159,7 +170,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         private void LoadRecipe()
         {
-            MainWindow.mainWindow.master.LoadRecipe(comboRecipeSelectedItem.ToString());
+            MainWindowVM.master.LoadRecipe(comboRecipeSelectedItem.ToString());
         }
 
         private ActionCommand closeRecipeCommand;

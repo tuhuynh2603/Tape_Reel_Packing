@@ -19,210 +19,48 @@ using System.Windows.Shapes;
 using static TapeReelPacking.Source.Application.Master;
 using TapeReelPacking.UI.UserControls.View;
 
-namespace TapeReelPacking.UI.UserControls
+namespace TapeReelPacking.UI.UserControls.View
 {
     /// <summary>
     /// Interaction logic for WarningMessageBox.xaml
     /// </summary>
-    public partial class WarningMessageBox : UserControl, INotifyPropertyChanged
+    public partial class WarningMessageBox : UserControl
     {
 
-        private string _m_SequenceWarningMessage = "........";
-        private WARNINGMESSAGE _m_warningMessage = WARNINGMESSAGE.MESSAGE_INFORMATION;
-        public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged(string Name)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Name));
-        }
-
-        public string m_SequenceWarningMessage
-        {
-            get { return _m_SequenceWarningMessage; }
-            set
-            {
-                if (value != _m_SequenceWarningMessage)
-                {
-                    _m_SequenceWarningMessage = value;
-                    OnPropertyChanged("m_SequenceWarningMessage");
-                }
-            }
-        }
         public WarningMessageBox()
         {
             InitializeComponent();
         }
 
-        public void updateMessageString(string strMessage, WARNINGMESSAGE warningtype)
+        private Point _startWarningPositionDlg;
+        private System.Windows.Vector _startOffsetWarningPositionDlg;
+
+        private void grd_Warning_Setting_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            _m_warningMessage = warningtype;
-            string strDateTime = DateTime.Now.ToString();
-            ////m_SequenceWarningMessage = $"[{strDateTime}]:   {strMessage}" ;
-            txtWarningMessage.Text = $"[{strDateTime}]:  {strMessage}";
-
-            btn_Sequence_Abort.IsEnabled = false;
-            btn_Sequence_Abort.Visibility = Visibility.Collapsed;
-
-            btn_Sequence_Continue.IsEnabled = false;
-            btn_Sequence_Continue.Visibility = Visibility.Collapsed;
-
-            btn_Sequence_Previous.IsEnabled = false;
-            btn_Sequence_Next.IsEnabled = false;
-
-            btn_Sequence_Previous.Visibility = Visibility.Collapsed;
-            btn_Sequence_Next.Visibility = Visibility.Collapsed;
-
-            btn_Retry_Current_Step.Visibility = Visibility.Collapsed;
-            btn_Retry_Current_Step.IsEnabled = false;
-
-            switch (warningtype)
-                {
-                case WARNINGMESSAGE.MESSAGE_EMERGENCY:
-                    //txtWarningMessage.Text = $"[{strDateTime}]:  Emergency Button Clicked!";
-
-                    btn_Sequence_Abort.IsEnabled = true;
-                    btn_Sequence_Abort.Visibility = Visibility.Visible
-                        ;
-                    break;
-
-                case WARNINGMESSAGE.MESSAGE_IMIDIATESTOP:
-                    //txtWarningMessage.Text = $"[{strDateTime}]: Imidiate Button Clicked! Please click Continue/Abort to Continue/End Sequence";
-
-                    btn_Sequence_Continue.IsEnabled = true;
-                    btn_Sequence_Continue.Visibility = Visibility.Visible;
-
-                    btn_Sequence_Abort.IsEnabled = true;
-                    btn_Sequence_Abort.Visibility = Visibility.Visible;
-
-                    //btn_Retry_Current_Step.Visibility = Visibility.Visible;
-                    //btn_Retry_Current_Step.IsEnabled = true;
-
-
-                    break;
-
-                case WARNINGMESSAGE.MESSAGE_STEPDEBUG:
-                    //btn_Sequence_Previous.IsEnabled = true;
-                    btn_Sequence_Next.IsEnabled = true;
-
-                    //btn_Sequence_Previous.Visibility = Visibility.Visible;
-                    btn_Sequence_Next.Visibility = Visibility.Visible;
-
-                    btn_Sequence_Abort.IsEnabled = true;
-                    btn_Sequence_Abort.Visibility = Visibility.Visible;
-                    break;
-
-                case WARNINGMESSAGE.MESSAGE_INFORMATION:
-                    //txtWarningMessage.Text = $"[{strDateTime}]: {strMessage}";
-
-                    btn_Sequence_Continue.IsEnabled = true;
-                    btn_Sequence_Continue.Visibility = Visibility.Visible;
-
-                    btn_Sequence_Abort.IsEnabled = true;
-                    btn_Sequence_Abort.Visibility = Visibility.Visible;
-
-                    break;
-
-
+            _startWarningPositionDlg = e.GetPosition(this);
+            if (_startWarningPositionDlg.X != 0 && _startWarningPositionDlg.Y != 0)
+            {
+                _startOffsetWarningPositionDlg = new Vector(tt_WarningSettings.X, tt_WarningSettings.Y);
+                grd_Warning_Setting.CaptureMouse();
             }
-
         }
 
-        private void btn_Sequence_Continue_Click(object sender, RoutedEventArgs e)
+        private void grd_Warning_Setting_MouseMove(object sender, MouseEventArgs e)
         {
-
-            ContinueSequenceButtonClicked(_m_warningMessage);
-
+            if (grd_Warning_Setting.IsMouseCaptured)
+            {
+                Vector offset = Point.Subtract(e.GetPosition(this), _startWarningPositionDlg);
+                tt_WarningSettings.X = _startOffsetWarningPositionDlg.X + offset.X;
+                tt_WarningSettings.Y = _startOffsetWarningPositionDlg.Y + offset.Y;
+            }
         }
 
-        public void ContinueSequenceButtonClicked(WARNINGMESSAGE nWarningMessges)
+        private void grd_Warning_Setting_MouseUp(object sender, MouseButtonEventArgs e)
         {
-
-            if (RobotIOStatus.m_EmergencyStatus == 1)
-                return;
-
-            Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
-            MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
-            if(RobotIOStatus.m_ImidiateStatus_Simulate == 1)
-                RobotIOStatus.m_ImidiateStatus_Simulate = 0;
-            MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE;
-                Master.m_bNeedToImidiateStop = false;
-            Thread.Sleep(500);
-            Master.m_NextStepSequenceEvent.Set();
-
-
-            //if (MainWindow.mainWindow.master.RobotIOStatus.m_ImidiateStatus + MainWindow.mainWindow.master.RobotIOStatus.m_EmergencyStatus > 0)
-            //    return;
-
-            //Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
-            //if (nWarningMessges == WARNINGMESSAGE.MESSAGE_IMIDIATESTOP)
-            //{
-            //    MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE;
-            //    MainWindow.mainWindow.master.m_bNeedToImidiateStop = false;
-            //}
-            //else
-            //    MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
-
-
-            //MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
-            //Master.m_NextStepSequenceEvent.Set();
-
+            grd_Warning_Setting.ReleaseMouseCapture();
         }
 
-        private void btn_Sequence_Abort_Click(object sender, RoutedEventArgs e)
-        {
-            if (Master.RobotIOStatus.m_EmergencyStatus == 1)
-                return;
 
-            MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_ABORT;
-
-
-            MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
-            Thread.Sleep(500);
-            Master.m_NextStepSequenceEvent.Set();
-        }
-
-        private void btn_Sequence_Previous_Click(object sender, RoutedEventArgs e)
-        {
-            //if (MainWindow.mainWindow.master.RobotIOStatus.m_ImidiateStatus + MainWindow.mainWindow.master.RobotIOStatus.m_EmergencyStatus > 0)
-            //    return;
-
-            //Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
-            //MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_GOBACK;
-
-            //MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
-            //Thread.Sleep(500);
-            //Master.m_NextStepSequenceEvent.Set();
-
-        }
-
-        private void btn_Sequence_Next_Click(object sender, RoutedEventArgs e)
-        {
-            if (Master.RobotIOStatus.m_EmergencyStatus == 1)
-                return;
-
-            Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
-            MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
-
-            MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
-            Thread.Sleep(500);
-            Master.m_NextStepSequenceEvent.Set();
-
-        }
-
-        private void btn_Retry_Current_Step_Click(object sender, RoutedEventArgs e)
-        {
-            //if (MainWindow.mainWindow.master.RobotIOStatus.m_ImidiateStatus + MainWindow.mainWindow.master.RobotIOStatus.m_EmergencyStatus > 0)
-            //    return;
-
-            //MainWindow.mainWindow.master.m_bNeedToImidiateStop = false;
-            //Source.Hardware.SDKHrobot.HWinRobot.set_motor_state(Source.Hardware.SDKHrobot.HiWinRobotInterface.m_RobotConnectID, 1);
-
-            //MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_CONTINUE;
-
-            //MainWindow.mainWindow.PopupWarningMessageBox("", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
-            //Thread.Sleep(500);
-            //Master.m_NextStepSequenceEvent.Set();
-
-        }
     }
 }

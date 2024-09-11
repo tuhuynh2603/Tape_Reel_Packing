@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:TapeReelPacking.Source.Hardware"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid Background="LightGray" Width="Auto" Height="Auto">
+    <Grid Background="LightGray" Width="Auto" Height="Auto" Visibility="{Binding isVisible}">
         <Grid.RowDefinitions>
             <RowDefinition Height="35"></RowDefinition>
             <RowDefinition  Height="35"></RowDefinition>

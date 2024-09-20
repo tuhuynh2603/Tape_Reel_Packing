@@ -5,8 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TapeReelPacking.Source.Hardware"
              mc:Ignorable="d" 
-             d:DesignHeight="550" d:DesignWidth="700">
-    <Grid Background="AliceBlue"  Visibility="{Binding isVisible}">
+             >
+    <Grid Background="AliceBlue">
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"></RowDefinition>
             <RowDefinition Height="3.4*"></RowDefinition>
@@ -108,6 +108,8 @@
 
                             <Slider ValueChanged="slider_AccRatioPercent_ValueChanged"  Grid.Column="1" x:Name="slider_AccRatioPercent" Minimum="10" Maximum="100" SmallChange="1" VerticalAlignment="Center" 
                                                                                      Value="{Binding Path=Text, ElementName=slider_AccRatioPercentShow, Mode=TwoWay}">
+
+
                             </Slider>
                             <TextBox x:Name="slider_AccRatioPercentShow" TextChanged ="slider_AccRatioPercentShow_TextChanged"  Background="Transparent" Text="{Binding Path=Value, ElementName=m_nAccRatioPercentValue, Mode=TwoWay ,UpdateSourceTrigger=PropertyChanged}" Foreground="Black" TextAlignment="Center" VerticalContentAlignment="Center" FontSize="15"></TextBox>
 

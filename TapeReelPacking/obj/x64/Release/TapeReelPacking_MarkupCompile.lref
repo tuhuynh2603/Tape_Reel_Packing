@@ -1,12 +1,13 @@
 ﻿
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\App.xaml;;
+FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\Template\DragDropUserControl.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\RibbonTabItems\InspectionTab.xaml;;
+FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\LayOutAnchorView.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\MainWindow.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\MappingCanvasView.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\MappingSetingUC.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\UI\UserControls\View\PopupUserControl.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\ResourceControl.xaml;;
-FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\Source\Hardware\ETHERNETIP_View.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\Source\Hardware\HIKControlCameraView.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\Source\Hardware\HiWinRobotUserControl.xaml;;
 FC:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\Source\Hardware\PLCCOMM.xaml;;

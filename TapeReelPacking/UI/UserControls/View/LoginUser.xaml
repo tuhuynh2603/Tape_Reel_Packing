@@ -16,14 +16,11 @@
         <!--<local:ConvertColorToBool x:Key="cvtColortoBool"></local:ConvertColorToBool>-->
     </UserControl.Resources>
 
-
-
-
     <UserControl.InputBindings>
         <KeyBinding Key="Enter" Command="{Binding LoginCommand}" />
     </UserControl.InputBindings>
     
-    <Grid Visibility="{Binding isVisible}">
+    <Grid>
         <Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                 <GradientStop Color="White" Offset="0.439"/>

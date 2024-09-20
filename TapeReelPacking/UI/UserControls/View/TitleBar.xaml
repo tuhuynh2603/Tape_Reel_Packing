@@ -7,11 +7,11 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:viewmodels="clr-namespace:TapeReelPacking.UI.UserControls.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="0" d:DesignWidth="100">
+             d:DesignHeight="0" d:DesignWidth="120">
     
-    <UserControl.DataContext>
+    <!--<UserControl.DataContext>
         <viewmodels:TitleBarVM></viewmodels:TitleBarVM>
-    </UserControl.DataContext>
+    </UserControl.DataContext>-->
 
     <Grid>
 

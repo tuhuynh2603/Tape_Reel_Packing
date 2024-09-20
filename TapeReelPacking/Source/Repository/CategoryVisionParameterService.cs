@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TapeReelPacking.Source.Model;
+using Xceed.Wpf.Toolkit.PropertyGrid.Converters;
 
 namespace TapeReelPacking.Source.Repository
 {
-    public class CategoryVisionParameterService
+    public class CategoryVisionParameterService: ICatergoryParameterService
     {
         private readonly CategoryVisionParameterRepository _repository;
 

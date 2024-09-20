@@ -258,15 +258,4 @@
         </Setter>
     </Style>
 
-
-    <RoutedUICommand x:Key="Routed_btn_inspect_Click"/>
-    <RoutedUICommand x:Key="Routed_Btn_load_teach_image_Click"/>
-    <RoutedUICommand x:Key="Routed_btn_Binarize_Click"/>
-    <RoutedUICommand x:Key="Routed_btn_Pixel_Ruler_Click"/>
-    <RoutedUICommand x:Key="Routed_btn_next_teach_click"/>
-    <RoutedUICommand x:Key="Routed_btn_abort_teach_Click"/>
-    <RoutedUICommand x:Key="Routed_btn_Clear_Comm_Click"/>
-    <RoutedUICommand x:Key="Routed_btn_ShowOverlay_Click"/>
-
-
 </ResourceDictionary>

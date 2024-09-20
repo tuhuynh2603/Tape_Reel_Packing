@@ -4,127 +4,115 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TapeReelPacking.UI.UserControls"
+             xmlns:behavior="clr-namespace:TapeReelPacking.Source.Behaviors"
              xmlns:viewmodel="clr-namespace:TapeReelPacking.UI.UserControls.ViewModel"
-             mc:Ignorable="d"                       
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Margin="0,160,0,0"
-            Width="800" Height="400">
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             mc:Ignorable="d" >
     <!--<UserControl.DataContext>
         <viewmodel:WarningMessageBoxVM></viewmodel:WarningMessageBoxVM>
     </UserControl.DataContext>-->
-    <UserControl.Resources>
-        <Grid x:Key="continueImage">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="3*"></RowDefinition>
-                <RowDefinition Height="1*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <Image Grid.Row="0"   Source="/Resources/ContinueSequenceButton.png" Margin="3"></Image>
-            <TextBlock Grid.Row="1" Text="Continue" Foreground="black" TextAlignment="Center" FontSize="20"></TextBlock>
-        </Grid>
+    <Grid >
+        <Grid.Resources>
+            <Grid x:Key="continueImage">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Image Grid.Row="0"   Source="/Resources/ContinueSequenceButton.png" Margin="3"></Image>
+                <TextBlock Grid.Row="1" Text="Continue" Foreground="black" TextAlignment="Center" FontSize="20"></TextBlock>
+            </Grid>
 
-        <Grid x:Key="AbortImage">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="3*"></RowDefinition>
-                <RowDefinition Height="1*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <Image Grid.Row="0"   Source="/Resources/AbortSequenceButton.png"></Image>
-            <TextBlock Grid.Row="1" Text="Abort" Foreground="black" TextAlignment="Center" FontSize="20"></TextBlock>
-        </Grid>
-        
-        <Grid x:Key="NextImage">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="3*"></RowDefinition>
-                <RowDefinition Height="1*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <Image Grid.Row="0"   Source="/Resources/SequenceNextButton.png"></Image>
-            <TextBlock Grid.Row="1" Text="Next" Foreground="black" TextAlignment="Center" FontSize="20"></TextBlock>
-        </Grid>
+            <Grid x:Key="AbortImage">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Image Grid.Row="0"   Source="/Resources/AbortSequenceButton.png"></Image>
+                <TextBlock Grid.Row="1" Text="Abort" Foreground="black" TextAlignment="Center" FontSize="20"></TextBlock>
+            </Grid>
 
-        <Grid x:Key="PreviousImage">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="3*"></RowDefinition>
-                <RowDefinition Height="1*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <Image Grid.Row="0"   Source="/Resources/SequencePreviousButton.png"></Image>
-            <TextBlock Grid.Row="1" Text="Back" Foreground="black" TextAlignment="Center" FontSize="20"></TextBlock>
-        </Grid>
+            <Grid x:Key="NextImage">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Image Grid.Row="0"   Source="/Resources/SequenceNextButton.png"></Image>
+                <TextBlock Grid.Row="1" Text="Next" Foreground="black" TextAlignment="Center" FontSize="20"></TextBlock>
+            </Grid>
 
-        <Grid x:Key="RetryImage">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="3*"></RowDefinition>
-                <RowDefinition Height="1*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <Image Grid.Row="0"   Source="/Resources/SequenceRetry.png"></Image>
-            <TextBlock Grid.Row="1" Text="Retry" Foreground="black" TextAlignment="Center" FontSize="20"></TextBlock>
-        </Grid>
+            <Grid x:Key="PreviousImage">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Image Grid.Row="0"   Source="/Resources/SequencePreviousButton.png"></Image>
+                <TextBlock Grid.Row="1" Text="Back" Foreground="black" TextAlignment="Center" FontSize="20"></TextBlock>
+            </Grid>
 
-        
+            <Grid x:Key="RetryImage">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Image Grid.Row="0"   Source="/Resources/SequenceRetry.png"></Image>
+                <TextBlock Grid.Row="1" Text="Retry" Foreground="black" TextAlignment="Center" FontSize="20"></TextBlock>
+            </Grid>
 
-    </UserControl.Resources>
 
-    <Grid Visibility="{Binding isVisible}"
-          Background="White"  
-          MouseDown="grd_Warning_Setting_MouseDown" 
-          MouseMove="grd_Warning_Setting_MouseMove" 
-          MouseUp="grd_Warning_Setting_MouseUp" 
-          x:Name="grd_Warning_Setting" >
-        <Grid.RenderTransform >
-            <TranslateTransform x:Name="tt_WarningSettings"/>
-        </Grid.RenderTransform>
+
+        </Grid.Resources>
+
 
         <Grid.RowDefinitions>
             <RowDefinition Height="0.5*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="1.5*"/>
         </Grid.RowDefinitions>
-        <Border Grid.Row="0" Background="Yellow" BorderBrush="DarkCyan" BorderThickness="1">
+
+        <Border Grid.Row="0" Background="Yellow" BorderBrush="DarkCyan" BorderThickness="1" >
             <Label Content="Warning Message" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Foreground="Red" FontSize="20"></Label>
         </Border>
         <TextBlock Margin="5" Grid.Row="1" Text="{Binding strWarningMessage}" 
-                   TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" FontSize="20" Foreground="Black"></TextBlock>
-        
-        <Grid Grid.Row="2" >
+                        TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" FontSize="20" Foreground="Black"></TextBlock>
+
+        <Grid Grid.Row="2" Background="White">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="1"  Orientation="Horizontal" HorizontalAlignment="Right" Margin="10,5,5,5">
                 <Button  x:Name="btn_Sequence_Continue" Background="Transparent" BorderThickness="0"
-                     Content="{StaticResource continueImage }" 
-                         Command="{Binding btn_Sequence_Continue_ClickCmd}"
-                         Visibility="{Binding btn_Sequence_ContinueVisible}"
-                         Margin="5,0,5,0"></Button>
+                            Content="{StaticResource continueImage }" 
+                                Command="{Binding btn_Sequence_Continue_ClickCmd}"
+                                Visibility="{Binding btn_Sequence_ContinueVisible}"
+                                Margin="5,0,5,0"></Button>
                 <Button x:Name="btn_Sequence_Abort" Background="Transparent" BorderThickness="0"  
-                    Content="{StaticResource AbortImage}"
-                    Command="{Binding btn_Sequence_Abort_ClickCmd}"    
-                        Visibility="{Binding btn_Sequence_AbortVisible}"
-                     Margin="5,0,5,0"></Button>
+                        Content="{StaticResource AbortImage}"
+                        Command="{Binding btn_Sequence_Abort_ClickCmd}"    
+                            Visibility="{Binding btn_Sequence_AbortVisible}"
+                            Margin="5,0,5,0"></Button>
             </StackPanel>
-            
+
             <StackPanel Grid.Column="0"  Orientation="Horizontal" HorizontalAlignment="Right" Margin="10,5,5,5">
                 <Button x:Name="btn_Sequence_Previous" Background="Transparent" BorderThickness="0"  
-                    Content="{StaticResource PreviousImage}"
-                     Command="{Binding btn_Sequence_Previous_ClickCmd}"   
-                     Margin="5,0,5,0"
-                     Visibility="{Binding btn_Sequence_PreviousVisible}"></Button>
-                
+                        Content="{StaticResource PreviousImage}"
+                            Command="{Binding btn_Sequence_Previous_ClickCmd}"   
+                            Margin="5,0,5,0"
+                            Visibility="{Binding btn_Sequence_PreviousVisible}"></Button>
+
                 <Button  x:Name="btn_Sequence_Next" Background="Transparent" BorderThickness="0"
-                     Content="{StaticResource NextImage }"
-                     Command="{Binding btn_Sequence_Next_ClickCmd}" 
-                     Margin="5,0,5,0"
-                     Visibility="{Binding btn_Sequence_NextVisible}"></Button>
+                            Content="{StaticResource NextImage }"
+                            Command="{Binding btn_Sequence_Next_ClickCmd}" 
+                            Margin="5,0,5,0"
+                            Visibility="{Binding btn_Sequence_NextVisible}"></Button>
 
                 <Button  x:Name="btn_Retry_Current_Step" Background="Transparent" BorderThickness="0"
-                     Content="{StaticResource RetryImage }"
-                     Command="{Binding btn_Retry_Current_Step_ClickCmd}"
-                     Visibility="{Binding btn_Retry_Current_StepVisible}"
-                         Margin="5,0,5,0"></Button>
+                            Content="{StaticResource RetryImage }"
+                            Command="{Binding btn_Retry_Current_Step_ClickCmd}"
+                            Visibility="{Binding btn_Retry_Current_StepVisible}"
+                                Margin="5,0,5,0"></Button>
 
             </StackPanel>
         </Grid>
-
-        
-        
     </Grid>
 </UserControl>

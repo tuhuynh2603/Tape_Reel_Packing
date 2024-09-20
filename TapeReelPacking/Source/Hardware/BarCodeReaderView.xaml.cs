@@ -62,7 +62,7 @@ namespace TapeReelPacking.Source.Hardware
         {
             string strFullPathImageOut;
             nDeviceIDTemp++;
-            if (nDeviceIDTemp > Application.Application.categoriesMappingParam.M_NumberDevicePerLot)
+            if (nDeviceIDTemp > ((MappingSetingUCVM)MainWindowVM.mainWindowVM.mMappingSettingUCVM.CurrentViewModel).categoriesMappingParam.M_NumberDevicePerLot)
             {
                 nDeviceIDTemp = 0;
                 strLot = string.Format("{0}{1}{2}+{3}{4}{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));

@@ -12,6 +12,7 @@ using System.IO;
 using System.Windows;
 using Master = TapeReelPacking.Source.Application.Master;
 using Application = TapeReelPacking.Source.Application.Application;
+using static TapeReelPacking.UI.UserControls.ViewModel.StepDebugVM;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
@@ -372,10 +373,10 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         public static SetEnableTeachButtonDelegate setEnableTeachButtonDelegate;
 
 
-        private MainWindowVM mainWindowVM { set; get; }
+        private MainWindowVM _mainWindowVM { set; get; }
         public InspectionTabVM(MainWindowVM mainVM)
         {
-            mainWindowVM = mainVM;
+            _mainWindowVM = mainVM;
             setDisableTeachButtonDelegate = SetDisableTeachButton;
             setEnableTeachButtonDelegate = SetEnableTeachButton;
             loginEnableButtonDelegate = enableAftetLogin;
@@ -440,8 +441,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         private void Performbtn_debug_UncheckedCmd()
         {
 
-            m_bEnableDebug = false;
-            mainWindowVM.mStepDebugVM.isVisible = Visibility.Collapsed;
+            _mainWindowVM.mStepDebugVM.isVisible = Visibility.Collapsed;
             //MainWindow.mainWindow.grd_Defect_Settings.Visibility = Visibility.Collapsed;
         }
 
@@ -462,26 +462,12 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         private void Performbtn_debug_CheckedCmd()
         {
-            m_bEnableDebug = true;
-            mainWindowVM.mStepDebugVM.isVisible = Visibility.Visible;
-            //MainWindow.mainWindow.m_bEnableDebug = true;
-            //if (MainWindowVM.m_bSequenceRunning)
-            //    return;
-
-            //if (MainWindowVM.master.m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].btmSource.Width < 0)
-            //    return;
-
-            //var defectInforData = (DefectInfoVM)MainWindow.mainWindow.defectInfor.DataContext;
-            //defectInforData.m_TrackDebugging = MainWindow.activeImageDock.trackID;
-            //MainWindowVM.master.m_Tracks[MainWindow.activeImageDock.trackID].m_InspectionCore.LoadImageToInspection(MainWindowVM.master.m_Tracks[MainWindow.activeImageDock.trackID].m_imageViews[0].btmSource);
-            //MainWindowVM.master.m_Tracks[MainWindow.activeImageDock.trackID].DebugFunction();
-            //UpdateDebugInfor();
-            //return;
+            _mainWindowVM.mStepDebugVM.isVisible = Visibility.Visible;
+            doStepDebugDelegate?.Invoke(MainWindowVM.activeImageDock.trackID);
         }
 
 
         //private string _color_portReceive;
-        public static bool m_bEnableDebug;
         public void UpdateDebugInfor()
         {
             //if (!m_bEnableDebug)
@@ -625,7 +611,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         private void Performbtn_teach_parameters_UncheckedCmd()
         {
-            mainWindowVM.mTeachParameterVM.isVisible = Visibility.Collapsed;
+            _mainWindowVM.mTeachParameterVM.isVisible = Visibility.Collapsed;
         }
 
         private ActionCommand btn_teach_parameters_CheckedCmd1;
@@ -645,7 +631,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         private void Performbtn_teach_parameters_CheckedCmd()
         {
-            mainWindowVM.mTeachParameterVM.isVisible = Visibility.Visible;
+            _mainWindowVM.mTeachParameterVM.isVisible = Visibility.Visible;
         }
 
         private ActionCommand pviArea_parameters_btn_UncheckedCmd1;
@@ -665,7 +651,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         private void PerformpviArea_parameters_btn_UncheckedCmd()
         {
-            mainWindowVM.mVisionParameterVM.isVisible = Visibility.Collapsed;
+            _mainWindowVM.mVisionParameterVM.isVisible = Visibility.Collapsed;
 
         }
 
@@ -686,7 +672,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         private void PerformpviArea_parameters_btn_CheckedCmd()
         {
-            mainWindowVM.mVisionParameterVM.isVisible = Visibility.Visible;
+            _mainWindowVM.mVisionParameterVM.isVisible = Visibility.Visible;
         }
 
         private ActionCommand btn_next_teach_clickCmd1;

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Expression.Interactivity.Core;
+using Microsoft.Extensions.DependencyInjection;
 using Prism.Commands;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,8 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using TapeReelPacking.Source.Application;
 using TapeReelPacking.Source.Define;
+using TapeReelPacking.Source.Factory;
+using TapeReelPacking.Source.Interface;
 using TapeReelPacking.Source.LogMessage;
 using TapeReelPacking.Source.Model;
 using TapeReelPacking.Source.Repository;
@@ -19,24 +22,20 @@ using Point = System.Windows.Point;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
-    public class MainWindowVM:BaseVM
+    public class MainWindowVM : BaseVM
     {
         public static Master master;
-
+        public Application applications { set; get; }
         public static bool IsFisrtLogin = false;
         public bool Logout = false;
 
-        public static MainWindow mainWindow;
+        public static MainWindowVM mainWindowVM;
         public static bool m_IsWindowOpen = true;
 
         public int m_nDeviceX = 5;
         public int m_nDeviceY = 5;
         public int m_nTotalDevicePerLot = 1000;
-        public static StepDebugView defectInfor = new StepDebugView();
-        public SerialCommunicationView m_SerialCommunicationView;
 
-
-        public RecipeManageView m_RecipeManage;
         internal static string accountUser;
         internal static AccessLevel accessLevel;
 
@@ -53,6 +52,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         public OutputLogView outputLogView;
         public StatisticView m_staticView;
+        public StatisticVM m_staticVM;
 
         private LayoutDocumentPaneGroup mainPanelGroup;
         public LayoutDocumentPaneGroup oldPanelGroup = new LayoutDocumentPaneGroup();
@@ -179,58 +179,109 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         }
 
 
-
         public DatabaseContext databaseContext { set; get; } = new DatabaseContext();
-
-        CategoryVisionParameterRepository categoryVisionParameterRepository { set; get; }
-
-
-        CategoryTeachParameterRepository categoryTeachParameterRepository { set; get; }
-
-        CategoryTeachParameterService categoryTeachParameterService { set; get; }
-        CategoryVisionParameterService categoryVisionParameterService { set; get; }
-
-
         public void ConstructModels()
         {
-            categoryTeachParameterRepository = new CategoryTeachParameterRepository(databaseContext);
-            categoryTeachParameterService = new CategoryTeachParameterService(categoryTeachParameterRepository);
-            categoryVisionParameterRepository = new CategoryVisionParameterRepository(databaseContext);
-            categoryVisionParameterService = new CategoryVisionParameterService(categoryVisionParameterRepository);
 
-            mLoginUserVM = new LoginUserVM(this);
 
-            mTeachParameterVM = new TeachParameterVM(this, categoryTeachParameterService);
-            mVisionParameterVM = new VisionParameterVM(this, categoryVisionParameterService);
 
-            mSerialCommunicationVM = new SerialCommunicationVM();
-            mPixelRulerVM = new PixelRulerVM();
-            mPLCCOMMVM = new PLCCOMMVM();
-            mHiwinRobotVM = new HIKRobotVM();
-            mHIKControlCameraVM = new HIKControlCameraVM();
-            mMappingSettingUCVM = new MappingSetingUCVM();
-            mStepDebugVM = new StepDebugVM();
-            mBarCodeReaderVM = new BarcodeReaderVM();
-            mLotBarcodeDataTableVM = new LotBarcodeDatatableVM();
-            mWarningMessageBoxVM = new WarningMessageBoxVM(this);
 
+            mTitleBarVM = new TitleBarVM(this);   
+            mLoginUserVM = new DragDropUserControlVM((p, mainVM) => new LoginUserVM(p, mainVM), this);
+            mSerialCommunicationVM = new DragDropUserControlVM((p, mainVM) => new SerialCommunicationVM(p, mainVM), this);
+            mPixelRulerVM = new DragDropUserControlVM((p, mainVM) => new PixelRulerVM(p, mainVM), this);
+            mPLCCOMMVM = new DragDropUserControlVM((p, mainVM) => new PLCCOMMVM(p, mainVM), this);
+            mHiwinRobotVM = new DragDropUserControlVM((p) => new HIKRobotVM(p));
+            mHIKControlCameraVM = new DragDropUserControlVM((p) => new HIKControlCameraVM(p));
+            mMappingSettingUCVM = new DragDropUserControlVM((p, mainVM, databaseContext) => new MappingSetingUCVM(p, mainVM, databaseContext), this, databaseContext);
+            mBarCodeReaderVM = new DragDropUserControlVM((p) => new BarcodeReaderVM(p));
+            mLotBarcodeDataTableVM = new DragDropUserControlVM((p, mainVM) => new LotBarcodeDatatableVM(p, mainVM), this);
+            mRecipeManageVM = new DragDropUserControlVM((p, mainVM) => new RecipeManageVM(p, mainVM), this);
+            mWarningMessageBoxVM = new DragDropUserControlVM((p) => new WarningMessageBoxVM(p));
+            mTeachParameterVM = new DragDropUserControlVM((p, databaseContext) => new TeachParameterVM(p, databaseContext), databaseContext);
+            mVisionParameterVM = new DragDropUserControlVM((p, databaseContext) => new VisionParameterVM(p, databaseContext), databaseContext);
+            mStepDebugVM = new DragDropUserControlVM((p) => new StepDebugVM(p));
+            inspectionTabVM = new InspectionTabVM(this);
 
         }
+
+        //public Func<DragDropUserControlVM, MainWindowVM, BaseVM> InitLoginUserVM = (p, mainVM) =>
+        //{
+        //    return new LoginUserVM(p, mainVM);
+        //};
+
+        //public Func<DragDropUserControlVM, MainWindowVM, BaseVM> InitSerialCommunicationVM = (p, mainVM) =>
+        //{
+        //    return new SerialCommunicationVM(p, mainVM);
+        //};
+        //public Func<DragDropUserControlVM, MainWindowVM, BaseVM> InitPixelRulerVM = (p, mainVM) =>
+        //{
+        //    return new PixelRulerVM(p, mainVM);
+        //};
+        //public Func<DragDropUserControlVM, MainWindowVM, BaseVM> InitPLCCOMMVM = (p, mainVM) =>
+        //{
+        //    return new PLCCOMMVM(p, mainVM);
+        //};
+        //public Func<DragDropUserControlVM, BaseVM> InitHIKRobotVM = (p) =>
+        //{
+        //    return new HIKRobotVM(p);
+        //};
+        //public Func<DragDropUserControlVM, BaseVM> InitHIKControlCameraVM = (p) =>
+        //{
+        //    return new HIKControlCameraVM(p);
+        //};
+        //public Func<DragDropUserControlVM, MainWindowVM, DatabaseContext, BaseVM> InitMappingSetingUCVM = (p, mainVM, databaseContext) =>
+        //{
+        //    return new MappingSetingUCVM(p, mainVM, databaseContext);
+        //};
+        //public Func<DragDropUserControlVM, MainWindowVM, BaseVM> InitLotBarcodeDatatableVM = (p, mainVM) =>
+        //{
+        //    return new LotBarcodeDatatableVM(p, mainVM);
+        //};
+        //public Func<DragDropUserControlVM, BaseVM> InitBarcodeReaderVM = (p) =>
+        //{
+        //    return new BarcodeReaderVM(p);
+        //};
+        //public Func<DragDropUserControlVM, MainWindowVM, BaseVM> InitRecipeManageVM = (mainVM, databaseContext) =>
+        //{
+        //    return new RecipeManageVM(mainVM, databaseContext);
+        //};
+
+        //public Func<DragDropUserControlVM, BaseVM> InitWarningBoxVM = (p) =>
+        //{
+        //    return new WarningMessageBoxVM(p);
+        //};
+
+        //public Func<DragDropUserControlVM, DatabaseContext, BaseVM> InitTeachParameterVM = (p, databaseContext) =>
+        //{
+        //    return new TeachParameterVM(p, databaseContext);
+        //};
+
+        //public Func<DragDropUserControlVM, DatabaseContext, BaseVM> InitVisionParameterVM = (p, databaseContext) =>
+        //{
+        //    return new VisionParameterVM(p, databaseContext);
+        //};
+
+        //public Func<DragDropUserControlVM, BaseVM> InitStepDebugVM = (p) =>
+        //{
+        //    return new StepDebugVM(p);
+        //};
+
+
+
+        MappingCanvasVM mappingCanvasVM { set; get; }
 
 
         public MainWindowVM()
         {
             LogMessage.WriteToDebugViewer(0, string.Format("Start Application...."));
+            applications = new Application(this);
 
             enableButton(false);
-
-            //mainWindow = main;
-            master = new Master(this);
-            outputLogView = new OutputLogView();
-            m_staticView = new StatisticView();
-            inspectionTabVM = new InspectionTabVM(this);
             ConstructModels();
 
+            mainWindowVM = this;
+            master = new Master(this);
 
             ContrucUIComponent();
             MappingImageDockToAvalonDock();
@@ -242,9 +293,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             updateCameraConnectionStatusDelegate = UpdateCameraConnectionStatus;
             zoomDocPanelDelegate = ZoomDocPanel;
             updateTitleDocDelegate = UpdateTitleDoc;
-            //showLoginUserDelegate = showLoginUser;
             loadAllStatisticDelegate = loadAllStatistic;
-            //stepDebugSizeChangedCmd = new DelegateCommand<SizeChangedEventArgs>(OnStepDebugGridSizeChanged);
         }
 
 
@@ -273,6 +322,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         }
         private void ContrucUIComponent()
         {
+
             InitBigDocPanel();
 
             // InitTeachDocument();
@@ -320,6 +370,10 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
 
             #region Output Log Contruction
+
+            outputLogView = new OutputLogView();
+
+
             outPutLogViewDoc = new LayoutAnchorable();
             outPutLogViewDoc.Title = "Output Log View";
             outPutLogViewDoc.Content = outputLogView;
@@ -341,6 +395,11 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
 
             #region Statistic Contruction
+            m_staticView = new StatisticView();
+            mappingCanvasVM = new MappingCanvasVM(((MappingSetingUCVM)mMappingSettingUCVM.CurrentViewModel).categoriesMappingParam);
+            m_staticVM = new StatisticVM(mappingCanvasVM);
+            m_staticView.DataContext = m_staticVM;
+
             m_MappingViewDoc = new LayoutAnchorable();
             m_MappingViewDoc.Title = "Mapping Results";
             m_MappingViewDoc.Content = m_staticView;
@@ -538,7 +597,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
             if (bResetSummary)
             {
-                for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)
+                for (int n = 0; n < ((MappingSetingUCVM)mMappingSettingUCVM.CurrentViewModel).categoriesMappingParam.M_NumberDevicePerLot; n++)
                 {
                     master.m_Tracks[nT].m_VisionResultDatas[n] = new VisionResultData();
                     master.m_Tracks[nT].m_VisionResultDatas_Total[n] = new VisionResultData();
@@ -547,7 +606,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                 VisionResultData.ReadLotResultFromExcel(Application.m_strCurrentLot, nT, ref master.m_Tracks[nT].m_VisionResultDatas, ref master.m_Tracks[nT].m_CurrentSequenceDeviceID);
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
-                    for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)
+                    for (int n = 0; n < ((MappingSetingUCVM)mMappingSettingUCVM.CurrentViewModel).categoriesMappingParam.M_NumberDevicePerLot; n++)
                     {
                         StatisticVM.updateValueStatisticDelegate?.Invoke(master.m_Tracks[nT].m_VisionResultDatas[n].m_nResult, nT);
                     }
@@ -1485,9 +1544,9 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             }
         }
 
-        private HIKRobotVM mHiwinRobotVM1;
+        private DragDropUserControlVM mHiwinRobotVM1;
 
-        public HIKRobotVM mHiwinRobotVM
+        public DragDropUserControlVM mHiwinRobotVM
         {
             get => mHiwinRobotVM1;
             set
@@ -1497,9 +1556,9 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             }
         }
 
-        private VisionParameterVM mVisionParameterVM1;
+        private DragDropUserControlVM mVisionParameterVM1;
 
-        public VisionParameterVM mVisionParameterVM
+        public DragDropUserControlVM mVisionParameterVM
         {
             get => mVisionParameterVM1;
             set
@@ -1509,9 +1568,9 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             }
         }
 
-        private TeachParameterVM mTeachParameterVM1;
+        private DragDropUserControlVM mTeachParameterVM1;
 
-        public TeachParameterVM mTeachParameterVM
+        public DragDropUserControlVM mTeachParameterVM
         {
             get => mTeachParameterVM1;
             set
@@ -1521,9 +1580,9 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             }
         }
 
-        private HIKControlCameraVM mHIKControlCameraVM1;
+        private DragDropUserControlVM mHIKControlCameraVM1;
 
-        public HIKControlCameraVM mHIKControlCameraVM
+        public DragDropUserControlVM mHIKControlCameraVM
         {
             get => mHIKControlCameraVM1;
             set
@@ -1532,9 +1591,9 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                 OnPropertyChanged(nameof(mHIKControlCameraVM));
             }
         }
-        private LoginUserVM mLoginUserVM1;
+        private DragDropUserControlVM mLoginUserVM1;
 
-        public LoginUserVM mLoginUserVM
+        public DragDropUserControlVM mLoginUserVM
         {
             get => mLoginUserVM1;
             set
@@ -1543,9 +1602,9 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                 OnPropertyChanged(nameof(mLoginUserVM));
             }
         }
-        private PixelRulerVM mPixelRulerVM1;
+        private DragDropUserControlVM mPixelRulerVM1;
 
-        public PixelRulerVM mPixelRulerVM
+        public DragDropUserControlVM mPixelRulerVM
         {
             get => mPixelRulerVM1;
             set
@@ -1554,9 +1613,9 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                 OnPropertyChanged(nameof(mPixelRulerVM));
             }
         }
-        private PLCCOMMVM mPLCCOMMVM1;
+        private DragDropUserControlVM mPLCCOMMVM1;
 
-        public PLCCOMMVM mPLCCOMMVM
+        public DragDropUserControlVM mPLCCOMMVM
         {
             get => mPLCCOMMVM1;
             set
@@ -1566,9 +1625,9 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             }
         }
 
-        private MappingSetingUCVM mMappingSettingUCVM1;
+        private DragDropUserControlVM mMappingSettingUCVM1;
 
-        public MappingSetingUCVM mMappingSettingUCVM
+        public DragDropUserControlVM mMappingSettingUCVM
         {
             get => mMappingSettingUCVM1;
             set
@@ -1579,9 +1638,9 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         }
 
 
-        private StepDebugVM mStepDebugVM1;
+        private DragDropUserControlVM mStepDebugVM1;
 
-        public StepDebugVM mStepDebugVM
+        public DragDropUserControlVM mStepDebugVM
         {
             get => mStepDebugVM1;
             set
@@ -1591,8 +1650,8 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             }
         }
 
-        private BarcodeReaderVM mBarCodeReaderVM1;
-        public BarcodeReaderVM mBarCodeReaderVM
+        private DragDropUserControlVM mBarCodeReaderVM1;
+        public DragDropUserControlVM mBarCodeReaderVM
         {
             get => mBarCodeReaderVM1;
             set
@@ -1602,8 +1661,8 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             }
         }
 
-        private LotBarcodeDatatableVM mLotBarcodeDataTableVM1;
-        public LotBarcodeDatatableVM mLotBarcodeDataTableVM
+        private DragDropUserControlVM mLotBarcodeDataTableVM1;
+        public DragDropUserControlVM mLotBarcodeDataTableVM
         {
             get => mLotBarcodeDataTableVM1;
             set
@@ -1613,9 +1672,9 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             }
         }
 
-        private WarningMessageBoxVM mWarningMessageBoxVM1;
+        private DragDropUserControlVM mWarningMessageBoxVM1;
 
-        public WarningMessageBoxVM mWarningMessageBoxVM
+        public DragDropUserControlVM mWarningMessageBoxVM
         {
             get => mWarningMessageBoxVM1;
             set
@@ -1625,9 +1684,9 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             }
         }
 
-        private SerialCommunicationVM mSerialCommunicationVM1;
+        private DragDropUserControlVM mSerialCommunicationVM1;
 
-        public SerialCommunicationVM mSerialCommunicationVM
+        public DragDropUserControlVM mSerialCommunicationVM
         {
             get => mSerialCommunicationVM1;
             set
@@ -1635,6 +1694,54 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                 mSerialCommunicationVM1 = value;
                 OnPropertyChanged(nameof(mSerialCommunicationVM));
             }
+        }
+
+        private DragDropUserControlVM mRecipeManageVM1;
+
+        public DragDropUserControlVM mRecipeManageVM
+        {
+            get => mRecipeManageVM1;
+            set
+            {
+                mRecipeManageVM1 = value;
+                OnPropertyChanged(nameof(mRecipeManageVM));
+            }
+        }
+
+        private TitleBarVM mTitleBarVM1;
+
+        public TitleBarVM mTitleBarVM
+        {
+            get => mTitleBarVM1;
+            set
+            {
+                mTitleBarVM1 = value;
+                OnPropertyChanged(nameof(mTitleBarVM));
+            }
+        }
+
+        private ActionCommand btn_LoadRecipe_ClickCmd1;
+
+        public ICommand btn_LoadRecipe_ClickCmd
+        {
+            get
+            {
+                if (btn_LoadRecipe_ClickCmd1 == null)
+                {
+                    btn_LoadRecipe_ClickCmd1 = new ActionCommand(Performbtn_LoadRecipe_ClickCmd);
+                }
+
+                return btn_LoadRecipe_ClickCmd1;
+            }
+        }
+
+        private void Performbtn_LoadRecipe_ClickCmd()
+        {
+            if (mRecipeManageVM.isVisible == Visibility.Visible)
+                mRecipeManageVM.isVisible = Visibility.Collapsed;
+            else
+                mRecipeManageVM.isVisible = Visibility.Visible;
+
         }
     }
 }

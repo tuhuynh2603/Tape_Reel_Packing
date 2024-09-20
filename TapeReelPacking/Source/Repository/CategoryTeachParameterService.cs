@@ -7,7 +7,7 @@ using TapeReelPacking.Source.Model;
 
 namespace TapeReelPacking.Source.Repository
 {
-    public class CategoryTeachParameterService
+    public class CategoryTeachParameterService: ICatergoryParameterService
     {
         private readonly CategoryTeachParameterRepository _repository;
 

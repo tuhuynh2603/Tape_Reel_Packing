@@ -1,11 +1,22 @@
 ﻿using Microsoft.Expression.Interactivity.Core;
+using Microsoft.Identity.Client;
+using MySqlX.XDevAPI.Common;
+using Org.BouncyCastle.Ocsp;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using TapeReelPacking.Source.Define;
+using TapeReelPacking.Source.Repository;
 using TapeReelPacking.UI.UserControls.View;
+using static Microsoft.Expression.Prototyping.Data.Serializer;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
@@ -38,44 +49,55 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         public delegate void InitCanvasMappingDelegate();
         public static InitCanvasMappingDelegate initCanvasMappingDelegate;
 
+        public delegate Task<MappingRectangleVM[]> InitCanvasMappingDelegateAsync(int n);
+        public static InitCanvasMappingDelegateAsync initCanvasMappingDelegateAsync;
+
         public delegate void SetMappingPageDelegate(int nTrack, int nPage);
         public static SetMappingPageDelegate setMappingPageDelegate;
 
         public delegate void SetMappingSizeDelegate(double w, double h);
         public static SetMappingSizeDelegate setMappingSizeDelegate;
 
-        private void SetMappingSize(double w, double h)
+        public void SetMappingSize(double w, double h)
         {
-            mappingCanvasWidth = w;
-            mappingCanvasHeight = h;
+            MappingCanvasWidth = w;
+            MappingCanvasHeight = h;
         }
 
+
         private void SetMappingPage(int nTrack, int nPage) => m_nPageID[nTrack] = nPage;
-        public MappingCanvasVM()
+        public MappingCanvasVM(CatergoryMappingParameters catergoryMappingParameters)
         {
-            InitCanvasMapping();
+            _catergoryMappingParameters = catergoryMappingParameters;
+
             ResetMappingResultDeleagate = ResetMappingResult;
             updateMappingResultPageDelegate = UpdateMappingResultPage;
             updateMappingResultDelegate = UpdateMappingResult;
             initCanvasMappingDelegate = InitCanvasMapping;
             setMappingPageDelegate = SetMappingPage;
             setMappingSizeDelegate = SetMappingSize;
+            initCanvasMappingDelegateAsync = InitCanvasMappingAsync;
             // Example data
         }
 
-        int m_nDeviceX = 5;
-        int m_nDeviceY = 5;
-        int m_nTotalDevicePerLot = 1000;
-        public void InitCanvasMapping()
-        {
-            if (MainWindow.mainWindow == null)
-                return;
+        //int m_nDeviceX = 5;
+        //int m_nDeviceY = 5;
+        //int m_nTotalDevicePerLot = 1000;
+        private CatergoryMappingParameters _catergoryMappingParameters { set; get; } = new CatergoryMappingParameters();
+        private CatergoryMappingParameters _catergoryMappingParametersTemp { set; get; } = new CatergoryMappingParameters();
 
-            m_nDeviceX = Source.Application.Application.categoriesMappingParam.M_NumberDeviceX;
-            m_nDeviceY = Source.Application.Application.categoriesMappingParam.M_NumberDeviceY;
-            m_nTotalDevicePerLot = Source.Application.Application.categoriesMappingParam.M_NumberDevicePerLot;
-            int nMaxDeviceStep = m_nDeviceX > m_nDeviceY ? m_nDeviceX : m_nDeviceY;
-            double dPage = Math.Ceiling((m_nTotalDevicePerLot * 1.0) / (m_nDeviceX * 1.0) / m_nDeviceY * 1.0);
+
+        public async Task<MappingRectangleVM[]> InitCanvasMappingAsync(int n)
+        {
+
+            //if (MainWindow.mainWindow == null)
+            //    return null;
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Restart();
+            Console.WriteLine("start " + n);
+            //initCanvasMappingDelegate?.Invoke();
+            int nMaxDeviceStep = _catergoryMappingParameters.M_NumberDeviceX > _catergoryMappingParameters.M_NumberDeviceY ? _catergoryMappingParameters.M_NumberDeviceX : _catergoryMappingParameters.M_NumberDeviceY;
+            double dPage = Math.Ceiling((_catergoryMappingParameters.M_NumberDevicePerLot * 1.0) / (_catergoryMappingParameters.M_NumberDeviceX * 1.0) / _catergoryMappingParameters.M_NumberDeviceY * 1.0);
             m_nNumberMappingPage = (int)dPage;
 
             int nWidthgrid = MappingCanvasWidth > 0 ? (int)MappingCanvasWidth : 500;
@@ -83,49 +105,144 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             double m_nWidthMappingRect = (int)(nWidthgrid / nMaxDeviceStep / 2.2);
             if (m_nWidthMappingRect > 100)
                 m_nWidthMappingRect = 100;
-            if (m_nWidthMappingRect < 35)
-                m_nWidthMappingRect = 35;
+            if (m_nWidthMappingRect < 25)
+                m_nWidthMappingRect = 25;
 
+
+            
             double m_nStepMappingRect = m_nWidthMappingRect + 1;
             string path = @"/Resources/gray-chip.png";
 
-            mappingRectangles = new ObservableCollection<MappingRectangleVM>();
-            MappingRectangleVM rec;
-            int nID = 0;
+            ObservableCollection<Task<MappingRectangleVM>> mappingRectangleVMTasks = new ObservableCollection<Task<MappingRectangleVM>>();
             for (int nTrack = 0; nTrack < 2; nTrack++)
             {
 
-                for (int nDeviceX = 0; nDeviceX < m_nDeviceX; nDeviceX++)
+                for (int nDeviceX = 0; nDeviceX < _catergoryMappingParameters.M_NumberDeviceX; nDeviceX++)
                 {
-                    for (int nDeviceY = 0; nDeviceY < m_nDeviceY; nDeviceY++)
+                    for (int nDeviceY = 0; nDeviceY < _catergoryMappingParameters.M_NumberDeviceY; nDeviceY++)
                     {
+                        int nTrackTemp = nTrack;
+                        int nDeviceXTemp = nDeviceX;
+                        int nDeviceYTemp = nDeviceY;
 
-                        rec = new MappingRectangleVM();
-                        rec.trackID = nTrack;
-                        rec.imageSource = new BitmapImage(new Uri(path, UriKind.Relative));
-                        rec.imageWidth = 0.95 * m_nWidthMappingRect;
-                        rec.imageHeight = 0.95 * m_nWidthMappingRect;
-                        rec.mappingID = nDeviceX + 1 + nDeviceY * m_nDeviceX + m_nPageID[nTrack] * m_nDeviceX * m_nDeviceY;
-                        rec.fontMappingSize = 0.95 * m_nWidthMappingRect / 3;
-                        rec.minMappingWidth = 0.95 * m_nWidthMappingRect;
-                        rec.minMappingHeight = 0.95 * m_nWidthMappingRect;
-                        rec.imageLeft = m_nStepMappingRect * nDeviceX + nTrack * m_nWidthMappingRect * (m_nDeviceX + 1);
-                        rec.imageTop = m_nStepMappingRect * nDeviceY;
-                        rec.labelLeft = m_nStepMappingRect * nDeviceX + nTrack * m_nWidthMappingRect * (m_nDeviceX + 1);
-                        rec.labelTop = m_nStepMappingRect * nDeviceY + 0.95 * m_nWidthMappingRect / 9;
-                        mappingRectangles.Add(rec);
+                        MappingRectangleVM rec = new MappingRectangleVM();
+                        //mappingRectangles.Add(rec);
+                        mappingRectangleVMTasks.Add(Task.Run(
+                         async () =>
+                        {
+                            rec.trackID = nTrackTemp;
+                            //await Application.Current.Dispatcher.InvokeAsync(() =>
+                            //{
+                            //    rec.imageSource = new BitmapImage(new Uri(path, UriKind.Relative));
+                            //});
+                            //Thread.Sleep(10);
+                            rec.imageWidth = 0.95 * m_nWidthMappingRect;
+                            rec.imageHeight = 0.95 * m_nWidthMappingRect;
+                            rec.mappingID = nDeviceXTemp + 1 + nDeviceYTemp * _catergoryMappingParameters.M_NumberDeviceX + m_nPageID[nTrackTemp] * _catergoryMappingParameters.M_NumberDeviceX * _catergoryMappingParameters.M_NumberDeviceY;
+                            rec.fontMappingSize = 0.95 * m_nWidthMappingRect / 3;
+                            rec.minMappingWidth = 0.95 * m_nWidthMappingRect;
+                            rec.minMappingHeight = 0.95 * m_nWidthMappingRect;
+                            rec.imageLeft = m_nStepMappingRect * nDeviceXTemp + nTrackTemp * m_nWidthMappingRect * (_catergoryMappingParameters.M_NumberDeviceX + 1);
+                            rec.imageTop = m_nStepMappingRect * nDeviceYTemp;
+                            rec.labelLeft = m_nStepMappingRect * nDeviceXTemp + nTrackTemp * m_nWidthMappingRect * (_catergoryMappingParameters.M_NumberDeviceX + 1);
+                            rec.labelTop = m_nStepMappingRect * nDeviceYTemp + 0.95 * m_nWidthMappingRect / 9;
+                            return rec;
+                        }
+                        ));
+
+
 
                     }
                 }
             }
 
-            //mappingRectangles = null;
-            //mappingRectangles = mappingRectangles;
+            var result = await Task.WhenAll(mappingRectangleVMTasks);
+            mappingRectangles = new ObservableCollection<MappingRectangleVM>();
 
-            if (MainWindowVM.mainWindow != null)
-                MainWindowVM.loadAllStatisticDelegate?.Invoke(false);
+            foreach (var rec in result)
+            {
+                mappingRectangles.Add(rec);
+
+            }
+
+            Console.WriteLine($"end {n}     {stopWatch.ElapsedMilliseconds} " );
+
+
+            return result;
+        }
+
+        public void InitCanvasMapping()
+        {
+
+            if (MainWindow.mainWindow == null)
+                return;
+
+            int nMaxDeviceStep = _catergoryMappingParameters.M_NumberDeviceX > _catergoryMappingParameters.M_NumberDeviceY ? _catergoryMappingParameters.M_NumberDeviceX : _catergoryMappingParameters.M_NumberDeviceY;
+            double dPage = Math.Ceiling((_catergoryMappingParameters.M_NumberDevicePerLot * 1.0) / (_catergoryMappingParameters.M_NumberDeviceX * 1.0) / _catergoryMappingParameters.M_NumberDeviceY * 1.0);
+            m_nNumberMappingPage = (int)dPage;
+
+            int nWidthgrid = MappingCanvasWidth > 0 ? (int)MappingCanvasWidth : 500;
+
+            double m_nWidthMappingRect = (int)(nWidthgrid / nMaxDeviceStep / 2.2);
+            if (m_nWidthMappingRect > 100)
+                m_nWidthMappingRect = 100;
+            if (m_nWidthMappingRect < 25)
+                m_nWidthMappingRect = 25;
+
+
+            double m_nStepMappingRect = m_nWidthMappingRect + 1;
+            string path = @"/Resources/gray-chip.png";
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                mappingRectangles = new ObservableCollection<MappingRectangleVM>();
+            });
+
+            for (int nTrack = 0; nTrack < 2; nTrack++)
+            {
+
+                for (int nDeviceX = 0; nDeviceX < _catergoryMappingParameters.M_NumberDeviceX; nDeviceX++)
+                {
+                    for (int nDeviceY = 0; nDeviceY < _catergoryMappingParameters.M_NumberDeviceY; nDeviceY++)
+                    {
+
+                        //Thread.Sleep(10);
+                        int nTrackTemp = nTrack;
+                        int nDeviceXTemp = nDeviceX;
+                        int nDeviceYTemp = nDeviceY;
+                        MappingRectangleVM rec = new MappingRectangleVM();
+                        rec.trackID = nTrackTemp;
+                        rec.imageSource = new BitmapImage(new Uri(path, UriKind.Relative));
+                        rec.imageWidth = 0.95 * m_nWidthMappingRect;
+                        rec.imageHeight = 0.95 * m_nWidthMappingRect;
+                        rec.mappingID = nDeviceXTemp + 1 + nDeviceYTemp * _catergoryMappingParameters.M_NumberDeviceX + m_nPageID[nTrackTemp] * _catergoryMappingParameters.M_NumberDeviceX * _catergoryMappingParameters.M_NumberDeviceY;
+                        rec.fontMappingSize = 0.95 * m_nWidthMappingRect / 3;
+                        rec.minMappingWidth = 0.95 * m_nWidthMappingRect;
+                        rec.minMappingHeight = 0.95 * m_nWidthMappingRect;
+                        rec.imageLeft = m_nStepMappingRect * nDeviceXTemp + nTrackTemp * m_nWidthMappingRect * (_catergoryMappingParameters.M_NumberDeviceX + 1);
+                        rec.imageTop = m_nStepMappingRect * nDeviceYTemp;
+                        rec.labelLeft = m_nStepMappingRect * nDeviceXTemp + nTrackTemp * m_nWidthMappingRect * (_catergoryMappingParameters.M_NumberDeviceX + 1);
+                        rec.labelTop = m_nStepMappingRect * nDeviceYTemp + 0.95 * m_nWidthMappingRect / 9;
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            mappingRectangles.Add(rec);
+                        });
+
+                    }
+                }
+            }
+
+            // Await all tasks to complete and return their results
+            // Ensure the UI update is performed on the UI thread
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                // Optionally invoke a delegate for additional UI updates
+                if (MainWindowVM.mainWindowVM != null)
+                    MainWindowVM.loadAllStatisticDelegate?.Invoke(false);
+            });
+
 
         }
+
 
 
         public void UpdateMappingResultPage(int nTrack)
@@ -142,9 +259,12 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             int nResultTotal;
             //for(int nTrack = 0; nTrack < 2; nTrack++)
             //{
-            int nDevice = m_nDeviceX * m_nDeviceY;
-            for (int nID = 0; nID < m_nDeviceX * m_nDeviceY; nID++)
+            int nDevice = _catergoryMappingParameters.M_NumberDeviceX * _catergoryMappingParameters.M_NumberDeviceY;
+            for (int nID = 0; nID < _catergoryMappingParameters.M_NumberDeviceX * _catergoryMappingParameters.M_NumberDeviceY;  nID++)
             {
+                if (nID >= mappingRectangles.Count())
+                    return;
+
                 nResultTotal = MainWindowVM.master.m_Tracks[nTrack].m_VisionResultDatas[nID + m_nPageID[nTrack] * nDevice].m_nResult;
 
                 switch (nResultTotal)
@@ -179,7 +299,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         public void UpdateMappingResult(VisionResultData resultData, int nTrack, int nDeviceID)
         {
-            int nDevice = m_nDeviceX * m_nDeviceY;
+            int nDevice = _catergoryMappingParameters.M_NumberDeviceX * _catergoryMappingParameters.M_NumberDeviceY;
 
             if (nDeviceID >= (m_nPageID[nTrack] + 1) * nDevice)
             {
@@ -206,7 +326,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
         public void ResetMappingResult(int nTrackID = (int)TRACK_TYPE.TRACK_CAM1)
         {
-            int nDevice = m_nDeviceX * m_nDeviceY;
+            int nDevice = _catergoryMappingParameters.M_NumberDeviceX * _catergoryMappingParameters.M_NumberDeviceY;
 
             string path = @"/Resources/gray-chip.png";
             for (int nID = 0; nID < nDevice; nID++)
@@ -359,10 +479,54 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         }
 
         private double mappingCanvasHeight = 300;
+
+        int n = 0;
+        Task a ;
         public double MappingCanvasHeight
         {
             get => mappingCanvasHeight;
-            set => SetProperty(ref mappingCanvasHeight, value);
+            set
+            {
+                mappingCanvasHeight = value;
+                OnPropertyChanged(nameof(MappingCanvasHeight));
+
+                // Await the async operation properly
+                //Stopwatch stopWatch = new Stopwatch();
+                //stopWatch.Restart();
+                //Console.WriteLine("start");
+                //initCanvasMappingDelegate?.Invoke();
+
+                if (a == null)
+                {
+                    a = InitCanvasMappingAsync(n++);
+                    //a.Start();
+                }
+                //else if (a.Status == TaskStatus.Running)
+                //{
+                //    a.Wait();
+                //    a = InitCanvasMappingAsync(n++);
+                //    //a.Start();
+                //}
+               else
+                    a = InitCanvasMappingAsync(n++);
+
+
+
+
+                //Console.WriteLine($"end {stopWatch.ElapsedMilliseconds}");
+                //// Update the ObservableCollection on the UI thread
+                //Dispatcher.Invoke(() =>
+                //{
+                //    vm.mappingRectangles = new ObservableCollection<MappingRectangleVM>();
+                //    foreach (var item in data)
+                //    {
+                //        vm.mappingRectangles.Add(item);
+                //    }
+                //    Console.WriteLine("end 2");
+
+                //});
+            }
+
         }
 
 

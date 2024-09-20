@@ -7,23 +7,19 @@ using System.Windows;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
-    public class HIKRobotVM:BaseVM
+    public class HIKRobotVM:BaseVM, ICustomUserControl
     {
-        private Visibility _isVisible = Visibility.Collapsed;
-
-        public Visibility isVisible
+        private DragDropUserControlVM _dragDropVM { set; get; }
+        public void RegisterUserControl()
         {
-            get => _isVisible;
-            set
-            {
-                _isVisible = value;
-                OnPropertyChanged(nameof(isVisible));
-            }
+            _dragDropVM.RegisterMoveGrid();
+            _dragDropVM.RegisterResizeGrid();
         }
 
-        public HIKRobotVM()
+        public HIKRobotVM(DragDropUserControlVM dragDropVM)
         {
-
+            _dragDropVM = dragDropVM;
+            RegisterUserControl();
         }
     }
 }

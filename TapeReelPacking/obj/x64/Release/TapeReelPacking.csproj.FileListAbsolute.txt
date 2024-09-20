@@ -11,13 +11,13 @@ C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking.c
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking.exe.config
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\Styles\RibbonStyle.baml
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\Source\Hardware\BarCodeReaderView.baml
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\Template\DragDropUserControl.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\RibbonTabItems\InspectionTab.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\View\MainWindow.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\View\MappingCanvasView.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\View\MappingSetingUC.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\View\PopupUserControl.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\Source\Hardware\BarCodeReaderView.g.cs
-C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\Source\Hardware\ETHERNETIP_View.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\Source\Hardware\HIKControlCameraView.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\Source\Hardware\HiWinRobotUserControl.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\Source\Hardware\PLCCOMM.g.cs
@@ -41,13 +41,13 @@ C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\GeneratedInternal
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking_MarkupCompile.cache
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking_MarkupCompile.lref
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\App.baml
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\Template\DragDropUserControl.baml
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\RibbonTabItems\InspectionTab.baml
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\View\MainWindow.baml
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\View\MappingCanvasView.baml
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\View\MappingSetingUC.baml
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\View\PopupUserControl.baml
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\ResourceControl.baml
-C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\Source\Hardware\ETHERNETIP_View.baml
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\Source\Hardware\HIKControlCameraView.baml
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\Source\Hardware\HiWinRobotUserControl.baml
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\Source\Hardware\PLCCOMM.baml
@@ -73,3 +73,5 @@ C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking.c
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReel.877A6096.Up2Date
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking.exe
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\TapeReelPacking.pdb
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\View\LayOutAnchorView.g.cs
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Release\UI\UserControls\View\LayOutAnchorView.baml

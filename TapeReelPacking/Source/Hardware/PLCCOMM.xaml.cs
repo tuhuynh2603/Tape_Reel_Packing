@@ -91,7 +91,6 @@ namespace TapeReelPacking.Source.Hardware
             t3.Start();
             await t3;
             Thread.Sleep(1000);
-            Console.WriteLine("aaa");
             combo_PLC_Comm_Function.Items.Add("Write Value");
             combo_PLC_Comm_Function.Items.Add("Read Value");
             m_modbusClient.ReceiveDataChanged += M_modbusClient_ReceiveDataChanged;

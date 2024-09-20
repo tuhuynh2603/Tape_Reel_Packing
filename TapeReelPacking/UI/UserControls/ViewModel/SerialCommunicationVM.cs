@@ -11,19 +11,8 @@ using Application = TapeReelPacking.Source.Application.Application;
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
 
-    public class SerialCommunicationVM : BaseVM
+    public class SerialCommunicationVM : BaseVM, ICustomUserControl
     {
-
-        private Visibility _isVisible = Visibility.Collapsed;
-        public Visibility isVisible
-        {
-            get => _isVisible;
-            set
-            {
-                _isVisible = value;
-                OnPropertyChanged(nameof(isVisible));
-            }
-        }
         public ICommand DrowDownListCommCommand { get; set; }
         public ICommand DrowDownListBauRateCommand { get; set; }
         public ICommand btn_ConnectSerial_Click { get; set; }
@@ -130,8 +119,20 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         public int nBaurate = 115200;
         public static Source.Comm.SerialCommunication m_serialCommunication;
         public System.Threading.Thread threadSendLotData;
-        public SerialCommunicationVM()
+        public MainWindowVM _mainWindowVM { get; set; }
+        private DragDropUserControlVM _dragDropVM { set; get; }
+        public void RegisterUserControl()
         {
+            _dragDropVM.RegisterMoveGrid();
+            _dragDropVM.RegisterResizeGrid();
+        }
+
+
+        public SerialCommunicationVM(DragDropUserControlVM dragDropVM, MainWindowVM mainVM)
+        {
+            _mainWindowVM = mainVM;
+            _dragDropVM = dragDropVM;
+            RegisterUserControl();
             selectedCommLoad = FileHelper.GetCommInfo("Serial Communication COM", "COM5", Application.pathRegistry);
             selectedBauRate = int.Parse(FileHelper.GetCommInfo("Serial Communication BauRate", "115200", Application.pathRegistry));
             m_serialCommunication = new Source.Comm.SerialCommunication(selectedCommLoad.ToString(), (int)selectedBauRate);

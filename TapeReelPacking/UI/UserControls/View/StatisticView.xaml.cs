@@ -14,6 +14,8 @@ using Image = System.Windows.Controls.Image;
 using Label = System.Windows.Controls.Label;
 using Point = System.Windows.Point;
 using static TapeReelPacking.UI.UserControls.ViewModel.MappingCanvasVM;
+using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace TapeReelPacking.UI.UserControls.View
 {
@@ -32,13 +34,5 @@ namespace TapeReelPacking.UI.UserControls.View
 
 
         }
-        private void StatisticSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            setMappingSizeDelegate?.Invoke(e.NewSize.Width, e.NewSize.Height);
-
-            initCanvasMappingDelegate?.Invoke();
-        }
     }
-
-
 }

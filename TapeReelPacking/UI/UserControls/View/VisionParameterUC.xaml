@@ -4,14 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:ViewModel="clr-namespace:TapeReelPacking.UI.UserControls.ViewModel"
              xmlns:xceedtk="http://schemas.xceed.com/wpf/xaml/toolkit"
-             xmlns:behaviors1="clr-namespace:TapeReelPacking.Source.Behaviors"
+             xmlns:behavior="clr-namespace:TapeReelPacking.Source.Behaviors"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              >
     <!--<UserControl.DataContext>
         <ViewModel:VisionParameterVM></ViewModel:VisionParameterVM>
     </UserControl.DataContext>-->
-    <Grid Visibility="{Binding isVisible}">
+    <Grid>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition/>
@@ -28,11 +28,11 @@
                                 Background="#FF322F2E" 
                                 Foreground="LightGray">
 
-                    
+
 
                     <i:Interaction.Behaviors>
-                        <behaviors1:EventToCommandBehavior EventName="PropertyValueChanged"
-                                      Command="{Binding PropertyChangedCommand}" />
+                        <behavior:EventToCommandBehavior EventName="PropertyValueChanged"
+                                        Command="{Binding PropertyChangedCommand}" />
                     </i:Interaction.Behaviors>
                 </xceedtk:PropertyGrid>
 
@@ -62,29 +62,26 @@
                 </Button>
             </StackPanel>
 
-        </Grid>
+            </Grid>
 
         <StackPanel  Margin="50,-510,0,0" Orientation="Horizontal">
-            <ComboBox Height="25" x:Name="track_ComboBox" Foreground="Black" Width="120"
-                  SelectedIndex="{Binding SelectedCameraIndex, Mode=TwoWay,
-            UpdateSourceTrigger=PropertyChanged}">
-                <ComboBoxItem Content="Camera 1"></ComboBoxItem>
-                <ComboBoxItem Content="Camera 2"></ComboBoxItem>
-            </ComboBox>
+                <ComboBox Height="25" x:Name="track_ComboBox" Foreground="Black" Width="120"
+                      SelectedIndex="{Binding SelectedCameraIndex, Mode=TwoWay,
+                UpdateSourceTrigger=PropertyChanged}">
+                    <ComboBoxItem Content="Camera 1"></ComboBoxItem>
+                    <ComboBoxItem Content="Camera 2"></ComboBoxItem>
+                </ComboBox>
 
-            <ComboBox Height="25" x:Name="comboSelectedPVIArea" Foreground="Black"   Width="120"
-                  SelectedIndex="{Binding SelectedPVIAreaIndex, Mode=TwoWay,
-            UpdateSourceTrigger=PropertyChanged}">
-                <ComboBoxItem Content="Area 1"></ComboBoxItem>
-                <ComboBoxItem Content="Area 2"></ComboBoxItem>
-                <ComboBoxItem Content="Area 3"></ComboBoxItem>
-                <ComboBoxItem Content="Area 4"></ComboBoxItem>
-                <ComboBoxItem Content="Area 5"></ComboBoxItem>
+                <ComboBox Height="25" x:Name="comboSelectedPVIArea" Foreground="Black"   Width="120"
+                      SelectedIndex="{Binding SelectedPVIAreaIndex, Mode=TwoWay,
+                UpdateSourceTrigger=PropertyChanged}">
+                    <ComboBoxItem Content="Area 1"></ComboBoxItem>
+                    <ComboBoxItem Content="Area 2"></ComboBoxItem>
+                    <ComboBoxItem Content="Area 3"></ComboBoxItem>
+                    <ComboBoxItem Content="Area 4"></ComboBoxItem>
+                    <ComboBoxItem Content="Area 5"></ComboBoxItem>
 
-            </ComboBox>
+                </ComboBox>
         </StackPanel>
-
-
-
     </Grid>
 </UserControl>

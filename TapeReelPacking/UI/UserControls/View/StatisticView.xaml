@@ -8,17 +8,16 @@
              mc:Ignorable="d"
              d:DesignHeight="350" d:DesignWidth="1000">
 
-    <UserControl.DataContext>
+    <!--<UserControl.DataContext>
         <viewmodel:StatisticVM></viewmodel:StatisticVM>
-    </UserControl.DataContext>
+    </UserControl.DataContext>-->
     <Grid >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="6.1*"></ColumnDefinition>
             <ColumnDefinition  Width="3.1*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <local:MappingCanvasView Grid.Column="0" SizeChanged="StatisticSizeChanged">
-        </local:MappingCanvasView>
 
+        <local:MappingCanvasView DataContext="{Binding mMappingCanvasVM}" Grid.Column="0"/>
         <Grid Grid.Column="1">
 
             <Border Height="Auto"

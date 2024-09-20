@@ -26,17 +26,17 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         public delegate void ClearStatisticDelegate();
         public static ClearStatisticDelegate clearStatisticDelegate;
 
-        public StatisticVM()
+        public StatisticVM(MappingCanvasVM mappingCanvasVM)
         {
             listSummary = new ObservableCollection<SummaryTemplateVM>();
-
             listSummary.Add(new SummaryTemplateVM() { nameSummary = "Checked", valueSummary_Camera1 = 0, valueSummary_Camera2 = 0, color = Brushes.WhiteSmoke });
             listSummary.Add(new SummaryTemplateVM() { nameSummary = "Passed", valueSummary_Camera1 = 0, valueSummary_Camera2 = 0, color = Brushes.Yellow });
             listSummary.Add(new SummaryTemplateVM() { nameSummary = "Failed", valueSummary_Camera1 = 0, valueSummary_Camera2 = 0, color = Brushes.Red });
             listSummary.Add(new SummaryTemplateVM() { nameSummary = "Yield %", valueSummary_Camera1 = 0, valueSummary_Camera2 = 0, color = Brushes.Lime });
-
             updateValueStatisticDelegate = UpdateValueStatistic;
             clearStatisticDelegate = ClearStatistic;
+
+            mMappingCanvasVM = mappingCanvasVM;
         }
 
         public void UpdateValueStatistic(int result, int nTrack)
@@ -72,6 +72,18 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             {
                 def.valueSummary_Camera1 = 0;
                 def.valueSummary_Camera2 = 0;
+            }
+        }
+
+        private MappingCanvasVM mMappingCanvasVM1;
+
+        public MappingCanvasVM mMappingCanvasVM
+        {
+            get => mMappingCanvasVM1;
+            set
+            {
+                mMappingCanvasVM1 = value;
+                OnPropertyChanged(nameof(mMappingCanvasVM));
             }
         }
 

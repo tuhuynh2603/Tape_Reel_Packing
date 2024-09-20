@@ -27,7 +27,7 @@ namespace TapeReelPacking.Source.Helper
                 return (string)registerPreferences.GetValue(key);
         }
 
-        public static void ReadLine_Magnus(string strGroup, string strName, IniFile ini, ref Dictionary<string, string> dictionary)
+        public static void ReadLine_Magnus(string strGroup, string strName, IniFile ini, Dictionary<string, string> dictionary)
         {
             string strParameterName = (strGroup + strName).Replace(" ", "").ToLower();
             string data = ini.ReadValue(strGroup, strName, "");

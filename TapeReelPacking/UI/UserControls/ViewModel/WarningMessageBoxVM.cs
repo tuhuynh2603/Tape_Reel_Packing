@@ -11,13 +11,15 @@ using TapeReelPacking.Source.Define;
 using static TapeReelPacking.Source.Application.Master;
 using TapeReelPacking.UI.UserControls.View;
 using TapeReelPacking.Source.Application;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
-    public class WarningMessageBoxVM:BaseVM
+    public class WarningMessageBoxVM:BaseVM, ICustomUserControl
     {
 
-        private MainWindowVM _mainWindowVM { set; get; }
+        private DragDropUserControlVM _dragDropVM { set; get; }
         private WARNINGMESSAGE _m_warningMessage = WARNINGMESSAGE.MESSAGE_INFORMATION;
         private string _strWarningMessage = "........";
 
@@ -32,26 +34,20 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         }
 
 
-        private Visibility _isVisible = Visibility.Collapsed;
-        public Visibility isVisible
+        public void RegisterUserControl()
         {
-            get => _isVisible;
-            set
-            {
-                _isVisible = value;
-                OnPropertyChanged(nameof(isVisible));
-            }
+            _dragDropVM.RegisterMoveGrid();
+            _dragDropVM.RegisterResizeGrid();
         }
 
-        public WarningMessageBoxVM(MainWindowVM mainWindowVM)
+        public WarningMessageBoxVM(DragDropUserControlVM dragDropVM)
         {
-            _mainWindowVM = mainWindowVM;
+            _dragDropVM = dragDropVM;
+            RegisterUserControl();
+
             popupWarningMessageBoxDelegate = PopupWarningMessageBox;
-            continueSequenceButtonClickedDelegate = ContinueSequenceButtonClicked;        
+            continueSequenceButtonClickedDelegate = ContinueSequenceButtonClicked;
         }
-
-
-
 
         public void updateMessageString(string strMessage, WARNINGMESSAGE warningtype)
         {
@@ -326,20 +322,17 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                 {
                     updateMessageString(strDebugMessage, warningtype);
 
-                    isVisible = Visibility.Visible;
+                    _dragDropVM.isVisible = Visibility.Visible;
                 });
             }
             else
             {
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
-                    isVisible = Visibility.Collapsed;
+                    _dragDropVM.isVisible = Visibility.Collapsed;
 
                 });
             }
         }
-
-
-
     }
 }

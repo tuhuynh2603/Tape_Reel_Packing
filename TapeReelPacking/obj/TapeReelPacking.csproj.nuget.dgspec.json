@@ -43,6 +43,10 @@
       "frameworks": {
         "net472": {
           "dependencies": {
+            "DevExpressMvvm": {
+              "target": "Package",
+              "version": "[23.2.3, )"
+            },
             "Dragablz": {
               "target": "Package",
               "version": "[0.0.3.234, )"
@@ -129,7 +133,7 @@
             },
             "Prism.Core": {
               "target": "Package",
-              "version": "[8.1.97, )"
+              "version": "[9.0.537, )"
             },
             "Xceed.Wpf.AvalonDock.Themes.VS2013": {
               "target": "Package",

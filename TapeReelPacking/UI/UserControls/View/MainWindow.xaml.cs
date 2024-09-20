@@ -20,6 +20,7 @@ using Xceed.Wpf.AvalonDock.Layout;
 using Application = TapeReelPacking.Source.Application.Application;
 using TapeReelPacking.UI.UserControls.ViewModel;
 using static TapeReelPacking.UI.UserControls.ViewModel.InspectionTabVM;
+using static TapeReelPacking.UI.UserControls.ViewModel.MappingCanvasVM;
 
 namespace TapeReelPacking.UI.UserControls.View
 {
@@ -42,6 +43,14 @@ namespace TapeReelPacking.UI.UserControls.View
             InitializeComponent();
             mainWindow = this;
 
+        }
+
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)  // Only allow left-click drag                     
+            {
+                this.DragMove();  // Moves the window
+            }
         }
     }
 }

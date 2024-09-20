@@ -19,10 +19,16 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-    class RelayCommand<T> : ICommand
+
+    public class RelayCommand<T> : ICommand
     {
         private readonly Predicate<T> _canExecute;
         private readonly Action<T> _execute;
+        public RelayCommand(Action<T> execute)
+        : this(null, execute)
+        {
+        }
+
         public RelayCommand(Predicate<T> canExecute, Action<T> execute)
         {
             if (execute == null)

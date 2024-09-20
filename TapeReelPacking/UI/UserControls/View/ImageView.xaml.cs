@@ -1309,20 +1309,6 @@ namespace TapeReelPacking.UI.UserControls.View
             Canvas.SetLeft(rec, GetRectangle().TopLeft.X * scaleX);
             GridOverlay.Children.Add(rec);
         }
-        //private void SldValueBinaChange(object sender, RoutedPropertyChangedEventArgs<double> e)
-        //{
-        //    valueSliderGray = (int)sldBinary.Value;
-        //    UpdateSourceSliderChangeValue();
-        //}
-        //public void UpdateSourceSliderChangeValue()
-        //{
-        //    byte[] bufferConvert = ConvertMonoToBinary();
-        //    if (bufferConvert.Length == 0)
-        //        return;
-        //    image.Source = BitmapSource.Create(_imageWidth, _imageHeight, _dpi, _dpi,
-        //        PixelFormats.Gray8, BitmapPalettes.Gray256, bufferConvert, (PixelFormats.Gray8.BitsPerPixel + 7) / 8 * _imageWidth);
-        //}
-
         private void SetupImageDockMouseFeature()
         {
             MouseLeftButtonDown += getChosenDoc;
@@ -1332,11 +1318,6 @@ namespace TapeReelPacking.UI.UserControls.View
         private void getChosenDoc(object sender, MouseButtonEventArgs e)
         {
             MainWindowVM.activeImageDock = sender as ImageView;
-            //MainWindow.activeImageDock = this;
-            //if (MainWindowVM.activeImageDock.enableGray == 0)
-            //    MainWindowVM.btn_Binarize.IsChecked = false;
-            //else
-            //    MainWindow.mainWindow.btn_Binarize.IsChecked = true;
         }
 
         private void ImageDoc_DoubleClick(object sender, MouseButtonEventArgs e)

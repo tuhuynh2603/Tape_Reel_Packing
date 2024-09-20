@@ -7,20 +7,22 @@ using System.Windows;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
-    public class PLCCOMMVM:BaseVM
+    public class PLCCOMMVM:BaseVM, ICustomUserControl
     {
-
-        private Visibility _isVisible = Visibility.Collapsed;
-        public Visibility isVisible
+        public MainWindowVM _mainWindowVM { get; set; }
+        private DragDropUserControlVM _dragDropVM { set; get; }
+        public void RegisterUserControl()
         {
-            get => _isVisible;
-            set
-            {
-                _isVisible = value;
-                OnPropertyChanged(nameof(isVisible));
-            }
+            _dragDropVM.RegisterMoveGrid();
+            _dragDropVM.RegisterResizeGrid();
         }
 
-        public PLCCOMMVM() { }
+
+        public PLCCOMMVM(DragDropUserControlVM dragDropVM, MainWindowVM mainVM)
+        {
+            _mainWindowVM = mainVM;
+            _dragDropVM = dragDropVM;
+            RegisterUserControl();
+        }
     }
 }

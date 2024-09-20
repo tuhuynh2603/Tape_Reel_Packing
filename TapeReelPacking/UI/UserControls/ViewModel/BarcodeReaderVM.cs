@@ -7,20 +7,20 @@ using System.Windows;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
-    public class BarcodeReaderVM : BaseVM
+    public class BarcodeReaderVM : BaseVM, ICustomUserControl
     {
-        private Visibility _isVisible = Visibility.Collapsed;
-
-        public Visibility isVisible
+        private DragDropUserControlVM _dragDropVM { set; get; }
+        public void RegisterUserControl()
         {
-            get => _isVisible;
-            set
-            {
-                _isVisible = value;
-                OnPropertyChanged(nameof(isVisible));
-            }
+            _dragDropVM.RegisterMoveGrid();
+            _dragDropVM.RegisterResizeGrid();
         }
-        public BarcodeReaderVM() { }
+
+        public BarcodeReaderVM(DragDropUserControlVM dragDropVM) 
+        {
+            _dragDropVM =  (DragDropUserControlVM)dragDropVM;
+            RegisterUserControl();
+        }
 
     }
 

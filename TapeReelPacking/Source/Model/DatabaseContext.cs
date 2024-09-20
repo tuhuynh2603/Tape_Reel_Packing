@@ -18,17 +18,14 @@ namespace TapeReelPacking.Source.Model
         {
             builder.AddFilter(DbLoggerCategory.Query.Name, LogLevel.Information);
             builder.AddConsole();
-            //builder.AddFilter(DbLoggerCategory.Database.Name, LogLevel.Information);
 
         });
         private const string _connectionString = "server=localhost;user=root;database=db1;port=3306;password=gacon05637";
-        //private const string _connectionString = "server=localhost;user=root;database=mvvmlogindb;port=3306;password=gacon05637";
         public DbSet<RectanglesModel> rectanglesModel { get; set; }
         public DbSet<CategoryTeachParameter> categoryTeachParametersModel { get; set; }
         public DbSet<CategoryVisionParameter> categoryVisionParametersModel { get; set; }
 
 
-        //public DbSet<CategoryTeachParameter> userlogins { set; get; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionssBuilder)
         {
             base.OnConfiguring(optionssBuilder);

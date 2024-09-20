@@ -7,7 +7,7 @@
              mc:Ignorable="d"           
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
               Width="300" Height="100">
-    <Border Visibility="{Binding isVisible}" BorderThickness="1" BorderBrush="Aqua"  Background="#FF2D2D30">
+    <Border BorderThickness="1" BorderBrush="Aqua"  Background="#FF2D2D30">
         <Grid>
         
             <TextBlock Text="Pixel Ruler" Name="titleDlg"

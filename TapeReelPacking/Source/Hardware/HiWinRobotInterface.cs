@@ -416,7 +416,7 @@ namespace TapeReelPacking.Source.Hardware.SDKHrobot
         public HiWinRobotInterface()
         {
             m_strRobotIPAddress = FileHelper.GetCommInfo("Robot Comm::IpAddress", m_strRobotIPAddress, Application.Application.pathRegistry);
-            Task t = ConnectoHIKRobot(m_strRobotIPAddress);
+            _= ConnectoHIKRobot(m_strRobotIPAddress);
         }
 
         //public void ConnectoHIKRobot(string strAddress = "127.0.0.1")

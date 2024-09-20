@@ -12,27 +12,26 @@ using TapeReelPacking.Source.Define;
 using TapeReelPacking.Source.LogMessage;
 using TapeReelPacking.UI.UserControls.View;
 using System.Drawing;
+using TapeReelPacking.UI.UserControls.ViewModel;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
-    public class LoginUserVM:BaseVM
+    public class LoginUserVM:BaseVM, ICustomUserControl
     {
 
-        private Visibility _isVisible = Visibility.Visible;
-        public Visibility isVisible
+        public MainWindowVM _mainWindowVM { get; set; }
+        private DragDropUserControlVM _dragDropVM { set; get; }
+        public void RegisterUserControl()
         {
-            get => _isVisible;
-            set
-            {
-                _isVisible = value;
-                OnPropertyChanged(nameof(isVisible));
-            }
+            _dragDropVM.RegisterMoveGrid();
+            _dragDropVM.RegisterResizeGrid();
         }
 
-        public MainWindowVM _mainWindowVM { get; set; }
-        public LoginUserVM(MainWindowVM mainVM)
+        public LoginUserVM(DragDropUserControlVM dragDropVM, MainWindowVM mainVM)
         {
             _mainWindowVM = mainVM;
+            _dragDropVM = (DragDropUserControlVM)dragDropVM;
+            RegisterUserControl();
         }
 
 

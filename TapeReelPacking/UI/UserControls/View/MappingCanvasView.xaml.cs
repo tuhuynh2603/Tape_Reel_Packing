@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,6 +27,26 @@ namespace TapeReelPacking.UI.UserControls.View
         public MappingCanvasView()
         {
             InitializeComponent();
+        }
+
+        private async void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+
+            setMappingSizeDelegate?.Invoke(e.NewSize.Width, e.NewSize.Height);
+
+
+            //MappingCanvasVM vm = (MappingCanvasVM)this.DataContext;
+
+            //// Update the mapping size
+            //vm.SetMappingSize(e.NewSize.Width, e.NewSize.Height);
+
+            //// Await the async operation properly
+            //Stopwatch stopWatch = new Stopwatch();
+            //stopWatch.Restart();
+            //Console.WriteLine("start");
+            //await vm.InitCanvasMappingAsync();
+            //Console.WriteLine($"end {stopWatch.ElapsedMilliseconds}");
+
         }
     }
 }

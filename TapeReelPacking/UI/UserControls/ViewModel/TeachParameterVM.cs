@@ -6,6 +6,7 @@ using System.Windows.Input;
 using TapeReelPacking.Source.Algorithm;
 using TapeReelPacking.Source.Application;
 using TapeReelPacking.Source.Helper;
+using TapeReelPacking.Source.Interface;
 using TapeReelPacking.Source.Model;
 using TapeReelPacking.Source.Repository;
 using TapeReelPacking.UI.UserControls.View;
@@ -14,19 +15,8 @@ using Application = TapeReelPacking.Source.Application.Application;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
-    public class TeachParameterVM : BaseVM
+    public class TeachParameterVM : BaseVM, ICustomUserControl, IParameter
     {
-
-        private Visibility _isVisible = Visibility.Collapsed;
-        public Visibility isVisible
-        {
-            get => _isVisible;
-            set
-            {
-                _isVisible = value;
-                OnPropertyChanged(nameof(isVisible));
-            }
-        }
 
 
         public int nDefectROIIndex = 0;
@@ -60,18 +50,55 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             }
         }
 
+        private double _TeachParameterHeight = 400;
+        public double TeachParameterHeight
+        {
+            get => _TeachParameterHeight;
+            set
+            {
+                _TeachParameterHeight = value;
+                OnPropertyChanged(nameof(TeachParameterHeight));
+            }
+        }
+
+
+        private double _scrollViewerHeight;
+        public double scrollViewerHeight
+        {
+            get => _scrollViewerHeight;
+            set
+            {
+                _scrollViewerHeight = value;
+                OnPropertyChanged(nameof(scrollViewerHeight));
+            }
+        }
+
 
         public ICommand SaveCommand { get; }
         public ICommand CancelCommand { get; }
         public ICommand PropertyChangedCommand { set; get; }
 
-        CategoryTeachParameterService categoryTeachParameterService { set; get; }
-        private MainWindowVM _mainWindowVM { get; set; }
-        public TeachParameterVM(MainWindowVM mainWindowVM, CategoryTeachParameterService service)
-        {
-            _mainWindowVM = mainWindowVM;
-            categoryTeachParameterService = service;
+        CategoryTeachParameterRepository categoryTeachParameterRepository { set; get; }
+        ICatergoryParameterService categoryTeachParameterService { set; get; }
+        private DatabaseContext _databaseContext { set; get; }
 
+
+        private DragDropUserControlVM _dragDropVM { get; set; }
+        public void RegisterUserControl()
+        {
+            _dragDropVM.RegisterMoveGrid();
+            _dragDropVM.RegisterResizeGrid();
+        }
+
+        public TeachParameterVM(DragDropUserControlVM dragDropVM, DatabaseContext databaseContext)
+        {
+            _dragDropVM = dragDropVM;
+            RegisterUserControl();
+            scrollViewerHeight = _dragDropVM.GridHeight;
+
+            _databaseContext = databaseContext;
+            categoryTeachParameterRepository = new CategoryTeachParameterRepository(_databaseContext);
+            categoryTeachParameterService = new CategoryTeachParameterService(categoryTeachParameterRepository);
 
             SaveCommand = new RelayCommand<TeachParameterVM>((p) => { return true; },
                                          async (p) =>
@@ -162,33 +189,33 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             string pathFile = Path.Combine(Application.pathRecipe, Application.currentRecipe, strFileName);
             IniFile ini = new IniFile(pathFile);
 
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_DeviceLocationRoi)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_LocationEnable)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_ThresholdType)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_ObjectColor)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_lowerThreshold)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_upperThreshold)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_lowerThresholdInnerChip)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_upperThresholdInnerChip)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_DeviceLocationRoi)), ini, dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_LocationEnable)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_ThresholdType)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_ObjectColor)), ini, dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_lowerThreshold)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_upperThreshold)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_lowerThresholdInnerChip)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_upperThresholdInnerChip)), ini,  dictTeachParam);
 
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_OpeningMask)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_DilationMask)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_MinWidthDevice)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_MinHeightDevice)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_TemplateRoi)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_NumberSide)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_ScaleImageRatio)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_MinScore)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_CornerIndex)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_NumberROILocation)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_OpeningMask)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_DilationMask)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_MinWidthDevice)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_MinHeightDevice)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_TemplateRoi)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_NumberSide)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_ScaleImageRatio)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_MinScore)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_CornerIndex)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_LOCATION, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.L_NumberROILocation)), ini,  dictTeachParam);
 
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_EnableCheck)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_lowerThreshold)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_upperThreshold)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_OpeningMask)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_DilationMask)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_MinWidthDevice)), ini, ref dictTeachParam);
-            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_MinHeightDevice)), ini, ref dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_EnableCheck)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_lowerThreshold)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_upperThreshold)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_OpeningMask)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_DilationMask)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_MinWidthDevice)), ini,  dictTeachParam);
+            FileHelper.ReadLine_Magnus(CategoryTeachParameter.CATEGORY_OPPOSITE_CHIP, ExceedToolkit.GetDisplayName<CategoryTeachParameter>(nameof(CategoryTeachParameter.OC_MinHeightDevice)), ini,  dictTeachParam);
             return dictTeachParam;
         }
 

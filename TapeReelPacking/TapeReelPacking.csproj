@@ -127,27 +127,43 @@
     </ApplicationDefinition>
     <Compile Include="Source\Behaviors\DragBehavior.cs" />
     <Compile Include="Source\Behaviors\FocusBehavior.cs" />
+    <Compile Include="Source\Behaviors\ThumbBehavior.cs" />
+    <Compile Include="Source\Factory\DragDropUserControlFactory.cs" />
     <Compile Include="Source\Helper\CameraHelper.cs" />
     <Compile Include="Source\Helper\FileHelper.cs" />
     <Compile Include="Source\Helper\TypeConverterHelper.cs" />
     <Compile Include="Source\Interface\IParameter.cs" />
     <Compile Include="Source\Model\CameraParameter.cs" />
+    <Compile Include="Source\Repository\CategoryMappingParameter.cs" />
+    <Compile Include="Source\Repository\ICatergoryParameterService.cs" />
+    <Compile Include="UI\UserControls\Template\DragDropUserControl.xaml.cs">
+      <DependentUpon>DragDropUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\UserControls\RibbonTabItems\InspectionTab.xaml.cs">
       <DependentUpon>InspectionTab.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\UserControls\ViewModel\BarcodeReaderVM.cs" />
+    <Compile Include="UI\UserControls\ViewModel\DragDropUserControlAbstract.cs" />
+    <Compile Include="UI\UserControls\ViewModel\DragDropUserControlFactory.cs" />
     <Compile Include="UI\UserControls\ViewModel\HIKControlCameraVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\HIKRobotVM.cs" />
+    <Compile Include="Source\Interface\ICustomUserControl.cs" />
+    <Compile Include="UI\UserControls\ViewModel\DocumentVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\InspectionTabVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\LoginUserVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\LotBarcodeDatatableVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\MainWindowVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\MappingSettingUCVM.cs" />
+    <Compile Include="UI\UserControls\ViewModel\PaneVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\PixelRulerVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\PLCCOMMVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\StatisticVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\SummaryTemplateVM.cs" />
     <Compile Include="UI\UserControls\ViewModel\WarningMessageBoxVM.cs" />
+    <Compile Include="UI\UserControls\ViewModel\imageViewVM.cs" />
+    <Compile Include="UI\UserControls\View\LayOutAnchorView.xaml.cs">
+      <DependentUpon>LayOutAnchorView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\UserControls\View\MappingCanvasView.xaml.cs">
       <DependentUpon>MappingCanvasView.xaml</DependentUpon>
     </Compile>
@@ -184,9 +200,6 @@
       <DependentUpon>BarCodeReaderView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Source\Hardware\CommInterface.cs" />
-    <Compile Include="Source\Hardware\ETHERNETIP_View.xaml.cs">
-      <DependentUpon>ETHERNETIP_View.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Source\Hardware\HIKControlCameraView.xaml.cs">
       <DependentUpon>HIKControlCameraView.xaml</DependentUpon>
     </Compile>
@@ -197,11 +210,9 @@
     <Compile Include="Source\Hardware\HWinRobot.cs" />
     <Compile Include="Source\Hardware\JpegOperate.cs" />
     <Compile Include="Source\Hardware\MVCamera.cs" />
-    <Compile Include="Source\Hardware\HistoricalData.cs" />
     <Compile Include="Source\Hardware\PLCCOMM.xaml.cs">
       <DependentUpon>PLCCOMM.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Source\Hardware\PLCCOMM_TCPIP.cs" />
     <Compile Include="Source\LogMessage\LogMessage.cs" />
     <Compile Include="Source\Model\CategoryVisionParameter.cs" />
     <Compile Include="Source\Model\DatabaseContext.cs" />
@@ -270,11 +281,19 @@
     <Compile Include="UI\UserControls\View\WarningMessageBox.xaml.cs">
       <DependentUpon>WarningMessageBox.xaml</DependentUpon>
     </Compile>
+    <Page Include="UI\UserControls\Template\DragDropUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\UserControls\RibbonTabItems\InspectionTab.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\UserControls\Styles\RibbonStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\UserControls\View\LayOutAnchorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -307,10 +326,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Source\Hardware\BarCodeReaderView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Source\Hardware\ETHERNETIP_View.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -414,6 +429,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="DevExpressMvvm">
+      <Version>23.2.3</Version>
+    </PackageReference>
     <PackageReference Include="Dragablz">
       <Version>0.0.3.234</Version>
     </PackageReference>
@@ -482,7 +500,7 @@
       <Version>3.1.2</Version>
     </PackageReference>
     <PackageReference Include="Prism.Core">
-      <Version>8.1.97</Version>
+      <Version>9.0.537</Version>
     </PackageReference>
     <PackageReference Include="Xceed.Wpf.AvalonDock.Themes.VS2013">
       <Version>2.9.0.1</Version>

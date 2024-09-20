@@ -19,7 +19,7 @@ using static TapeReelPacking.Source.Hardware.SDKHrobot.Global;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
-    public class StepDebugVM:BaseVM
+    public class StepDebugVM:BaseVM, ICustomUserControl
     {
 
 
@@ -57,12 +57,24 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             get => _selectedItem;
         }
 
-
-
         public ICommand SelectionChangedCommand { set; get; }
 
-        public StepDebugVM()
+
+        private DragDropUserControlVM _dragDropVM { set; get; }
+
+        public void RegisterUserControl()
         {
+            //_dragDropVM.RegisterMoveGrid();
+            //_dragDropVM.RegisterResizeGrid();
+        }
+
+
+        public StepDebugVM(DragDropUserControlVM dragDropVM)
+        {
+            _dragDropVM = dragDropVM;
+            _dragDropVM.RegisterMoveGrid();
+            _dragDropVM.RegisterResizeGrid();
+
             SelectionChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(OnSelectionChanged);
             listStepDebugInfors = new ObservableCollection<DebugInfors>();
             doStepDebugDelegate = DoStepDebug;
@@ -80,11 +92,11 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                 {
                     Mat matImage = item.mat_Image;
                     Image<Gray, byte> imgg = matImage.ToImage<Gray, byte>().Clone();
-                    MainWindowVM.master.m_Tracks[m_TrackDebugging].m_imageViews[0].ClearOverlay();
-                    MainWindowVM.master.m_Tracks[m_TrackDebugging].m_imageViews[0].UpdateUIImageMono(Track.BitmapToByteArray(imgg.ToBitmap()));
+                    MainWindowVM.activeImageDock.ClearOverlay();
+                    MainWindowVM.activeImageDock.UpdateUIImageMono(Track.BitmapToByteArray(imgg.ToBitmap()));
                     Mat matRegion = item.mat_Region;
                     SolidColorBrush color = new SolidColorBrush(Colors.Cyan);
-                    MainWindowVM.master.m_Tracks[m_TrackDebugging].m_imageViews[0].DrawRegionOverlay(matRegion, color);
+                    MainWindowVM.activeImageDock.DrawRegionOverlay(matRegion, color);
                 });
  
                 return;
@@ -100,10 +112,10 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
 
 
             m_TrackDebugging = MainWindowVM.activeImageDock.trackID;
-            if (MainWindowVM.master.m_Tracks[m_TrackDebugging].m_imageViews[0].btmSource.Width < 0)
+            if (MainWindowVM.activeImageDock.btmSource.Width < 0)
                 return;
 
-            MainWindowVM.master.m_Tracks[m_TrackDebugging].m_InspectionCore.LoadImageToInspection(MainWindowVM.master.m_Tracks[m_TrackDebugging].m_imageViews[0].btmSource);
+            MainWindowVM.master.m_Tracks[m_TrackDebugging].m_InspectionCore.LoadImageToInspection(MainWindowVM.activeImageDock.btmSource);
             MainWindowVM.master.m_Tracks[m_TrackDebugging].DebugFunction();
             listStepDebugInfors = null;
             listStepDebugInfors = new ObservableCollection<DebugInfors> (MainWindowVM.master.m_Tracks[m_TrackDebugging].m_StepDebugInfors);

@@ -7,10 +7,10 @@
              xmlns:viewmodels="clr-namespace:TapeReelPacking.UI.UserControls.ViewModel" 
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" Width="500" Height="500">
-    <UserControl.DataContext>
+    <!--<UserControl.DataContext>
         <viewmodels:SerialCommunicationVM></viewmodels:SerialCommunicationVM>
-    </UserControl.DataContext>
-    <Grid Background="LightGray" Visibility="{Binding isVisible}"> 
+    </UserControl.DataContext>-->
+    <Grid Background="LightGray"> 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
             <ColumnDefinition/>

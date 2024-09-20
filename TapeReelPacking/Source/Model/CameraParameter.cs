@@ -13,12 +13,6 @@ namespace TapeReelPacking.Source.Model
         public float exposureTime { set; get; }
         public float frameRate { set; get; }
         public float gain { set; get; }
-        //public CameraParameter(bool softwareTrigger, float exposureTime, float frameRate, float gain)
-        //{
-        //    this.softwareTrigger = softwareTrigger;
-        //    this.exposureTime = exposureTime;
-        //    this.frameRate = frameRate;
-        //    this.gain = gain;
-        //}
+
     }
 }

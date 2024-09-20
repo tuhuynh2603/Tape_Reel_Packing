@@ -25,17 +25,17 @@ namespace TapeReelPacking.Source.Application
     using static TapeReelPacking.UI.UserControls.ViewModel.MappingCanvasVM;
     using System.Windows.Forms;
     using MessageBox = System.Windows.Forms.MessageBox;
+    using System.Collections.ObjectModel;
 
     public class Master
     {
         //private int width, height, dpi;
         public Track[] m_Tracks { set; get; }
         public int m_nActiveTrack { set; get; }
-        public Application applications { set; get; }
         public BarCodeReaderInterface m_BarcodeReader { set; get; }
         //public TeachParametersUC teachParameterUC { set; get; }
         //public VisionParameterUC visionParametersUC { set; get; } = new VisionParameterUC();
-        public MappingSetingUC mappingParameter { set; get; } = new MappingSetingUC();
+        //public MappingSetingUC mappingParameter { set; get; } = new MappingSetingUC();
 
 
         public static bool m_bIsTeaching { set; get; }
@@ -77,19 +77,11 @@ namespace TapeReelPacking.Source.Application
         private MainWindowVM m_MainWindowVM { set; get; }
         public Master(MainWindowVM mainVM)
         {
-            applications = new Application(mainVM);
             m_MainWindowVM = mainVM;
+            ContructorDocComponent();
+            LoadRecipe();
             m_NextStepTeachEvent = new AutoResetEvent(false);
             m_bIsTeaching = false;
-
-            Application.CheckRegistry();
-            Application.LoadRegistry();
-
-            ContructorDocComponent();
-            LogMessage.LogMessage.WriteToDebugViewer(2, "BarCodeReaderInterface");
-
-            LoadRecipe();
-
             m_nActiveTrack = 0;
             InitThread();
         }
@@ -163,9 +155,10 @@ namespace TapeReelPacking.Source.Application
 
 
 
-            Application.dictMappingParam.Clear();
-            Application.LoadMappingParamFromFile();
-            mappingParameter.UpdateMappingParamFromDictToUI(Application.dictMappingParam);
+            //Application.dictMappingParam.Clear();
+            Dictionary<string, string> dictParam = MappingSetingUCVM.LoadMappingParamFromFile();
+            //MappingSetingUCVM mappingSetingUCVM = m_MainWindowVM.mMappingSettingUCVM.CurrentViewModel as MappingSetingUCVM;
+            ((MappingSetingUCVM)m_MainWindowVM.mMappingSettingUCVM.CurrentViewModel).UpdateMappingParamFromDictToUI(dictParam);
 
             #region Load Teach Paramter
             for (int nTrack = 0; nTrack < Application.m_nTrack; nTrack++)
@@ -914,7 +907,7 @@ namespace TapeReelPacking.Source.Application
                         Thread.Sleep(250);
                         for (int nT = 0; nT < 2; nT++)
                         {
-                            for (int n = 0; n < Application.categoriesMappingParam.M_NumberDevicePerLot; n++)
+                            for (int n = 0; n < ((MappingSetingUCVM)MainWindowVM.mainWindowVM.mMappingSettingUCVM.CurrentViewModel).categoriesMappingParam.M_NumberDevicePerLot; n++)
                             {
                                 m_Tracks[nT].m_VisionResultDatas[n] = new VisionResultData();
                                 m_Tracks[nT].m_VisionResultDatas_Total[n] = new VisionResultData();
@@ -1149,9 +1142,9 @@ namespace TapeReelPacking.Source.Application
         public void sendLastLotDataToPID()
         {
             m_IsPIDSentStatus = true;
-            List<VisionResultDataExcel> list_BarcodeResult = new List<VisionResultDataExcel>();
-            LotBarcodeDataTable.ReadLotResultFromExcel(Application.m_strCurrentLot, ref list_BarcodeResult);
-            string strDataSend = LotBarcodeDataTable.CombineReelIDStringSentToClient(ref list_BarcodeResult, Application.m_strCurrentLot);
+            ObservableCollection<VisionResultDataExcel> list_BarcodeResult = new ObservableCollection<VisionResultDataExcel>();
+            LotBarcodeDatatableVM.ReadLotResultFromExcel(Application.m_strCurrentLot, list_BarcodeResult);
+            string strDataSend = LotBarcodeDatatableVM.CombineReelIDStringSentToClient(list_BarcodeResult, Application.m_strCurrentLot);
             int nError = SendAndReceiveAndCheckDataFromPID(strDataSend);
             if (nError == -1)
             {
@@ -2124,7 +2117,7 @@ namespace TapeReelPacking.Source.Application
 
                 System.Drawing.PointF pCenter = new System.Drawing.PointF(0, 0);
                 System.Drawing.PointF pCorner = new System.Drawing.PointF(0, 0);
-                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = m_Tracks[1].Inspect(out pCenter, out pCorner);
+                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = m_Tracks[1].Inspect(out pCenter, out pCorner, false);
 
 
                 if (strBarcodeResult.Contains("Dummy") || strBarcodeResult.Length < 1)
@@ -2446,17 +2439,6 @@ namespace TapeReelPacking.Source.Application
             try
             {
                 TeachParameterVM.WriteTeachParam(nTrack);
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        public void WriteMappingParam()
-        {
-            try
-            {
-                applications.WriteMappingParam();
             }
             catch (Exception)
             {

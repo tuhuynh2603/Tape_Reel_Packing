@@ -4,28 +4,45 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TapeReelPacking.UI.UserControls"
+             xmlns:viewmodel="clr-namespace:TapeReelPacking.UI.UserControls.ViewModel" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:behavior="clr-namespace:TapeReelPacking.Source.Behaviors"
              mc:Ignorable="d"
              HorizontalAlignment="Center"
              VerticalAlignment="Center">
-    <Grid Visibility="{Binding isVisible}" Height="500">
+    <!--<UserControl.DataContext>
+        <viewmodel:LotBarcodeDatatableVM></viewmodel:LotBarcodeDatatableVM>
+    </UserControl.DataContext>-->
+    <Grid Margin="10">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
-            <ColumnDefinition Width="400"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
 
         <Border Grid.Column="0" BorderBrush="White" BorderThickness="0,0,3,0" Background="Black">
             <StackPanel Margin="0,100,0,0">
-                <DatePicker  Margin="0,50,0,0" Name="DatePicker_Date" SelectedDateChanged="DatePicker_Date_SelectedDateChanged"></DatePicker>
+                <DatePicker  Margin="0,50,0,0" Name="DatePicker_Date" SelectedDate="{Binding selectedDate}">
+
+                    <i:Interaction.Behaviors>
+                        <behavior:EventToCommandBehavior EventName="SelectedDateChanged"
+                                        Command="{Binding DateSelectionChangedCmd}" />
+                    </i:Interaction.Behaviors>
+
+                </DatePicker>
                 <Grid  Margin="0,10,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="45"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0" Content="Lot ID:" Foreground="White" Background="SlateGray"></Label>
-                    <ComboBox Grid.Column="1" x:Name="ccb_LotSelected_ComboBox" SelectionChanged="ccb_LotSelected_ComboBox_SelectionChanged"></ComboBox>
+                    <ComboBox Grid.Column="1" x:Name="ccb_LotSelected_ComboBox" SelectedValue="{Binding lotSelected}"
+                              ItemsSource="{Binding m_ListStrLotFullPath}">
+                        <i:Interaction.Behaviors>
+                            <behavior:EventToCommandBehavior EventName="SelectionChanged"
+                                        Command="{Binding SelectionChangedCmd}" />
+                        </i:Interaction.Behaviors>
+                    </ComboBox>
                 </Grid>
-                <Button Width="70"  Margin="0,10,10,0" HorizontalAlignment="Right" x:Name="btn_Load_Lot" Content="Load Lot" Click="btn_Load_Lot_Click"></Button>
-                <Button Width="70" Margin="0,10,10,0" HorizontalAlignment="Right" x:Name="btn_Send_To_Server" Content="Send Lot" IsEnabled="False" Visibility="Hidden" Click ="btn_Send_To_Server_Click"></Button>
+                <Button Width="70"  Margin="0,10,10,0" HorizontalAlignment="Right" x:Name="btn_Load_Lot" Content="Load Lot" Command="{Binding btn_Load_Lot_ClickCmd}"></Button>
+                <Button Width="70" Margin="0,10,10,0" HorizontalAlignment="Right" x:Name="btn_Send_To_Server" Content="Send Lot" IsEnabled="False" Visibility="Hidden" Command="{Binding btn_Send_To_Server_ClickCmd}"></Button>
 
             </StackPanel>
 
@@ -80,7 +97,7 @@
             <!--<Border CornerRadius="0" BorderThickness="1" BorderBrush="#FF86D2F9" Background="#FF242526">-->
             <ListView x:Name="lvLotBarCodeData" FontSize="15" Width="Auto"  Height="550" Background="LightSlateGray" 
                           SelectionChanged="lvLotBarCodeData_SelectionChanged"
-                          FocusableChanged="lvLotBarCodeData_FocusableChanged"  MouseWheel="lvLotBarCodeData_PreviewMouseWheel">
+                          FocusableChanged="lvLotBarCodeData_FocusableChanged"  MouseWheel="lvLotBarCodeData_PreviewMouseWheel" ItemsSource="{Binding m_ListLotBarcodeDataTable}">
 
                 <ListView.ItemTemplate>
                     <DataTemplate>

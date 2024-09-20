@@ -280,14 +280,7 @@ namespace TapeReelPacking.UI.UserControls.View
                 MainWindowVM.accessLevel = GetAccessLevel(userName.Text);
 
                 MainWindowVM.UICurrentState = UISTate.IDLE_STATE;
-                //for (int itrack = 0; itrack < Source.Application.Application.m_nTrack; itrack++)
-                //{
-                //	if (!main.master.m_Tracks[itrack].isAvailable)
-                //	{
-                //		MainWindowVM.UICurrentState = UISTate.IDLE_NOCAM_STATE;
-                //		break;
-                //	}
-                //}
+
                 currentUser.Content = userName.Text;
                 currentAccesslevel.Content = AccessLevelString(GetAccessLevel(userName.Text));
                 LogMessage.WriteToDebugViewer(0, string.Format("Login to user '{0}' Success", userName.Text));
@@ -302,30 +295,8 @@ namespace TapeReelPacking.UI.UserControls.View
 
                 LoginUserVM loginUserVM = this.DataContext as LoginUserVM;
                 loginUserVM._mainWindowVM.enableButton(true);
-				loginUserVM.isVisible = Visibility.Collapsed;
+				loginUserVM._mainWindowVM.mLoginUserVM.isVisible = Visibility.Collapsed;
 
-                //main.RegistryPreference();
-                //main.master.inspectionParameter.InitReferenceBoxSize();
-
-                //bool isFullCam = true;
-                //for (int itrack = 0; itrack < Application.Application.num_track; itrack++)
-                //{
-                //	if (!main.master.trackSF[itrack].isAvailable)
-                //	{
-                //		isFullCam = false;
-                //		break;
-                //	}		
-                //}
-                //if (isFullCam)
-                //	CommPLC.PlcCommMode = PLCCommMode.PLC_ONLINE;
-
-                //else
-                //	CommPLC.PlcCommMode = PLCCommMode.PLC_SIMULATOR;
-
-                //main.master.commPLC.isVisionReady = true;
-                //main.master.commPLC.UpdateSentMessageToPLC((int)VisionProcess.VISION_READY);
-
-                //KeepHeartBeat();
                 MainWindowVM.loadAllStatisticDelegate?.Invoke(false);
 
                 return;
@@ -362,14 +333,7 @@ namespace TapeReelPacking.UI.UserControls.View
 				MainWindowVM.accessLevel = GetAccessLevel(userName.Text);
 
 				MainWindowVM.UICurrentState = UISTate.IDLE_STATE;
-				//for (int itrack = 0; itrack < Source.Application.Application.m_nTrack; itrack++)
-				//{
-				//	if (!main.master.m_Tracks[itrack].isAvailable)
-				//	{
-				//		MainWindowVM.UICurrentState = UISTate.IDLE_NOCAM_STATE;
-				//		break;
-				//	}
-				//}
+
 				currentUser.Content = userName.Text;
 				currentAccesslevel.Content = AccessLevelString(GetAccessLevel(userName.Text));
 				LogMessage.WriteToDebugViewer(0, string.Format("Login to user '{0}' Success", userName.Text));
@@ -384,31 +348,8 @@ namespace TapeReelPacking.UI.UserControls.View
 
 				LoginUserVM loginUserVM = this.DataContext as LoginUserVM;
 				loginUserVM._mainWindowVM.enableButton(true);
-                loginUserVM.isVisible = Visibility.Collapsed;
+                loginUserVM._mainWindowVM.mLoginUserVM.isVisible = Visibility.Collapsed;
 
-                //loginUserVM.loginUserVisible = Visibility.Collapsed;
-                //main.RegistryPreference();
-                //main.master.inspectionParameter.InitReferenceBoxSize();
-
-                //bool isFullCam = true;
-                //for (int itrack = 0; itrack < Application.Application.num_track; itrack++)
-                //{
-                //	if (!main.master.trackSF[itrack].isAvailable)
-                //	{
-                //		isFullCam = false;
-                //		break;
-                //	}		
-                //}
-                //if (isFullCam)
-                //	CommPLC.PlcCommMode = PLCCommMode.PLC_ONLINE;
-
-                //else
-                //	CommPLC.PlcCommMode = PLCCommMode.PLC_SIMULATOR;
-
-                //main.master.commPLC.isVisionReady = true;
-                //main.master.commPLC.UpdateSentMessageToPLC((int)VisionProcess.VISION_READY);
-
-                //KeepHeartBeat();
                 MainWindowVM.loadAllStatisticDelegate?.Invoke(false);
 
 				return;
@@ -421,43 +362,7 @@ namespace TapeReelPacking.UI.UserControls.View
 			}
 
 		}
-		//private System.Windows.Threading.DispatcherTimer dispatcherTimer;
-		//private int time = 0;
-		//private void KeepHeartBeat()
-		//{
-		//	dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-		//	dispatcherTimer.Tick += new EventHandler(DoCountTimeOut);
-		//	dispatcherTimer.Interval = new TimeSpan(0, 0, 30);
-		//	dispatcherTimer.Start();
-		//	main.master.commPLC.UpdateSentMessageToPLC((int)VisionProcess.VISION_HEART_BEAT);
-		//}
-		//private void DoCountTimeOut(object sender, EventArgs e)
-		//{
-		//	time += 1;
-		//	if (main.master.commPLC.isHeatBeatError)
-		//	{
-		//		if (time == 1)
-		//		{
-		//			main.master.commPLC.UpdateSentMessageToPLC((int)VisionProcess.VISION_HEART_BEAT);
-		//		}
-		//		else if (time == 2)
-		//		{
-		//			//MessageBox.Show("Connection error", "Heart Beat Status", MessageBoxButton.OK, MessageBoxImage.Information);
-		//			time = 0;
-		//			dispatcherTimer.Stop();
-		//			dispatcherTimer.Start();
-		//			main.master.commPLC.UpdateSentMessageToPLC((int)VisionProcess.VISION_HEART_BEAT);
-		//		}
-		//	}
-		//	else
-		//	{
-		//		time = 0;
-		//		dispatcherTimer.Stop();
-		//		dispatcherTimer.Start();
-		//		main.master.commPLC.UpdateSentMessageToPLC((int)VisionProcess.VISION_HEART_BEAT);
-		//	}
-		//	main.master.commPLC.isHeatBeatError = true;
-		//}
+
 		private void Cancel_Click(object sender, System.Windows.RoutedEventArgs e)
 		{
 			int currentTabIndex = MainWindow.mainWindow.tab_controls.SelectedIndex;
@@ -465,23 +370,12 @@ namespace TapeReelPacking.UI.UserControls.View
             MainWindow.mainWindow.btnLogIn.IsEnabled = true;
 			if (MainWindowVM.IsFisrtLogin)
 			{
-				//main.AddHotKey();
-				//if (main.master.trackSF[0].isAvailable)
-				//{
-				//	main.tabRibbon.IsEnabled = true;
 
-				//	main.tabItem_View.IsEnabled = true;
-				//}
-				//else
-				//{
-				//	main.tabRibbon.IsEnabled = true;
-				//	main.tabItem_View.IsEnabled = true;
-				//}
 			}
             MainWindow.mainWindow.tab_controls.SelectedIndex = currentTabIndex;
 			ResetTextBox();
             LoginUserVM loginUserVM = this.DataContext as LoginUserVM;
-            loginUserVM.isVisible = Visibility.Collapsed;
+            loginUserVM._mainWindowVM.mLoginUserVM.isVisible = Visibility.Collapsed;
 
             //loginUserVM.loginUserVisible = Visibility.Collapsed;
 
@@ -551,30 +445,6 @@ namespace TapeReelPacking.UI.UserControls.View
 		#region EVENT MOUSEDOWN
 		private void logInMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
-			//main.CleanHotKey();
-			//foreach (COMMAND_CODE cmd in Master.cmdCode)
-			//{
-			//	if (cmd != COMMAND_CODE.IDLE)
-			//	{
-			//		if (MessageBox.Show("Can not Login Software, Software is busy", "Log In", MessageBoxButton.OK, MessageBoxImage.Warning) == MessageBoxResult.OK)
-			//		{
-			//			if (main.master.trackSF[0].isAvailable)
-			//			{
-			//				MainWindowVM.UICurrentState = UISTate.IDLE_STATE;
-			//			}
-			//			else
-			//			{
-			//				MainWindowVM.UICurrentState = UISTate.IDLE_NOCAM_STATE;
-
-			//			}
-			//			main.ChangeUIState();
-			//			main.btnLogIn.IsChecked = false;
-			//			main.btnLogIn.IsEnabled = true;
-
-			//			return;
-			//		}
-			//	}
-			//}
 			InitLogInDialog();
 		}
 
@@ -671,18 +541,6 @@ namespace TapeReelPacking.UI.UserControls.View
 		{
 			if (MainWindowVM.accountUser != "None")
 			{
-				//foreach (COMMAND_CODE cmd in Master.cmdCode)
-				//{
-				//	if (cmd != COMMAND_CODE.IDLE)
-				//	{
-				//		if (MessageBox.Show("Can not Delete current account, Software is busy", "Delete current account", MessageBoxButton.OK, MessageBoxImage.Warning) == MessageBoxResult.OK)
-				//		{
-				//			main.btnLogIn.IsChecked = false;
-				//			main.btnLogIn.IsEnabled = true;
-				//			return;
-				//		}
-				//	}
-				//}
 				if (MessageBox.Show(string.Format("Are you sure delete this account '{0}'", MainWindowVM.accountUser), "Information", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
 				{
 
@@ -714,23 +572,6 @@ namespace TapeReelPacking.UI.UserControls.View
 				else
 				{
 					int currentTabIndex = MainWindow.mainWindow.tab_controls.SelectedIndex;
-                    //if (main.master.trackSF[0].isAvailable)
-                    //{
-
-                    //	main.tab_Production.IsEnabled = true;
-                    //	main.tab_Offline.IsEnabled = true;
-                    //	main.tab_Hardware.IsEnabled = true;
-                    //	main.tab_View.IsEnabled = true;
-                    //	main.tab_Parameter.IsEnabled = true;
-                    //}
-                    //else
-                    //{
-                    //	main.tab_Production.IsEnabled = true;
-                    //	main.tab_Offline.IsEnabled = true;
-                    //	main.tab_Hardware.IsEnabled = false;
-                    //	main.tab_View.IsEnabled = true;
-                    //	main.tab_Parameter.IsEnabled = true;
-                    //}
                     MainWindow.mainWindow.btnLogIn.IsChecked = false;
                     MainWindow.mainWindow.btnLogIn.IsEnabled = true;
                     //main.AddHotKey();
@@ -746,19 +587,6 @@ namespace TapeReelPacking.UI.UserControls.View
 		{
 			if (MainWindowVM.accountUser != "None")
 			{
-				//foreach (COMMAND_CODE cmd in Master.cmdCode)
-				//{
-				//	if (cmd != COMMAND_CODE.IDLE)
-				//	{
-				//		if (MessageBox.Show("Can not Logout Software, Software is busy", "Log Out", MessageBoxButton.OK, MessageBoxImage.Warning) == MessageBoxResult.OK)
-				//		{
-				//			main.btnLogIn.IsChecked = false;
-				//			main.btnLogIn.IsEnabled = true;
-				//			ResetTextBox();
-				//			return;
-				//		}
-				//	}
-				//}
 				if (MessageBox.Show("Log Out This Account ?", "Question ?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
 				{
 
@@ -783,32 +611,6 @@ namespace TapeReelPacking.UI.UserControls.View
 
                 }
 				ResetTextBox();
-
-				//else
-				//{
-				//	int currentTabIndex = main.tab_controls.SelectedIndex;
-				//	if (main.master.trackSF[0].isAvailable)
-				//	{
-				//		main.tab_Production.IsEnabled = true;
-				//		main.tab_Offline.IsEnabled = true;
-				//		main.tab_Hardware.IsEnabled = true;
-				//		main.tab_View.IsEnabled = true;
-				//		main.tab_Parameter.IsEnabled = true;
-				//	}
-				//	else
-				//	{
-				//		main.tab_Production.IsEnabled = true;
-				//		main.tab_Offline.IsEnabled = true;
-				//		main.tab_Hardware.IsEnabled = false;
-				//		main.tab_View.IsEnabled = true;
-				//		main.tab_Parameter.IsEnabled = true;
-				//	}
-				//	main.btnLogIn.IsChecked = false;
-				//	main.btnLogIn.IsEnabled = true;
-				//	main.AddHotKey();
-				//	ResetTextBox();
-				//	main.tab_controls.SelectedIndex = currentTabIndex;
-				//}
 			}
 		}
 		#endregion
@@ -956,42 +758,6 @@ namespace TapeReelPacking.UI.UserControls.View
 
 		#endregion
 
-
-
-		//private bool _isDragging;
-		//private Point _startPoint;
-		//private double _startHorizontalOffset;
-		//private double _startVerticalOffset;
-		//private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-		//{
-		//	// Start dragging
-		//	_isDragging = true;
-		//	_startPoint = e.GetPosition(null);
-		//	_startHorizontalOffset = DraggablePopup.HorizontalOffset;
-		//	_startVerticalOffset = DraggablePopup.VerticalOffset;
-		//	((UIElement)sender).CaptureMouse();
-		//}
-
-		//private void Grid_MouseMove(object sender, MouseEventArgs e)
-		//{
-		//	if (_isDragging)
-		//	{
-		//		// Calculate the new offset
-		//		Point currentPosition = e.GetPosition(null);
-		//		double offsetX = currentPosition.X - _startPoint.X;
-		//		double offsetY = currentPosition.Y - _startPoint.Y;
-
-		//		DraggablePopup.HorizontalOffset = _startHorizontalOffset + offsetX;
-		//		DraggablePopup.VerticalOffset = _startVerticalOffset + offsetY;
-		//	}
-		//}
-
-		//private void Grid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-		//{
-		//	// Stop dragging
-		//	_isDragging = false;
-		//	((UIElement)sender).ReleaseMouseCapture();
-		//}
 
 	}
 

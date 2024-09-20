@@ -7,62 +7,56 @@
              xmlns:ViewModel="clr-namespace:TapeReelPacking.UI.UserControls.ViewModel"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:behaviors1="clr-namespace:TapeReelPacking.Source.Behaviors"         
-             Width="300" Height="Auto" Background="Transparent">
-    <!--<UserControl.DataContext>
-        <ViewModel:TeachParameterVM></ViewModel:TeachParameterVM>
-    </UserControl.DataContext>-->
-    <Grid Visibility="{Binding isVisible}">
-        <StackPanel>
-            <Label Content="Teach Parameter" HorizontalAlignment="Center"/>
-            <ComboBox Height="25" x:Name="track_ComboBox" Foreground="Black"  Panel.ZIndex="1" HorizontalAlignment="Right"
+             xmlns:behavior ="clr-namespace:TapeReelPacking.Source.Behaviors">
+
+    <StackPanel  Background="Transparent">
+                <Label Content="Teach Parameter" HorizontalAlignment="Center" />
+                <ComboBox Height="25" x:Name="track_ComboBox" Foreground="Black"  Panel.ZIndex="1" HorizontalAlignment="Right"
                   SelectedIndex="{Binding SelectedCameraIndex, Mode=TwoWay,
                 UpdateSourceTrigger=PropertyChanged}">
-                <ComboBoxItem Content="Camera 1"></ComboBoxItem>
-                <ComboBoxItem Content="Camera 2"></ComboBoxItem>
-            </ComboBox>
+                    <ComboBoxItem Content="Camera 1"></ComboBoxItem>
+                    <ComboBoxItem Content="Camera 2"></ComboBoxItem>
+                </ComboBox>
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Height="{Binding scrollViewerHeight}">
+                    <xceedtk:PropertyGrid  x:Name="pgr_PropertyGrid_Teach" 
+                                    SelectedObject="{Binding categoriesTeachParam, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                    Panel.ZIndex="0"
+                                    Margin="0,-50,0,0"
+                                    ShowTitle="True"
+                                    ShowSearchBox="false"
+                                    ShowSummary="True"
+                                    Background="#FF322F2E" 
+                                    Foreground="LightGray">
 
-            <xceedtk:PropertyGrid  x:Name="pgr_PropertyGrid_Teach" 
-                                SelectedObject="{Binding categoriesTeachParam, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                Panel.ZIndex="0"
-                                Margin="0,-50,0,30"
-                                ShowTitle="True"
-                                ShowSearchBox="false"
-                                ShowSummary="True"
-                                Background="#FF322F2E" 
-                                Foreground="LightGray">
 
-
-                <i:Interaction.Behaviors>
-                    <behaviors1:EventToCommandBehavior EventName="PropertyValueChanged"
-                                      Command="{Binding PropertyChangedCommand}" />
-                </i:Interaction.Behaviors>
-            </xceedtk:PropertyGrid>
-
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="30">
-                <Button Name="btn_ok" FontSize="8" Padding="0"
+                        <i:Interaction.Behaviors>
+                            <behavior:EventToCommandBehavior EventName="PropertyValueChanged"
+                                          Command="{Binding PropertyChangedCommand}" />
+                        </i:Interaction.Behaviors>
+                    </xceedtk:PropertyGrid>
+            </ScrollViewer>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="30">
+                    <Button Name="btn_ok" FontSize="8" Padding="0"
                     Background="#FF343333"
                     Height="25" 
                     HorizontalAlignment="Center"
-                    Margin="0,2,15,1"
+                    Margin="0,0,15,1"
                     ToolTip="Save"
                     Command="{Binding SaveCommand}"
                     Width="40" BorderBrush="#FF352622">
-                    <materialDesign:PackIcon Kind="UserCheck" Height="24" Width="24" Foreground="#FFFD1A12"/>
-                </Button>
-                <Button Name="btn_cancel" FontSize="8" Padding="0"
+                        <materialDesign:PackIcon Kind="UserCheck" Height="24" Width="24" Foreground="#FFFD1A12"/>
+                    </Button>
+                    <Button Name="btn_cancel" FontSize="8" Padding="0"
                     Background="#FF343333"
                     Height="25"
-                    Margin="0,2,10,1"
+                    Margin="0,0,10,1"
                     ToolTip="Cancel"
                     HorizontalAlignment="Center"
                     Command="{Binding CancelCommand}"
                     Width="40" BorderBrush="#FF352622">
-                    <materialDesign:PackIcon Kind="RemoveCircle" Height="24" Width="24" Foreground="#FFFD1A12"/>
-                </Button>
+                        <materialDesign:PackIcon Kind="RemoveCircle" Height="24" Width="24" Foreground="#FFFD1A12"/>
+                    </Button>
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
-    </Grid>
-    
-    
+
 </UserControl>

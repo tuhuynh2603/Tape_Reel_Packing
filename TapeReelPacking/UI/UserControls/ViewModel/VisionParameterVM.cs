@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Microsoft.Expression.Interactivity.Core;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls.Primitives;
+using System.Windows.Controls;
 using System.Windows.Input;
 using TapeReelPacking.Source.Algorithm;
 using TapeReelPacking.Source.Application;
@@ -14,20 +17,10 @@ using Application = TapeReelPacking.Source.Application.Application;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
-    public class VisionParameterVM : BaseVM, IParameter
+    public class VisionParameterVM :BaseVM, ICustomUserControl, IParameter
     {
 
-        private Visibility _isVisible = Visibility.Collapsed;
-
-        public Visibility isVisible
-        {
-            get => _isVisible;
-            set
-            {
-                _isVisible = value;
-                OnPropertyChanged(nameof(isVisible));
-            }
-        }
+        private DragDropUserControlVM _dragDropVM { get; set; }
 
         private int selectedPVIAreaIndex = 0;
         public int SelectedPVIAreaIndex
@@ -66,22 +59,35 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                 _categoriesVisionParam = value;
                 OnPropertyChanged(nameof(categoriesVisionParam));
             }
+
         }
-
-
         public ICommand SaveCommand { get; }
         public ICommand CancelCommand { get; }
         public ICommand PropertyChangedCommand { set; get; }
 
-
-        CategoryVisionParameterService categoryVisionParameterService { set; get; }
-        private MainWindowVM _mainWindowVM { get; set; }
-
-        public VisionParameterVM(MainWindowVM mainVM, CategoryVisionParameterService service)
+        public void RegisterUserControl()
         {
+            _dragDropVM.RegisterMoveGrid();
 
-            categoryVisionParameterService = service;
-            _mainWindowVM = mainVM;
+        }
+
+
+        CategoryVisionParameterRepository categoryVisionParameterRepository { set; get; }
+
+
+
+        ICatergoryParameterService categoryVisionParameterService { set; get; }
+
+        private DatabaseContext _databaseContext { set; get; }
+
+        public VisionParameterVM(DragDropUserControlVM dragDropVM, DatabaseContext databaseContext)
+        {
+            _dragDropVM = dragDropVM;
+            RegisterUserControl();
+
+            _databaseContext = databaseContext;
+            categoryVisionParameterRepository = new CategoryVisionParameterRepository(_databaseContext);
+            categoryVisionParameterService = new CategoryVisionParameterService(categoryVisionParameterRepository);
 
             SaveCommand = new RelayCommand<TeachParameterVM>((p) => { return true; },
                                          (p) =>
@@ -154,13 +160,13 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             string pathFile = Path.Combine(Application.pathRecipe, Application.currentRecipe, strFileName);
             IniFile ini = new IniFile(pathFile);
 
-            FileHelper.ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_AreaEnable)), ini, ref dict);
-            FileHelper.ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_lowerThreshold)), ini, ref dict);
-            FileHelper.ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_upperThreshold)), ini, ref dict);
-            FileHelper.ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_OpeningMask)), ini, ref dict);
-            FileHelper.ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_DilationMask)), ini, ref dict);
-            FileHelper.ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_ObjectCoverPercent)), ini, ref dict);
-            FileHelper.ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_DefectROILocation)), ini, ref dict);
+            FileHelper.ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_AreaEnable)), ini,  dict);
+            FileHelper.ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_lowerThreshold)), ini,  dict);
+            FileHelper.ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_upperThreshold)), ini,  dict);
+            FileHelper.ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_OpeningMask)), ini,  dict);
+            FileHelper.ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_DilationMask)), ini,  dict);
+            FileHelper.ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_ObjectCoverPercent)), ini,  dict);
+            FileHelper.ReadLine_Magnus(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_DefectROILocation)), ini,  dict);
 
             return dict;
             //}
@@ -198,9 +204,6 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             FileHelper.WriteLine(CategoryVisionParameter.CAETEGORYORDER_LABEL_DEFECT, ExceedToolkit.GetDisplayName<CategoryVisionParameter>(nameof(CategoryVisionParameter.LD_DefectROILocation)), ini, TypeConverterHelper.ConvertRectanglesToString(inspectionCore.m_SurfaceDefectParameter[nAreaIndex].m_DR_DefectROILocations));
 
         }
-
-
-
 
     }
 }

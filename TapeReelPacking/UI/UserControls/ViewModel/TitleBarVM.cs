@@ -10,7 +10,7 @@ using WindowState = System.Windows.WindowState;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
-    class TitleBarVM : BaseVM
+    public class TitleBarVM : BaseVM
     {
 
         #region ICommand
@@ -19,10 +19,10 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
         public ICommand MaximizeWindowCommand { get; set; }
         #endregion
 
-       // MainWindowVM _mainWindowVM { get; set; }
-        public TitleBarVM(/*MainWindowVM mainWindowVM*/)
+        MainWindowVM _mainWindowVM { get; set; }
+        public TitleBarVM(MainWindowVM mainWindowVM)
         {
-            //_mainWindowVM = mainWindowVM;
+            _mainWindowVM = mainWindowVM;
             InitCommand();
         }
         public static void CloseWindow(Window w)
@@ -73,7 +73,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                                                                             MainWindow.mainWindow.Close();
                                                                             //MainWindow.mainWindow = null;
                                                                             System.Windows.Application.Current.Shutdown();
-                                                                            MainWindowVM.master.applications.KillCurrentProcess();
+                                                                            _mainWindowVM.applications.KillCurrentProcess();
                                                                         }
                                                                     });
 

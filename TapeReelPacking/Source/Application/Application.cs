@@ -16,6 +16,7 @@ using TapeReelPacking.Source.Model;
 using Rectangles = TapeReelPacking.Source.Define.Rectangles;
 using TapeReelPacking.UI.UserControls.View;
 using TapeReelPacking.Source.Helper;
+using static TapeReelPacking.UI.UserControls.ViewModel.MappingSetingUCVM;
 
 namespace TapeReelPacking.Source.Application
 {
@@ -28,11 +29,11 @@ namespace TapeReelPacking.Source.Application
 
         //public static TeachParametersUC.CategoryAreaParameter categoryAreaParam = new TeachParametersUC.CategoryAreaParameter();
 
-        public static MappingSetingUCVM.CatergoryMappingParameters categoriesMappingParam = new MappingSetingUCVM.CatergoryMappingParameters();
+        //public static MappingSetingUCVM.CatergoryMappingParameters categoriesMappingParam = new MappingSetingUCVM.CatergoryMappingParameters();
 
         //public static Dictionary<string, string> dictTeachParam = new Dictionary<string, string>();
 
-        public static Dictionary<string, string> dictMappingParam = new Dictionary<string, string>();
+        //public static Dictionary<string, string> dictMappingParam = new Dictionary<string, string>();
 
         public static string pathRecipe;// = "C:\\Wisely\\C#\\TapeReelPacking\\Config";
         public static string currentRecipe;// = "Recipe1";
@@ -50,9 +51,15 @@ namespace TapeReelPacking.Source.Application
         public static int[] m_Width = { 3840, 680 };
         public static int[] m_Height = { 2748, 512 };
         static RegistryKey registerPreferences;
+
         MainWindowVM _mainWindowVM { set; get; }    
         public Application(MainWindowVM mainWindowVM)
         {
+            _mainWindowVM = mainWindowVM;
+
+            Application.CheckRegistry();
+            Application.LoadRegistry();
+
             if (!CheckMuTexProcess())
             {
                 MessageBox.Show("The other Application is running!");
@@ -61,7 +68,6 @@ namespace TapeReelPacking.Source.Application
             RegistryKey reg = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
             reg.SetValue("HD Tape And Reel Packing Vision", System.Windows.Forms.Application.ExecutablePath.ToString());
 
-            _mainWindowVM = mainWindowVM;
         }
 
         #region KILL PROCCESS
@@ -197,27 +203,6 @@ namespace TapeReelPacking.Source.Application
 
             RegistryKey registerPreferences = Registry.CurrentUser.CreateSubKey(pathRegistry + "\\Preferences", true);
             registerPreferences.SetValue("Recipe Name", currentRecipe);
-        }
-
-
-        public static void LoadMappingParamFromFile()
-        {
-            string pathFile = Path.Combine(pathRecipe, currentRecipe, "MappingParameters.cfg");
-            IniFile ini = new IniFile(pathFile);
-
-            FileHelper.ReadLine_Magnus("MAPPING", "Number Device X", ini, ref dictMappingParam);
-            FileHelper.ReadLine_Magnus("MAPPING", "Number Device Y", ini, ref dictMappingParam);
-            FileHelper.ReadLine_Magnus("MAPPING", "Number Device Per Lot", ini, ref dictMappingParam);
-
-        }
-
-        public void WriteMappingParam()
-        {
-            string pathFile = Path.Combine(pathRecipe, currentRecipe, "MappingParameters.cfg");
-            IniFile ini = new IniFile(pathFile);
-            FileHelper.WriteLine("MAPPING", "Number Device X", ini, categoriesMappingParam.M_NumberDeviceX.ToString());
-            FileHelper.WriteLine("MAPPING", "Number Device Y", ini, categoriesMappingParam.M_NumberDeviceY.ToString());
-            FileHelper.WriteLine("MAPPING", "Number Device Per Lot", ini, categoriesMappingParam.M_NumberDevicePerLot.ToString());        
         }
 
 

@@ -12,19 +12,18 @@ using TapeReelPacking.UI.UserControls.View;
 
 namespace TapeReelPacking.UI.UserControls.ViewModel
 {
-    public class RecipeManageVM:BaseVM
+
+    public class RecipeManageVM:BaseVM, ICustomUserControl
     {
 
-        private Visibility _isVisible = Visibility.Collapsed;
-        public Visibility isVisible
+        public MainWindowVM _mainWindowVM { get; set; }
+        private DragDropUserControlVM _dragDropVM { set; get; }
+        public void RegisterUserControl()
         {
-            get => _isVisible;
-            set
-            {
-                _isVisible = value;
-                OnPropertyChanged(nameof(isVisible));
-            }
+            _dragDropVM.RegisterMoveGrid();
+            _dragDropVM.RegisterResizeGrid();
         }
+
 
         private string _m_strNewRecipe = "";
         public string m_strNewRecipe{
@@ -32,12 +31,17 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
             set {
                 _m_strNewRecipe = value;
                 OnPropertyChanged(nameof(m_strNewRecipe));
-            } }
+            } 
+        }
 
         public ICommand Cmd_AddNewRecipe { get; set; }
 
-        public RecipeManageVM()
+        public RecipeManageVM(DragDropUserControlVM dragDropVM, MainWindowVM mainVM)
         {
+            _mainWindowVM = mainVM;
+            _dragDropVM = dragDropVM;
+            RegisterUserControl();
+
             Cmd_AddNewRecipe =new RelayCommand<RecipeManageVM>((p) => { return true; },
                                      (p) =>
                                      {

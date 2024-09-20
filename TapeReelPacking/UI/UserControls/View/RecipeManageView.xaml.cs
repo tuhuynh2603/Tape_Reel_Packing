@@ -15,7 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Path = System.IO.Path;
 
-namespace TapeReelPacking.UI.UserControls
+namespace TapeReelPacking.UI.UserControls.View
 {
     /// <summary>
     /// Interaction logic for RecipeManageView.xaml

@@ -10,24 +10,16 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:view="clr-namespace:TapeReelPacking.UI.UserControls.View"
         xmlns:viewmodel="clr-namespace:TapeReelPacking.UI.UserControls.ViewModel"
-        xmlns:taskmanager="clr-namespace:TapeReelPacking.UI.UserControls" 
+        xmlns:template="clr-namespace:TapeReelPacking.UI.UserControls" 
         xmlns:hardware="clr-namespace:TapeReelPacking.Source.Hardware" 
         xmlns:ribbontabitems="clr-namespace:TapeReelPacking.UI.UserControls.RibbonTabItems"
         xmlns:behaviors="clr-namespace:TapeReelPacking.Source.Behaviors"
         Height="900" Width="1600"
-        WindowState="{Binding windowState}" WindowStyle="None"
-        Title="MainWindow">
-    <!--<Window.Resources>
-        <RoutedUICommand x:Key="Routed_btn_inspect_Click"/>
-        <RoutedUICommand x:Key="Routed_Btn_load_teach_image_Click"/>
-        <RoutedUICommand x:Key="Routed_btn_Binarize_Click"/>
-        <RoutedUICommand x:Key="Routed_btn_Pixel_Ruler_Click"/>
-        <RoutedUICommand x:Key="Routed_btn_next_teach_click"/>
-        <RoutedUICommand x:Key="Routed_btn_abort_teach_Click"/>
-        <RoutedUICommand x:Key="Routed_btn_Clear_Comm_Click"/>
-        <RoutedUICommand x:Key="Routed_btn_ShowOverlay_Click"/>
-
-    </Window.Resources>-->
+        WindowState="{Binding windowState}" WindowStyle="None" 
+        AllowDrop="True"
+        Title="MainWindow"
+        MouseDown="Window_MouseDown"
+        Margin="10">
 
 
     <!--<Window.CommandBindings>
@@ -84,6 +76,13 @@
                 </Border.Background>
 
                 <Grid Grid.Row="0">
+
+                    <Grid.Resources>
+                        <DataTemplate DataType="{x:Type viewmodel:TitleBarVM}">
+                            <view:TitleBar/>
+                        </DataTemplate>
+                    </Grid.Resources>
+
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
 
@@ -213,7 +212,12 @@
                             </RibbonToggleButton>
 
                         </StackPanel>
-                        <view:TitleBar Grid.Column="1"></view:TitleBar>
+
+
+
+                        <ContentControl Content="{Binding mTitleBarVM}" Grid.Column="1"/>
+
+                        <!--<view:TitleBar Grid.Column="1" DataContext="{Binding mTitleBarVM}"/>-->
 
                     </StackPanel>
 
@@ -265,7 +269,7 @@
                                             </TextBlock.Effect>
                                         </TextBlock>
                                     </RibbonGroup.Header>
-                                    
+
                                     <RibbonButton Content="1" Width="0" Height="50"/>
 
                                     <Grid Margin="0,0,0,-30">
@@ -302,7 +306,7 @@
                                                         CheckedBackground="{StaticResource CheckedButtonStyle}"
                                                         MouseOverBackground="{StaticResource MouseOverButtonStyle}"
                                                         Width="auto">
-                                                
+
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="Unchecked">
                                                         <i:InvokeCommandAction Command="{Binding btn_Camera_Setting_UncheckedCmd}" />
@@ -338,7 +342,7 @@
                                                         MouseOverBackground="{StaticResource BgButton}"
                                                         
                                                         Width="Auto">
-                                            
+
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="Unchecked">
                                                     <i:InvokeCommandAction Command="{Binding btn_Robot_Controller_UncheckedCmd}" />
@@ -375,7 +379,7 @@
                                                         CheckedBackground="{StaticResource CheckedButtonStyle}"
                                                         MouseOverBackground="{StaticResource BgButton}" 
                                                         Width="Auto">
-                                            
+
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="Unchecked">
                                                     <i:InvokeCommandAction Command="{Binding btn_BarCodeReader_Setting_UncheckedCmd}" />
@@ -660,7 +664,6 @@
                     <RowDefinition Height="2*"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid >
-
                     <avalonDock:DockingManager x:Name="dockManager"
                                        AllowMixedOrientation="True" 
                                        GridSplitterWidth="10" 
@@ -672,7 +675,6 @@
                         <avalonDock:DockingManager.DocumentHeaderTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-
                                     <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
                                     <TextBlock Text="{Binding ContentId}" Margin="0 0 0 0" FontSize="10" FontWeight="Bold"/>
                                 </StackPanel>
@@ -683,26 +685,81 @@
             </Grid>
         </Grid>
 
-        <Grid Margin="50,200,50,50">
-            
+        <Canvas Margin="50,200,50,50">
 
-        <view:VisionParameterUC DataContext="{Binding mVisionParameterVM}"/>
-        <view:TeachParametersUC  DataContext="{Binding mTeachParameterVM}"/>
-        
-        <view:SerialCommunicationView DataContext="{Binding mSerialCommunicationVM}"/>
-        <view:PixelRuler  DataContext="{Binding mPixelRulerVM}"/>
-        <hardware:PLCCOMM DataContext="{Binding mPLCCOMMVM}"/>
-        <hardware:HiWinRobotUserControl DataContext="{Binding mHiwinRobotVM}"/>
+            <Canvas.Resources>
+                <DataTemplate DataType="{x:Type viewmodel:WarningMessageBoxVM}">
+                    <view:WarningMessageBox/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewmodel:VisionParameterVM}">
+                    <view:VisionParameterUC/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewmodel:TeachParameterVM}">
+                    <view:TeachParametersUC/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewmodel:StepDebugVM}">
+                    <view:StepDebugView/>
+                </DataTemplate>
 
-        <hardware:HIKControlCameraView DataContext="{Binding mHIKControlCameraVM}"/>
-        <view:MappingSetingUC DataContext="{Binding mMappingSettingUCVM}"/>
-        <view:StepDebugView DataContext="{Binding mStepDebugVM}" />
-        <hardware:BarCodeReaderView DataContext="{Binding mBarCodeReaderVM}"/>
-        <view:LotBarcodeDataTable DataContext="{Binding mLotBarcodeDataTableVM}"/>
-        <view:WarningMessageBox DataContext="{Binding mWarningMessageBoxVM}" />
+                <DataTemplate DataType="{x:Type viewmodel:SerialCommunicationVM}">
+                    <view:SerialCommunicationView/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewmodel:PixelRulerVM}">
+                    <view:PixelRuler/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewmodel:PLCCOMMVM}">
+                    <hardware:PLCCOMM/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewmodel:HIKRobotVM}">
+                    <hardware:HiWinRobotUserControl/>
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type viewmodel:HIKControlCameraVM}">
+                    <hardware:HIKControlCameraView/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewmodel:MappingSetingUCVM}">
+                    <view:MappingSetingUC/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewmodel:LoginUserVM}">
+                    <view:LoginUser/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewmodel:BarcodeReaderVM}">
+                    <hardware:BarCodeReaderView/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewmodel:LotBarcodeDatatableVM}">
+                    <view:LotBarcodeDataTable/>
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type viewmodel:RecipeManageVM}">
+                    <view:RecipeManageView/>
+                </DataTemplate>
+            </Canvas.Resources>
+
+            <!--<view:VisionParameterUC DataContext="{Binding mVisionParameterVM}"/>-->
+            <!--<view:TeachParametersUC  DataContext="{Binding mTeachParameterVM}"/>-->
+            <template:DragDropUserControl DataContext="{Binding mSerialCommunicationVM}" />
+            <template:DragDropUserControl  DataContext="{Binding mPixelRulerVM}"  />
+            <template:DragDropUserControl DataContext="{Binding mPLCCOMMVM}"  />
+            <template:DragDropUserControl DataContext="{Binding mHiwinRobotVM}" />
+            <template:DragDropUserControl DataContext="{Binding mHIKControlCameraVM}" />
+            <template:DragDropUserControl DataContext="{Binding mMappingSettingUCVM}" />
+            <template:DragDropUserControl DataContext="{Binding mRecipeManageVM}"/>
+            <template:DragDropUserControl DataContext="{Binding mLoginUserVM}"/>
+
+            <!--<view:StepDebugView DataContext="{Binding mStepDebugVM}" />-->
+            <template:DragDropUserControl DataContext="{Binding mBarCodeReaderVM}" />
+            <template:DragDropUserControl DataContext="{Binding mLotBarcodeDataTableVM}"  />
+            <template:DragDropUserControl DataContext="{Binding mWarningMessageBoxVM}" />
+            <template:DragDropUserControl DataContext="{Binding mVisionParameterVM}" />
+            <template:DragDropUserControl DataContext="{Binding mTeachParameterVM}"/>
+            <template:DragDropUserControl DataContext="{Binding mStepDebugVM}" />
+        </Canvas>
         
-        <view:LoginUser DataContext="{Binding mLoginUserVM}"/>
-        </Grid>
+        
+        
+        
+        
+
 
     </Grid>
 </Window>

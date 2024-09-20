@@ -508,10 +508,8 @@ namespace TapeReelPacking.Source.Application
 
             {
                 //Track _track = m_track;
-
-                if (InspectionTabVM.m_bEnableDebug)
-                    m_StepDebugInfors.Clear();
-
+                //if (InspectionTabVM.m_bEnableDebug)
+                //    m_StepDebugInfors.Clear();
                 m_ArrayOverLay.Clear();
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {
@@ -582,7 +580,7 @@ namespace TapeReelPacking.Source.Application
             PointF pCorner = new PointF();
 
 
-            int nResult = Inspect(out pCenter, out pCorner);
+            int nResult = Inspect(out pCenter, out pCorner, true);
             double dDeltaAngle = MagnusMatrix.CalculateShiftXYAngle(pCenter, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint);
             //Todo need to later after adding the calib function to calculate the transform matrix
             if (MainWindowVM.master.m_hiWinRobotInterface.m_hiWinRobotUserControl == null)
@@ -598,11 +596,11 @@ namespace TapeReelPacking.Source.Application
             return nResult;
         }
 
-        public int Inspect( out PointF pCenterOut, out PointF pCornerOut)
+        public int Inspect( out PointF pCenterOut, out PointF pCornerOut, bool IsStepDebug)
         {
             //Track _track = m_track;
 
-            if (InspectionTabVM.m_bEnableDebug)
+            if (IsStepDebug)
                 m_StepDebugInfors.Clear();
 
             m_ArrayOverLay.Clear();
@@ -615,7 +613,7 @@ namespace TapeReelPacking.Source.Application
             //double nAngleOutput = 0;
             PointF pCenter = new PointF(0, 0);
             PointF pCorner = new PointF(0, 0);
-            nResult = m_InspectionCore.Inspect(ref m_InspectionCore.m_SourceImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, m_StepDebugInfors, InspectionTabVM.m_bEnableDebug);
+            nResult = m_InspectionCore.Inspect(ref m_InspectionCore.m_SourceImage, ref m_ArrayOverLay, ref pCenter, ref pCorner, m_StepDebugInfors, IsStepDebug);
             pCenterOut = pCenter;
             pCornerOut = pCorner;
 
@@ -694,7 +692,7 @@ namespace TapeReelPacking.Source.Application
                     //    OutputLogVM.AddLineOutputLog($"  {m_nTrackID}  Inspect");
 
                     //});
-                    m_SequenceVisionResult = Inspect( out pCenter, out pCorner);
+                    m_SequenceVisionResult = Inspect( out pCenter, out pCorner, false);
                     m_Center_Vision = pCenter;
                     m_dDeltaAngleInspection = MagnusMatrix.CalculateShiftXYAngle(m_Center_Vision, pCorner, m_InspectionCore.m_DeviceLocationResult.m_dCenterDevicePoint, m_InspectionCore.m_DeviceLocationResult.m_dCornerDevicePoint);
                     m_InspectionOnlineThreadVisionResult.m_nResult = m_SequenceVisionResult;

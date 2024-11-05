@@ -130,7 +130,5 @@ namespace TapeReelPacking.UI.UserControls
             }
         }
 
-
-
     }
 }

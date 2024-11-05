@@ -1170,17 +1170,21 @@ namespace TapeReelPacking.Source.Application
             if (m_CompletedReelStatus == 1)
             {
 
-                sendLastLotDataToPID();
+                sendLotDataToPID(Application.m_strCurrentLot);
             }
         }
 
         bool m_IsPIDSentStatus = false;
-        public void sendLastLotDataToPID()
+        public void sendLotDataToPID(string strLot)
         {
             m_IsPIDSentStatus = true;
             List<VisionResultDataExcel> list_BarcodeResult = new List<VisionResultDataExcel>();
-            LotBarcodeDataTable.ReadLotResultFromExcel(Application.m_strCurrentLot, ref list_BarcodeResult);
-            string strDataSend = LotBarcodeDataTable.CombineReelIDStringSentToClient(ref list_BarcodeResult, Application.m_strCurrentLot);
+
+            LotBarcodeDataTable.ReadLotResultFromExcel(strLot, ref list_BarcodeResult);
+
+            string strDataSend = LotBarcodeDataTable.CombineReelIDStringSentToClient(ref list_BarcodeResult, strLot);
+
+
             int nError = SendAndReceiveAndCheckDataFromPID(strDataSend);
             if (nError == -1)
             {
@@ -1190,16 +1194,16 @@ namespace TapeReelPacking.Source.Application
 
             int nTotalDevice = 0;
             string strLastLot = "";
-            VisionResultData.ReadTotalLotFromExcel(Application.m_strCurrentLot, 1, ref m_nTotalCompletedLot, ref nTotalDevice, ref strLastLot);
+            VisionResultData.ReadTotalLotFromExcel(strLot, 1, ref m_nTotalCompletedLot, ref nTotalDevice, ref strLastLot);
 
-            if (strLastLot == Application.m_strCurrentLot)
+            if (strLastLot == strLot)
             {
                 m_IsPIDSentStatus = false;
                 return;
             }
 
             m_nTotalCompletedLot++;
-            VisionResultData.SaveTotalLotToExcel(Application.m_strCurrentLot, 1, m_nTotalCompletedLot, startLot_dateTime.ToString(), list_BarcodeResult.Count);
+            VisionResultData.SaveTotalLotToExcel(strLot, 1, m_nTotalCompletedLot, startLot_dateTime.ToString(), list_BarcodeResult.Count);
             m_IsPIDSentStatus = false;
         }
 
@@ -1310,6 +1314,9 @@ namespace TapeReelPacking.Source.Application
 
             SerialCommunication.m_SerialDataReceivedEvent.Reset();
             nTimeout = 0;
+
+            MainWindow.mainWindow.master.m_bNextStepSequence = (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE;
+            MainWindow.mainWindow.PopupWarningMessageBox("Waiting 'ACK' from PID...", WARNINGMESSAGE.MESSAGE_INFORMATION_ABORT);
             while (SerialCommunication.m_SerialDataReceivedEvent.WaitOne(100) == false)
             {
                 if (m_bMachineNotReadyNeedToReset)
@@ -1323,21 +1330,29 @@ namespace TapeReelPacking.Source.Application
                     return -1;
                 }
 
-                MainWindow.mainWindow.PopupWarningMessageBox("Waiting 'ACK' from PID...", WARNINGMESSAGE.MESSAGE_INFORMATION);
+                //string strString = "Waiting 'ACK' from PID... Press 'Continue' to continue waiting or 'Abort' to end sequence.";
+                //int nSelect = WaitForNextStepSequenceEvent(strString, true);
 
-                nTimeout += 100;
-                if (nTimeout >= 50000)
+                if (MainWindow.mainWindow.master.m_bNextStepSequence == (int)SEQUENCE_OPTION.SEQUENCE_ABORT)
                 {
-                    nTimeout = 0;
-
-                    string strString = "Timeout when Reading Data from PID. Press 'Continue' to resend or 'Abort' to end sequence.";
-                    int nSelect = WaitForNextStepSequenceEvent(strString, true);
-
-                    if (nSelect == (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE)
-                        goto SendDataToClient;
-                    else
-                        return -1;
+                    return -1;
                 }
+
+
+
+                //nTimeout += 100;
+                //if (nTimeout >= 50000)
+                //{
+                //    nTimeout = 0;
+
+                //    string strString = "Timeout when Reading Data from PID. Press 'Continue' to resend or 'Abort' to end sequence.";
+                //    int nSelect = WaitForNextStepSequenceEvent(strString, true);
+
+                //    if (nSelect == (int)SEQUENCE_OPTION.SEQUENCE_IMIDIATE_BUTTON_CONTINUE)
+                //        goto SendDataToClient;
+                //    else
+                //        return -1;
+                //}
             }
             MainWindow.mainWindow.PopupWarningMessageBox("Waiting 'ACK' from PID...", WARNINGMESSAGE.MESSAGE_INFORMATION, false);
 
@@ -1346,7 +1361,7 @@ namespace TapeReelPacking.Source.Application
 
             if (strReceived_ACK.Contains("ACK") == false)
             {
-                string strString = "Received ACK_Error From Client. End Sequence. Please Check the PID machine then open Serial Communication Dialog to manually send lot data to PID.";
+                string strString = "Received ACK_Error From Client. End Sequence. Please Check the PID machine then open Barcode Dialog to manually send lot data to PID.";
                 WaitForNextStepSequenceEvent(strString, true);
                 System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
                 {

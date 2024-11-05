@@ -52,7 +52,6 @@ C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Debug\TapeReelPacking.g.r
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Debug\TapeReelPacking.Properties.Resources.resources
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Debug\TapeReelPacking.csproj.GenerateResource.cache
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Debug\TapeReelPacking.csproj.CoreCompileInputs.cache
-C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Debug\TapeReelPacking.csproj.CopyComplete
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Debug\TapeReelPacking.exe
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Debug\TapeReelPacking.pdb
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Debug\TapeReelPacking.csproj.AssemblyReference.cache
@@ -60,3 +59,4 @@ C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Debug\UI\UserControls\Lot
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Debug\UI\UserControls\View\SerialCommunicationView.g.cs
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Debug\UI\UserControls\LotBarcodeDataTable.baml
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Debug\UI\UserControls\View\SerialCommunicationView.baml
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\x64\Debug\TapeReelPacking.csproj.CopyComplete

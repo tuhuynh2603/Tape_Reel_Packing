@@ -156,15 +156,60 @@ namespace TapeReelPacking.UI.UserControls
             lvLotBarCodeData.ItemsSource = m_ListLotBarcodeDataTable;
         }
 
+
+        private System.Threading.Thread threadSendLotData;
+
         private void btn_Send_To_Server_Click(object sender, RoutedEventArgs e)
         {
+            
             List<VisionResultDataExcel> list_DeviceID = new List<VisionResultDataExcel>();
             if (m_ListLotBarcodeDataTable.Count() == 0)
                 return;
 
             object selectLot = ccb_LotSelected_ComboBox.SelectedItem;
-            string strWriteData = CombineReelIDStringSentToClient(ref m_ListLotBarcodeDataTable, selectLot.ToString());
-            ViewModel.SerialCommunicationVM.WriteSerialCom(strWriteData);
+            //string strWriteData = CombineReelIDStringSentToClient(ref m_ListLotBarcodeDataTable, selectLot.ToString());
+
+
+            if (threadSendLotData == null)
+            {
+                threadSendLotData = new System.Threading.Thread(new System.Threading.ThreadStart(() =>
+                {
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        btn_Send_To_Server.IsEnabled = false;
+                    });
+                    MainWindow.mainWindow.master.sendLotDataToPID(selectLot.ToString().Replace(".xlsx", ""));
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        btn_Send_To_Server.IsEnabled = true;
+                    });
+                }
+                ));
+                threadSendLotData.Start();
+                return;
+            }
+            else if (!threadSendLotData.IsAlive)
+            {
+                threadSendLotData = new System.Threading.Thread(new System.Threading.ThreadStart(() =>
+                {
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        btn_Send_To_Server.IsEnabled = false;
+                    });
+                    MainWindow.mainWindow.master.sendLotDataToPID(selectLot.ToString().Replace(".xlsx", ""));
+
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        btn_Send_To_Server.IsEnabled = true;
+                    });
+                }
+                ));
+                threadSendLotData.Start();
+                return;
+            }
+
+
+           // ViewModel.SerialCommunicationVM.WriteSerialCom(strWriteData);
             
         }
 

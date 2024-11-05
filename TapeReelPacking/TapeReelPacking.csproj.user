@@ -16,7 +16,7 @@
     <RemoteDebugEnabled>false</RemoteDebugEnabled>
     <RemoteDebugMachine>localhost:4024</RemoteDebugMachine>
     <AuthenticationMode>None</AuthenticationMode>
-    <StartWorkingDirectory>C:\Wisely\C#\Debug\</StartWorkingDirectory>
+    <StartWorkingDirectory>C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\bin\x64\Debug</StartWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
@@ -27,6 +27,6 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <RemoteDebugMachine>DESKTOP-J62N07U:4024</RemoteDebugMachine>
     <AuthenticationMode>None</AuthenticationMode>
-    <StartWorkingDirectory>C:\Wisely\C#\Release\</StartWorkingDirectory>
+    <StartWorkingDirectory>C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\bin\x64\Release</StartWorkingDirectory>
   </PropertyGroup>
 </Project>

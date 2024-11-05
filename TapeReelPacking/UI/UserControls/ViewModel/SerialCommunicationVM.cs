@@ -174,7 +174,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                                                  threadSendLotData = new System.Threading.Thread(new System.Threading.ThreadStart(() => 
                                                  {
                                                      bSendLotEnable = false;
-                                                     MainWindow.mainWindow.master.sendLastLotDataToPID();
+                                                     MainWindow.mainWindow.master.sendLotDataToPID(Application.m_strCurrentLot);
                                                      bSendLotEnable = true;
                                                  }
                                                  ));
@@ -186,7 +186,7 @@ namespace TapeReelPacking.UI.UserControls.ViewModel
                                                  threadSendLotData = new System.Threading.Thread(new System.Threading.ThreadStart(() => 
                                                  {
                                                      bSendLotEnable = false;
-                                                     MainWindow.mainWindow.master.sendLastLotDataToPID();
+                                                     MainWindow.mainWindow.master.sendLotDataToPID(Application.m_strCurrentLot);
                                                      bSendLotEnable = true;
                                                  }
                                                  ));

@@ -69,7 +69,8 @@ namespace TapeReelPacking.Source.Define
         MESSAGE_EMERGENCY,
         MESSAGE_IMIDIATESTOP,
         MESSAGE_STEPDEBUG,
-        MESSAGE_INFORMATION
+        MESSAGE_INFORMATION,
+        MESSAGE_INFORMATION_ABORT
     }
 
     public enum DIRECTION : int

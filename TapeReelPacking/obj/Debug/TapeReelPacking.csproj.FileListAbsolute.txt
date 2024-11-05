@@ -116,3 +116,15 @@ C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\Debug\TapeReelPacking.csproj.
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\Debug\TapeReelPacking.csproj.CopyComplete
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\Debug\TapeReelPacking.exe
 C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\Debug\TapeReelPacking.pdb
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\bin\x64\Debug\Microsoft.Expression.Controls.dll
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\bin\x64\Debug\Microsoft.Expression.Drawing.dll
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\bin\x64\Debug\Microsoft.Expression.Effects.dll
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\bin\x64\Debug\Microsoft.Expression.Interactions.dll
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\bin\x64\Debug\Microsoft.Expression.Prototyping.Interactivity.dll
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\bin\x64\Debug\Microsoft.Expression.Prototyping.SketchControls.dll
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\bin\x64\Debug\Microsoft.SDK.Expression.Blend.dll
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\bin\x64\Debug\System.Windows.Interactivity.dll
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\Debug\UI\UserControls\LotBarcodeDataTable.g.cs
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\Debug\UI\UserControls\View\SerialCommunicationView.g.cs
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\Debug\UI\UserControls\LotBarcodeDataTable.baml
+C:\Wisely\C#\Tape_Reel_Packing\TapeReelPacking\obj\Debug\UI\UserControls\View\SerialCommunicationView.baml

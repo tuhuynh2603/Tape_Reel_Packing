@@ -121,6 +121,15 @@ namespace TapeReelPacking.UI.UserControls
 
                     break;
 
+                case WARNINGMESSAGE.MESSAGE_INFORMATION_ABORT:
+                    //txtWarningMessage.Text = $"[{strDateTime}]:  Emergency Button Clicked!";
+
+                    btn_Sequence_Abort.IsEnabled = true;
+                    btn_Sequence_Abort.Visibility = Visibility.Visible
+                        ;
+                    break;
+
+
 
             }
 

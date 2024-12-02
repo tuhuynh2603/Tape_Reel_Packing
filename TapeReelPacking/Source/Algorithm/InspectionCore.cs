@@ -54,7 +54,7 @@ namespace TapeReelPacking.Source.Algorithm
             public/* static*/ int m_L_StepTemplate = 4;
             public/* static*/ double m_L_ScaleImageRatio = 0.1;
             public/* static*/ double m_L_MinScore = 50.0;
-            public/* static*/ int m_L_CornerIndex = 0;
+            public/* static*/ ROI_POSITION m_L_CornerIndex = ROI_POSITION.CENTER;
 
 
             public int m_DR_NumberROILocation = 1;
@@ -1067,15 +1067,19 @@ namespace TapeReelPacking.Source.Algorithm
             if (bIsChipFound)
             {
                 nErrorTemp = -(int)ERROR_CODE.PASS;
-                int[] nResult = new int[m_DeviceLocationParameter.m_DR_NumberROILocation];
-                for (int nPVIAreaIndex = 0; nPVIAreaIndex < m_DeviceLocationParameter.m_DR_NumberROILocation; nPVIAreaIndex++)
+
+                if (!Master.isByPassVisionInspection)
                 {
-                    nResult[nPVIAreaIndex] = 0;
-                    LabelMarking_Inspection(zoomedInImage, nPVIAreaIndex, p_CenterPoint_Temp, p_CornerPoint_Temp, ref nResult[nPVIAreaIndex], ref list_arrayOverlay, ref debugInfors, bEnableDebug);
-                    if (nResult[nPVIAreaIndex] < 0)
+                    int[] nResult = new int[m_DeviceLocationParameter.m_DR_NumberROILocation];
+                    for (int nPVIAreaIndex = 0; nPVIAreaIndex < m_DeviceLocationParameter.m_DR_NumberROILocation; nPVIAreaIndex++)
                     {
-                        nErrorTemp = nResult[nPVIAreaIndex];
-                        break;
+                        nResult[nPVIAreaIndex] = 0;
+                        LabelMarking_Inspection(zoomedInImage, nPVIAreaIndex, p_CenterPoint_Temp, p_CornerPoint_Temp, ref nResult[nPVIAreaIndex], ref list_arrayOverlay, ref debugInfors, bEnableDebug);
+                        if (nResult[nPVIAreaIndex] < 0)
+                        {
+                            nErrorTemp = nResult[nPVIAreaIndex];
+                            break;
+                        }
                     }
                 }
 

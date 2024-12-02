@@ -37,6 +37,21 @@ namespace TapeReelPacking.Source.Hardware
             InitializeComponent();
             combo_BarcodeBrank.Items.Add("1");
             combo_BarcodeBrank.Items.Add("2");
+            combo_BarcodeBrank.Items.Add("3");
+
+            combo_BarcodeBrank.Items.Add("4");
+
+            combo_BarcodeBrank.Items.Add("5");
+
+            combo_BarcodeBrank.Items.Add("6");
+
+            combo_BarcodeBrank.Items.Add("7");
+
+            combo_BarcodeBrank.Items.Add("8");
+
+            combo_BarcodeBrank.Items.Add("9");
+
+
             //combo_BarcodeBrank.SelectedItem = MainWindow.mainWindow.master.m_BarcodeReader.barcodeSetting.brankID;
             //combo_commandSendToBarCode.Items.Add("LOFF");
 

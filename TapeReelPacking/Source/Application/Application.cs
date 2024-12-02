@@ -689,6 +689,19 @@ namespace TapeReelPacking.Source.Application
                         //info.SetValue(local_Category, value);
                     }
 
+                    else if (type.Name == "ROI_POSITION")
+                    {
+                        ROI_POSITION value;
+                        bool success = Enum.TryParse(dictParam.Values.ElementAt(i), out value);
+                        if (success == false)
+                            value = (ROI_POSITION)info.GetCustomAttribute<DefaultValueAttribute>().Value;
+                        info.SetValue(application_Category, value);
+                        //info.SetValue(local_Category, value);
+                    }
+
+                    
+
+
                     else if (type.Name == "Double")
                     {
                         double value = 0.0;

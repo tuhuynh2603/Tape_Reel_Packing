@@ -345,6 +345,15 @@
     <PackageReference Include="Emgu.CV">
       <Version>4.1.0.3408</Version>
     </PackageReference>
+    <PackageReference Include="Emgu.CV.Bitmap">
+      <Version>4.9.0.5494</Version>
+    </PackageReference>
+    <PackageReference Include="Emgu.CV.runtime.windows">
+      <Version>4.9.0.5494</Version>
+    </PackageReference>
+    <PackageReference Include="Emgu.CV.UI">
+      <Version>4.9.0.5494</Version>
+    </PackageReference>
     <PackageReference Include="EPPlus">
       <Version>7.0.1</Version>
     </PackageReference>

@@ -64,6 +64,16 @@ namespace TapeReelPacking.Source.Define
         A4,
         A5,
     }
+
+    public enum ROI_POSITION : int
+    {
+        TOP_LEFT,
+        TOP_RIGHT,
+        BOTTOM_RIGHT,
+        BOTTOM_LEFT,
+        CENTER
+    }
+
     public enum WARNINGMESSAGE : int
     {
         MESSAGE_EMERGENCY,

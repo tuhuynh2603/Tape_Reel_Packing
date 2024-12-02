@@ -1975,6 +1975,7 @@ namespace TapeReelPacking.Source.Application
         }
 
         int m_nWaitEventInspectionOnlineThreadStatus = 0;
+
         public int func_CameraTriggerThread(int nCurrentSequenceStep = -1, int nTrack = 0)
         {
             //int nError;
@@ -2030,6 +2031,8 @@ namespace TapeReelPacking.Source.Application
         }
 
         public bool m_bBarcodeReaderSequenceStatus = false;
+
+        public static bool isByPassVisionInspection = true; // ByPass
         void func_BarcodeReaderSequence()
         {
 
@@ -2155,62 +2158,72 @@ namespace TapeReelPacking.Source.Application
 
 
                 LogMessage.LogMessage.WriteToDebugViewer(7 + 1, $"Get barcode  Device {m_Tracks[1].m_CurrentSequenceDeviceID} ");
-                string strFullPathImageOut;
-                string strBarcodeResult = m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut, nDeviceID, Application.m_strCurrentLot);
-                LogMessage.LogMessage.WriteToDebugViewer(7 + 1, "Get barcode Done ");
-
-
-                LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Waiting for vision done....  Device {m_Tracks[1].m_CurrentSequenceDeviceID} ");
-                System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                {
-
-                    m_Tracks[1].m_InspectionCore.LoadImageToInspection(m_Tracks[1].m_imageViews[0].btmSource);
-
-                });
-
+                string strFullPathImageOut = "";
                 System.Drawing.PointF pCenter = new System.Drawing.PointF(0, 0);
                 System.Drawing.PointF pCorner = new System.Drawing.PointF(0, 0);
-                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = m_Tracks[1].Inspect(ref mainWindow.master.m_Tracks[1], out pCenter, out pCorner);
+                string strBarcodeResult;
 
-
-                if (strBarcodeResult.Contains("Dummy") || strBarcodeResult.Length < 1)
+                if(isByPassVisionInspection)
                 {
-                    m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = -(int)ERROR_CODE.LABEL_FAIL;
+                    strBarcodeResult = $"008000000D000DM{m_Tracks[1].m_CurrentSequenceDeviceID}";
+                    m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = -(int)ERROR_CODE.PASS;
+                }          
+                else{
+                    strBarcodeResult = m_BarcodeReader.GetBarCodeStringAndImage(out strFullPathImageOut, nDeviceID, Application.m_strCurrentLot);
+                    LogMessage.LogMessage.WriteToDebugViewer(7 + 1, "Get barcode Done ");
+
+
+                    LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Waiting for vision done....  Device {m_Tracks[1].m_CurrentSequenceDeviceID} ");
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+
+                        m_Tracks[1].m_InspectionCore.LoadImageToInspection(m_Tracks[1].m_imageViews[0].btmSource);
+
+                    });
+
+
+                    m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = m_Tracks[1].Inspect(ref mainWindow.master.m_Tracks[1], out pCenter, out pCorner);
+
+                    if (strBarcodeResult.Contains("Dummy") || strBarcodeResult.Length < 1)
+                    {
+                        m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = -(int)ERROR_CODE.LABEL_FAIL;
+                    }
+
+                    m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nDeviceIndexOnReel = nDeviceID;
+                    m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strDeviceID = strBarcodeResult;
+                    m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath = strFullPathImageOut;
+                    string strDateTime = string.Format("{0}:{1}:{2}_{3}:{4}:{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
+                    m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strDatetime = strDateTime;
+                    //if (m_EmergencyStatus == 1)
+                    //{
+                    //    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                    //    {
+                    //        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Reader Sequence Ended!", (int)ERROR_CODE.LABEL_FAIL);
+
+                    //    });
+                    //    continue;
+
+                    //}
+
+                    LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Vision Done!  Device {m_Tracks[1].m_CurrentSequenceDeviceID}");
+                    if (nDeviceID > 0)
+                        if (m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strDeviceID == m_Tracks[1].m_VisionResultDatas[nDeviceID - 1].m_strDeviceID
+                            && m_Tracks[1].m_VisionResultDatas[nDeviceID - 1].m_nResult == m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult)
+                        {
+                            m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = -(int)ERROR_CODE.PROCESS_ERROR;
+                            string strFullPathImageOutTemp = m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath;
+                            string strFailImage = strFullPathImageOutTemp.Replace("PASS IMAGE", "FAIL IMAGE");
+                            if (File.Exists(strFullPathImageOutTemp) && !File.Exists(strFailImage))
+                                File.Move(strFullPathImageOutTemp, strFailImage);
+                            m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath = strFailImage;
+                            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Barcode Reader: Scanned same device. Result FAILED!  Device {m_Tracks[1].m_CurrentSequenceDeviceID}", (int)ERROR_CODE.LABEL_FAIL);
+
+                            });
+                        }
                 }
 
-                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nDeviceIndexOnReel = nDeviceID;
-                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strDeviceID = strBarcodeResult;
-                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath = strFullPathImageOut;
-                string strDateTime = string.Format("{0}:{1}:{2}_{3}:{4}:{5}", DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"), DateTime.Now.ToString("dd"), DateTime.Now.ToString("HH"), DateTime.Now.ToString("mm"), DateTime.Now.ToString("ss"));
-                m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strDatetime = strDateTime;
-                //if (m_EmergencyStatus == 1)
-                //{
-                //    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                //    {
-                //        ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog("Barcode Reader Sequence Ended!", (int)ERROR_CODE.LABEL_FAIL);
-
-                //    });
-                //    continue;
-
-                //}
-
-                LogMessage.LogMessage.WriteToDebugViewer(8, $"Barcode Reader: Vision Done!  Device {m_Tracks[1].m_CurrentSequenceDeviceID}");
-                if (nDeviceID > 0)
-                    if (m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strDeviceID == m_Tracks[1].m_VisionResultDatas[nDeviceID - 1].m_strDeviceID
-                        && m_Tracks[1].m_VisionResultDatas[nDeviceID - 1].m_nResult == m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult)
-                    {
-                        m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult = -(int)ERROR_CODE.PROCESS_ERROR;
-                        string strFullPathImageOutTemp = m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath;
-                        string strFailImage = strFullPathImageOutTemp.Replace("PASS IMAGE", "FAIL IMAGE");
-                        if (File.Exists(strFullPathImageOutTemp) && !File.Exists(strFailImage))
-                            File.Move(strFullPathImageOutTemp, strFailImage);
-                        m_Tracks[1].m_VisionResultDatas[nDeviceID].m_strFullImagePath = strFailImage;
-                        System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
-                        {
-                            ((MainWindow)System.Windows.Application.Current.MainWindow).AddLineOutputLog($"Barcode Reader: Scanned same device. Result FAILED!  Device {m_Tracks[1].m_CurrentSequenceDeviceID}", (int)ERROR_CODE.LABEL_FAIL);
-
-                        });
-                    }
 
                 bool bFailSendToPLC = false;
                 if (m_Tracks[1].m_VisionResultDatas[nDeviceID].m_nResult != -(int)ERROR_CODE.PASS)

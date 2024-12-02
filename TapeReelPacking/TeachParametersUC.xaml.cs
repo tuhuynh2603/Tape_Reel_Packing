@@ -329,14 +329,14 @@ namespace TapeReelPacking
             public double L_MinScore { get; set; }
 
 
-            [Browsable(false)]
+            [Browsable(true)]
             [Category("LOCATION")]
             [DisplayName("Corner Index")]
             [Range(0, 3)]
             [DefaultValue(0)]
             [Description("")]
             [PropertyOrder(16)]
-            public int L_CornerIndex { get; set; }
+            public ROI_POSITION L_CornerIndex { get; set; }
 
             #endregion
 

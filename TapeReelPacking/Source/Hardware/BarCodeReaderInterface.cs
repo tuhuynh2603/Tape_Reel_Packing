@@ -148,15 +148,23 @@ namespace TapeReelPacking.Source.Hardware
 
 
 			string resp = m_reader.ExecCommand($"LON,0{barcodeSetting.brankID}");
-			if (resp.Length > 0)
-			{
-				strDeviceID = resp.Replace("\r", "");
-				strDeviceID = strDeviceID.Replace(":", "");
-				strDeviceID = strDeviceID.Replace("-", "");
+			//if (resp.Length < 1)
+			//{
+   //             LogMessage.WriteToDebugViewer(3, $"Failed. Retry with next bank {barcodeSetting.brankID}: ");
 
-			}
+   //             resp = m_reader.ExecCommand($"LON,0{barcodeSetting.brankID + 2}");
+                
+   //         }
 
-			LogMessage.WriteToDebugViewer(3, "Message responsed from Barcode Bank 1: " + strDeviceID);
+            if (resp.Length > 0)
+            {
+                strDeviceID = resp.Replace("\r", "");
+                strDeviceID = strDeviceID.Replace(":", "");
+                strDeviceID = strDeviceID.Replace("-", "");
+
+            }
+
+            LogMessage.WriteToDebugViewer(3, "Message responsed from Barcode Bank 1: " + strDeviceID);
 			//string resp2 = m_reader.ExecCommand("LON,02");
 			//if (resp2.Length > 0)
 			//{
@@ -182,7 +190,7 @@ namespace TapeReelPacking.Source.Hardware
 
                 m_liveviewForm.DownloadRecentImage(strImageFullName);
 
-				MainWindow.mainWindow.master.m_Tracks[1].m_imageViews[0].UpdateNewImageMono(strImageFullName);
+                MainWindow.mainWindow.master.m_Tracks[1].m_imageViews[0].UpdateNewImageMono(strImageFullName);
 			});
 			//if (strDeviceID.Length < 1)
 			//{
